@@ -1,0 +1,377 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{ac0e09cb-567c-4b5a-89f5-e9a3bd54ac83}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{6084b504-b201-4eb6-a4d8-19e4a5764503}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C3IFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C3I\CParamInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C3I\CParamInfoRT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFormula.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractdatacenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractinformation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractnet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractparam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractstation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstracttask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="abstracttimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\buffer\buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\channelselectconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="datacenterinstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="datacentertest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showtype\dataresultstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showtype\dateresultstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\historyparam\historyparam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\historyparambuffer\historyparambuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main\src\infoprocthread\infoprocthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="informationinstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\netbuffer\netbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="netcomponents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\netconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="netinstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main\src\network\network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showtype\numericalvalueresultstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main\src\parameter\parameter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main\src\recvinfothread\recvinfothread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\stationconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stationinstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="taskinstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\thread\thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showtype\timeresultstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="timerinstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\xattribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\xdocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\config\xelement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\xmlproc\xmlproc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\zxparam\zxparam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selfshare\src\zxparambuffer\zxparambuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_abstractdatacenter.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_abstractdatacenter.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_abstractinformation.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_abstractinformation.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_abstractnet.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_abstractnet.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_abstractstation.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_abstractstation.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_abstracttask.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_abstracttask.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_abstracttimer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_abstracttimer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_informationinstance.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_informationinstance.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_taskinstance.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_taskinstance.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="PDXPFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C3IFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3I\CParamInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3I\CParamInfoRT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFormula.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\OS_Def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="abstractdatacenter.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="abstractinformation.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="abstractnet.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="abstractparam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="abstractstation.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="abstracttask.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="abstracttimer.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="selfshare\src\baseobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\buffer\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\channelselectconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\const.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="datacenterinstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="datacentertest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="showtype\dataresultstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\datastruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="showtype\dateresultstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\historyparam\historyparam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\historyparambuffer\historyparambuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main\src\infoprocthread\infoprocthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="informationinstance.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="..\..\..\..\include\net\netDepends">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="net_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\netbuffer\netbuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="netcomponents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\netconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="netinstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main\src\network\network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="showtype\numericalvalueresultstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main\src\parameter\parameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main\src\recvinfothread\recvinfothread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\stationconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stationinstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3I\stru.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="taskinstance.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="selfshare\src\thread\thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="showtype\timeresultstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timerinstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\xattribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\xdocument.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\config\xelement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\xmlproc\xmlproc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\zxparam\zxparam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selfshare\src\zxparambuffer\zxparambuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PDXPFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\net\net_resource.rc" />
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\net\netd_resource.rc" />
+  </ItemGroup>
+</Project>

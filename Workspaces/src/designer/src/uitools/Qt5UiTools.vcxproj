@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{49EFCC63-5B48-3E4D-BEC4-DCE510B3BFD0}</ProjectGuid>
+    <RootNamespace>Qt5UiTools</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <PlatformToolSet>v140</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\lib\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <IntermediateDirectory>.obj\debug\</IntermediateDirectory>
+    <PrimaryOutput>Qt5UiToolsd</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PlatformToolSet>v140</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\lib\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <IntermediateDirectory>.obj\release\</IntermediateDirectory>
+    <PrimaryOutput>Qt5UiTools</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\lib</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Qt5UiToolsd</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Qt5UiTools</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\..\include;..\..\..\..\include\QtUiTools;..\..\..\..\include\QtUiTools\5.3.1;..\..\..\..\include\QtUiTools\5.3.1\QtUiTools;tmp;..\lib\uilib;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>.obj\debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <ForcedIncludeFiles>..\..\..\..\include\QtUiTools\QtUiToolsDepends;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)\Qt5UiToolsd.pch</PrecompiledHeaderOutputFile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_BUILD_UITOOLS_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QFORMINTERNAL_NAMESPACE;QT_DESIGNER_STATIC;QT_DESIGNER;QT_NO_EXCEPTIONS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\Qt5UiToolsd.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_BUILD_UITOOLS_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QFORMINTERNAL_NAMESPACE;QT_DESIGNER_STATIC;QT_DESIGNER;QT_NO_EXCEPTIONS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\..\include;..\..\..\..\include\QtUiTools;..\..\..\..\include\QtUiTools\5.3.1;..\..\..\..\include\QtUiTools\5.3.1\QtUiTools;tmp;..\lib\uilib;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>.obj\release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <ForcedIncludeFiles>..\..\..\..\include\QtUiTools\QtUiToolsDepends;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>..\..\..\..\include\QtUiTools\QtUiToolsDepends</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)\Qt5UiTools.pch</PrecompiledHeaderOutputFile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_BUILD_UITOOLS_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QFORMINTERNAL_NAMESPACE;QT_DESIGNER_STATIC;QT_DESIGNER;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\Qt5UiTools.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_BUILD_UITOOLS_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QFORMINTERNAL_NAMESPACE;QT_DESIGNER_STATIC;QT_DESIGNER;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\uilib\abstractformbuilder.cpp" />
+    <ClCompile Include="..\lib\uilib\formbuilder.cpp" />
+    <ClCompile Include="..\lib\uilib\formbuilderextra.cpp" />
+    <ClCompile Include="..\lib\uilib\properties.cpp" />
+    <ClCompile Include=".moc\Debug\moc_properties_p.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\Debug\moc_quiloader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_properties_p.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\Release\moc_quiloader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="quiloader.cpp" />
+    <ClCompile Include="..\lib\uilib\resourcebuilder.cpp" />
+    <ClCompile Include="..\lib\uilib\textbuilder.cpp" />
+    <ClCompile Include="..\lib\uilib\ui4.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\QtUiTools\QtUiToolsDepends" />
+    <ClInclude Include="..\lib\uilib\abstractformbuilder.h" />
+    <ClInclude Include="..\lib\uilib\container.h" />
+    <ClInclude Include="..\lib\uilib\customwidget.h" />
+    <ClInclude Include="..\lib\uilib\formbuilder.h" />
+    <ClInclude Include="..\lib\uilib\formbuilderextra_p.h" />
+    <CustomBuild Include="..\lib\uilib\properties_p.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_UITOOLS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQFORMINTERNAL_NAMESPACE -DQT_DESIGNER_STATIC -DQT_DESIGNER -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\QtUiTools" "-I.\..\..\..\..\include\QtUiTools\5.3.1" "-I.\..\..\..\..\include\QtUiTools\5.3.1\QtUiTools" "-I.\tmp" "-I.\..\lib\uilib" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtWidgets" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtGui" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtANGLE" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing properties_p.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/QtUiTools/QtUiToolsDepends" "-f../../../lib/uilib/properties_p.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_UITOOLS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQFORMINTERNAL_NAMESPACE -DQT_DESIGNER_STATIC -DQT_DESIGNER -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DNDEBUG "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\QtUiTools" "-I.\..\..\..\..\include\QtUiTools\5.3.1" "-I.\..\..\..\..\include\QtUiTools\5.3.1\QtUiTools" "-I.\tmp" "-I.\..\lib\uilib" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtWidgets" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtGui" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtANGLE" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing properties_p.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="quiloader.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_UITOOLS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQFORMINTERNAL_NAMESPACE -DQT_DESIGNER_STATIC -DQT_DESIGNER -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\QtUiTools" "-I.\..\..\..\..\include\QtUiTools\5.3.1" "-I.\..\..\..\..\include\QtUiTools\5.3.1\QtUiTools" "-I.\tmp" "-I.\..\lib\uilib" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtWidgets" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtGui" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtANGLE" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing quiloader.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/QtUiTools/QtUiToolsDepends" "-f../../quiloader.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_UITOOLS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQFORMINTERNAL_NAMESPACE -DQT_DESIGNER_STATIC -DQT_DESIGNER -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DNDEBUG "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\QtUiTools" "-I.\..\..\..\..\include\QtUiTools\5.3.1" "-I.\..\..\..\..\include\QtUiTools\5.3.1\QtUiTools" "-I.\tmp" "-I.\..\lib\uilib" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtWidgets" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtGui" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtANGLE" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing quiloader.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="..\lib\uilib\resourcebuilder_p.h" />
+    <ClInclude Include="..\lib\uilib\textbuilder_p.h" />
+    <ClInclude Include="..\lib\uilib\ui4_p.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include=".moc\debug\quiloader.moc">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">quiloader.cpp;$(QTDIR)\bin\moc.exe;.\quiloader.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+"$(QTDIR)\bin\moc.exe"  "quiloader.cpp" -o ".moc\debug\%(Filename).moc"   -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_UITOOLS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQFORMINTERNAL_NAMESPACE -DQT_DESIGNER_STATIC -DQT_DESIGNER -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\QtUiTools" "-I.\..\..\..\..\include\QtUiTools\5.3.1" "-I.\..\..\..\..\include\QtUiTools\5.3.1\QtUiTools" "-I.\tmp" "-I.\..\lib\uilib" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtWidgets" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtGui" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtANGLE" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing quiloader.cpp...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\quiloader.moc;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include=".moc\release\quiloader.moc">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">quiloader.cpp;$(QTDIR)\bin\moc.exe;.\quiloader.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+"$(QTDIR)\bin\moc.exe"  "quiloader.cpp" -o ".\.moc\$(ConfigurationName)\%(Filename).moc"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_UITOOLS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQFORMINTERNAL_NAMESPACE -DQT_DESIGNER_STATIC -DQT_DESIGNER -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DNDEBUG  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\QtUiTools" "-I.\..\..\..\..\include\QtUiTools\5.3.1" "-I.\..\..\..\..\include\QtUiTools\5.3.1\QtUiTools" "-I.\tmp" "-I.\..\lib\uilib" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtWidgets" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtGui" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtANGLE" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing quiloader.cpp...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\quiloader.moc;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="Qt5.5.0-msvc2015" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/singleState.png</file>
+    </qresource>
+</RCC>

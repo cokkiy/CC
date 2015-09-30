@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EE7451F9-209D-37BF-9F58-E17A47397E18}</ProjectGuid>
+    <RootNamespace>q2wmapplugin</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;" Label="Configuration">
+    <PlatformToolSet>v140</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\..\plugins\designer\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <IntermediateDirectory>.obj\debug\</IntermediateDirectory>
+    <PrimaryOutput>q2wmapplugind</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;" Label="Configuration">
+    <PlatformToolSet>v140</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\..\plugins\designer\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <IntermediateDirectory>.obj\release\</IntermediateDirectory>
+    <PrimaryOutput>q2wmapplugin</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">..\..\..\..\..\plugins\designer\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">.obj\debug\</IntDir>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">q2wmapplugind</TargetName>
+    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</IgnoreImportLibrary>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">..\..\..\..\..\plugins\designer\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">.obj\release\</IntDir>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">q2wmapplugin</TargetName>
+    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerBase;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtPrintSupport;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>.obj\debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>.obj\debug\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_PLUGIN;QT_DESIGNER_LIB;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/netd.lib;D:\CodeStores\Workspaces\lib\Qt5DesignerBased.lib;$(QTDIR)\lib\Qt5PrintSupportd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkDLL>true</LinkDLL>
+      <OutputFile>$(OutDir)\q2wmapplugind.dll</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_PLUGIN;QT_DESIGNER_LIB;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerBase;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtPrintSupport;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>.obj\release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>.obj\release\</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_PLUGIN;QT_DESIGNER_LIB;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName></ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:\CodeStores\Workspaces\lib\net531.lib;D:\CodeStores\Workspaces\lib\Qt5DesignerBase.lib;$(QTDIR)\lib\Qt5PrintSupport.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkDLL>true</LinkDLL>
+      <LinkIncremental>false</LinkIncremental>
+      <OutputFile>$(OutDir)\q2wmapplugin.dll</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_PLUGIN;QT_DESIGNER_LIB;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="q2wmap.cpp" />
+    <ClCompile Include="q2wmapPrivate.cpp" />
+    <ClCompile Include="q2wmapplugin.cpp" />
+    <ClCompile Include="qcustomplot.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="q2wmap.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">q2wmap.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore q2wmap.h -o .moc\debug\moc_q2wmap.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC q2wmap.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">.moc\debug\moc_q2wmap.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">q2wmap.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore q2wmap.h -o .moc\release\moc_q2wmap.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC q2wmap.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">.moc\release\moc_q2wmap.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="q2wmapPrivate.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">q2wmapPrivate.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore q2wmapPrivate.h -o .moc\debug\moc_q2wmapPrivate.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC q2wmapPrivate.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">.moc\debug\moc_q2wmapPrivate.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">q2wmapPrivate.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore q2wmapPrivate.h -o .moc\release\moc_q2wmapPrivate.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC q2wmapPrivate.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">.moc\release\moc_q2wmapPrivate.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="q2wmapplugin.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">q2wmapplugin.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore q2wmapplugin.h -o .moc\debug\moc_q2wmapplugin.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC q2wmapplugin.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">.moc\debug\moc_q2wmapplugin.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">q2wmapplugin.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore q2wmapplugin.h -o .moc\release\moc_q2wmapplugin.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC q2wmapplugin.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">.moc\release\moc_q2wmapplugin.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="qcustomplot.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">qcustomplot.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore qcustomplot.h -o .moc\debug\moc_qcustomplot.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC qcustomplot.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">.moc\debug\moc_qcustomplot.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">qcustomplot.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/q2wmap -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore qcustomplot.h -o .moc\release\moc_qcustomplot.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">MOC qcustomplot.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">.moc\release\moc_qcustomplot.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include=".moc\debug\moc_q2wmap.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmap.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapPrivate.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapPrivate.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapplugin.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapplugin.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qcustomplot.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qcustomplot.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_icons.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_icons.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="icons.qrc">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">icons.qrc;images\q2wmap.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\rcc.exe -name icons icons.qrc -o .rcc\debug\qrc_icons.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">RCC icons.qrc</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">.rcc\debug\qrc_icons.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">icons.qrc;images\q2wmap.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">setlocal&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;c:\qt\Qt5.5.0-msvc2015\bin\rcc.exe -name icons icons.qrc -o .rcc\release\qrc_icons.cpp&#x000D;&#x000A;if errorlevel 1 goto VCEnd&#x000D;&#x000A;endlocal</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">RCC icons.qrc</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">.rcc\release\qrc_icons.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="images\q2wmap.png" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

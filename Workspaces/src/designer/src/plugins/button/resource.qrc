@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/button_normal.png</file>
+        <file>resource/button_hover.png</file>
+        <file>resource/button_disabled.png</file>
+        <file>resource/button_focused.png</file>
+        <file>resource/button_pressed.png</file>
+    </qresource>
+</RCC>

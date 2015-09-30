@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F7B67588-57CA-3BCC-92DC-5AF7873C1A8C}</ProjectGuid>
+    <RootNamespace>circleanglePlugin</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <PlatformToolSet>v140</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\..\plugins\designer\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <IntermediateDirectory>.obj\debug\</IntermediateDirectory>
+    <PrimaryOutput>circleanglePlugind</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PlatformToolSet>v140</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\..\plugins\designer\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <IntermediateDirectory>.obj\release\</IntermediateDirectory>
+    <PrimaryOutput>circleanglePlugin</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\..\plugins\designer\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.obj\debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">circleanglePlugind</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\..\plugins\designer\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.obj\release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">circleanglePlugin</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerBase;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>.obj\debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>.obj\debug\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_PLUGIN;QT_DESIGNER_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBased.dll;D:\CodeStores\Workspaces\lib\Qt5DesignerBased.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkDLL>true</LinkDLL>
+      <OutputFile>$(OutDir)\circleanglePlugind.dll</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_PLUGIN;QT_DESIGNER_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerBase;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>.obj\release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>.obj\release\</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_PLUGIN;QT_DESIGNER_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBase.dll;D:\CodeStores\Workspaces\lib\Qt5DesignerBase.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkDLL>true</LinkDLL>
+      <LinkIncremental>false</LinkIncremental>
+      <OutputFile>$(OutDir)\circleanglePlugin.dll</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_PLUGIN;QT_DESIGNER_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;QDESIGNER_EXPORT_WIDGETS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="circleangle.cpp" />
+    <ClCompile Include="circleangleplugin.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="circleangle.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">circleangle.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/circleangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore circleangle.h -o .moc\debug\moc_circleangle.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC circleangle.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_circleangle.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">circleangle.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/circleangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore circleangle.h -o .moc\release\moc_circleangle.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC circleangle.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_circleangle.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="circleangleplugin.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">circleangleplugin.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/circleangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore circleangleplugin.h -o .moc\debug\moc_circleangleplugin.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC circleangleplugin.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_circleangleplugin.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">circleangleplugin.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/circleangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore circleangleplugin.h -o .moc\release\moc_circleangleplugin.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC circleangleplugin.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_circleangleplugin.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include=".moc\debug\moc_circleangle.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_circleangle.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_circleangleplugin.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_circleangleplugin.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_icons.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_icons.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\circle.png" />
+    <CustomBuild Include="icons.qrc">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">icons.qrc;images\circle.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\rcc.exe -name icons icons.qrc -o .rcc\debug\qrc_icons.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RCC icons.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.rcc\debug\qrc_icons.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">icons.qrc;images\circle.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\rcc.exe -name icons icons.qrc -o .rcc\release\qrc_icons.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RCC icons.qrc</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.rcc\release\qrc_icons.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

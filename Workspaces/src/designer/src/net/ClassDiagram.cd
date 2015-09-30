@@ -1,0 +1,1026 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="C3IFrame" Collapsed="true">
+    <Position X="29" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAKAAIACAEAAAAAAAAAAQIAAACgQAAAACAAAoIAA=</HashCode>
+      <FileName>C3IFrame.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CParamInfo" Collapsed="true">
+    <Position X="9.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABEIIIAAAGAAIAgAAQQgIAAAAAANkAAAgCAAQAAQgIA=</HashCode>
+      <FileName>C3I\CParamInfo.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CParamInfoRT" Collapsed="true">
+    <Position X="9.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAkgAAIBAAAgAUGAAAAAAAAQAAACIwAAAgIEIAQAAIQ=</HashCode>
+      <FileName>C3I\CParamInfoRT.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LFormula" Collapsed="true">
+    <Position X="34.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAImUQQEAAAACEAAEBAQALgSwEKAgAAJaIADAFwJAA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AbstractParam" Collapsed="true">
+    <Position X="17.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMEIAAAAAgFEADAJhEKACAgQgCAFABARQRUAAAAAgAQ=</HashCode>
+      <FileName>abstractparam.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BaseObject" Collapsed="true">
+    <Position X="14" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEQAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\baseobject.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Buffer" Collapsed="true">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABBCAQAAAAAAABAABAAAQQAAAAEAAQAAAAgQAAQQAA=</HashCode>
+      <FileName>selfshare\src\buffer\buffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ChannelSelectConfig" Collapsed="true">
+    <Position X="30.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACACAIAAAAAAAAAAAAAQAAAAAEAAIAAAAAACAAA=</HashCode>
+      <FileName>selfshare\src\config\channelselectconfig.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Config" Collapsed="true">
+    <Position X="10.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgCAAAAAAAARAACIAAQBRAAAAAAiAAAAAAA=</HashCode>
+      <FileName>selfshare\src\config\config.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DataCenterInstance" Collapsed="true">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAABAAAAAAAAAQAAAAAAQAACAAAAEA=</HashCode>
+      <FileName>datacenterinstance.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DataCenterTest" Collapsed="true">
+    <Position X="2.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAABAAAAACAAAAAAAAAQAAQgAAQAAAAkAAAAAGA=</HashCode>
+      <FileName>datacentertest.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QDataResultString" Collapsed="true">
+    <Position X="29" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAkAAAABAQAEIAAAAAAQAoAiBAAAAQAAAAAQ=</HashCode>
+      <FileName>showtype\dataresultstring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetParameter" Collapsed="true">
+    <Position X="39.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IEAAAAAAAAAAAAACAAAAAAAAAAAAAAAABAAAAAAAAAg=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QDateResultString" Collapsed="true">
+    <Position X="30.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABgAAAAAAAAAAgBAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>showtype\dateresultstring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InputFrame" Collapsed="true">
+    <Position X="19.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEZABAAAAQAAAAAIAAABiAATAgAYAAABAxIAACA=</HashCode>
+      <FileName>main\src\frame\frame.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HistoryParam" Collapsed="true">
+    <Position X="24.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EBAAAQAAAQAAACAAAJIAAAAAgAAAAAAAAAAgAAEQAAA=</HashCode>
+      <FileName>selfshare\src\historyparam\historyparam.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HistoryParamBuffer" Collapsed="true">
+    <Position X="4" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAAAAAAAAAAACAAgACAACAAAABAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\historyparambuffer\historyparambuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InfoProcThread" Collapsed="true">
+    <Position X="5.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAgBABAACAAAAAAAAAAAAMAAAEAAAgIAAAAAAgAA=</HashCode>
+      <FileName>main\src\infoprocthread\infoprocthread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Item" Collapsed="true">
+    <Position X="8.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAIAAACAACAAAACAAIAAAAAEAAQAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Table" Collapsed="true">
+    <Position X="41.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamInfo" Collapsed="true">
+    <Position X="15.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAEAIAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InfoTableProc">
+    <Position X="22" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABQAAACAAAQAAAIAACAAAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetBuffer" Collapsed="true">
+    <Position X="26.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAABBAACAAAACAAAAIAgAAAAAAgAAAAAAAEA=</HashCode>
+      <FileName>selfshare\src\netbuffer\netbuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetComponents" Collapsed="true">
+    <Position X="36" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAABAAABAAAAAAQAAQAAAAkAA=</HashCode>
+      <FileName>netcomponents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetConfig" Collapsed="true">
+    <Position X="37.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQIACIAIAAQAAAAAIAAAEAAAABAAAAAQAAAAAAA=</HashCode>
+      <FileName>selfshare\src\config\netconfig.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetInstance" Collapsed="true">
+    <Position X="3.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEICAAAAgAQAAAAAAAAAgEAAAAAAAAAgAAAI=</HashCode>
+      <FileName>netinstance.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Network" Collapsed="true">
+    <Position X="13" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KQAAAACCEAggAAAAABAAAAA0AAQCAQAAAAAXAAQAAEA=</HashCode>
+      <FileName>main\src\network\network.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QNumericalValueResultString" Collapsed="true">
+    <Position X="32.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAQhAAAAIBAAAAAAAAAAAAAAQAgAA=</HashCode>
+      <FileName>showtype\numericalvalueresultstring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parameter">
+    <Position X="17.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ZQIAYQAAEFEAAIBAAEAKBAAAAADQCIAACAAgAECAIMQ=</HashCode>
+      <FileName>main\src\parameter\parameter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RecvInfoThread" Collapsed="true">
+    <Position X="7.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAgAAICCAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\recvinfothread\recvinfothread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Station" Collapsed="true">
+    <Position X="36" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAUAQEAAAAAAgACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\config\stationconfig.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StationConfig" Collapsed="true">
+    <Position X="37.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAgAAIAIAIAEAAAAICAAAAGgAAAAAAAAgAAAAAAAI=</HashCode>
+      <FileName>selfshare\src\config\stationconfig.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StationInstance" Collapsed="true">
+    <Position X="0.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAIAIAAAAAAAAIAAAAECgAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>stationinstance.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="stru_State" Collapsed="true">
+    <Position X="39.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PThread" Collapsed="true">
+    <Position X="6.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAICAAABAAAAgAgAAAA=</HashCode>
+      <FileName>selfshare\src\thread\thread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QTimeResultString" Collapsed="true">
+    <Position X="34.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAASAEAAAIAAQACAAEAAAgAAAIAAAACCAAQAAA=</HashCode>
+      <FileName>showtype\timeresultstring.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TimerInstance" Collapsed="true">
+    <Position X="6.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAACAAAAAgAAA=</HashCode>
+      <FileName>timerinstance.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XAttribute" Collapsed="true">
+    <Position X="29" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAgAAAAACA=</HashCode>
+      <FileName>selfshare\src\config\xattribute.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XDocument" Collapsed="true">
+    <Position X="30.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAQAAAAAAAAAAgCACAAAAAAAAACAAAAIAA=</HashCode>
+      <FileName>selfshare\src\config\xdocument.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XElement" Collapsed="true">
+    <Position X="32.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAABgAABIAAVAAAAAAQQAAwQAAAAAAAgAAAA4AE=</HashCode>
+      <FileName>selfshare\src\config\xelement.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Property" Collapsed="true">
+    <Position X="41.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>selfshare\src\xmlproc\xmlproc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XmlElement" Collapsed="true">
+    <Position X="34.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAEAAgAAAAIAAQAAAAAAAgAA=</HashCode>
+      <FileName>selfshare\src\xmlproc\xmlproc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XmlProc" Collapsed="true">
+    <Position X="36" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ZQAABASAgAAIAAAAAEIRAAAQAAAQAIKgAAQAAAkAAAA=</HashCode>
+      <FileName>selfshare\src\xmlproc\xmlproc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ZXParam" Collapsed="true">
+    <Position X="13.25" Y="7.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AJGAIAAIEiBFAQRdiACGCAAQACwBCDAxQRagEAAQAAw=</HashCode>
+      <FileName>selfshare\src\zxparam\zxparam.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ZXParamBuffer" Collapsed="true">
+    <Position X="6.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAEAAAAAACAAAACAAAAACAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\zxparambuffer\zxparambuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DataCenterInterface" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAQAAAACAAAAAAAAAEA=</HashCode>
+      <FileName>abstractdatacenter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InformationInterface" Collapsed="true">
+    <Position X="3.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQIAAAAAAAAAAQAAAAAAAAEAAAIAAAAAAAAA=</HashCode>
+      <FileName>abstractinformation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetInterface" Collapsed="true">
+    <Position X="3.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAgAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>abstractnet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StationInterface" Collapsed="true">
+    <Position X="0.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAIAIAAAAAAAAIAAAAACgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>abstractstation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TaskInterface" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAABAAA=</HashCode>
+      <FileName>abstracttask.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TimerInterface" Collapsed="true">
+    <Position X="6.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>abstracttimer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InformationInstance" Collapsed="true">
+    <Position X="3.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAACAAQIAAIAAAAAABQAAAAAAAAEAAAIAAAAAAAAA=</HashCode>
+      <FileName>informationinstance.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TaskInstance" Collapsed="true">
+    <Position X="0.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABBAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAABAAA=</HashCode>
+      <FileName>taskinstance.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DataCenterTestPrivate" Collapsed="true">
+    <Position X="32.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAQBAAAAACAAAAAAAAAQAAAgAAQAAAAAAAAAAEA=</HashCode>
+      <FileName>datacentertest.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="qt_meta_stringdata_DataCenterInterface_t" Collapsed="true">
+    <Position X="30.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_abstractdatacenter.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_InformationInterface_t" Collapsed="true">
+    <Position X="34.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_abstractinformation.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_NetInterface_t" Collapsed="true">
+    <Position X="36" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_abstractnet.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_StationInterface_t" Collapsed="true">
+    <Position X="37.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_abstractstation.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_TaskInterface_t" Collapsed="true">
+    <Position X="41.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_abstracttask.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_TimerInterface_t" Collapsed="true">
+    <Position X="29" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_abstracttimer.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_InformationInstance_t" Collapsed="true">
+    <Position X="32.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_informationinstance.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="qt_meta_stringdata_TaskInstance_t" Collapsed="true">
+    <Position X="39.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>.moc\Debug\moc_taskinstance.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DateUnit" Collapsed="true">
+    <Position X="36" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAQAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\CParamInfoRT.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="HeaderDate" Collapsed="true">
+    <Position X="34.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACJAIAAAAAAAAAAIAAAAAAAAAGAAAAAAAAAAA=</HashCode>
+      <FileName>FrameHeader.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="C3IFrameHeader" Collapsed="true">
+    <Position X="32.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEBBAAAAAAAAAgCAACAAAAAAAAACCEAAAAAAAQAAAAA=</HashCode>
+      <FileName>FrameHeader.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PDXPFrameHeader" Collapsed="true">
+    <Position X="29" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KAAAAAAAAAAAAAAAAAACAACAAAAgAAABQAAAgABAATA=</HashCode>
+      <FileName>FrameHeader.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="OperatorData" Collapsed="true">
+    <Position X="39.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAQAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="LogRecord" Collapsed="true">
+    <Position X="37.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAIAAAEAAAAAAAACAAAAAABAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ParamRecord" Collapsed="true">
+    <Position X="41.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAIAAAAAAAAAAAgAAAJCAAQAAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="tm_s" Collapsed="true">
+    <Position X="37.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="BackComStatus" Collapsed="true">
+    <Position X="29" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="structDecisionaidNode" Collapsed="true">
+    <Position X="32.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAgAAAAAIAAAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_DataDispenseCfg" Collapsed="true">
+    <Position X="37.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABjAKAAJAAACQAAEAQAAAAAIAEIBAAEAAQIAEQEIBAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_SoftLockInfo" Collapsed="true">
+    <Position X="39.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_MeanValue" Collapsed="true">
+    <Position X="7.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAgAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_C3IDate" Collapsed="true">
+    <Position X="32.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACJAIAAAAAAAAAAIAAAAAAAAAGAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ToolTipInfo" Collapsed="true">
+    <Position X="32.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ParamColor" Collapsed="true">
+    <Position X="37.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACEAAAAAAAAABAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ParamInfoTemplet" Collapsed="true">
+    <Position X="29" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_Remark" Collapsed="true">
+    <Position X="36" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAABAACAAAAAAAIAAAAAEAAAAAgEAABAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_Param" Collapsed="true">
+    <Position X="36" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BABACAABAAAIEAACgAAAAAAKABALhQAEAQQgIECAwAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ParamIndex" Collapsed="true">
+    <Position X="41.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_C3INetInfo" Collapsed="true">
+    <Position X="34.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACQAAAAAAAAAAMAAAACAAAAAgAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ErrorLog" Collapsed="true">
+    <Position X="39.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_FileSaveConfig" Collapsed="true">
+    <Position X="41.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAQAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_HistoryCurve" Collapsed="true">
+    <Position X="29" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAIAAAAAAAAAAAACAAAABAAAAAgAAACAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_NetConfig" Collapsed="true">
+    <Position X="34.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAACSgQAAgAAAAIAAAABACgIAABAAgAAgAABAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="str_IPNetConfig" Collapsed="true">
+    <Position X="30.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAgAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_Image" Collapsed="true">
+    <Position X="30.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAASAAAAAAAAAQAAABAAgAEAgAAAEACAEAAQAAAAgA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ParamDriveImage" Collapsed="true">
+    <Position X="39.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAACQAAAAEAABIAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_Psw" Collapsed="true">
+    <Position X="34.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_TaskPhase" Collapsed="true">
+    <Position X="41.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_SeriesTask" Collapsed="true">
+    <Position X="37.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAhAAAAAAAAAAAAAIAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ZXList" Collapsed="true">
+    <Position X="36" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_TimeDriveImage" Collapsed="true">
+    <Position X="30.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAACAAACAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ZXWSFile" Collapsed="true">
+    <Position X="37.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAIAgACAAQGAQEAACAAUIBAAAAIAAAAAggAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_UpdateConfig" Collapsed="true">
+    <Position X="34.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACAAAAAAAAAAAAAAAAAAAAAAgAAEAAQBAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="STRUCT_FA_SHE_XI" Collapsed="true">
+    <Position X="29" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAIEUgAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="STRUCT_CLX_POINT" Collapsed="true">
+    <Position X="41.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQQAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="STRUCT_BLTCURVE" Collapsed="true">
+    <Position X="39.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAERgAQAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="STRUCT_REA" Collapsed="true">
+    <Position X="30.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiAAQBAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ImageGraphicGroup" Collapsed="true">
+    <Position X="32.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_CMDFlow" Collapsed="true">
+    <Position X="36" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACgAAAEAAACAgAQIAAAABAAAAoAAAAQAgAAACAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_TestResult" Collapsed="true">
+    <Position X="29" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAgAAAAAAAAAAAAQAAAACAAAACAAQAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ParamTemp" Collapsed="true">
+    <Position X="30.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAEAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="stru_ParamtoParamTemp" Collapsed="true">
+    <Position X="32.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASE=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="T0Struct" Collapsed="true">
+    <Position X="34.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkCAATCBAAAAUgEgAABAAAAEFAAAAAAAACAAgAwA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="BCDTime" Collapsed="true">
+    <Position X="30.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgQAgAAAAAAAAAAAAAAAAAAAAAAEKAQAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="TableNoParam" Collapsed="true">
+    <Position X="36" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\CParamInfo.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="ParaMap" Collapsed="true">
+    <Position X="36" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\CParamInfo.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="TableMap" Collapsed="true">
+    <Position X="37.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\CParamInfo.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="qint64" Collapsed="true">
+    <Position X="29" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="quint64" Collapsed="true">
+    <Position X="30.75" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="WORD" Collapsed="true">
+    <Position X="37.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="FormulaZXParamMap" Collapsed="true">
+    <Position X="39.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="TempHistoryParamMap" Collapsed="true">
+    <Position X="41.25" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="BufferList" Collapsed="true">
+    <Position X="29" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\buffer\buffer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="u_int16_t" Collapsed="true">
+    <Position X="29" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\const.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="u_int32_t" Collapsed="true">
+    <Position X="30.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\const.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="u_int8_t" Collapsed="true">
+    <Position X="32.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\const.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OutNode" Collapsed="true">
+    <Position X="34.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="NetworkSet" Collapsed="true">
+    <Position X="32.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="HistoryParamMap" Collapsed="true">
+    <Position X="29" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\historyparambuffer\historyparambuffer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="HistoryParamLimit" Collapsed="true">
+    <Position X="41.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\historyparambuffer\historyparambuffer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ParameterItem" Collapsed="true">
+    <Position X="37.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ParameterTable" Collapsed="true">
+    <Position X="39.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ChangeParamInfo" Collapsed="true">
+    <Position X="30.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="WholeTable" Collapsed="true">
+    <Position X="36" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\infotable\infotable.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="SOCKET" Collapsed="true">
+    <Position X="34.25" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\network\network.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="socklen_t" Collapsed="true">
+    <Position X="36" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\network\network.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="NamedSockets" Collapsed="true">
+    <Position X="30.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main\src\network\network.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint" Collapsed="true">
+    <Position X="34.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>showtype\numericalvalueresultstring.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DWORD" Collapsed="true">
+    <Position X="32.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="MeanValue" Collapsed="true">
+    <Position X="7.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C3I\stru.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ElementList" Collapsed="true">
+    <Position X="34.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\config\xelement.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XmlProperty" Collapsed="true">
+    <Position X="39.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\xmlproc\xmlproc.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ElNameStack" Collapsed="true">
+    <Position X="36" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\xmlproc\xmlproc.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ElSave" Collapsed="true">
+    <Position X="37.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\xmlproc\xmlproc.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ZXParamMap" Collapsed="true">
+    <Position X="41.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>selfshare\src\zxparambuffer\zxparambuffer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="SingleTableParamVector" Collapsed="true">
+    <Position X="32.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>abstractinformation.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ParamMap" Collapsed="true">
+    <Position X="41.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>abstractinformation.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="TabMap" Collapsed="true">
+    <Position X="39.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>abstractinformation.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="OPERATORDATAType" Collapsed="true">
+    <Position X="32.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAQBAAAGAIACBAAIAACAGAlIAAAAABAAAAAAAIA=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="FunName" Collapsed="true">
+    <Position X="30.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAEEAAAAAAAAAAAAAAAAAAAAAQAAAACBI=</HashCode>
+      <FileName>LFormula.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DataType" Collapsed="true">
+    <Position X="29" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAAAIAAAgAAAAAAEAgAAAECAAAgAEQAAAAAIACQACg=</HashCode>
+      <FileName>selfshare\src\datastruct.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Rights" Collapsed="true">
+    <Position X="34.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAADAAAABA=</HashCode>
+      <FileName>selfshare\src\config\stationconfig.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>
