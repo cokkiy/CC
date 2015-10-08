@@ -24,3 +24,4 @@ qttools.pro.user
 qttools.pro.user.*
 **/taskinstance.cpp
 **/const_var.h
+**/GeneratedFiles
