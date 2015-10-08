@@ -22,3 +22,5 @@ LGPL_EXCEPTION.txt
 /examples
 qttools.pro.user
 qttools.pro.user.*
+**/taskinstance.cpp
+**/const_var.h
