@@ -172,8 +172,7 @@ void RecvInfoThread::run()
                     continue;
                 }
                
-                count++;
-                //logger.logReceivedPacketCount(count);
+                logger.logReceivedPacketCount();
 
                 //判断是否是有效的包
                 if (!isValidPacket(result, udpbuf))

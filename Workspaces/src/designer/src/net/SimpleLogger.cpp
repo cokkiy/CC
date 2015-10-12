@@ -66,15 +66,8 @@ void SimpleLogger::start(string path)
         //writer = new std::thread(&SimpleLogger::write2file, this);
     }
 
-    //open parsed packet count file
-    memset(filename, 0, path.length() + 32);
-    sprintf(filename, "%s/parsed-packet-count-%d.txt", path.c_str(), cur);
-    file4packetCount = fopen(filename, "w");
-
-    //open received data count file
-    memset(filename, 0, path.length() + 32);
-    sprintf(filename, "%s/received-frame-count-%d.txt", path.c_str(), cur);
-    file4receivedCount = fopen(filename, "w");
+    //save path
+    this->path = path;
 }
 
 // stop record
@@ -98,37 +91,39 @@ void SimpleLogger::stop()
     }
     _close(file);    //关闭文件
 
+    time_t cur;
+    time(&cur);
+    char* filename = new char[path.length() + 32];
+     //open parsed packet count file
+    memset(filename, 0, path.length() + 32);
+    sprintf(filename, "%s/packet-count-%d.txt", path.c_str(), cur);
+    FILE* file4packetCount = fopen(filename, "w");
+    delete filename;
+
     //关闭计数文件
     if (file4packetCount != NULL)
     {
+        //write count to file
+        fprintf(file4packetCount, "Received Frame:%d, After Parsed:%d packet.", receivedDataCount, parsedPacketCount);
         fclose(file4packetCount);
         file4packetCount = NULL;
-    }
-
-    //关闭计数文件
-    if (file4receivedCount != NULL)
-    {
-        fclose(file4receivedCount);
-        file4receivedCount = NULL;
-    }
+    }    
 }
 
 //记录处理后的包个数
-void SimpleLogger::logPacketCount(unsigned int count)
+void SimpleLogger::logPacketCount()
 {
-    if (file4packetCount != NULL)
-    {
-        fprintf(file4packetCount, "%d\n", count);
-    }
+    mutexForParsedCount.lock();
+    parsedPacketCount++;
+    mutexForParsedCount.unlock();
 }
 
 //记录网络接收到的帧个数
-void SimpleLogger::logReceivedPacketCount(unsigned int count)
+void SimpleLogger::logReceivedPacketCount()
 {
-    if (file4receivedCount != NULL)
-    {
-        fprintf(file4receivedCount, "%d\n", count);       
-    }
+    mutexForReceivedCount.lock();
+    receivedDataCount++;
+    mutexForReceivedCount.unlock();
 }
 
 

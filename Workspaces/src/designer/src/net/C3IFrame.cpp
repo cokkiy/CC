@@ -191,7 +191,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
     pBuffer += 2;
     procFramePos += 2;
     //子帧时间
-    childFrameTime = *(unsigned long*)pBuffer;
+    childFrameTime = *(unsigned int*)pBuffer;
     pBuffer += 4;
     procFramePos += 4;
     //表号
@@ -245,7 +245,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
                 else
                 {
                     //信源%1完整帧%2第%3字节处前后异常%4号表%5参数
-                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Unknown Error");
+                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 .childFrameLen less than  paramLen");
                     qWarning() << str.arg(pFHead->sourse).arg(pFHead->framecounter).arg(procFramePos + 24).arg(paramTable).arg(paramCode);
 
                     
@@ -276,7 +276,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
                 else
                 {
                     //信源%1完整帧%2第%3字节处前后异常%4号表%5参数
-                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Unknown Error");
+                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Child frame len less than 3");
                     qWarning() << str.arg(pFHead->sourse).arg(pFHead->framecounter).arg(procFramePos + 24)
                         .arg(paramTable).arg(paramCode);
                    

@@ -153,9 +153,9 @@ char* CParamInfoRT::SetParamValue(unsigned short usParamTable,
     g_cfg.m_zxParamBuf.PutBuffer(abstractParam);
 
     //记录日志
-    //logger.log(*pParam);
-    count++;
-    logger.logPacketCount(count);
+    //logger.log(*pParam);   
+    logger.logPacketCount();
+
     HistoryParam hParam;
     double t_value = 0.0;
     if (abstractParam.getValueFromCode(t_value))

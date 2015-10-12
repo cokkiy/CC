@@ -39,8 +39,6 @@ class NETSHARED_EXPORT RecvInfoThread:public PThread
 
         //检查是否是有效的数据包
         bool isValidPacket(int dataLen, char* buf);
-
-        unsigned int  count = 0;
 };
 
 

@@ -17,10 +17,10 @@ public:
     void log(const stru_Param& param);
 
     //记录分析处理后的数据包个数
-    void logPacketCount(unsigned int count);
+    void logPacketCount();
 
     //记录接收到的数据包个数
-    void logReceivedPacketCount(unsigned int count);
+    void logReceivedPacketCount();
 
     //开始记录数据
     void start(string path);
@@ -49,6 +49,11 @@ private:
     // mutex for notify between put to/get from buf list 
     mutex mutexForNotify;
 
+    // mutex for received count 
+    mutex mutexForReceivedCount;
+    // mutex for parsed count
+    mutex mutexForParsedCount;
+
     // has item condition
     condition_variable hasItemCV;
     
@@ -56,12 +61,15 @@ private:
     bool bStop = false;
 
     //file to record data
-    int file;
-    //处理后包计数文件
-    FILE * file4packetCount;
-    //网络包计数文件
-    FILE * file4receivedCount;
+    int file;   
 
+    //接收数据计数
+    unsigned int receivedDataCount = 0;
+    //分析包计数
+    unsigned int parsedPacketCount = 0;
+
+    //file path 
+    string path;
     // thread for writing data to file
     std::thread * writer;
 

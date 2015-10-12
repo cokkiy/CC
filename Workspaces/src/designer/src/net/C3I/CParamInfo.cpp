@@ -272,7 +272,7 @@ bool CParamInfo::LoadParamFromXML(const QString& dir)
     for (auto file : fileList)
     {
         //**********装载zx_param_global_c3i.xml等文件***//
-        if (file.fileName().startsWith("zx_param_global_", Qt::CaseInsensitive) 
+        if (file.fileName().startsWith("zx_param_global", Qt::CaseInsensitive) 
             && file.fileName().endsWith(".xml", Qt::CaseInsensitive))
         {
                XDocument doc;

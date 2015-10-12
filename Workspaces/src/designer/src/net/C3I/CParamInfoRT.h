@@ -149,8 +149,6 @@ protected:
 public:
     //获取闰秒
     static UTCTime GetGPSLeapSecond() { return m_GPSLeapSecond; };
-private:
-    int count=0;
 };
 
 //表示时间的结构
