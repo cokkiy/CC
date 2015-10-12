@@ -23,9 +23,12 @@
 #include "stru.h"
 #include "selfshare/src/datastruct.h"
 #include "selfshare/src/config/config.h"
+#include "SimpleLogger.h"
 
 //外部变量.配置信息和缓存信息
 extern Config g_cfg;
+//外部变量,数据记录工具
+extern SimpleLogger logger;
 
 UTCTime CParamInfoRT::m_GPSLeapSecond = 15.0;
 
@@ -148,6 +151,11 @@ char* CParamInfoRT::SetParamValue(unsigned short usParamTable,
     
     // added by cokkiy, 存入到数据缓冲区中
     g_cfg.m_zxParamBuf.PutBuffer(abstractParam);
+
+    //记录日志
+    //logger.log(*pParam);
+    count++;
+    logger.logPacketCount(count);
     HistoryParam hParam;
     double t_value = 0.0;
     if (abstractParam.getValueFromCode(t_value))

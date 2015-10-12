@@ -79,6 +79,8 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <DisableLanguageExtensions>
+      </DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>D:/CodeStores/Workspaces/lib/WS2_32.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -233,6 +235,7 @@
     <ClCompile Include="main\src\parameter\parameter.cpp" />
     <ClCompile Include="main\src\recvinfothread\recvinfothread.cpp" />
     <ClCompile Include="selfshare\src\config\stationconfig.cpp" />
+    <ClCompile Include="SimpleLogger.cpp" />
     <ClCompile Include="stationinstance.cpp" />
     <ClCompile Include="taskinstance.cpp" />
     <ClCompile Include="selfshare\src\thread\thread.cpp" />
@@ -411,6 +414,7 @@ endlocal
     <ClInclude Include="main\src\parameter\parameter.h" />
     <ClInclude Include="main\src\recvinfothread\recvinfothread.h" />
     <ClInclude Include="selfshare\src\config\stationconfig.h" />
+    <ClInclude Include="SimpleLogger.h" />
     <ClInclude Include="stationinstance.h" />
     <ClInclude Include="C3I\stru.h" />
     <CustomBuild Include="taskinstance.h">
