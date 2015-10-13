@@ -68,6 +68,12 @@ enum FunName
 	SET,//根据值设置参数值
 	TIM//取参数时间
 };
+enum ParseType
+{
+    HistoryData,
+    CurData
+};
+
 struct OperatorData 
 {
     char type;
@@ -78,6 +84,8 @@ struct OperatorData
     };
     bool GetValue(double& ret_d);
     bool GetValue(QVariant& ret_d);
+    // 获取参数的小写的源码
+    bool GetCode(std::string & code);
 	void GetCodeValue(double& ret_d);
 };
 #define MINIMUSDATA (0.0000000000001)
@@ -129,20 +137,25 @@ public:
     */
     int compute(std::string formulaX,std::string formulaY,QVector<double>& resultX,QVector<double>& resultY);
     /*!
-      获取数据中包含的参数指针
-      @return AbstractParam*  参数指针，NULL为没有
+      通过输入公式化的参数表达式获取参数数据的大写的源码
+      @param string formula  字符串，包含参数的公式计算表达式
+      @param std::string& code  参数数据的源码
+      @return int  获取成功或失败，1为成功，-1为失败
     */
-    AbstractParam* getParam();
+    int code(std::string formula,std::string& code);
     /*!
-      更新公式中包含参数的数据
-    */
-    void updateParam();
-
-    /*!
-      获取数据中包含的参数指针
-      @return AbstractParam*  参数指针，NULL为没有
+      获取参数数据中的表号和参数号
+      @param string formula  字符串，包含参数的公式计算表达式
+      @param unsigned short &tn  表号
+      @param unsigned short &pn  参数号
+      @return bool  获取成功或失败，true为成功，false为失败
     */
     static bool getParam(std::string formula,unsigned short &tn,unsigned short & pn);
+    /*!
+      经过公式计算后，获取参数的指针
+      @return AbstractParam*   参数的指针
+    */
+    AbstractParam* getParam();
 
     /*
      *获得时标
@@ -156,6 +169,10 @@ public:
     void setDate(int date);
     void setTime(int time);
 private:
+    /*!
+      更新公式中包含参数的数据
+    */
+    void updateParam();
     /*!
       获取表达式的值
       @param double& result  公式计算的结果，为浮点数
@@ -173,7 +190,12 @@ private:
       @param string formula  字符串，包含参数的公式计算表达式
       @return bool  获取成功或失败，true为成功，false为失败
     */
-    bool parse(std::string formula);
+    bool parse(std::string formula,ParseType type = CurData);
+    /*!
+      是否是只包含单个参数的公式，如[1,2]
+      @return bool  true,只包含单个参数;false,还有其他公式项目
+    */
+    bool singleParam();
 private:
     //是否能使用公式
     bool use(){return m_bUse;}
@@ -181,6 +203,8 @@ private:
     bool change(std::string);
 	//是否使用公式
     bool m_bUse;
+    //是否是单个参数
+    bool m_bSingleParam;
 	//字符串公式
     std::string m_formula;
 	//操作数对象列表
@@ -194,7 +218,9 @@ private:
     Config* m_config;
     FormulaZXParamMap m_zxparamMap;
     TempHistoryParamMap m_tHistoryMap;
-    AbstractParam* addParam(unsigned short,unsigned short);
+    AbstractParam* m_primaryParam;
+    AbstractParam* addParam(unsigned short,unsigned short,ParseType type = CurData);
+    AbstractParam* getParam(std::string formula);
     //no use
     ZXParam& getParam(unsigned short,unsigned short);
     //no use

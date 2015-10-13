@@ -3,8 +3,6 @@
 #include<stdio.h>
 #include<string>
 
-typedef unsigned int uint;
-
 using namespace std;
 class QNumericalValueResultString
 {

@@ -41,6 +41,7 @@ class ZXParamBuffer :public BaseObject
 
 		//从队列中取出缓冲区
         AbstractParam GetBuffer(unsigned short tabno, unsigned short paramno);
+        AbstractParam* GetParamBuffer(unsigned short tabno, unsigned short paramno);
 };
 
 

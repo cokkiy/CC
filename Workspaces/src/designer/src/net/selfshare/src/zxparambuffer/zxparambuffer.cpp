@@ -85,4 +85,13 @@ AbstractParam ZXParamBuffer::GetBuffer(unsigned short tabno, unsigned short para
 	return buf;
 }
 
+//******************
+//说明：从缓冲区取出参数
+//功能：从缓冲区队列取出参数
+//备注：前面进，后面出
+//******************
+AbstractParam* ZXParamBuffer::GetParamBuffer(unsigned short tabno, unsigned short paramno)
+{
+    return &(m_ZXparamBuf[tabno][paramno]);
+}
 

@@ -14,26 +14,19 @@
 #include "../infoprocthread/infoprocthread.h"
 #include "../../../selfshare/src/config/config.h"
 #include "FrameHeader.h"
-#include "SimpleLogger.h"
  
-//外部变量
+
 extern InfoProcThread 	g_InfoProcThread[MAX_THREAD_NUM];
 extern bool g_quitFlag;
 
-//外部变量,数据记录工具
-extern SimpleLogger logger;
-
+//定义最大socket数量
+#define MAX_SOCKET 100
 
 //构造函数
 RecvInfoThread::RecvInfoThread():PThread()
 {
 	m_primaryThreadNo = 0;
     m_backupThreadNo = 0;
-}
-
-//析构函数
-RecvInfoThread::~RecvInfoThread()
-{
 }
 
 ///************************************
@@ -50,8 +43,7 @@ bool RecvInfoThread::isValidPacket(int dataLen, char* dataBuf)
 {
     //检查帧的第一个字节，确定帧的数据格式。
     //0x80表示PDXP
-    unsigned char firstByte = (unsigned char)dataBuf[0];
-    if (PDXP_VERSION == firstByte)
+    if (PDXP_VERSION == (unsigned char)dataBuf[0])
     {
         //接收数据后，检查接收的pRevBuffer的字节数要大于32个字节
         if (dataLen <= 32)
@@ -74,8 +66,8 @@ bool RecvInfoThread::isValidPacket(int dataLen, char* dataBuf)
     //04h：表示本帧是指挥信息帧；
     //11h：表示本帧是带数长挑点信息帧；
     //f3h：指显历史曲线数据应答帧；
-    else if (firstByte == 0 || firstByte == 1 || firstByte == 4
-        || firstByte == 0xf3 || firstByte == 0x11)
+    else if (dataBuf[0] == 0 || dataBuf[0] == 1 || dataBuf[0] == 4
+        || dataBuf[0] == 0xf3 || dataBuf[0] == 0x11)
     {
         //接收数据后，检查接收的pRevBuffer的字节数要大于28个字节（帧头加帧尾共计28字节）
         if (dataLen < 28)
@@ -111,7 +103,7 @@ bool RecvInfoThread::isValidPacket(int dataLen, char* dataBuf)
     {
         //帧类别错误
         QString str = QObject::tr("Frame type error. Unknown type: %1");
-        qWarning() << str.arg(firstByte);
+        qWarning() << str.arg(dataBuf[0]);
         return false;
     }
 
@@ -172,8 +164,6 @@ void RecvInfoThread::run()
                     continue;
                 }
                
-                logger.logReceivedPacketCount();
-
                 //判断是否是有效的包
                 if (!isValidPacket(result, udpbuf))
                 {

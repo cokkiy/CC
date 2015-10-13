@@ -13,7 +13,38 @@ public:
     bool getValue(QVariant&);
     bool setValue(double val);
     bool getValue(double& val);
+    // 获取参数的小写的源码
+    bool getCode(std::string & result);
+    AbstractParam & operator =(const AbstractParam &aParam)
+    {
+        m_tableNo = aParam.m_tableNo;  				 //表号
+        m_paramNo = aParam.m_paramNo;          //参数号
+        m_paramTitle = aParam.m_paramTitle;
+        m_paramDataType = aParam.m_paramDataType;    //参数数据类型
+        m_paramDataLen = aParam.m_paramDataLen; //参数数据长度
+        m_ucNew = aParam.m_ucNew; //是否为新值,对于源码、字符串类型参数该值始终为0 0表示首次，1表示旧值，2表示新值
+        m_paramTime = aParam.m_paramTime;//参数采集时间,绝对时
+        m_paramdate = aParam.m_paramdate; //参数采集日期,绝对时
+        m_bError = aParam.m_bError;
+        m_dParamLorlmt = aParam.m_dParamLorlmt;
+        m_dParamUprlmt = aParam.m_dParamUprlmt;
+        m_dParamQuotiety = aParam.m_dParamQuotiety;
+        m_pcParamID = aParam.m_pcParamID;
+        m_pcParamUnit = aParam.m_pcParamUnit;
+        m_ucChangeType = aParam.m_ucChangeType;
+        m_pcShowType = aParam.m_pcShowType;
+        m_pcTheoryValue = aParam.m_pcTheoryValue;
+        m_pcValueRange = aParam.m_pcValueRange;
+        m_ulGroupIndex = aParam.m_ulGroupIndex;
+        m_ucTransType = aParam.m_ucTransType;
+        m_pcParamNote = aParam.m_pcParamNote;
+        m_val = aParam.m_val;
+        Parameter::operator =(aParam);
+        return *this;
+    }
+
 private:
+    //参数存放的浮点型的数据
     double m_val;
 public:
     //设置参数表号

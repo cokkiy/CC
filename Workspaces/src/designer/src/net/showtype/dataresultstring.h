@@ -2,16 +2,32 @@
 #define DATARESULTSTRING_H
 #include "../../net/net_global.h"
 #include "../selfshare/src/datastruct.h"
+#include "LFormula.h"
 #include<string>
 using namespace std;
 class QDataResultString
 {
 public:
-    QDataResultString(const double ,const string ,unsigned char ,const string ,const string );
+    enum DisplayType{
+        Value,
+        Time,
+        Date,
+        Code,
+        Other
+    };
+    /*!
+      构造函数
+      @param LFormula* formula  LFormula的指针
+      @param string dataStr  参数数据的字符串
+      @param QVariant& result  显示格式的字符串
+    */
+    QDataResultString(LFormula* formula,const string dataStr,const string dispStr);
     string getResultString();
     void analysisShowAttrString();
 private:
+    string m_computeStr;//参数数据字符串(图元配置的属性)
     string m_paramShowAttrString;//参数显示属性字符串(图元配置的属性)
+    LFormula* m_formula;//公式解释器的指针
 
     string m_ShowAttrStringHeader;
     string m_ShowAttrString;

@@ -184,7 +184,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
     unsigned short paramCode = 0;//参数号
     unsigned short paramLen = 0;//参数长
     unsigned char transType = 0;//参数传输类型
-    unsigned long paramDate = *(unsigned long*)&pFHead->date;
+    unsigned long paramDate = *(unsigned int*)&pFHead->date;
 
     //子帧的数据区长
     childFrameLen = *(unsigned short*)pBuffer;
@@ -319,7 +319,7 @@ char* C3IFrame::ProcChildFrame_TD(char *pBuffer, C3IFrameHeader* pFHead, unsigne
     unsigned short usParamCode = 0;//参数号
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
-    unsigned long ulParamDate = *(unsigned long*)&pFHead->date;
+    unsigned long ulParamDate = *(unsigned int*)&pFHead->date;
 
     //子帧数据区长度
     lChildFrameLen = *(unsigned short*)pBuffer;
@@ -463,7 +463,7 @@ char* C3IFrame::ProcChildFrame_ZH(char *pBuffer, C3IFrameHeader* pFHead, unsigne
     unsigned short usParamCode = 0;//参数号
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
-    unsigned long ulParamDate = *(unsigned long*)&pFHead->date;
+    unsigned long ulParamDate = *(unsigned int*)&pFHead->date;
 
     /*	if(usProcFrameLen < 7 )//不够一个子帧
     return 0;*/
@@ -599,7 +599,7 @@ char* C3IFrame::ProcChildFrame_AddLength_TD(char *pBuffer, C3IFrameHeader *pFHea
     unsigned char ParamCodeLength;//帧中自带参数长度
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
-    unsigned long ulParamDate = *(unsigned long*)&pFHead->date;
+    unsigned long ulParamDate = *(unsigned int*)&pFHead->date;
 
     //子帧数据区长度
     lChildFrameLen = *(unsigned short*)pBuffer;

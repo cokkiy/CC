@@ -249,7 +249,7 @@ unsigned int PDXPFrame::ChangeDateToBCD(unsigned int uldate)
     headerDate.Month = t1.date().month() % 10;
     headerDate.Day_10 = t1.date().day() / 10;
     headerDate.Day = t1.date().day() % 10;
-    return	*(unsigned long*)&headerDate;
+    return	*(unsigned int*)&headerDate;
 }
 
 
@@ -556,7 +556,7 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
     pBuffer += 2;
     procFramePos += 2;
     //子帧时间
-    ulChildFrameTime = *(unsigned long*)pBuffer;
+    ulChildFrameTime = *(unsigned int*)pBuffer;
     pBuffer += 4;
     procFramePos += 4;
     //表号
@@ -705,7 +705,7 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
     pBuffer += 2;
     procFramePos += 2;
 
-    ulChildFrameTime = *(unsigned long*)pBuffer;
+    ulChildFrameTime = *(unsigned int*)pBuffer;
     pBuffer += 4;
     procFramePos += 4;
 

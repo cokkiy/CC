@@ -45,7 +45,10 @@ bool AbstractParam::getValue(QVariant&result)
     {
         char temp[MAX_PARAMETER_VAL_LEN] = {0};
         if(GetFrameData(temp))
+        {
             result = QVariant(temp);
+            return true;
+        }
         else
             return false;
     }
@@ -55,7 +58,10 @@ bool AbstractParam::getValue(QVariant&result)
         QByteArray ba;
         ba.resize(GetParamDataLen());
         if(GetFrameData(ba.data()))
+        {
             result = QVariant(ba);
+            return true;
+        }
         else
             return false;
     }
@@ -64,7 +70,7 @@ bool AbstractParam::getValue(QVariant&result)
     {
         char tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -73,7 +79,7 @@ bool AbstractParam::getValue(QVariant&result)
     {
         unsigned char tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -82,7 +88,7 @@ bool AbstractParam::getValue(QVariant&result)
     {
         short tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -91,7 +97,7 @@ bool AbstractParam::getValue(QVariant&result)
     {
         unsigned short tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -100,18 +106,27 @@ bool AbstractParam::getValue(QVariant&result)
     {
         int tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
         break;
     case tp_DWORD:
-    case tp_PMTime:
     case tp_Date:
     {
         unsigned int tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
+        else
+            return false;
+    }
+        break;
+    // PMTime的数据格式统一为0.1毫秒的整数，不进行量纲运算,andrew,20150929
+    case tp_PMTime:
+    {
+        unsigned int tempVal = 0;
+        if(GetFrameData(&tempVal))
+            data = tempVal/**GetZXParamQuotiety()*/;
         else
             return false;
     }
@@ -120,18 +135,21 @@ bool AbstractParam::getValue(QVariant&result)
     {
         float tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
         break;
     case tp_double:
     {
-        if(!GetFrameData(&data))
+        if(GetFrameData(&data))
+            data = data*GetZXParamQuotiety();
+        else
             return false;
     }
         break;
     default:
+        return false;
         break;
     }
     result = QVariant(data);
@@ -146,7 +164,7 @@ bool AbstractParam::getValueFromCode(double& data)
     {
         char tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -155,7 +173,7 @@ bool AbstractParam::getValueFromCode(double& data)
     {
         unsigned char tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -164,7 +182,7 @@ bool AbstractParam::getValueFromCode(double& data)
     {
         short tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -173,7 +191,7 @@ bool AbstractParam::getValueFromCode(double& data)
     {
         unsigned short tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
@@ -182,18 +200,27 @@ bool AbstractParam::getValueFromCode(double& data)
     {
         int tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
         break;
     case tp_DWORD:
-    case tp_PMTime:
     case tp_Date:
     {
         unsigned int tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
+        else
+            return false;
+    }
+        break;
+    // PMTime的数据格式统一为0.1毫秒的整数，不进行量纲运算,andrew,20150929
+    case tp_PMTime:
+    {
+        unsigned int tempVal = 0;
+        if(GetFrameData(&tempVal))
+            data = tempVal/**GetZXParamQuotiety()*/;
         else
             return false;
     }
@@ -202,14 +229,17 @@ bool AbstractParam::getValueFromCode(double& data)
     {
         float tempVal = 0;
         if(GetFrameData(&tempVal))
-            data = tempVal;
+            data = tempVal*GetZXParamQuotiety();
         else
             return false;
     }
         break;
     case tp_double:
     {
-        return GetFrameData(&data);
+        if(GetFrameData(&data))
+            data = data*GetZXParamQuotiety();
+        else
+            return false;
     }
         break;
     case tp_String:
@@ -220,6 +250,8 @@ bool AbstractParam::getValueFromCode(double& data)
     }
         break;
     }
+    //为减少计算，提高效率，将参数的数据临时存放到m_val上，便于读取,andrew,20150929
+    m_val = data;
     return true;
 }
 bool AbstractParam::setValue(double val)
@@ -229,10 +261,28 @@ bool AbstractParam::setValue(double val)
 }
 bool AbstractParam::getValue(double& val)
 {
+    if(GetParamTranType() == tp_String
+            || GetParamTranType() == tp_Code
+            || GetParamTime() == 0xffffffff)
+    {
+        return false;
+    }
     val = m_val;
     return true;
 }
 
+bool AbstractParam::getCode(std::string & result)
+{
+    QByteArray ba;
+    ba.resize(GetParamDataLen());
+    if(GetFrameData(ba.data()))
+    {
+        result = std::string(ba.toHex().constData());
+        return true;
+    }
+    else
+        return false;
+}
 
 //设置参数表号
 void AbstractParam::SetZXParamTableNo(const unsigned short& bh)

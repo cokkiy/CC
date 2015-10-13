@@ -8,7 +8,6 @@
 #include "selfshare/src/config/netconfig.h"
 #include "C3I/CParamInfoRT.h"
 #include "selfshare/src/config/channelselectconfig.h"
-#include "SimpleLogger.h"
 #include <QDebug>
 
 extern Config g_cfg;
@@ -22,8 +21,6 @@ CParamInfoRT g_paramInfoRT;
 //全局变量,主备信道切换表
 ChannelSelectConfig channelSelectConfig;
 
-//数据记录
-SimpleLogger logger;
 
 bool g_quitFlag = false;
 
@@ -91,9 +88,6 @@ bool NetInstance::startThread(bool b)
     }
 
     rithread.start(QThread::NormalPriority);
-
-    //启动记录
-    logger.start("d:/DataRecord");
 
     return true;
 }

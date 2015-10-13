@@ -2,42 +2,86 @@
 #include "numericalvalueresultstring.h"
 #include "timeresultstring.h"
 #include "dateresultstring.h"
-
-QDataResultString::QDataResultString(const double Value,const string showTypeStr,unsigned char DataType,const string paraShowType,const string unitStr)
-
+#include "coderesultstring.h"
+QDataResultString::QDataResultString(LFormula * formula,const string computeStr,const string dispStr)
+    :m_formula(formula),m_computeStr(computeStr),m_paramShowAttrString(dispStr)
 {
-    m_paramValue = Value;//参数值
-    m_paramUnit = unitStr;//参数单位(信息约定表设置的属性)
-    m_paramShowAttrString = showTypeStr;//参数显示属性字符串(图元配置的属性)
-    m_paramDataType = DataType; //参数类型(信息约定表设置的属性)
-    m_paramShowType = paraShowType; //参数显示类型(信息约定表设置的属性)
 }
+
 string QDataResultString::getResultString()
 {
     analysisShowAttrString();
     string str = "";
     switch (m_ShowAttrType) {
-    case 1:
+    case Value:
     {
-        QNumericalValueResultString NumericalValueResultString;
-        str = NumericalValueResultString.getNumericalValueString(m_paramValue,m_ShowAttrString);
+        if(m_formula != NULL&&m_formula->compute(m_computeStr,m_paramValue)!=-1)
+        {
+            QNumericalValueResultString NumericalValueResultString;
+            str = NumericalValueResultString.getNumericalValueString(m_paramValue,m_ShowAttrString);
+        }
         break;
     }
-    case 2:
+    case Time:
     {
-        QTimeResultString TimeResultString;
-        str = TimeResultString.GetTimeString(m_paramValue,m_ShowAttrString);
+        if(m_formula != NULL&&m_formula->compute(m_computeStr,m_paramValue)!=-1)
+        {
+            QTimeResultString TimeResultString;
+            str = TimeResultString.GetTimeString(m_paramValue,m_ShowAttrString);
+        }
         break;
     }
-    case 3:
+    case Date:
     {
-        QDateResultString DateResultString;
-        str = DateResultString.GetDateString(m_paramValue,m_ShowAttrString);
+        if(m_formula != NULL&&m_formula->compute(m_computeStr,m_paramValue)!=-1)
+        {
+            QDateResultString DateResultString;
+            str = DateResultString.GetDateString(m_paramValue,m_ShowAttrString);
+        }
         break;
     }
+    case Code:
+    {
+        if(m_formula != NULL&&m_formula->code(m_computeStr,str)!=-1)
+        {
+            CodeResultString codeResultString;
+            str = codeResultString.getResultString(str,m_ShowAttrString);
+        }
+        break;
+    }
+    case Other:
     default:
     {
-        str = GetDefaultString(m_paramValue);
+        QVariant result;
+        if(m_formula != NULL&&m_formula->compute(m_computeStr,result)!=-1)
+        {
+            switch(result.type())
+            {
+            case QVariant::Double:
+
+            {
+                m_paramValue = result.value<double>();
+                AbstractParam* param = m_formula->getParam();
+                //获取参数的转换类型，如果转换类型没有定义则采用传输类型,andrew,20150929
+                m_paramDataType = param->GetParamConvType();
+                if(m_paramDataType == -1)
+                {
+                    m_paramDataType = param->GetParamTranType();
+                }
+                str = GetDefaultString(m_paramValue);
+            }
+                break;
+            case QVariant::ByteArray:
+            {
+                QByteArray ba = result.value<QByteArray>();
+                str = ba.toHex().toUpper().data();
+            }
+                break;
+            case QVariant::String:
+                str = result.value<QString>().toStdString();
+                break;
+            }
+        }
         break;
     }
   }
@@ -97,8 +141,7 @@ string QDataResultString::GetDefaultString(const double Value)
          }
    case tp_PMTime:
          {
-            uint iValue = (uint)Value/10000;
-            sprintf(str,"%.3f",iValue);
+            sprintf(str,"%.3f",Value/10000);
             break;
           }
    case tp_Date:
@@ -154,94 +197,94 @@ void QDataResultString::analysisShowAttrString()
     m_ShowAttrType = 0;
     if(!strcmp(m_ShowAttrString.c_str(), "H"))
     {
-        m_ShowAttrType = 1;
+        m_ShowAttrType = Code;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "h"))
     {
-        m_ShowAttrType = 1;
+        m_ShowAttrType = Code;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "b"))
     {
-        m_ShowAttrType = 1;
+        m_ShowAttrType = Code;
         return;
     }
     if(m_ShowAttrString.find('.',0) == 0)
     {
-        m_ShowAttrType = 1;
+        m_ShowAttrType = Value;
         return;
     }
     if(m_ShowAttrString.find('?',0) == 0)
     {
-        m_ShowAttrType = 1;
+        m_ShowAttrType = Value;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "T1"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "t1"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "T2"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "t2"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "T3"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "t3"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "T4"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "t4"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "t5"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "t6"))
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(m_ShowAttrString.find("t.",0) == 0)
     {
-        m_ShowAttrType = 2;
+        m_ShowAttrType = Time;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "LED_DT"))
     {
-        m_ShowAttrType = 3;
+        m_ShowAttrType = Date;
         return;
     }
     if(!strcmp(m_ShowAttrString.c_str(), "d2000"))
     {
-        m_ShowAttrType = 3;
+        m_ShowAttrType = Date;
         return;
     }
-    m_ShowAttrType = 4;
+    m_ShowAttrType = Other;
 }
 

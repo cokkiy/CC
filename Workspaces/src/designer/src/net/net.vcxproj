@@ -220,6 +220,7 @@
     <ClCompile Include="selfshare\src\config\config.cpp" />
     <ClCompile Include="datacenterinstance.cpp" />
     <ClCompile Include="datacentertest.cpp" />
+    <ClCompile Include="showtype\coderesultstring.cpp" />
     <ClCompile Include="showtype\dataresultstring.cpp" />
     <ClCompile Include="showtype\dateresultstring.cpp" />
     <ClCompile Include="selfshare\src\historyparam\historyparam.cpp" />
@@ -378,6 +379,7 @@ endlocal
     <ClInclude Include="selfshare\src\const.h" />
     <ClInclude Include="datacenterinstance.h" />
     <ClInclude Include="datacentertest.h" />
+    <ClInclude Include="showtype\coderesultstring.h" />
     <ClInclude Include="showtype\dataresultstring.h" />
     <ClInclude Include="selfshare\src\datastruct.h" />
     <ClInclude Include="showtype\dateresultstring.h" />

@@ -23,12 +23,9 @@
 #include "stru.h"
 #include "selfshare/src/datastruct.h"
 #include "selfshare/src/config/config.h"
-#include "SimpleLogger.h"
 
 //外部变量.配置信息和缓存信息
 extern Config g_cfg;
-//外部变量,数据记录工具
-extern SimpleLogger logger;
 
 UTCTime CParamInfoRT::m_GPSLeapSecond = 15.0;
 
@@ -147,17 +144,7 @@ char* CParamInfoRT::SetParamValue(unsigned short usParamTable,
 	default:pp = 0;
 		break;
 	}
-
-    //return pp;
     AbstractParam abstractParam = (AbstractParam)(*pParam);
-    
-    // added by cokkiy, 存入到数据缓冲区中
-    g_cfg.m_zxParamBuf.PutBuffer(abstractParam);
-
-    //记录日志
-    //logger.log(*pParam);   
-    logger.logPacketCount();
-
     HistoryParam hParam;
     double t_value = 0.0;
     if (abstractParam.getValueFromCode(t_value))
@@ -167,7 +154,8 @@ char* CParamInfoRT::SetParamValue(unsigned short usParamTable,
         hParam.setValue(t_value);
         g_cfg.m_zxHistoryParamBuf.PutBuffer(abstractParam.GetTableNo(), abstractParam.GetParamNo(), hParam);
     }
-
+    // 将数据写入历史缓冲区后，再写入参数缓冲区，并记录double类型的临时数据,andrew,20150929
+    g_cfg.m_zxParamBuf.PutBuffer(abstractParam);
 	m_bCritical = false;
 	return pp;
 }

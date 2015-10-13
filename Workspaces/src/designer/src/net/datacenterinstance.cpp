@@ -118,15 +118,7 @@ qint32 DataCenterInstance::getHistoryDatas(qint32 count...)
 
 int DataCenterInstance::getString(QString computeStr,QString dispStr,QString& resultStr)
 {
-    QVariant result;
-    double value = 0.0;
-    getValue(computeStr,result);
-    //AbstractParam* param = m_LFormula.getParam();
-    if(result.type()==QVariant::Type::Double)
-        value = result.value<double>();
-    else
-        return 0;
-    QDataResultString DataResultString(value,dispStr.toStdString(),0,"","");
-    resultStr = tr(DataResultString.getResultString().c_str());
+    QDataResultString dataResultString(&m_LFormula,computeStr.toStdString(),dispStr.toStdString());
+    resultStr = tr(dataResultString.getResultString().c_str());
     return 1;
 }

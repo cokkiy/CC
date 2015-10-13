@@ -272,7 +272,7 @@ bool CParamInfo::LoadParamFromXML(const QString& dir)
     for (auto file : fileList)
     {
         //**********装载zx_param_global_c3i.xml等文件***//
-        if (file.fileName().startsWith("zx_param_global", Qt::CaseInsensitive) 
+        if (file.fileName().startsWith("zx_param_global_", Qt::CaseInsensitive) 
             && file.fileName().endsWith(".xml", Qt::CaseInsensitive))
         {
                XDocument doc;
@@ -884,12 +884,9 @@ void* CParamInfo::GetParam(unsigned short usParamTable, unsigned short usParamCo
             auto param_pos = code->find(usParamCode);
             if (param_pos != code->end())//有该参数
                 result= param_pos->second;
-//             else//没有该参数返回0空地址
-//                 return 0;
         }//如果表号map有该表
-//         else//没有该表返回0空地址	
-//             return 0;
-//             save to cache
+
+//      save to cache
         cachedParam.insert({key,result});
 
         return result;

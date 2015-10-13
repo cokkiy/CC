@@ -75,7 +75,8 @@ SOURCES += \
     C3IFrame.cpp \
     abstracttimer.cpp \
     timerinstance.cpp \
-    PDXPFrame.cpp
+    PDXPFrame.cpp \
+    showtype/coderesultstring.cpp
 
 HEADERS += \
         net_global.h \
@@ -127,7 +128,8 @@ HEADERS += \
     C3IFrame.h \
     abstracttimer.h \
     timerinstance.h \
-    PDXPFrame.h
+    PDXPFrame.h \
+    showtype/coderesultstring.h
 
 
 unix {

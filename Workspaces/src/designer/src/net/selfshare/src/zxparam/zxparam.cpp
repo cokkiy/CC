@@ -52,14 +52,14 @@ ZXParam::ZXParam():Parameter()
 	m_pcParamUnit = "";
 
 	//参数转换后的存储类型
-	m_ucChangeType = 0;
+	m_ucChangeType = -1;
 
 	//参数的表现类型 表现类型是指参数在指显终端以表格方式显示时
 	//的显示形态。曲线绘制时不考虑此因素
 	m_pcShowType = "";
 
 	//参数传输类型
-	m_ucTransType = 0;
+    m_ucTransType = -1;
 
 	//理论值
 	m_pcTheoryValue = "";

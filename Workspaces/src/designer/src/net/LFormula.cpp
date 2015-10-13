@@ -54,28 +54,25 @@ bool OperatorData::GetValue(double& ret_d)
     return false;
 }
 
-bool OperatorData::GetValue(QVariant& ret_d)
+bool OperatorData::GetValue(QVariant &reslut)
 {
     if (type==DATA)
     {
-        ret_d = QVariant(data);
+        reslut = QVariant(data);
         return true;
     }
-    else if (type==PARAM)
+    else if (type==PARAM && param)
     {
-        if(param)
-        {
-            double t_val = 0.0;
-            if(param->getValue(t_val))
-            {
-                ret_d = QVariant(t_val);
-                return true;
-            }
-            else
-            {
-                return param->getValue(ret_d);
-            }
-        }
+        return param->getValue(reslut);
+    }
+    return false;
+}
+
+bool OperatorData::GetCode(std::string &code)
+{
+    if (type == PARAM && param)
+    {
+        return param->getCode(code);
     }
     return false;
 }
@@ -98,7 +95,9 @@ void OperatorData::GetCodeValue(double& ret_d)
         //throw(formula_error, INVALIDDATATYPE);
 	}
 }
-LFormula::LFormula(Config*cf):m_bUse(true),m_config(cf),m_formula(""),m_savTime(0),m_savDate(0)
+LFormula::LFormula(Config*cf)
+    :m_bUse(true),m_config(cf),m_formula(""),
+      m_savTime(0),m_savDate(0),m_primaryParam(NULL)
 {
 
 }
@@ -108,14 +107,44 @@ LFormula::~LFormula()
 
 }
 
-AbstractParam* LFormula::addParam(unsigned short tn,unsigned short pn)
+AbstractParam* LFormula::addParam(unsigned short tn,unsigned short pn,ParseType type)
 {
     unsigned int tp = INDEX(tn,pn);
-    if(m_zxparamMap.find(tp)==m_zxparamMap.end())
+    switch(type)
     {
-        m_zxparamMap[tp] = m_config->m_zxParamBuf.GetBuffer(tn,pn);
+    case HistoryData:
+    {
+        if(m_zxparamMap.find(tp)==m_zxparamMap.end())
+        {
+            m_zxparamMap[tp] = m_config->m_zxParamBuf.GetBuffer(tn,pn);
+            m_primaryParam = m_config->m_zxParamBuf.GetParamBuffer(tn,pn);
+        }
+        return &(m_zxparamMap[tp]);
     }
-    return &(m_zxparamMap[tp]);
+        break;
+    case CurData:
+    {
+        m_primaryParam = m_config->m_zxParamBuf.GetParamBuffer(tn,pn);
+        return m_primaryParam;
+    }
+        break;
+    }
+    return NULL;
+}
+
+AbstractParam* LFormula::getParam(std::string formula)
+{
+    if(m_primaryParam!=NULL&&m_formula == formula)
+        return m_primaryParam;
+    m_formula = formula;
+    unsigned short tn;
+    unsigned short pn;
+    if(getParam(formula,tn,pn))
+    {
+        m_primaryParam = m_config->m_zxParamBuf.GetParamBuffer(tn,pn);
+        return m_primaryParam;
+    }
+    return NULL;
 }
 
 ZXParam& LFormula::getParam(unsigned short tn,unsigned short pn)
@@ -155,6 +184,10 @@ void LFormula::updateParam()
         if(t_param.getValueFromCode(t_val))
         {
             m_zxparamMap[pn].setValue(t_val);
+        }
+        else
+        {
+            m_zxparamMap[pn] = t_param;
         }
         it++;
     }
@@ -233,7 +266,6 @@ int LFormula::compute(std::string formula,double& result)
 {
     if(parse(formula))
     {
-        updateParam();
         if(compute(result))
         {
             return 1;
@@ -246,7 +278,6 @@ int LFormula::compute(std::string formula,QVariant& result)
 {
     if(parse(formula))
     {
-        updateParam();
         if(compute(result))
         {
             return 1;
@@ -257,7 +288,7 @@ int LFormula::compute(std::string formula,QVariant& result)
 
 int LFormula::compute(std::string formula,QVector<double>& result)
 {
-    if(parse(formula))
+    if(parse(formula,HistoryData))
     {
         bool b_compute = false;
         //get All data
@@ -283,6 +314,15 @@ int LFormula::compute(std::string formula,QVector<double>& result)
 
 int LFormula::compute(std::string formulaX,std::string formulaY,QVector<double>& resultX,QVector<double>& resultY)
 {
+    return -1;
+}
+int LFormula::code(std::string formula,std::string& code)
+{
+    AbstractParam* t_param = getParam(formula);
+    if(t_param!=NULL&&t_param->getCode(code))
+    {
+        return 1;
+    }
     return -1;
 }
 
@@ -582,17 +622,10 @@ bool LFormula::compute(double& ret_d)
 		{
 			OperatorData t_OD_ret = t_Data_Stack.top();
 			t_Data_Stack.pop();
-			t_OD_ret.GetValue(t_ret_d);			
+			return t_OD_ret.GetValue(ret_d);
 		}		
-		ret_d = t_ret_d;
-		return true;
 	}
-	else
-		return false;
-    //}catch (formula_error e)
-	{		
-		return false;		
-	}
+    return false;
 }
 
 bool LFormula::compute(QVariant& ret_d)
@@ -893,17 +926,14 @@ bool LFormula::compute(QVariant& ret_d)
 '	purpose:	运算完成后，还有数据就提取出数据，并作为最终
 的计算结果，要经过充分测试才能启用
 ************************************************************/
-        ret_d = QVariant(t_ret_d);
         while (!t_Data_Stack.empty())
         {
             OperatorData t_OD_ret = t_Data_Stack.top();
             t_Data_Stack.pop();
             return t_OD_ret.GetValue(ret_d);
         }
-        return true;
     }
-    else
-        return false;
+    return false;
 }
 
 bool LFormula::change(std::string newformula)
@@ -918,7 +948,7 @@ bool LFormula::change(std::string newformula)
         return false;
 }
 
-bool LFormula::parse(std::string formula)
+bool LFormula::parse(std::string formula,ParseType type)
 {
     //没有使用公式
     if (formula.empty())
@@ -974,7 +1004,8 @@ bool LFormula::parse(std::string formula)
                 int commaPos = data.find(',',0);
                 if(commaPos>0)
                     pParam = addParam(atoi(data.substr(0,commaPos).c_str()),
-                                  atoi(data.substr(commaPos+1,nextpos-pos-1).c_str()));
+                                  atoi(data.substr(commaPos+1,nextpos-pos-1).c_str())
+                                      ,type);
                 else
                     return false;
             }
@@ -1014,7 +1045,8 @@ bool LFormula::parse(std::string formula)
                 int commaPos = data.find(',',0);
                 if(commaPos>0)
                     pParam = addParam(atoi(data.substr(0,commaPos).c_str()),
-                                  atoi(data.substr(commaPos+1,nextpos-pos-1).c_str()));
+                                  atoi(data.substr(commaPos+1,nextpos-pos-1).c_str())
+                                      ,type);
                 else
                     return false;
             }
@@ -1508,15 +1540,6 @@ bool LFormula::ParseData(std::stack<OperatorData >& ostack,std::string data, Ope
     return true;
 }
 
-AbstractParam* LFormula::getParam()
-{
-    FormulaZXParamMap::iterator it = m_zxparamMap.begin();
-    if(it!=m_zxparamMap.end())
-    {
-        return &(it->second);
-    }
-    return NULL;
-}
 /*!
   获取数据中包含的参数指针
   @return AbstractParam*  参数指针，NULL为没有
@@ -1544,6 +1567,11 @@ bool LFormula::getParam(std::string formula,unsigned short &tn,unsigned short & 
     return false;
 }
 
+AbstractParam* LFormula::getParam()
+{
+    return m_primaryParam;
+}
+
 /*
  *获得时标
 */
@@ -1568,4 +1596,15 @@ void LFormula::setDate(int date)
 void LFormula::setTime(int time)
 {
     m_savTime = time;
+}
+
+bool LFormula::singleParam()
+{
+    if(m_OperData.size()==1)
+    {
+        OperatorData t_d = m_OperData.at(0);
+        if(t_d.type==PARAM)
+            return true;
+    }
+    return false;
 }

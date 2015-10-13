@@ -17,7 +17,6 @@ class NETSHARED_EXPORT RecvInfoThread:public PThread
 {
 	public:
 		RecvInfoThread(); 								//构造函数
-        ~RecvInfoThread();
 
         //为信息接收线程设置工作用的Network对象
         void setNetwork(Network*);
@@ -38,7 +37,7 @@ class NETSHARED_EXPORT RecvInfoThread:public PThread
         Network *ni;
 
         //检查是否是有效的数据包
-        bool isValidPacket(int dataLen, char* buf);
+        bool isValidPacket(int dataLen,char* buf);
 };
 
 

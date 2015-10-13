@@ -15,8 +15,7 @@ const QString c_IsCurTask = "true";
 
 TaskInstance::TaskInstance()
 {
-    //m_currentTaskPath = QString("../zx_config/");
-    m_currentTaskPath = QString("D:/CodeStores/Workspaces/zx_config/");
+    m_currentTaskPath = QString("../zx_config/");
     m_currentTaskCode = QString("");
     QFile file(g_taskConfigRelativeFileName);
     if (file.open(QFile::ReadOnly | QFile::Text)) {
