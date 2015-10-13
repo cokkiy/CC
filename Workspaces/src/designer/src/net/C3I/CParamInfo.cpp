@@ -904,14 +904,14 @@ void CParamInfo::ClearParam()
     while (tablePos != m_pMapParamTable->end())
     {
         //得到表
-        TableMap* pTableMap = (TableMap*)((*tablePos).second);
-        if (pTableMap != NULL)
+        ParaMap* pParamMap =tablePos->second;
+        if (pParamMap != NULL)
         {
-            TableMap::iterator codePos = pTableMap->begin();
-            while (codePos != pTableMap->end())
+            auto codePos = pParamMap->begin();
+            while (codePos != pParamMap->end())
             {
                 //得到参数
-                stru_Param* pParam = (stru_Param*)((*codePos).second);
+                stru_Param* pParam = codePos->second;
                 if (pParam != NULL)
                 {
 
@@ -948,8 +948,8 @@ void CParamInfo::ClearParam()
                 }
                 codePos++;
             }
-            pTableMap->clear();
-            delete pTableMap;
+            pParamMap->clear();
+            delete pParamMap;
         }
         tablePos++;
     }
