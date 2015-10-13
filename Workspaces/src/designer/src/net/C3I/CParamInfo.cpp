@@ -860,22 +860,42 @@ void* CParamInfo::GetParam(unsigned short usParamTable, unsigned short usParamCo
     {
         return NULL;
     }
-    //检索表号map
-    TableMap::iterator pos =
-        m_pMapParamTable->find(usParamTable);
-    if (pos != m_pMapParamTable->end())//如果表号map有该表
+
+    // first,find in cache
+    unsigned int key = usParamTable;
+    key = key << 16;
+    key += usParamCode;
+    auto c_pos = cachedParam.find(key);
+    if (c_pos != cachedParam.end())
     {
-        //检索该表的参数字段号map
-        TableMap* code =
-            (TableMap*)((*pos).second);
-        pos = code->find(usParamCode);
-        if (pos != code->end())//有该参数
-            return (*pos).second;
-        else//没有该参数返回0空地址
-            return 0;
-    }//如果表号map有该表
-    else//没有该表返回0空地址	
-        return 0;
+        // find in cache
+        return c_pos->second;
+    }
+    else
+    {
+        stru_Param* result = NULL;
+        //检索表号map
+        TableMap::iterator pos =
+            m_pMapParamTable->find(usParamTable);
+        if (pos != m_pMapParamTable->end())//如果表号map有该表
+        {
+            //检索该表的参数字段号map
+            ParaMap* code = pos->second;
+            auto param_pos = code->find(usParamCode);
+            if (param_pos != code->end())//有该参数
+                result= param_pos->second;
+//             else//没有该参数返回0空地址
+//                 return 0;
+        }//如果表号map有该表
+//         else//没有该表返回0空地址	
+//             return 0;
+//             save to cache
+        cachedParam.insert({key,result});
+
+        return result;
+    }
+
+    return NULL;
 }
 
 

@@ -18,12 +18,13 @@
 #pragma once
 
 #include <map>
+#include <unordered_map>
 #include "stru.h"
 
 //定义ParaMap类型,表示某表号下的所有参数集合(按参数号组织)
 typedef std::map<unsigned short, stru_Param*> ParaMap;
 //定义ParaMap类型,表示按表号,参数号组织的所有参数集合
-typedef std::map<unsigned short, ParaMap*> TableMap;
+typedef std::unordered_map<unsigned short, ParaMap*> TableMap;
 
 class CXMLReaderParamMean;
 /*class CXMLReaderColor;*/
@@ -140,6 +141,9 @@ protected:
 
     //参数约定表
 	TableMap* m_pMapParamTable;
+
+    // 缓存的表号,参数号<->参数列表
+    unordered_map<unsigned int, stru_Param*> cachedParam;
 };
 
 

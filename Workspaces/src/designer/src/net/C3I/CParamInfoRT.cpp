@@ -147,6 +147,8 @@ char* CParamInfoRT::SetParamValue(unsigned short usParamTable,
 	default:pp = 0;
 		break;
 	}
+
+    //return pp;
     AbstractParam abstractParam = (AbstractParam)(*pParam);
     
     // added by cokkiy, 存入到数据缓冲区中
