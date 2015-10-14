@@ -147,27 +147,6 @@ AbstractParam* LFormula::getParam(std::string formula)
     return NULL;
 }
 
-ZXParam& LFormula::getParam(unsigned short tn,unsigned short pn)
-{
-    return m_zxparamMap[INDEX(tn,pn)];
-}
-
-double LFormula::getValue(unsigned short tn,unsigned short pn)
-{
-    ZXParam& p = m_zxparamMap[INDEX(tn,pn)];
-    //double ret = p.getParamValue();
-    return 1;
-}
-
-bool LFormula::getValue(ZXParam*p,double&ret)
-{
-    if(p)
-    {
-        return 1;
-    }
-    return false;
-}
-
 void LFormula::updateParam(unsigned short tn,unsigned short pn)
 {
     m_zxparamMap[INDEX(tn,pn)] = m_config->m_zxParamBuf.GetBuffer(tn,pn);

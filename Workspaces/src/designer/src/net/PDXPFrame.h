@@ -71,7 +71,7 @@ private:
     bool checkChannelToContinue(unsigned int tableNo);
 
     //检查参数是否正确
-    bool CheckParam(stru_Param* param);
+    bool CheckParam(AbstractParam* param);
 
     //将日期转换为BCD码格式
     unsigned int ChangeDateToBCD(unsigned int uldate);

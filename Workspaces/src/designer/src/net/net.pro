@@ -40,12 +40,10 @@ SOURCES += \
        selfshare/src/netbuffer/netbuffer.cpp \
        selfshare/src/thread/thread.cpp \
        selfshare/src/xmlproc/xmlproc.cpp \
-       selfshare/src/zxparam/zxparam.cpp \
        selfshare/src/zxparambuffer/zxparambuffer.cpp \
        main/src/network/network.cpp \
        main/src/recvinfothread/recvinfothread.cpp \
        main/src/infoprocthread/infoprocthread.cpp \
-       main/src/parameter/parameter.cpp \
        LFormula.cpp \
        abstractparam.cpp \
     abstractdatacenter.cpp \
@@ -91,12 +89,10 @@ HEADERS += \
        selfshare/src/netbuffer/netbuffer.h \
        selfshare/src/thread/thread.h \
        selfshare/src/xmlproc/xmlproc.h \
-       selfshare/src/zxparam/zxparam.h \
        selfshare/src/zxparambuffer/zxparambuffer.h \
        main/src/network/network.h \
        main/src/recvinfothread/recvinfothread.h \
        main/src/infoprocthread/infoprocthread.h \
-       main/src/parameter/parameter.h \
        LFormula.h \
        abstractparam.h \
     abstractdatacenter.h \

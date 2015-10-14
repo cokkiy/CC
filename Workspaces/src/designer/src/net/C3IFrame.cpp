@@ -208,13 +208,16 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
         //开始处理子帧的数据
         while (childFrameLen > 0)
         {
-            paramCode++;//完整帧参数号自动累加		
-            transType = m_pParamInfoRT->GetTransType(paramTable, paramCode);
+            paramCode++;//完整帧参数号自动累加
+            AbstractParam* t_param = m_pParamInfoRT->GetParam(paramTable, paramCode);
+            if(t_param==NULL)
+                break;
+            transType = t_param->GetParamTranType();
 
             if (transType != 10 &&
                 transType != 11)//非 字符串、原码
             {
-                paramLen = m_pParamInfoRT->GetParamLen(paramTable, paramCode);
+                paramLen = t_param->GetParamDataLen();
                 if (paramLen == 0)//没有这个参数
                 {
                     //信源%1完整帧%2第%3字节处前后异常%4号表%5参数不存在
@@ -228,7 +231,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
                 if (childFrameLen >= paramLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        paramTable, paramCode, pBuffer, childFrameTime, paramDate);
+                        t_param, pBuffer, childFrameTime, paramDate);
                     if (pBuffer_temp == 0)
                     {
                         //信源%1完整帧%2第%3字节处前后异常%4号表%5参数设置失败
@@ -245,7 +248,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
                 else
                 {
                     //信源%1完整帧%2第%3字节处前后异常%4号表%5参数
-                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 .childFrameLen less than  paramLen");
+                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Unknown Error");
                     qWarning() << str.arg(pFHead->sourse).arg(pFHead->framecounter).arg(procFramePos + 24).arg(paramTable).arg(paramCode);
 
                     
@@ -258,7 +261,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
                 if (childFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        paramTable, paramCode, pBuffer, childFrameTime, paramDate);
+                        t_param, pBuffer, childFrameTime, paramDate);
                     if (pBuffer_temp == 0)
                     {
                         //信源%1完整帧%2第%3字节处前后异常%4号表%5参数
@@ -276,7 +279,7 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
                 else
                 {
                     //信源%1完整帧%2第%3字节处前后异常%4号表%5参数
-                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Child frame len less than 3");
+                    QString str("SourceID:%1, Full Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Unknown Error");
                     qWarning() << str.arg(pFHead->sourse).arg(pFHead->framecounter).arg(procFramePos + 24)
                         .arg(paramTable).arg(paramCode);
                    
@@ -326,7 +329,7 @@ char* C3IFrame::ProcChildFrame_TD(char *pBuffer, C3IFrameHeader* pFHead, unsigne
     pBuffer += 2;
     procFramePos += 2;
 
-    ulChildFrameTime = *(unsigned long*)pBuffer;
+    ulChildFrameTime = *(unsigned int*)pBuffer;
     pBuffer += 4;
     procFramePos += 4;
 
@@ -356,12 +359,14 @@ char* C3IFrame::ProcChildFrame_TD(char *pBuffer, C3IFrameHeader* pFHead, unsigne
             pBuffer += 2;
             procFramePos += 2;
             lChildFrameLen -= 2;
-
-            ucTransType = m_pParamInfoRT->GetTransType(usParamTable, usParamCode);
+            AbstractParam* t_param = m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            if(t_param==NULL)
+                break;
+            ucTransType = t_param->GetParamTranType();
 
             if (ucTransType != 10 && ucTransType != 11)//非 字符串、原码
             {
-                usParamLen = m_pParamInfoRT->GetParamLen(usParamTable, usParamCode);
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     //信源%1挑点帧%2第%3字节处前后异常%4号表%5参数不存在
@@ -374,7 +379,7 @@ char* C3IFrame::ProcChildFrame_TD(char *pBuffer, C3IFrameHeader* pFHead, unsigne
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                        t_param, pBuffer, ulChildFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         //信源%1挑点帧%2第%3字节处前后异常%4号表%5参数设置失败
@@ -403,7 +408,7 @@ char* C3IFrame::ProcChildFrame_TD(char *pBuffer, C3IFrameHeader* pFHead, unsigne
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                        t_param, pBuffer, ulChildFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         //信源%1挑点帧%2第%3字节处前后异常%4号表%5参数
@@ -501,13 +506,15 @@ char* C3IFrame::ProcChildFrame_ZH(char *pBuffer, C3IFrameHeader* pFHead, unsigne
             pBuffer += 2;
             procFramePos += 2;
             lChildFrameLen -= 2;
-
-            ucTransType = m_pParamInfoRT->GetTransType(usParamTable, usParamCode);
+            AbstractParam* t_param = m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            if(t_param==NULL)
+                break;
+            ucTransType = t_param->GetParamTranType();
 
             if (ucTransType != 10 &&
                 ucTransType != 11)//非 字符串、原码
             {
-                usParamLen = m_pParamInfoRT->GetParamLen(usParamTable, usParamCode);
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     //信源%1指挥帧%2第%3字节处前后异常%4号表%5参数不存在
@@ -520,7 +527,7 @@ char* C3IFrame::ProcChildFrame_ZH(char *pBuffer, C3IFrameHeader* pFHead, unsigne
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulFrameTime, ulParamDate);
+                        t_param, pBuffer, ulFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         //信源%1指挥帧%2第%3字节处前后异常%4号表%5参数不存在
@@ -549,7 +556,7 @@ char* C3IFrame::ProcChildFrame_ZH(char *pBuffer, C3IFrameHeader* pFHead, unsigne
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulFrameTime, ulParamDate);
+                        t_param, pBuffer, ulFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         //信源%1指挥帧%2第%3字节处前后异常%4号表%5参数设置失败
@@ -644,10 +651,10 @@ char* C3IFrame::ProcChildFrame_AddLength_TD(char *pBuffer, C3IFrameHeader *pFHea
             usProcFrameLen += 1;
             lChildFrameLen -= 1;
 
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            AbstractParam* t_param = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
 
             //若指针为NULL，则不处理此参数，跳到帧的下一参数继续处理
-            if (pParam == NULL)
+            if (t_param == NULL)
             {
                 //信源%1带数长挑点帧第%2帧第%3字节处前后异常：表号%4字段号%5异常
                 QString str("SourceID:%1, Point with Data length Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Unknown Error");
@@ -658,11 +665,11 @@ char* C3IFrame::ProcChildFrame_AddLength_TD(char *pBuffer, C3IFrameHeader *pFHea
                 pBuffer += ParamCodeLength;
                 continue;
             }
-            else if (pParam != NULL)
+            else if (t_param != NULL)
             {
-                ucTransType = pParam->ucTransType;
-                usParamLen = pParam->usParamLen;
-                if (!CheckParam(pParam))
+                ucTransType = t_param->GetParamTranType();
+                usParamLen = t_param->GetParamDataLen();
+                if (!CheckParam(t_param))
                 {
                     //信源%1带数长挑点帧第%2帧第%3字节处前后异常表号%4参数号%5类型与字长不一致不处理该子帧
                     QString str = QObject::tr("SourceID:%1, Point with Data length Frame:%2, Error occured at:%3. TableNo:%4 and ParaNo:%5 Frame type and Length no match");
@@ -692,7 +699,7 @@ char* C3IFrame::ProcChildFrame_AddLength_TD(char *pBuffer, C3IFrameHeader *pFHea
                         if (lChildFrameLen >= usParamLen)
                         {
                             char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                                usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                                t_param, pBuffer, ulChildFrameTime, ulParamDate);
                             if (pBuffer_temp == 0)
                             {
                                 //信源%1带数长挑点帧第%2帧第%3字节处前后异常：表号%4字段号%5异常
@@ -724,7 +731,7 @@ char* C3IFrame::ProcChildFrame_AddLength_TD(char *pBuffer, C3IFrameHeader *pFHea
                     if (lChildFrameLen >= 3)
                     {
                         char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                            usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                            t_param, pBuffer, ulChildFrameTime, ulParamDate);
                         if (pBuffer_temp == 0)
                         {
                             //信源%1带数长挑点帧第%2帧第%3字节处前后异常：表号%4字段号%5异常
@@ -779,19 +786,19 @@ bool C3IFrame::checkChannelToContinue(uint tableNo)
 作者：cokkiy（张立民)
 创建时间：2015/09/28 15:49:10
 */
-bool C3IFrame::CheckParam(stru_Param* param)
+bool C3IFrame::CheckParam(AbstractParam* param)
 {
     if (param == NULL)
         return false;
 
-    switch (param->ucTransType)
+    switch (param->GetParamTranType())
     {
     case tp_char:
     case tp_BYTE:
-        return param->usParamLen == 1;
+        return param->GetParamDataLen() == 1;
     case tp_short:
     case tp_WORD:
-        return param->usParamLen == 2;
+        return param->GetParamDataLen() == 2;
     case tp_long:
     case tp_DWORD:
     case tp_PMTime:
@@ -800,11 +807,11 @@ bool C3IFrame::CheckParam(stru_Param* param)
     case tp_float:
     case tp_longE:
     case tp_UTCTime:
-        return param->usParamLen == 4;
+        return param->GetParamDataLen() == 4;
     case tp_double:
     case tp_ulong8:
     case tp_long8:
-        return param->usParamLen == 8;
+        return param->GetParamDataLen() == 8;
         //字符串与源码的参数长度会被改变，不能作为判断的依据
     case tp_String:
     case tp_Code:

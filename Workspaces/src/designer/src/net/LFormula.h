@@ -222,12 +222,6 @@ private:
     AbstractParam* addParam(unsigned short,unsigned short,ParseType type = CurData);
     AbstractParam* getParam(std::string formula);
     //no use
-    ZXParam& getParam(unsigned short,unsigned short);
-    //no use
-    double getValue(unsigned short,unsigned short);
-    //no use
-    bool getValue(ZXParam*,double&);
-    //no use
     void updateParam(unsigned short,unsigned short);    
     /*!
       更新公式中包含参数的数据

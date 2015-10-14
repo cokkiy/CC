@@ -154,27 +154,6 @@ struct stru_SoftLockInfo
 //	char aValidFlag;   //密码数据有效标志
 };
 
-typedef enum DataType
-{
-	tp_char,
-	tp_BYTE,
-	tp_short,
-	tp_WORD,
-	tp_long,
-	tp_DWORD,
-	tp_float,
-	tp_double,
-	tp_PMTime,
-	tp_Date,
-	tp_String,
-	tp_Code,
-	tp_BCDTime,
-	tp_UTCTime,
-	tp_ulong8,
-	tp_long8,
-	tp_longE,
-}DataType;
-
 typedef list<unsigned char> OutNode;
 typedef vector<NetParameter> NetworkSet;
 //typedef map<unsigned short, struct NetWatchData> NetWatchDataMap;

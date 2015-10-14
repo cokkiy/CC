@@ -1,4 +1,5 @@
-﻿#include "abstractdatacenter.h"
+#include "abstractdatacenter.h"
+
 
 DataCenterInterface::DataCenterInterface(QObject *parent)
    :QObject(parent)

@@ -17,22 +17,8 @@ extern int errno;
 //******************
 ZXParamBuffer::ZXParamBuffer(): m_binSem(1)
 {
-	int res = 0;
-
 	//初始化缓冲区队列
 	m_ZXparamBuf.clear();
-
-//	m_listNum = 0;
-
-	//默认缓存50000帧
-//	m_bufLimit = 50000;
-
-	//初始化缓冲区操作同步信号量
-	/*res = sem_init(&m_binSem, 0, 1);
-	if(res != 0)
-	{
-		m_errorCode = errno;
-	}*/
 }
 
 //******************
@@ -42,12 +28,19 @@ ZXParamBuffer::ZXParamBuffer(): m_binSem(1)
 //******************
 ZXParamBuffer::~ZXParamBuffer()
 {
+    //释放所有参数申请的内存
+    TableMap::iterator it = m_ZXparamBuf.begin();
+    for(;it != m_ZXparamBuf.end();it++)
+    {
+        ParaMap& parammap = it->second;
+        ParaMap::iterator pit = parammap.begin();
+        for(;pit!= parammap.end();pit++)
+        {
+            (pit->second).FreeParamSpace();
+        }
+    }
 	//清空缓冲区队列
 	m_ZXparamBuf.clear();
-
-//	m_listNum = 0;
-
-	//sem_destroy(&m_binSem);
 }
 
 //******************
@@ -93,5 +86,10 @@ AbstractParam ZXParamBuffer::GetBuffer(unsigned short tabno, unsigned short para
 AbstractParam* ZXParamBuffer::GetParamBuffer(unsigned short tabno, unsigned short paramno)
 {
     return &(m_ZXparamBuf[tabno][paramno]);
+}
+
+TableMap* ZXParamBuffer::GetAllParamMapPoint()
+{
+    return &m_ZXparamBuf;
 }
 

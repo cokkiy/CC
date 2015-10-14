@@ -18,14 +18,6 @@ typedef unsigned short WORD;
 #define CONST_CURVEBUFFER  8*36000
 #define  MeansValueMap std::map< long, DWORD >
 
-//数据类型数量
-const int DataTypeNum = 17;
-
-//数据类型字符串数组
-const QString DataTypeStrings[DataTypeNum] = { "char","byte","short","word","long","dword",
-"float","double","pmtime","date","string","code",
-"bcdtime","utctime","ulong8","long8","longe" };
-
 class CElementList;
 //参数解释的结构，包含文本和颜色，及是否设置颜色等属性
 typedef struct stru_MeanValue
@@ -103,164 +95,11 @@ struct stru_Remark
 	bool bYMXS;//是否显示源码
 }; 
 
-//C3I参数存储结构体，C3I参数存储文件包含多个该结构体。
-struct stru_Param  
-{
-public:
-
-	//当前值的日期
-	unsigned long ulParamDate;
-
-	//当前值的时刻
-	unsigned long ulParamTime;
-
-	//是否超差
-	bool bError;
-
-	//是否为新值,对于源码、字符串类型参数该值始终为0
-	//0表示首次，1表示旧值，2表示新值
-	unsigned char ucNew;
-	
-	//原始值，不包括：原码和字符串
-	unsigned char ucParamValue_Old[8];
-
-	//数长
-	unsigned short usParamLen;
-
-	//备注
-	QString pcParamNote;
-
-	//数据下限
-	double dParamLorlmt;
-
-	//数据上限
-	double dParamUprlmt;
-
-	//参数值的存放地址
-	char* pParamValue;
-
-	//参数的转换系数，量纲
-	//用来对网络接收的数据进行处理
-	double dParamQuotiety;
-
-	//参数代号字符串的存储地址
-	QString pcParamID;
-
-	//参数名字符串的存储地址
-	QString pcParamName;
-
-	//参数单位
-	QString pcParamUnit;
-
-	//参数转换后的存储类型
-	unsigned char ucChangeType;
-
-	//参数的表现类型 表现类型是指参数在指显终端以表格方式显示时
-	//的显示形态。曲线绘制时不考虑此因素
-	QString pcShowType;
-
-	//参数传输类型
-	unsigned char ucTransType;
-
-	//参数号
-	unsigned short usParamCode;
-
-	//表号
-	unsigned short usParamTable;
-
-	//理论值
-	QString pcTheoryValue;
-
-	//范围
-	QString pcValueRange;
-
-	//索引
-	unsigned long ulGroupIndex;
-	//参数索引地址，当参数的表现形式为当前值对应的含义时（如0
-	//表示异常，1表示正常等）的含义表的起始地址。
-	MeansValueMap * pParamIndex;
-
-public:	
-	stru_Param():ulParamDate(0xffffffff),ulParamTime(0xffffffff),
-		bError(0),ucNew(0),pcParamNote(""),pParamValue(NULL),
-		pcParamID(""),pcParamName(""),pcParamUnit(""),
-		pcShowType(""),pcTheoryValue(""),pcValueRange(""),pParamIndex(NULL),
-		usParamLen(0),dParamLorlmt(0.0),dParamUprlmt(0.0),dParamQuotiety(1.0),ucChangeType(0),
-		ucTransType(0),usParamCode(0),usParamTable(0),ulGroupIndex(0)
-	{
-        memset(ucParamValue_Old, 0, 8);
-	}
-	stru_Param& operator=(stru_Param& p)
-	{
-		ulParamDate = p.ulParamDate;
-		ulParamTime = p.ulParamTime;
-		bError = p.bError;
-		ucNew = p.ucNew;
-		pcParamNote = p.pcParamNote;
-		pParamValue = p.pParamValue;
-		pcParamID = p.pcParamID;
-		pcParamName = p.pcParamName;
-		pcParamUnit = p.pcParamUnit;
-		pcShowType = p.pcShowType;
-		pcTheoryValue = p.pcTheoryValue;
-		pcValueRange = p.pcValueRange;
-		pParamIndex = p.pParamIndex;
-		usParamLen = p.usParamLen;
-		dParamLorlmt = p.dParamLorlmt;
-		dParamUprlmt = p.dParamUprlmt;
-		dParamQuotiety = p.dParamQuotiety;
-		ucChangeType = p.ucChangeType;
-		ucTransType = p.ucTransType;
-		usParamCode = p.usParamCode;
-		usParamTable = p.usParamTable;
-		ulGroupIndex = p.ulGroupIndex;
-		memcpy(ucParamValue_Old,p.ucParamValue_Old,8);
-		return *this;
-	}
-
-    //强制类型转换,转换成AbstractParam类型
-    explicit operator AbstractParam() const
-    {
-        AbstractParam aParam;
-        aParam.m_tableNo = usParamTable;  				 //表号
-        aParam.m_paramNo = usParamCode;          //参数号
-        aParam.m_paramTitle = pcParamName.toLocal8Bit().data();
-        aParam.m_paramDataType = DataTypeStrings[ucTransType].toStdString();    //参数数据类型
-        aParam.m_paramDataLen = usParamLen; //参数数据长度
-        aParam.m_ucNew = ucNew; //是否为新值,对于源码、字符串类型参数该值始终为0 0表示首次，1表示旧值，2表示新值
-        aParam.m_paramTime = ulParamTime;//参数采集时间,绝对时
-        aParam.m_paramdate = ulParamDate; //参数采集日期,绝对时
-        aParam.m_bError = bError;
-        aParam.m_dParamLorlmt = dParamLorlmt;
-        aParam.m_dParamUprlmt = dParamUprlmt;
-        aParam.m_dParamQuotiety = dParamQuotiety;
-        aParam.m_pcParamID = pcParamID.toStdString();
-        aParam.m_pcParamUnit = pcParamUnit.toStdString();
-        aParam.m_ucChangeType = ucChangeType;
-        aParam.m_pcShowType = pcShowType.toStdString();
-        aParam.m_pcTheoryValue = pcTheoryValue.toStdString();
-        aParam.m_pcValueRange = pcValueRange.toStdString();
-        aParam.m_ulGroupIndex = ulGroupIndex;
-        aParam.m_ucTransType = ucTransType;
-        aParam.m_paramVal = new char[usParamLen];
-        memcpy(aParam.m_paramVal, pParamValue, usParamLen);
-        memcpy(aParam.m_ucParamValue_Old, ucParamValue_Old, 8);
-        aParam.m_pcParamNote = pcParamNote.toStdString();
-        return aParam;
-    }
-
-    ~stru_Param()
-    {
-        if (pParamValue != NULL)
-            delete pParamValue;
-    }
-};
-
 //C3I参数与参数含义组的对应关系
 struct stru_ParamIndex
 {
 	unsigned long ulGroupIndex;//组号
-	stru_Param* pParam;//对应C3I参数
+    AbstractParam* pParam;//对应C3I参数
 };
 
 //C3I系统网络设备信息结构体
@@ -829,7 +668,7 @@ struct stru_TestResult
 	char*	paramname;	
 	DWORD*	value;			
 	char*	resulttext;	
-	stru_Param* pParam;
+    AbstractParam* pParam;
 	stru_TestResult()
 	{
 		tabno = 0;
@@ -879,16 +718,16 @@ struct T0Struct
 	WORD t0_ms_bh;//T0模式表号
 	WORD t0_ms_xh;//T0模式序号
 	std::vector<DWORD > t0_ms_invalid_vc;//T0模式无效值列表
-	stru_Param * dh_param;//点火参数
-	stru_Param * qf_param;//起飞参数
+    AbstractParam * dh_param;//点火参数
+    AbstractParam * qf_param;//起飞参数
 	//为了解决东风中心发现的BUG：
 	//T0时间为0，T0模式为0的情况下，
 	//在某些指显终端上偶尔出现，
 	//T0时间闪烁显示“00时00分00秒000毫秒”的现象
 	//新增T0时间临时存放参数的位置
 	//刘裕贵、陶小勇，2013年10月22日
-	stru_Param * qf_param_back;//起飞参数的临时存放位置
-	stru_Param * t0_ms_param;//T0模式参数
+    AbstractParam * qf_param_back;//起飞参数的临时存放位置
+    AbstractParam * t0_ms_param;//T0模式参数
 	std::vector<void *> gl_ty;//关联图元
 	bool t0_b;//T0是否有效
 	DWORD t0_old_value;//起飞参数旧值

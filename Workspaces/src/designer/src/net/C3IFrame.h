@@ -98,6 +98,6 @@ private:
     bool checkChannelToContinue(uint tableNo);
 
     //检查参数是否正确
-    bool CheckParam(stru_Param* param);
+    bool CheckParam(AbstractParam* param);
 };
 

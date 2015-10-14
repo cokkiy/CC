@@ -128,7 +128,7 @@ void PDXPFrame::ProcFrame_STable_WZ(char *pBuffer, PDXPFrameHeader *pFHead, unsi
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
 
-    unsigned long ulParamDate = ChangeDateToBCD(pFHead->Date);
+    unsigned int ulParamDate = ChangeDateToBCD(pFHead->Date);
     //表号
     usParamTable = *(unsigned short*)pBuffer;
     pBuffer += 2;
@@ -142,10 +142,8 @@ void PDXPFrame::ProcFrame_STable_WZ(char *pBuffer, PDXPFrameHeader *pFHead, unsi
         while (lChildFrameLen > 0)
         {
             usParamCode++;//完整帧参数号自动累加
-            auto transType = m_pParamInfoRT->GetTransType(usParamTable, usParamCode);
-
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
-            if (pParam == NULL)
+            AbstractParam* t_param = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            if (t_param == NULL)
             {
                 QString str = QObject::tr("Error occured on PDXP single table full frame packet at %5.Source:%1, Frame:%2, Table:%3, ParamNo:%4");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -153,8 +151,8 @@ void PDXPFrame::ProcFrame_STable_WZ(char *pBuffer, PDXPFrameHeader *pFHead, unsi
                 procFramePos = procFramePos + lChildFrameLen;
                 return;
             }
-            ucTransType = pParam->ucTransType;
-            if (!CheckParam(pParam))
+            ucTransType = t_param->GetParamTranType();
+            if (!CheckParam(t_param))
             {
                 QString str = QObject::tr("Error occured on PDXP single table full frame packet at %5.Source:%1, Frame:%2, Table:%3, ParamNo:%4. Frame type not match data length.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -163,7 +161,7 @@ void PDXPFrame::ProcFrame_STable_WZ(char *pBuffer, PDXPFrameHeader *pFHead, unsi
             }
             if (ucTransType != 10 && ucTransType != 11)//非 字符串、原码
             {
-                usParamLen = pParam->usParamLen;
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     QString str = QObject::tr("Error occured on PDXP single table full frame packet at %5.Source:%1, Frame:%2, Table:%3, ParamNo:%4. No such param.");
@@ -175,7 +173,7 @@ void PDXPFrame::ProcFrame_STable_WZ(char *pBuffer, PDXPFrameHeader *pFHead, unsi
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, pFHead->Time, ulParamDate);
+                        t_param, pBuffer, pFHead->Time, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("Error occured on PDXP single table full frame packet at %5.Source:%1, Frame:%2, Table:%3, ParamNo:%4. Unknown error.");
@@ -202,7 +200,7 @@ void PDXPFrame::ProcFrame_STable_WZ(char *pBuffer, PDXPFrameHeader *pFHead, unsi
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, pFHead->Time, ulParamDate);
+                        t_param, pBuffer, pFHead->Time, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("Error occured on PDXP single table full frame packet at %5.Source:%1, Frame:%2, Table:%3. Data length error.");
@@ -262,7 +260,7 @@ void PDXPFrame::ProcFrame_STable_TD(char *pBuffer, PDXPFrameHeader *pFHead, unsi
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
 
-    unsigned long ulParamDate = ChangeDateToBCD(pFHead->Date);
+    unsigned int ulParamDate = ChangeDateToBCD(pFHead->Date);
     //表号
     usParamTable = *(unsigned short*)pBuffer;
     pBuffer += 2;
@@ -290,8 +288,8 @@ void PDXPFrame::ProcFrame_STable_TD(char *pBuffer, PDXPFrameHeader *pFHead, unsi
             procFramePos += 2;
             lChildFrameLen -= 2;
 
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
-            if (pParam == NULL)
+            AbstractParam* t_param = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            if (t_param == NULL)
             {
                 QString str = QObject::tr("PDXP single table point frame error.Source:%1, Frame:%2, at:%3 .TableNo:%4. Unknown Error.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable);
@@ -299,8 +297,8 @@ void PDXPFrame::ProcFrame_STable_TD(char *pBuffer, PDXPFrameHeader *pFHead, unsi
                 procFramePos = procFramePos + lChildFrameLen;
                 return;
             }
-            ucTransType = pParam->ucTransType;
-            if (!CheckParam(pParam))
+            ucTransType = t_param->GetParamTranType();
+            if (!CheckParam(t_param))
             {
                 QString str = QObject::tr("PDXP single table point frame error.Source:%1, Frame:%2, at:%3 .TableNo:%4, FrameNo:%5. Frame data type not match data length.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -309,7 +307,7 @@ void PDXPFrame::ProcFrame_STable_TD(char *pBuffer, PDXPFrameHeader *pFHead, unsi
             }
             if (ucTransType != 10 && ucTransType != 11)//非 字符串、原码
             {
-                usParamLen = pParam->usParamLen;
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     QString str = QObject::tr("PDXP single table point frame error.Source:%1, Frame:%2, at:%3 .TableNo:%4, FrameNo:%5. No such param.");
@@ -320,7 +318,7 @@ void PDXPFrame::ProcFrame_STable_TD(char *pBuffer, PDXPFrameHeader *pFHead, unsi
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, pFHead->Time, ulParamDate);
+                        t_param, pBuffer, pFHead->Time, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP single table point frame error.Source:%1, Frame:%2, at:%3 .TableNo:%4, FrameNo:%5. Unknown error.");
@@ -345,7 +343,7 @@ void PDXPFrame::ProcFrame_STable_TD(char *pBuffer, PDXPFrameHeader *pFHead, unsi
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, pFHead->Time, ulParamDate);
+                        t_param, pBuffer, pFHead->Time, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP single table point frame error.Source:%1, Frame:%2, at:%3 .TableNo:%4, FrameNo:%5. Unknown error.");
@@ -378,7 +376,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
 
-    unsigned long ulParamDate = ChangeDateToBCD(pFHead->Date);
+    unsigned int ulParamDate = ChangeDateToBCD(pFHead->Date);
 
     //帧的数据区长
     lChildFrameLen = pFHead->DataLength;
@@ -407,16 +405,16 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
             procFramePos += 2;
             lChildFrameLen -= 2;
 
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
-            if (pParam == NULL)
+            AbstractParam* t_param = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            if (t_param == NULL)
             {
                 QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Frame Length error");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
 
                 return;
             }
-            ucTransType = pParam->ucTransType;
-            if (!CheckParam(pParam))
+            ucTransType = t_param->GetParamTranType();
+            if (!CheckParam(t_param))
             {
                 QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Data type not match data length");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -425,7 +423,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
             }
             if (ucTransType != 10 && ucTransType != 11)//非 字符串、原码
             {
-                usParamLen = pParam->usParamLen;
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. No such param");
@@ -436,7 +434,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, pFHead->Time, ulParamDate);
+                        t_param, pBuffer, pFHead->Time, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Unknown error");
@@ -460,7 +458,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, pFHead->Time, ulParamDate);
+                        t_param, pBuffer, pFHead->Time, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. SetParamValue error");
@@ -490,7 +488,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
             procFramePos += 2;
             lChildFrameLen -= 2;
 
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            AbstractParam* pParam = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
             if (pParam == NULL)
             {
                 QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. No such param");
@@ -498,7 +496,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
                 
                 return;
             }
-            ucTransType = pParam->ucTransType;
+            ucTransType = pParam->GetParamTranType();
             if (!CheckParam(pParam))
             {
                 QString str = QObject::tr("PDXP multi table point frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Data type length not match data type");
@@ -508,7 +506,7 @@ void PDXPFrame::ProcFrame_MultiTable_TD(char *pBuffer, PDXPFrameHeader *pFHead, 
             }
             if (ucTransType != 10 && ucTransType != 11)//非字符串、原码
             {
-                usParamLen = pParam->usParamLen;
+                usParamLen = pParam->GetParamDataLen();
                 pBuffer += usParamLen;
                 procFramePos += usParamLen;
                 lChildFrameLen -= usParamLen;
@@ -545,7 +543,7 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
     unsigned short usParamCode = 0;//参数号
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
-    unsigned long ulParamDate = ChangeDateToBCD(pFHead->Date);
+    unsigned int ulParamDate = ChangeDateToBCD(pFHead->Date);
 
     char* t_pcBackBuffer = pBuffer;
     unsigned short t_usBankFrameLen = procFramePos;
@@ -579,9 +577,9 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
         {
             //完整帧参数号自动累加
             usParamCode++;
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            AbstractParam* t_param = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
             //参数不存在则放弃该帧的处理
-            if (pParam == NULL)
+            if (t_param == NULL)
             {
                 QString str = QObject::tr("PDXP multi table full frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. No such param.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -589,8 +587,8 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
                 procFramePos = t_usBankFrameLen + t_lBackChildFrameLen + 10;
                 return t_pcBackBuffer + t_lBackChildFrameLen + 10;
             }
-            ucTransType = pParam->ucTransType;
-            if (!CheckParam(pParam))
+            ucTransType = t_param->GetParamTranType();
+            if (!CheckParam(t_param))
             {
                 QString str = QObject::tr("PDXP multi table full frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Param type not match data length.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -601,7 +599,7 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
 
             if (ucTransType != 10 && ucTransType != 11)// 字符串、原码
             {
-                usParamLen = pParam->usParamLen;
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     QString str = QObject::tr("PDXP multi table full frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. No such param.");
@@ -613,7 +611,7 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                        t_param, pBuffer, ulChildFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP multi table full frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. SetParamValue param.");
@@ -650,7 +648,7 @@ char* PDXPFrame::ProcFrame_MultiTable_WZ(char *pBuffer, PDXPFrameHeader *pFHead,
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                        t_param, pBuffer, ulChildFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP multi table full frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Unknown error.");
@@ -695,7 +693,7 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
     unsigned short usParamCode = 0;//参数号
     unsigned short usParamLen = 0;//参数长
     unsigned char ucTransType = 0;//参数传输类型
-    unsigned long ulParamDate = ChangeDateToBCD(pFHead->Date);
+    unsigned int ulParamDate = ChangeDateToBCD(pFHead->Date);
 
     unsigned short t_usBankFrameLen = procFramePos;
     char *t_pcBackBuffer = pBuffer;
@@ -740,8 +738,8 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
             procFramePos += 2;
             lChildFrameLen -= 2;
 
-            stru_Param* pParam = (stru_Param*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
-            if (pParam == NULL)
+            AbstractParam* t_param = (AbstractParam*)m_pParamInfoRT->GetParam(usParamTable, usParamCode);
+            if (t_param == NULL)
             {
                 QString str = QObject::tr("PDXP multi single table frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. No such param.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -749,8 +747,8 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
                 procFramePos = t_usBankFrameLen + t_lBackChildFrameLen + 10;
                 return t_pcBackBuffer + t_lBackChildFrameLen + 10;
             }
-            ucTransType = pParam->ucTransType;
-            if (!CheckParam(pParam))
+            ucTransType = t_param->GetParamTranType();
+            if (!CheckParam(t_param))
             {
                 QString str = QObject::tr("PDXP multi single table frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. Param type not match data length.");
                 qWarning() << str.arg(pFHead->SID).arg(pFHead->FrameNo).arg(procFramePos + 32).arg(usParamTable).arg(usParamCode);
@@ -760,7 +758,7 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
             }
             if (ucTransType != 10 && ucTransType != 11)//非 字符串、原码
             {
-                usParamLen = pParam->usParamLen;
+                usParamLen = t_param->GetParamDataLen();
                 if (usParamLen == 0)//没有这个参数
                 {
                     QString str = QObject::tr("PDXP multi single table frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. No such param.");
@@ -772,7 +770,7 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
                 if (lChildFrameLen >= usParamLen)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                        t_param, pBuffer, ulChildFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP multi single table frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. SetParamValue error.");
@@ -799,7 +797,7 @@ char* PDXPFrame::ProcFrame_MultiSTable_TD(char *pBuffer, PDXPFrameHeader *pFHead
                 if (lChildFrameLen >= 3)
                 {
                     char* pBuffer_temp = m_pParamInfoRT->SetParamValue(
-                        usParamTable, usParamCode, pBuffer, ulChildFrameTime, ulParamDate);
+                        t_param, pBuffer, ulChildFrameTime, ulParamDate);
                     if (pBuffer_temp == 0)
                     {
                         QString str = QObject::tr("PDXP multi single table frame error.Source:%1,Frame: %2, at:%3, TableNo:%4, FrameNo:%5. SetParamValue error.");
@@ -848,19 +846,19 @@ bool PDXPFrame::checkChannelToContinue(unsigned int tableNo)
 作者：cokkiy（张立民)
 创建时间：2015/09/28 15:49:10
 */
-bool PDXPFrame::CheckParam(stru_Param* param)
+bool PDXPFrame::CheckParam(AbstractParam* param)
 {
     if (param == NULL)
         return false;
 
-    switch (param->ucTransType)
+    switch (param->GetParamTranType())
     {
     case tp_char:
     case tp_BYTE:
-        return param->usParamLen == 1;
+        return param->GetParamDataLen() == 1;
     case tp_short:
     case tp_WORD:
-        return param->usParamLen == 2;
+        return param->GetParamDataLen() == 2;
     case tp_long:
     case tp_DWORD:
     case tp_PMTime:
@@ -869,11 +867,11 @@ bool PDXPFrame::CheckParam(stru_Param* param)
     case tp_float:
     case tp_longE:
     case tp_UTCTime:
-        return param->usParamLen == 4;
+        return param->GetParamDataLen() == 4;
     case tp_double:
     case tp_ulong8:
     case tp_long8:
-        return param->usParamLen == 8;
+        return param->GetParamDataLen() == 8;
         //字符串与源码的参数长度会被改变，不能作为判断的依据
     case tp_String:
     case tp_Code:

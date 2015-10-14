@@ -50,16 +50,10 @@ ParamMap InformationInstance::getParamMap()
     for (auto table : *tablemap)
     {
         unsigned short tabNo=table.first;
-        for (auto para : *table.second)
+        for (auto para : table.second)
         {
             unsigned short paraNo = para.first;
-            stru_Param* paraMap = para.second;
-            AbstractParam tempParam = (AbstractParam)*paraMap;
-            if (tempParam.GetZXParamInfo(tabNo, paraNo) == true)
-            {
-                m_paramMap[tabNo][paraNo] = tempParam;
-                tempParam.FreeParamSpace();
-            }
+            m_paramMap[tabNo][paraNo] = para.second;
         }
 
     }

@@ -13,17 +13,22 @@
 #include <list>
 #include "../../../abstractparam.h"
 #include "../baseobject.h"	
-
+#include <map>
+#include <unordered_map>
 using namespace std;
 
-typedef map<unsigned short, map<unsigned short, AbstractParam> > ZXParamMap;
-
+//定义ParaMap类型,表示某表号下的所有参数集合(按参数号组织)
+typedef std::map<unsigned short, AbstractParam> ParaMap;
+//定义ParaMap类型,表示按表号,参数号组织的所有参数集合
+typedef std::unordered_map<unsigned short, ParaMap > TableMap;
+//
+typedef unordered_map<unsigned int, AbstractParam*> CacheTableMap;
 class ZXParamBuffer :public BaseObject
 {
 	private:
 
-		//缓冲区队列
-		ZXParamMap m_ZXparamBuf;	
+        //缓冲区Map
+        TableMap m_ZXparamBuf;
 
 		//缓冲区读写同步信号量
 		QSemaphore m_binSem;
@@ -42,6 +47,7 @@ class ZXParamBuffer :public BaseObject
 		//从队列中取出缓冲区
         AbstractParam GetBuffer(unsigned short tabno, unsigned short paramno);
         AbstractParam* GetParamBuffer(unsigned short tabno, unsigned short paramno);
+        TableMap* GetAllParamMapPoint();
 };
 
 

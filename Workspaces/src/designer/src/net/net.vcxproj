@@ -55,6 +55,9 @@
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CodeAnalysisRuleSet>..\..\..\..\my.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;..\..\..\..\include;..\..\..\..\include\net;D:/CodeStores/Workspaces/include/net/5.3.1;D:/CodeStores/Workspaces/include/net/5.3.1/net;tmp;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtNetwork;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -233,10 +236,8 @@
     <ClCompile Include="netinstance.cpp" />
     <ClCompile Include="main\src\network\network.cpp" />
     <ClCompile Include="showtype\numericalvalueresultstring.cpp" />
-    <ClCompile Include="main\src\parameter\parameter.cpp" />
     <ClCompile Include="main\src\recvinfothread\recvinfothread.cpp" />
     <ClCompile Include="selfshare\src\config\stationconfig.cpp" />
-    <ClCompile Include="SimpleLogger.cpp" />
     <ClCompile Include="stationinstance.cpp" />
     <ClCompile Include="taskinstance.cpp" />
     <ClCompile Include="selfshare\src\thread\thread.cpp" />
@@ -246,7 +247,6 @@
     <ClCompile Include="selfshare\src\config\xdocument.cpp" />
     <ClCompile Include="selfshare\src\config\xelement.cpp" />
     <ClCompile Include="selfshare\src\xmlproc\xmlproc.cpp" />
-    <ClCompile Include="selfshare\src\zxparam\zxparam.cpp" />
     <ClCompile Include="selfshare\src\zxparambuffer\zxparambuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -413,10 +413,8 @@ endlocal
     <ClInclude Include="netinstance.h" />
     <ClInclude Include="main\src\network\network.h" />
     <ClInclude Include="showtype\numericalvalueresultstring.h" />
-    <ClInclude Include="main\src\parameter\parameter.h" />
     <ClInclude Include="main\src\recvinfothread\recvinfothread.h" />
     <ClInclude Include="selfshare\src\config\stationconfig.h" />
-    <ClInclude Include="SimpleLogger.h" />
     <ClInclude Include="stationinstance.h" />
     <ClInclude Include="C3I\stru.h" />
     <CustomBuild Include="taskinstance.h">
@@ -445,7 +443,6 @@ endlocal
     <ClInclude Include="selfshare\src\config\xdocument.h" />
     <ClInclude Include="selfshare\src\config\xelement.h" />
     <ClInclude Include="selfshare\src\xmlproc\xmlproc.h" />
-    <ClInclude Include="selfshare\src\zxparam\zxparam.h" />
     <ClInclude Include="selfshare\src\zxparambuffer\zxparambuffer.h" />
   </ItemGroup>
   <ItemGroup>

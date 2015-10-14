@@ -10,7 +10,6 @@
 #define HISTORYPARAM_H
 
 #include "../baseobject.h"	
-#include "../zxparam/zxparam.h"
 
 class HistoryParam : public BaseObject
 {

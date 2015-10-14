@@ -22,8 +22,8 @@ NetBuffer::NetBuffer(): m_binSem(1)
 	//初始化缓冲区队列
 	m_netBuf.clear();
 
-	//默认缓存500000帧
-	m_bufLimit = 500000;
+	//默认缓存50000帧
+	m_bufLimit = 50000;
 
 	m_listNum = 0;
 

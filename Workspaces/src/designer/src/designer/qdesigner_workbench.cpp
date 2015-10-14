@@ -61,7 +61,7 @@
 #include <QtDesigner/private/actioneditor_p.h>
 #include <QtDesigner/private/qdesigner_formwindowmanager_p.h>
 #include "previewmanager_p.h"
-#include "qdesigner_formbuilder_p.h""
+#include "qdesigner_formbuilder_p.h"
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QUrl>

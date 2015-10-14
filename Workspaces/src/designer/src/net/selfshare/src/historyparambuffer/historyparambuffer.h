@@ -9,9 +9,9 @@
 #ifndef HISTORYPARAMBUFFER_H
 #define HISTORYPARAMBUFFER_H
 
-//#include <semaphore.h>
 #include <qsemaphore.h>
 #include <list>
+#include <map>
 #include "../historyparam/historyparam.h"
 #include "../baseobject.h"	
 
