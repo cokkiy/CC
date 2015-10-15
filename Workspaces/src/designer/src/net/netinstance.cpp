@@ -9,6 +9,7 @@
 #include "C3I/CParamInfoRT.h"
 #include "selfshare/src/config/channelselectconfig.h"
 #include <QDebug>
+#include "SimpleLogger.h"
 
 extern Config g_cfg;
 
@@ -21,6 +22,8 @@ CParamInfoRT g_paramInfoRT;
 //全局变量,主备信道切换表
 ChannelSelectConfig channelSelectConfig;
 
+// log fot count
+SimpleLogger logger;
 
 bool g_quitFlag = false;
 
@@ -64,6 +67,9 @@ int NetInstance::load(QString dir)
         qCritical()<<"Init socket failure, Please check net config file then restart"<<endl;
         return -1;
     }
+
+    //start log
+    logger.start("d:/DataRecord/");
 
     return 1;
 }

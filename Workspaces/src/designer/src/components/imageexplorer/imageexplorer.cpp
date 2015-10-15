@@ -88,6 +88,7 @@ public:
     explicit ImageExplorerPrivate(QDesignerFormEditorInterface *core);
     ~ImageExplorerPrivate();
     QLineEdit *findWidget() const { return m_findWidget; }
+    QTabWidget *tabWidget() const { return m_tabWidget; }
     QTreeView *pageTreeView() const { return m_pageTreeView; }
     QTreeView *markTreeView() const { return m_markTreeView; }
     QString findPageKey() const { return m_findPageKey; }
@@ -105,6 +106,7 @@ private:
     QTreeView * m_pageTreeView;
     QTreeView * m_markTreeView;
     QLineEdit *m_findWidget;
+    QTabWidget *m_tabWidget;
     QString m_findPageKey;
     QString m_findMarkKey;
 };
@@ -118,6 +120,7 @@ ImageExplorer::ImageExplorerPrivate::ImageExplorerPrivate(QDesignerFormEditorInt
     m_findWidget->setPlaceholderText(tr("Key Word"));
     m_findWidget->setClearButtonEnabled(true);
 
+    m_tabWidget = new QTabWidget();
     ((XbelTree*)m_pageTreeView)->setColumnCount(2);
     ((XbelTree*)m_pageTreeView)->setDragEnabled(true);
     ((XbelTree*)m_pageTreeView)->viewport()->setAcceptDrops(true);
@@ -138,6 +141,7 @@ ImageExplorer::ImageExplorerPrivate::~ImageExplorerPrivate()
     delete m_pageTreeView;
     delete m_markTreeView;
     delete m_findWidget;
+    delete m_tabWidget;
 }
 
 void ImageExplorer::ImageExplorerPrivate::setFileName(const QString &file_name)
@@ -175,15 +179,16 @@ ImageExplorer::ImageExplorer(QDesignerFormEditorInterface *core, QWidget *parent
     connect(m_impl->findWidget(), SIGNAL(textChanged(QString)), m_impl->pageTreeView(), SLOT(filter(QString)));
     toolBar->addWidget(m_impl->findWidget());
     vbox->addWidget(toolBar);
-    QTabWidget *tabWidget = new QTabWidget(this);
-    tabWidget->addTab(m_impl->pageTreeView(),tr("PageTree"));
-    tabWidget->addTab(m_impl->markTreeView(),tr("BookMark"));
-    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(changeFilter(int)));
-    vbox->addWidget(tabWidget);
+    m_impl->tabWidget()->addTab(m_impl->pageTreeView(),tr("PageTree"));
+    m_impl->tabWidget()->addTab(m_impl->markTreeView(),tr("BookMark"));
+    connect(m_impl->tabWidget(), SIGNAL(currentChanged(int)), this, SLOT(changeFilter(int)));
+    vbox->addWidget(m_impl->tabWidget());
 }
 
 ImageExplorer::~ImageExplorer()
 {
+    disconnect(m_impl->findWidget(), SIGNAL(textChanged(QString)), m_impl->pageTreeView(), SLOT(filter(QString)));
+    disconnect(m_impl->tabWidget(), SIGNAL(currentChanged(int)), this, SLOT(changeFilter(int)));
     delete m_impl;
 }
 

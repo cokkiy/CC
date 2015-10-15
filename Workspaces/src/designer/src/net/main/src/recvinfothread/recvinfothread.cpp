@@ -14,13 +14,13 @@
 #include "../infoprocthread/infoprocthread.h"
 #include "../../../selfshare/src/config/config.h"
 #include "FrameHeader.h"
- 
+#include "SimpleLogger.h"
 
 extern InfoProcThread 	g_InfoProcThread[MAX_THREAD_NUM];
 extern bool g_quitFlag;
 
-//定义最大socket数量
-#define MAX_SOCKET 100
+// extern var, log for counting
+extern SimpleLogger logger;
 
 //构造函数
 RecvInfoThread::RecvInfoThread():PThread()
@@ -163,6 +163,9 @@ void RecvInfoThread::run()
                 {
                     continue;
                 }
+
+                //计数
+                //logger.logReceivedPacketCount();
                
                 //判断是否是有效的包
                 if (!isValidPacket(result, udpbuf))

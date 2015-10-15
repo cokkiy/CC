@@ -106,7 +106,7 @@ private:
     bool itemContainsKey(const QRegExp &key,QTreeWidgetItem *item);
     QTreeWidgetItem *createItem(const QDomElement &element,
                                 QTreeWidgetItem *parentItem = 0,int type=Type);
-    // remove an tree item
+    // remove an tree item and XML text
     void removeItem(QTreeWidgetItem * Item);
     // get page file name from an tree item
     QString pageFileName(QTreeWidgetItem * Item);
@@ -124,7 +124,9 @@ private:
     QDomDocument domDocument;
     QHash<QTreeWidgetItem *, QDomElement> domElementForItem;
     QIcon folderIcon;
+    QIcon unSavedfolderIcon;
     QIcon bookmarkIcon;
+    QIcon unSavedbookmarkIcon;
 
     QDesignerFormEditorInterface *m_core;
 

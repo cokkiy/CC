@@ -22,7 +22,7 @@ typedef std::map<unsigned short, AbstractParam> ParaMap;
 //定义ParaMap类型,表示按表号,参数号组织的所有参数集合
 typedef std::unordered_map<unsigned short, ParaMap > TableMap;
 //
-typedef unordered_map<unsigned int, AbstractParam*> CacheTableMap;
+typedef std::unordered_map<unsigned int, AbstractParam*> CacheTableMap;
 class ZXParamBuffer :public BaseObject
 {
 	private:

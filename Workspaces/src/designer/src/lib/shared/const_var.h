@@ -17,4 +17,5 @@ static const QString g_pageRelativeFilePath = "/private/page/";
 static const QString g_bookmarkRelativeFilePath = "/private/bookmark.xbel";
 static const QString g_netConfigRelativeFilePath = "/public/";
 static const QString g_privateRelativeFilePath = "D:/CodeStores/Workspaces/zx_config/private/";
+
 #endif // CONST_VAR_H

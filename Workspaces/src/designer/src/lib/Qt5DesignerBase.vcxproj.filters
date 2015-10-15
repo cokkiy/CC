@@ -1794,7 +1794,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\lib\Qt5DesignerBase_resource.rc" />
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\lib\Qt5DesignerBased_resource.rc" />
+    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\lib\Qt5DesignerBase_resource.rc" />
+    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\lib\Qt5DesignerBased_resource.rc" />
   </ItemGroup>
 </Project>

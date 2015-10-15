@@ -331,7 +331,7 @@ void FormWindowManager::setActiveFormWindow(QDesignerFormWindowInterface *w)
             old->repaintSelection();
     }
 
-    emit activeFormWindowChanged(m_activeFormWindow);
+    //emit activeFormWindowChanged(m_activeFormWindow);
 
     if (m_activeFormWindow) {
         m_activeFormWindow->emitSelectionChanged();

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Form Files">
@@ -44,16 +44,6 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{eda009c9-efc1-4714-8612-5e67e71ceb16}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
-    </Filter>
-    <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{0aec31dc-6d2d-4595-bfe2-f37004f9a76f}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -132,7 +122,10 @@
     <ClCompile Include="..\formeditor\formwindowsettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\graphdialog\graphdialog.cpp">
+    <ClCompile Include="..\propertyeditor\graphobj\graphobj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\propertyeditor\graphobj\graphobjdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\taskmenu\groupbox_taskmenu.cpp">
@@ -207,6 +200,12 @@
     <ClCompile Include="..\propertyeditor\propertyeditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapobj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="qdesigner_components.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -258,10 +257,10 @@
     <ClCompile Include="..\formeditor\qwizard_container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\selectmultiparamdlg.cpp">
+    <ClCompile Include="..\propertyeditor\paramselect\selectmultiparamdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\selectparamdialog.cpp">
+    <ClCompile Include="..\propertyeditor\paramselect\selectparamdialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\signalsloteditor\signalslot_utils.cpp">
@@ -300,16 +299,16 @@
     <ClCompile Include="..\propertyeditor\stringlisteditorbutton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\tablecell.cpp">
+    <ClCompile Include="..\propertyeditor\simpletable\tablecell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\tableitemset.cpp">
+    <ClCompile Include="..\propertyeditor\simpletable\tableitemset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\tablepropertysetDlg.cpp">
+    <ClCompile Include="..\propertyeditor\simpletable\tableproperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\propertyeditor\tableset.cpp">
+    <ClCompile Include="..\propertyeditor\simpletable\tablepropertysetDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\taskmenu\tablewidget_taskmenu.cpp">
@@ -368,591 +367,6 @@
     </ClCompile>
     <ClCompile Include="..\imageexplorer\xbeltree.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_abstractfindwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_abstractfindwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_buddyeditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_buddyeditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_buddyeditor_plugin.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_buddyeditor_plugin.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_buddyeditor_tool.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_buddyeditor_tool.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_button_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_button_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_combobox_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_combobox_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_connectdialog_p.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_connectdialog_p.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_containerwidget_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_containerwidget_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_default_actionprovider.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_default_actionprovider.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_default_container.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_default_container.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_default_layoutdecoration.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_default_layoutdecoration.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_designerpropertymanager.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_designerpropertymanager.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_deviceprofiledialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_deviceprofiledialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_dpi_chooser.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_dpi_chooser.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_embeddedoptionspage.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_embeddedoptionspage.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_formeditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_formeditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_formwindow.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_formwindow.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_formwindow_widgetstack.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_formwindow_widgetstack.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_formwindowcursor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_formwindowcursor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_formwindowmanager.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_formwindowmanager.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_formwindowsettings.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_formwindowsettings.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_graphdialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_graphdialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_groupbox_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_groupbox_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_imageexplorer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_imageexplorer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_inplace_editor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_inplace_editor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_inplace_widget_helper.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_inplace_widget_helper.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_itemlisteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_itemlisteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_itemview_propertysheet.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_itemview_propertysheet.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_itemviewfindwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_itemviewfindwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_label_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_label_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_layout_propertysheet.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_layout_propertysheet.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_layouttaskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_layouttaskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_line_propertysheet.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_line_propertysheet.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_lineedit_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_lineedit_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_listwidget_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_listwidget_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_listwidgeteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_listwidgeteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_menutaskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_menutaskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_newdynamicpropertydialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_newdynamicpropertydialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_objectinspector.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_objectinspector.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_paletteeditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_paletteeditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_paletteeditorbutton.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_paletteeditorbutton.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_previewactiongroup.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_previewactiongroup.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_previewframe.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_previewframe.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_previewwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_previewwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_propertyeditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_propertyeditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qdesignerundostack.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qdesignerundostack.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qlayoutwidget_propertysheet.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qlayoutwidget_propertysheet.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qlonglongvalidator.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qlonglongvalidator.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qmainwindow_container.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qmainwindow_container.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qmdiarea_container.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qmdiarea_container.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtbuttonpropertybrowser.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtbuttonpropertybrowser.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtcolorbutton.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtcolorbutton.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qteditorfactory.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qteditorfactory.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtgroupboxpropertybrowser.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtgroupboxpropertybrowser.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtpropertybrowser.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtpropertybrowser.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtpropertybrowserutils_p.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtpropertybrowserutils_p.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtpropertymanager.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtpropertymanager.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qttreepropertybrowser.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qttreepropertybrowser.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qtvariantproperty.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qtvariantproperty.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_qwizard_container.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_qwizard_container.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_selectmultiparamdlg.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_selectmultiparamdlg.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_selectparamdialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_selectparamdialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_signalsloteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_signalsloteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_signalsloteditor_p.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_signalsloteditor_p.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_signalsloteditor_plugin.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_signalsloteditor_plugin.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_signalsloteditor_tool.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_signalsloteditor_tool.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_signalsloteditorwindow.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_signalsloteditorwindow.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_simpleinputdialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_simpleinputdialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_singlestatedialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_singlestatedialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_singlestatelineeditdelegate.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_singlestatelineeditdelegate.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_singlestatespindelegate.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_singlestatespindelegate.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_spacer_propertysheet.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_spacer_propertysheet.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_stringlisteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_stringlisteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_stringlisteditorbutton.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_stringlisteditorbutton.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tableitemset.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tableitemset.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tablepropertysetDlg.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tablepropertysetDlg.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tableset.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tableset.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tablewidget_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tablewidget_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tablewidgeteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tablewidgeteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tabordereditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tabordereditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tabordereditor_plugin.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tabordereditor_plugin.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tabordereditor_tool.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tabordereditor_tool.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_taskmenu_component.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_taskmenu_component.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_templateoptionspage.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_templateoptionspage.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_textedit_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_textedit_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_texteditfindwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_texteditfindwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_tool_widgeteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_tool_widgeteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_toolbar_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_toolbar_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_treewidget_taskmenu.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_treewidget_taskmenu.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_treewidgeteditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_treewidgeteditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_widgetbox.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_widgetbox.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_widgetboxcategorylistview.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_widgetboxcategorylistview.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_widgetboxtreewidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_widgetboxtreewidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_widgetselection.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_widgetselection.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Debug\moc_xbeltree.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".moc\Release\moc_xbeltree.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_findwidget.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_formeditor.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_propertyeditor.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_qtpropertybrowser.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_widgetbox.cpp">
-      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1037,7 +451,10 @@
     <CustomBuild Include="..\formeditor\formwindowsettings.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\graphdialog\graphdialog.h">
+    <CustomBuild Include="..\propertyeditor\graphobj\graphobj.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\graphobj\graphobjdlg.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\taskmenu\groupbox_taskmenu.h">
@@ -1124,6 +541,12 @@
     <ClInclude Include="..\propertyeditor\propertyeditor_global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobj.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <ClInclude Include="..\formeditor\qdesigner_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1172,10 +595,10 @@
     <CustomBuild Include="..\formeditor\qwizard_container.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\selectmultiparamdlg.h">
+    <CustomBuild Include="..\propertyeditor\paramselect\selectmultiparamdlg.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\selectparamdialog.h">
+    <CustomBuild Include="..\propertyeditor\paramselect\selectparamdialog.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="..\signalsloteditor\signalslot_utils_p.h">
@@ -1220,16 +643,16 @@
     <CustomBuild Include="..\propertyeditor\stringlisteditorbutton.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="..\propertyeditor\tablecell.h">
+    <ClInclude Include="..\propertyeditor\simpletable\tablecell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="..\propertyeditor\tableitemset.h">
+    <CustomBuild Include="..\propertyeditor\simpletable\tableitemset.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\tablepropertysetDlg.h">
+    <ClInclude Include="..\propertyeditor\simpletable\tableproperty.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\tableset.h">
+    </ClInclude>
+    <CustomBuild Include="..\propertyeditor\simpletable\tablepropertysetDlg.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\taskmenu\tablewidget_taskmenu.h">
@@ -1295,41 +718,665 @@
     <CustomBuild Include="..\imageexplorer\xbeltree.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include=".moc\Debug\designerpropertymanager.moc">
-      <Filter>Generated Files\Debug</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Release\designerpropertymanager.moc">
-      <Filter>Generated Files\Release</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Debug\qteditorfactory.moc">
-      <Filter>Generated Files\Debug</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Release\qteditorfactory.moc">
-      <Filter>Generated Files\Release</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Debug\qtpropertymanager.moc">
-      <Filter>Generated Files\Debug</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Release\qtpropertymanager.moc">
-      <Filter>Generated Files\Release</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Debug\qttreepropertybrowser.moc">
-      <Filter>Generated Files\Debug</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Release\qttreepropertybrowser.moc">
-      <Filter>Generated Files\Release</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Debug\signalsloteditorwindow.moc">
-      <Filter>Generated Files\Debug</Filter>
-    </CustomBuild>
-    <CustomBuild Include=".moc\Release\signalsloteditorwindow.moc">
-      <Filter>Generated Files\Release</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include=".moc\debug\designerpropertymanager.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\release\designerpropertymanager.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
     <ClCompile Include="lib_pch.h.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include=".moc\debug\moc_abstractfindwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_abstractfindwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_buddyeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_buddyeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_buddyeditor_plugin.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_buddyeditor_plugin.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_buddyeditor_tool.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_buddyeditor_tool.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_button_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_button_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_combobox_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_combobox_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_connectdialog_p.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_connectdialog_p.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_containerwidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_containerwidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_default_actionprovider.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_default_actionprovider.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_default_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_default_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_default_layoutdecoration.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_default_layoutdecoration.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_designerpropertymanager.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_designerpropertymanager.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_deviceprofiledialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_deviceprofiledialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_dpi_chooser.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_dpi_chooser.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_embeddedoptionspage.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_embeddedoptionspage.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_formeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_formeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_formwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_formwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_formwindow_widgetstack.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_formwindow_widgetstack.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_formwindowcursor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_formwindowcursor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_formwindowmanager.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_formwindowmanager.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_formwindowsettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_formwindowsettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_graphobj.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_graphobj.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_graphobjdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_graphobjdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_groupbox_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_groupbox_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_imageexplorer.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_imageexplorer.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_inplace_editor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_inplace_editor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_inplace_widget_helper.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_inplace_widget_helper.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_itemlisteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_itemlisteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_itemview_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_itemview_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_itemviewfindwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_itemviewfindwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_label_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_label_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_layout_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_layout_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_layouttaskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_layouttaskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_line_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_line_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_lineedit_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_lineedit_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_listwidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_listwidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_listwidgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_listwidgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_menutaskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_menutaskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_newdynamicpropertydialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_newdynamicpropertydialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_objectinspector.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_objectinspector.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_paletteeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_paletteeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_paletteeditorbutton.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_paletteeditorbutton.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_previewactiongroup.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_previewactiongroup.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_previewframe.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_previewframe.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_previewwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_previewwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_propertyeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_propertyeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapobj.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapobj.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapobjdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapobjdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qdesignerundostack.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qdesignerundostack.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qlayoutwidget_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qlayoutwidget_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qlonglongvalidator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qlonglongvalidator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qmainwindow_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qmainwindow_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qmdiarea_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qmdiarea_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qtpropertybrowserutils_p.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qtpropertybrowserutils_p.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_qwizard_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_qwizard_container.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_selectmultiparamdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_selectmultiparamdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_selectparamdialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_selectparamdialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_signalsloteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_signalsloteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_signalsloteditor_p.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_signalsloteditor_p.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_signalsloteditor_plugin.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_signalsloteditor_plugin.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_signalsloteditor_tool.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_signalsloteditor_tool.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_signalsloteditorwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_signalsloteditorwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_simpleinputdialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_simpleinputdialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_singlestatedialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_singlestatedialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_singlestatelineeditdelegate.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_singlestatelineeditdelegate.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_singlestatespindelegate.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_singlestatespindelegate.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_spacer_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_spacer_propertysheet.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_stringlisteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_stringlisteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_stringlisteditorbutton.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_stringlisteditorbutton.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tableitemset.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tableitemset.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tablepropertysetDlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tablepropertysetDlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tablewidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tablewidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tablewidgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tablewidgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tabordereditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tabordereditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tabordereditor_plugin.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tabordereditor_plugin.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tabordereditor_tool.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tabordereditor_tool.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_taskmenu_component.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_taskmenu_component.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_templateoptionspage.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_templateoptionspage.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_textedit_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_textedit_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_texteditfindwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_texteditfindwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_tool_widgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_tool_widgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_toolbar_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_toolbar_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_treewidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_treewidget_taskmenu.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_treewidgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_treewidgeteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_widgetbox.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_widgetbox.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_widgetboxcategorylistview.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_widgetboxcategorylistview.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_widgetboxtreewidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_widgetboxtreewidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_widgetselection.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_widgetselection.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_xbeltree.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_xbeltree.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_findwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_findwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_formeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_formeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_propertyeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_propertyeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_qtpropertybrowser.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_qtpropertybrowser.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\debug\qrc_widgetbox.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".rcc\release\qrc_widgetbox.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <CustomBuild Include=".moc\debug\qteditorfactory.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\release\qteditorfactory.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\debug\qtpropertymanager.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\release\qtpropertymanager.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\debug\qttreepropertybrowser.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\release\qttreepropertybrowser.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\debug\signalsloteditorwindow.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include=".moc\release\signalsloteditorwindow.moc">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <ClInclude Include=".uic\ui_connectdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_deviceprofiledialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_formwindowsettings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_graphobj.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_graphobjdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_itemlisteditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_newdynamicpropertydialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_paletteeditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_previewwidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_q2wmapobj.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_q2wmapobjdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_selectmultiparamdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_selectsingleparamdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_singlestatedialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_stringlisteditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_tableitemset.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_tablepropertysetdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_tablewidgeteditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_templateoptionspage.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_treewidgeteditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\signalsloteditor\connectdialog.ui">
@@ -1341,7 +1388,10 @@
     <CustomBuild Include="..\formeditor\formwindowsettings.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\graphdialog\graphdialog.ui">
+    <CustomBuild Include="..\propertyeditor\graphobj\graphobj.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\graphobj\graphobjdlg.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\taskmenu\itemlisteditor.ui">
@@ -1356,7 +1406,16 @@
     <CustomBuild Include="..\propertyeditor\previewwidget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobj.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\propertyeditor\selectmultiparamdlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\selectsingleparamdialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\propertyeditor\singlestatedialog.ui">
@@ -1368,7 +1427,7 @@
     <CustomBuild Include="..\propertyeditor\tableitemset.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\propertyeditor\tableset.ui">
+    <CustomBuild Include="..\propertyeditor\tablepropertysetdialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\taskmenu\tablewidgeteditor.ui">
@@ -1996,57 +2055,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\components\lib\Qt5DesignerComponentsBase_resource.rc" />
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\components\lib\Qt5DesignerComponentsBased_resource.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GeneratedFiles\ui_connectdialog.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_deviceprofiledialog.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_formwindowsettings.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_graphdialog.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_itemlisteditor.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_newdynamicpropertydialog.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_paletteeditor.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_previewwidget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_selectmultiparamdlg.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_singlestatedialog.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_stringlisteditor.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_tableitemset.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_tableset.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_tablewidgeteditor.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_templateoptionspage.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_treewidgeteditor.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
+    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\components\lib\Qt5DesignerComponentsBase_resource.rc" />
+    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\components\lib\Qt5DesignerComponentsBased_resource.rc" />
   </ItemGroup>
 </Project>

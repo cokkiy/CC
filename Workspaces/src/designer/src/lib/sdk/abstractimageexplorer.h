@@ -17,6 +17,10 @@ public:
     QDesignerImageExplorerInterface(QWidget *parent, Qt::WindowFlags flags = 0);
     virtual ~QDesignerImageExplorerInterface();
 
+    virtual void setFileName(const QString &file_name) = 0;
+    virtual QString fileName() const = 0;
+    virtual bool load() = 0;
+    virtual bool save() = 0;
     virtual QDesignerFormEditorInterface *core() const;
 };
 

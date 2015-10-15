@@ -15,7 +15,7 @@ extern int errno;
 //功能：初始化各成员变量
 //备注：
 //******************
-HistoryParamBuffer::HistoryParamBuffer():m_binSem(1)
+HistoryParamBuffer::HistoryParamBuffer()//:m_binSem(1)
 {
 	int res = 0;
 
@@ -52,21 +52,27 @@ HistoryParamBuffer::~HistoryParamBuffer()
 //******************
 void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryParam& buf)
 {
-	//sem_wait(&m_binSem);
-    m_binSem.acquire();
-    m_HistoryParamBuf[tn][pn].push_front(buf);
-    int temp = m_savListLimit[tn][pn];
-    if(temp >= m_listLimit)
-    {
-        m_HistoryParamBuf[tn][pn].pop_back();
-    }
-    else
-    {
-        m_savListLimit[tn][pn]++;
-    }
 
-	//sem_post(&m_binSem);
-    m_binSem.release();
+    unsigned int key = tn;
+    key = key << 16 + tn;
+    auto param = m_HistoryParamBuf[key];   
+
+    lockForWriteBuf.lock();
+    param.pParamsBuf->push_front(buf);
+//     m_HistoryParamBuf[key]->push_front(buf);
+    //m_HistoryParamBuf[key].push_front(buf);
+    lockForWriteBuf.unlock();
+    //lockParam.mylock->unlock();
+//     int temp = m_savListLimit[tn][pn];
+//     if (temp >= m_listLimit)
+//     {
+//         //m_HistoryParamBuf[tn][pn].pop_back();
+//     }
+//     else
+//     {
+//         m_savListLimit[tn][pn]++;
+//     }
+    //m_binSem.release();
 }
 
 //******************
@@ -74,17 +80,19 @@ void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryPa
 //功能：从缓冲区队列取出参数
 //备注：前面进，后面出
 //******************
-list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigned short paramno)
+HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigned short paramno)
 {
-	list<HistoryParam> buf;
+	HistoryParams buf;
 
 	//sem_wait(&m_binSem);
-    m_binSem.acquire();
-	
-    buf = m_HistoryParamBuf[tableno][paramno];
+    //m_binSem.acquire();
+    unsigned int key = tableno;
+    key = key << 16 + paramno;
+    buf = *(m_HistoryParamBuf[key].pParamsBuf);
+    //buf = m_HistoryParamBuf[key];
 
 	//sem_post(&m_binSem);
-    m_binSem.release();
+    //m_binSem.release();
 
 	return buf;
 }
@@ -92,11 +100,14 @@ list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigne
 list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time)
 {
     //sem_wait(&m_binSem);
-    m_binSem.acquire();
+    //m_binSem.acquire();
     list<HistoryParam> buf;
     list<HistoryParam> retBuf;
     list<HistoryParam>::reverse_iterator it;
-    buf = m_HistoryParamBuf[tableno][paramno];
+    unsigned int key = tableno;
+    key = key << 16 + paramno;
+    buf = *(m_HistoryParamBuf[key].pParamsBuf);
+    //buf = m_HistoryParamBuf[key];
     //qDebug()<<"Date " << date << "Time " << time ;
     int t_date,t_time=0;
     //倒序取数据
@@ -120,6 +131,6 @@ list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigne
     }
     //qDebug()<<"Size " << retBuf.size();
     //sem_post(&m_binSem);
-    m_binSem.release();
+    ///m_binSem.release();
     return retBuf;
 }

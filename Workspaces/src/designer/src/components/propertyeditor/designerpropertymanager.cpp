@@ -49,11 +49,10 @@
 
 #include <designerpropertymanager.h>
 #include "singlestatedialog.h"
-#include "selectparamdialog.h"
-#include "tablepropertysetDlg.h"
+#include "paramselect/selectparamdialog.h"
+#include "paramselect/selectmultiparamdlg.h"
+#include "simpletable/tablepropertysetDlg.h"
 
-#include "../propertyeditor/graphdialog/graphdialog.h"
-//#include "graphdialog/ui_graphdialog.h"
 
 #include <formwindowbase_p.h>
 #include <textpropertyeditor_p.h>
@@ -302,7 +301,6 @@ private:
     QDesignerFormEditorInterface *m_core;
 
     SingleStateDialog *singleStateDialog;
-    GraphDialog *graphdialog;
 
 
 };
@@ -387,7 +385,8 @@ void TextEditor::setTextPropertyValidationMode(TextPropertyValidationMode vm)
                          || vm == ValidationMultiLine || vm == ValidationURL
                          || vm == ValidationData || vm == ValidationDataes
                          || vm == ValidationFile|| vm == ValidationStates
-                         || vm == ValidationTable||vm == ValidationGraphDialog);
+                         || vm == ValidationTable
+                         ||vm == Validation2wmapObj||vm == ValidationGraphObj);
 }
 
 void TextEditor::setText(const QString &text)
@@ -431,47 +430,71 @@ void TextEditor::buttonClicked()
     }
         break;
 
-    //zjb add
-    case ValidationGraphDialog:
-    {
 
-        // 多曲线配置对话框
-        GraphDialog dlg(m_core, this);
-        dlg.showDialog() ;//打开对话框
-        newText = dlg.TransStrStateJson();//将构建的Json字符串赋值给传输字符串
+    //zjb add 多曲线配置对话框,用于验证动态添加页面
+    case ValidationGraphObj:
+    {
+        //多曲线配置对话框
+        GraphObj dlg;
+        dlg.InitControl(oldText);
+        if(dlg.exec() == QDialog::Accepted)
+        {
+            newText = dlg.transText();//将构建的Json字符串赋值给传输字符串
+        }
+        else
+        {
+            newText = oldText;
+        }
+        //        dlg.Show() ;//打开对话框
+
+    }
+
+        break;
+
+    //rika add 20150928
+    case Validation2wmapObj:
+    {
+        //目标配置对话框
+        Q2wmapObj dlg;
+        dlg.InitControl(oldText);
+        if(dlg.exec() == QDialog::Accepted)
+        {
+            newText = dlg.transText();//将构建的Json字符串赋值给传输字符串
+        }
+        else
+        {
+            newText = oldText;
+        }
+//        dlg.Show() ;//打开对话框
+
      }
 
         break;
-
-
     case ValidationData:
-    {
-        // 单参数选择对话框
-        QSelectParamDialog dlg;
-        dlg.SetText(oldText);
-        //dlg.setDefaultFont(m_richTextDefaultFont);
-        //dlg.setText(oldText);
-        //dlg.showDialog();
-        if (dlg.showDialog() != QDialog::Accepted )
-            return;
-        newText = dlg.text();
-    }
-        break;
+        {
+            // 单参数选择对话框
+            QSelectParamDialog dlg;
+            dlg.SetText(oldText);
+            if (dlg.showDialog() != QDialog::Accepted )
+                return;
+            newText = dlg.text();
+        }
+            break;
     case ValidationDataes:
     {
         // 多参数选择对话框
-        PlainTextEditorDialog dlg(m_core, this);
-        dlg.setDefaultFont(m_richTextDefaultFont);
-        dlg.setText(oldText);
-        if (dlg.showDialog() != QDialog::Accepted)
+        QSelectMultiParamDlg dlg;
+        dlg.setMultiParamFormulaStr(oldText);
+        if (dlg.exec() != QDialog::Accepted)
             return;
-        newText = dlg.text();
+        newText = dlg.getMultiParamFormulaStr();
+        break;
     }
 
     case ValidationFile://rika add 20150814
     {
         // 文件选择对话框    替换
-        newText = QFileDialog::getOpenFileName(this, tr("Select File For Great Rika"), "", tr("All Files(*.*)"));
+        newText = QFileDialog::getOpenFileName(this, tr("Select File"), "", tr("All Files(*.*)"));
     }
         break;
 
@@ -488,21 +511,22 @@ void TextEditor::buttonClicked()
     case ValidationStates://wp add 201500916
     {
         // 状态选择对话框
-        SingleStateDialog dlg(m_core, this);
+        SingleStateDialog dlg(m_core,oldText, this);
         dlg.showDialog() ;//打开对话框
-        newText = dlg.TransStrStateJson();//将构建的Json字符串赋值给传输字符串
+        dlg.setText(oldText);
+        newText = dlg.transArrayJson();//将构建的Json字符串赋值给传输字符串
     }
         break;
-    case ValidationTable://
-    {
-        // 状态选择对话框
-        QTablePropertySetDlg dlg(m_core, this);
-        dlg.showDialog() ;//打开对话框
-    }
-        break;
-    default:
-        return;
-
+    case ValidationTable:
+        {
+            QTablePropertySetDlg dlg(this , oldText);
+            if (dlg.showDialog() != QDialog::Accepted )
+                return;
+            newText = dlg.getTableProperty().toJsonStr(1.0,1.0);
+        }
+            break;
+        default:
+            return;
     }
     if (newText != oldText) {
         m_editor->setText(newText);

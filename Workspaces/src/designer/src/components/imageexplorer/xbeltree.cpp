@@ -124,7 +124,7 @@ XbelTree::XbelTree(QWidget *parent)
                          QIcon::Normal, QIcon::Off);
     folderIcon.addPixmap(style()->standardPixmap(QStyle::SP_DirOpenIcon),
                          QIcon::Normal, QIcon::On);
-    bookmarkIcon.addPixmap(style()->standardPixmap(QStyle::SP_FileIcon));
+    bookmarkIcon.addPixmap(style()->standardPixmap(QStyle::SP_FileDialogStart));
 
     createActions();
     popMenu = new QMenu(this);
@@ -143,7 +143,12 @@ XbelTree::XbelTree(QDesignerFormEditorInterface *core, QString fileName, QWidget
                          QIcon::Normal, QIcon::Off);
     folderIcon.addPixmap(style()->standardPixmap(QStyle::SP_DirOpenIcon),
                          QIcon::Normal, QIcon::On);
+    unSavedfolderIcon.addPixmap(style()->standardPixmap(QStyle::SP_DirClosedIcon),
+                         QIcon::Normal, QIcon::Off);
+    unSavedfolderIcon.addPixmap(style()->standardPixmap(QStyle::SP_DirOpenIcon),
+                         QIcon::Normal, QIcon::On);
     bookmarkIcon.addPixmap(style()->standardPixmap(QStyle::SP_FileIcon));
+    unSavedbookmarkIcon.addPixmap(style()->standardPixmap(QStyle::SP_FileLinkIcon));
 
     createActions();
     popMenu = new QMenu(this);
@@ -158,7 +163,6 @@ XbelTree::XbelTree(QDesignerFormEditorInterface *core, QString fileName, QWidget
 
 XbelTree::~XbelTree()
 {
-    write();
     if(popMenu)
     {
         delete popMenu;
@@ -316,7 +320,7 @@ void XbelTree::contextMenuEvent(QContextMenuEvent *event)
 {
     //Clear Already add Actions,andie,20140902
     popMenu->clear();
-    QTreeWidgetItem * item = currentItem();
+    QTreeWidgetItem * item = itemAt(event->pos());
     if(item!=NULL)
     {
         qDebug()<< "right click tree item: "<< item->text(0);
@@ -349,6 +353,7 @@ void XbelTree::contextMenuEvent(QContextMenuEvent *event)
     {
         popMenu->addAction(createFolderAction);
     }
+    setCurrentItem(item);
     popMenu->exec(QCursor::pos());
     event->accept();
 }
@@ -505,16 +510,15 @@ void XbelTree::createFolder()
         insertTopLevelItem(0,item);
         currentElement = domDocument.documentElement();
     }
+    setCurrentItem(item);
     currentElement.appendChild(element);
     domElementForItem.insert(item, element);
-    write();
 }
 
 void XbelTree::removeFolder()
 {
     qDebug() << tr("start remove Folder!");
     removeItem(currentItem());
-    write();
 //    if (current_Item!=NULL) {
 //        qDebug() << tr("start delete folder!");
 //        QTreeWidgetItem * tParent = current_Item->parent();
@@ -540,7 +544,7 @@ void XbelTree::callbackCreatePage(QString bookMarkName,QString bookMarkHref)
     if (current_Item!=NULL) {
         item = new QTreeWidgetItem(current_Item,Page);
         item->setFlags(item->flags() | Qt::ItemIsEditable);
-        item->setIcon(0, bookmarkIcon);
+        item->setIcon(0, unSavedbookmarkIcon);
         item->setText(0, bookMarkName);
         item->setText(1, bookMarkHref);
         current_Item->addChild(item);
@@ -555,7 +559,7 @@ void XbelTree::callbackCreatePage(QString bookMarkName,QString bookMarkHref)
     } else {
         item = new QTreeWidgetItem(this,Page);
     }
-    write();
+    setCurrentItem(item);
 }
 
 void XbelTree::createPage()
@@ -571,7 +575,6 @@ void XbelTree::removePage()
 {
     qDebug() << tr("start remove page!");
     removeItem(currentItem());
-    write();
 }
 void XbelTree::removeItem(QTreeWidgetItem * Item)
 {
@@ -600,12 +603,12 @@ void XbelTree::removeItem(QTreeWidgetItem * Item)
         currentElement.parentNode().removeChild(currentElement);
         //remove tree node
         domElementForItem.remove(Item);
+        //remove Tree Item
         QTreeWidgetItem * parent = Item->parent();
         if(parent)
             parent->removeChild(Item);
         else
             takeTopLevelItem(indexOfTopLevelItem(Item));
-        qDebug() << tr("remove item name:")<<Item->text(0);
     }
 }
 
@@ -631,108 +634,151 @@ QString XbelTree::pageName()
 
 void XbelTree::moveUp()
 {
-    qDebug()<<"moveUpBookMark";
     QTreeWidgetItem * current_Item = currentItem();
     if(current_Item!=NULL)
     {
         QTreeWidgetItem * parent_Item = current_Item->parent();
-        int current_Index = parent_Item->indexOfChild(current_Item);
-        if(current_Index==0)
-            return;
-        //上移树节点
-        QTreeWidgetItem * clone_Item = current_Item->clone();
-        parent_Item->insertChild(current_Index-1,clone_Item);
-        parent_Item->removeChild(current_Item);
+        //节点的当前位置
+        int current_Index = 0;
+        if(parent_Item!=NULL)
+        {
+            current_Index = parent_Item->indexOfChild(current_Item);
+            //上面没有节点的情况
+            if(current_Index==0)
+                return;
+            //删除树形节点
+            parent_Item->removeChild(current_Item);
+            //上移树节点
+            parent_Item->insertChild(current_Index-1,current_Item);
+        }
+        else
+        {
+            current_Index = indexOfTopLevelItem(current_Item);
+            //上面没有节点的情况
+            if(current_Index==0)
+                return;
+            //删除树形节点
+            takeTopLevelItem(current_Index);
+            //上移树节点
+            insertTopLevelItem(current_Index-1,current_Item);
+        }
         //上移XML节点
         QDomElement current_Element = domElementForItem.value(current_Item);
         QDomNode parent_Element = current_Element.parentNode();
         QDomNode before_Element = current_Element.previousSibling();
         parent_Element.insertBefore(current_Element,before_Element);
-        //更改映射
-        domElementForItem.remove(current_Item);
-        domElementForItem.insert(clone_Item,current_Element);
-        write();
     }
 }
 void XbelTree::moveDown()
 {
-    qDebug()<<"moveDownBookMark";
     QTreeWidgetItem * current_Item = currentItem();
     if(current_Item!=NULL)
     {
         QTreeWidgetItem * parent_Item = current_Item->parent();
-        int current_Index = parent_Item->indexOfChild(current_Item);
-        if(current_Index==parent_Item->childCount())
-            return;
-        //下移树节点
-        QTreeWidgetItem * clone_Item = current_Item->clone();
-        parent_Item->insertChild(current_Index+2,clone_Item);
-        parent_Item->removeChild(current_Item);
+        //节点的当前位置
+        int current_Index = 0;
+        if(parent_Item!=NULL)
+        {
+            current_Index = parent_Item->indexOfChild(current_Item);
+            //下面没有节点的情况
+            if(current_Index==parent_Item->childCount()-1)
+                return;
+            //删除树形节点
+            parent_Item->removeChild(current_Item);
+            //下移树节点
+            parent_Item->insertChild(current_Index+1,current_Item);
+        }
+        else
+        {
+            current_Index = indexOfTopLevelItem(current_Item);
+            //下面没有节点的情况
+            if(itemBelow(current_Item) == NULL)
+                return;
+            //删除树形节点
+            takeTopLevelItem(current_Index);
+            //下移树节点
+            insertTopLevelItem(current_Index+1,current_Item);
+        }
         //下移XML节点
         QDomElement current_Element = domElementForItem.value(current_Item);
         QDomNode parent_Element = current_Element.parentNode();
         QDomNode after_Element = current_Element.nextSibling();
         parent_Element.insertAfter(current_Element,after_Element);
-        //更改映射
-        domElementForItem.remove(current_Item);
-        domElementForItem.insert(clone_Item,current_Element);
-        write();
     }
 }
 void XbelTree::moveTop()
 {
-    if(m_core)
-        m_core->formWindowManager()->showPreview();
-    qDebug()<<"moveTopBookMark";
     QTreeWidgetItem * current_Item = currentItem();
     if(current_Item!=NULL)
     {
         QTreeWidgetItem * parent_Item = current_Item->parent();
-        if(parent_Item)
+        //节点的当前位置
+        int current_Index = 0;
+        if(parent_Item!=NULL)
         {
-            int current_Index = parent_Item->indexOfChild(current_Item);
+            current_Index = parent_Item->indexOfChild(current_Item);
+            //上面没有节点的情况
             if(current_Index==0)
                 return;
-            //置顶树节点
-            QTreeWidgetItem * clone_Item = current_Item->clone();
-            parent_Item->insertChild(0,clone_Item);
+            //删除树形节点
             parent_Item->removeChild(current_Item);
-            //置顶XML节点
-            QDomElement current_Element = domElementForItem.value(current_Item);
-            QDomNode parent_Element = current_Element.parentNode();
-            QDomNode first_Element = parent_Element.firstChild();
-            parent_Element.insertBefore(current_Element,first_Element);
-            //更改映射
-            domElementForItem.remove(current_Item);
-            domElementForItem.insert(clone_Item,current_Element);
-            write();
+            //置顶树节点
+            parent_Item->insertChild(0,current_Item);
         }
+        else
+        {
+            current_Index = indexOfTopLevelItem(current_Item);
+            //上面没有节点的情况
+            if(current_Index==0)
+                return;
+            //删除树形节点
+            takeTopLevelItem(current_Index);
+            //置顶树节点
+            insertTopLevelItem(0,current_Item);
+        }
+        //置顶XML节点
+        QDomElement current_Element = domElementForItem.value(current_Item);
+        QDomNode parent_Element = current_Element.parentNode();
+        QDomNode first_Element = parent_Element.firstChild();
+        parent_Element.insertBefore(current_Element,first_Element);
     }    
 }
 void XbelTree::moveBottom()
 {
-    qDebug()<<"moveBottomBookMark";
     QTreeWidgetItem * current_Item = currentItem();
     if(current_Item!=NULL)
     {
         QTreeWidgetItem * parent_Item = current_Item->parent();
-        int current_Index = parent_Item->indexOfChild(current_Item);
-        int count = parent_Item->childCount();
-        if(current_Index==count)
-            return;
-        //置底树节点
-        QTreeWidgetItem * clone_Item = current_Item->clone();
-        parent_Item->insertChild(count,clone_Item);
-        parent_Item->removeChild(current_Item);
+        //节点的当前位置
+        int current_Index = 0;
+        if(parent_Item!=NULL)
+        {
+            current_Index = parent_Item->indexOfChild(current_Item);
+            int count = parent_Item->childCount();
+            if(current_Index==count-1)
+                return;
+            //删除树形节点
+            parent_Item->removeChild(current_Item);
+            //置底树节点
+            parent_Item->insertChild(count-1,current_Item);
+        }
+        else
+        {
+            current_Index = indexOfTopLevelItem(current_Item);
+            int count  = topLevelItemCount();
+            //下面没有节点的情况
+            if(current_Index == count-1)
+                return;
+            //删除树形节点
+            takeTopLevelItem(current_Index);
+            //置底树节点
+            insertTopLevelItem(count-1,current_Item);
+        }
         //置底XML节点
         QDomElement current_Element = domElementForItem.value(current_Item);
         QDomNode parent_Element = current_Element.parentNode();
         QDomNode last_Element = parent_Element.lastChild();
         parent_Element.insertAfter(current_Element,last_Element);
-        //更改映射
-        domElementForItem.remove(current_Item);
-        domElementForItem.insert(clone_Item,current_Element);
-        write();
     }
 }
 void XbelTree::openPage(QModelIndex index)

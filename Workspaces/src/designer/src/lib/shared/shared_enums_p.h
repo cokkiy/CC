@@ -75,8 +75,10 @@ namespace qdesigner_internal {
         ValidationObjectNameScope,
         // URL
         ValidationURL,
-        //GraphDialog
-        ValidationGraphDialog,
+        //GraphObj
+        ValidationGraphObj,
+        //2wmapObj
+        Validation2wmapObj,
         // Data
         ValidationData,
         // Dataes

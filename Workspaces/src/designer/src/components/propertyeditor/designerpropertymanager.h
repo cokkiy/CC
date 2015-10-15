@@ -49,9 +49,9 @@
 #include "fontpropertymanager.h"
 #include "singlestatedialog.h"
 
-//#include "../propertyeditor/graphdialog/ui_graphdialog.h"
-#include "../propertyeditor/graphdialog/graphdialog.h"
+#include "../propertyeditor/q2wmapobj/q2wmapobj.h"
 
+#include "../propertyeditor/graphobj/graphobj.h"
 
 #include <qdesigner_utils_p.h>
 #include <shared_enums_p.h>
@@ -82,8 +82,7 @@ class PixmapEditor;
 class StringListEditorButton;
 class FormWindowBase;
 class QSelectParamDialog;
-class QTablePropertySetDlg;
-//class GraphDialog;
+
 
 class ResetDecorator : public QObject
 {
@@ -188,7 +187,7 @@ private Q_SLOTS:
 private:
 
         SingleStateDialog *singleStateDialog;
-        GraphDialog    *graphdialog;
+
 
 
     void createIconSubProperty(QtProperty *iconProperty, QIcon::Mode mode, QIcon::State state, const QString &subName);

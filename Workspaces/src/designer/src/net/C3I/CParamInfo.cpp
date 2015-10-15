@@ -186,11 +186,12 @@ AbstractParam* CParamInfo::GetParam(unsigned short usParamTable, unsigned short 
     // first,find in cache
     unsigned int key = usParamTable;
     key = key << 16;
-    key += usParamCode;
-    lockForCache.lock();
-    auto c_pos = cachedParam.find(key);       
+    key += usParamCode;    
+    while (bWrite){} //wait untile write finished
+    bRead = true; //start reading
+    auto c_pos = cachedParam.find(key);
     auto end = cachedParam.end();
-    lockForCache.unlock();
+    bRead = false;
     if (c_pos != end)
     {
         // find in cache
@@ -213,7 +214,10 @@ AbstractParam* CParamInfo::GetParam(unsigned short usParamTable, unsigned short 
 
          //save to cache
         lockForCache.lock();
+        bWrite = true;
+        while (bRead) {  } //wait until current reading finished
         cachedParam.insert({key,param});
+        bWrite = false;
         lockForCache.unlock();
 
         return param;

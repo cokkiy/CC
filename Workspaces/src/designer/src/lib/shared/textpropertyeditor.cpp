@@ -246,24 +246,30 @@ namespace qdesigner_internal {
     void TextPropertyEditor::setTextPropertyValidationMode(TextPropertyValidationMode vm) {
         m_validationMode = vm;
         m_lineEdit->setWantNewLine(multiLine(m_validationMode));
+        m_lineEdit->setReadOnly(false);
         switch (m_validationMode) {
         case ValidationStyleSheet:
             m_lineEdit->setValidator(new  StyleSheetValidator(m_lineEdit));
             m_lineEdit->setCompleter(0);
             break;
         case ValidationMultiLine:
-        case ValidationRichText:
-        case ValidationGraphDialog:
-        case ValidationData:
-        case ValidationDataes:
-        case ValidationFile:
-        case ValidationStates:
-        case ValidationTable:
+        case ValidationRichText:        
             // Set a  validator that replaces newline characters by literal "\\n".
             // While it is not possible to actually type a newline  characters,
             // it can be pasted into the line edit.
             m_lineEdit->setValidator(new ReplacementValidator(m_lineEdit, NewLineChar, EscapedNewLine));
             m_lineEdit->setCompleter(0);
+            break;
+        case ValidationGraphObj:
+//            m_lineEdit->setReadOnly(true);
+//            break;
+        case ValidationData:
+        case ValidationDataes:
+        case ValidationFile:
+        case ValidationStates:
+        case ValidationTable:
+        case Validation2wmapObj:
+            m_lineEdit->setReadOnly(true);
             break;
         case ValidationSingleLine:
             // Set a  validator that replaces newline characters by a blank.
@@ -390,8 +396,7 @@ namespace qdesigner_internal {
         return validationMode == ValidationMultiLine || validationMode == ValidationStyleSheet
              || validationMode == ValidationRichText || validationMode == ValidationData
              || validationMode == ValidationDataes || validationMode == ValidationFile
-             || validationMode == ValidationStates|| validationMode == ValidationTable
-             || validationMode == ValidationGraphDialog;
+             || validationMode == ValidationStates|| validationMode == ValidationTable;
     }
 
     // Replace newline characters literal "\n"  for inline editing in mode ValidationMultiLine

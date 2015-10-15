@@ -152,9 +152,13 @@ QDesignerPropertyEditor::StringPropertyParameters QDesignerPropertyEditor::textP
         return StringPropertyParameters(ValidationRichText, true);
     }
 
-    // graphdialog: zjb,20150922
-    if (propertyName.endsWith(QStringLiteral("graphdialog"))) {
-        return StringPropertyParameters(ValidationGraphDialog, true);
+    //zjb add
+    if (propertyName.endsWith(QStringLiteral("graphobj"))) {
+        return StringPropertyParameters(ValidationGraphObj, true);
+    }
+    // q2wmapobj: 设置目标选择界面,rika,20150928
+    if (propertyName.endsWith(QStringLiteral("q2wmapobj"))) {
+        return StringPropertyParameters(Validation2wmapObj, true);
     }
 
     // data: 设置单参数数据的配置类别,andrew,20140421

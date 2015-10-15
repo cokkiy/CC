@@ -14,7 +14,7 @@ public:
     ~SimpleLogger();
 
     //记录接收到的数据包
-    void log(const stru_Param& param);
+    //void log(const stru_Param& param);
 
     //记录分析处理后的数据包个数
     void logPacketCount();
@@ -31,9 +31,9 @@ private:
     //一次写入多少个包
     const int FlushPacketCount = 13796;
     // size of one packet write to buf
-    const int packetSize = sizeof(time_t) + sizeof(stru_Param);  // 152 bytes in windows
+    //const int packetSize = sizeof(time_t) + sizeof(stru_Param);  // 152 bytes in windows
     //buf size
-    const int bufSize = FlushPacketCount*packetSize;
+    //const int bufSize = FlushPacketCount*packetSize;
 
     //写入缓冲区列表
     list<unsigned char*> bufList;
@@ -74,7 +74,7 @@ private:
     std::thread * writer;
 
     //把数据和时间放入到缓冲区
-    void put2buf(time_t cur, const stru_Param& param);
+    //void put2buf(time_t cur, const stru_Param& param);
 
     //write bufed data to file
     void write2file();

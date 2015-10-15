@@ -303,8 +303,10 @@ static qdesigner_internal::TextPropertyValidationMode typeStringToType(const QSt
         return qdesigner_internal::ValidationObjectNameScope;
     if (v  == QStringLiteral("url"))
         return qdesigner_internal::ValidationURL;
-    if (v ==  QStringLiteral("graphdialog"))
-        return qdesigner_internal::ValidationGraphDialog;
+    if (v ==  QStringLiteral("graphobj"))
+        return qdesigner_internal::ValidationGraphObj;
+    if (v ==  QStringLiteral("q2wmapobj"))
+        return qdesigner_internal::Validation2wmapObj;
     if (v.endsWith(QStringLiteral("data")))
         return qdesigner_internal::ValidationData;
     if (v.endsWith(QStringLiteral("dataes")))

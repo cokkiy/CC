@@ -97,6 +97,7 @@
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <Version>5.3</Version>
+      <Profile>true</Profile>
     </Link>
     <Midl>
       <DefaultCharType>Unsigned</DefaultCharType>
@@ -238,6 +239,7 @@
     <ClCompile Include="showtype\numericalvalueresultstring.cpp" />
     <ClCompile Include="main\src\recvinfothread\recvinfothread.cpp" />
     <ClCompile Include="selfshare\src\config\stationconfig.cpp" />
+    <ClCompile Include="SimpleLogger.cpp" />
     <ClCompile Include="stationinstance.cpp" />
     <ClCompile Include="taskinstance.cpp" />
     <ClCompile Include="selfshare\src\thread\thread.cpp" />
@@ -415,6 +417,7 @@ endlocal
     <ClInclude Include="showtype\numericalvalueresultstring.h" />
     <ClInclude Include="main\src\recvinfothread\recvinfothread.h" />
     <ClInclude Include="selfshare\src\config\stationconfig.h" />
+    <ClInclude Include="SimpleLogger.h" />
     <ClInclude Include="stationinstance.h" />
     <ClInclude Include="C3I\stru.h" />
     <CustomBuild Include="taskinstance.h">

@@ -16,8 +16,8 @@ QWidget *SingleStateLineEditDelegate::createEditor(QWidget *parent,const QStyleO
                                                                                                      // 使LineEditDelegate能够捕获QLineEdit对象的事件
     QString strpath=index.model()->data(index).toString();     //获取指定index数据项的数据。调用QMdelIndex的model()函数可获得提供index的
                                                                                             //Model对象，data()函数返回的是QVariant对象，toString将它转换为一个String数据
-    strpath=QFileDialog::getOpenFileName(parent, tr("打开"),"/",tr("Images (*.png *.bmp *.jpg .*gif .*psd)"));                   //打开文件并将选择的文件路径返回给strpath
 
+    strpath=QFileDialog::getOpenFileName(parent, tr("打开"),"/",tr("Images (*.png *.bmp *.jpg .*gif .*psd)"));       //打开文件并将选择的文件路径返回给strpath
     QLineEdit *lineedit = static_cast<QLineEdit*>(editor);        //将lineedit转换为QLineEdit对象，以获得编辑控件的对象指针
     lineedit->setText(strpath);                                            //在LineEdit显示打开的文件路径
     return editor;

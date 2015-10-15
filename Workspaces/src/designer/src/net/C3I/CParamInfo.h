@@ -59,6 +59,10 @@ protected:
 private:
     //mutex for reading and writing cache
     mutex lockForCache;
+    // current reading
+    bool bRead = false;
+    // current writing
+    bool bWrite = false;
 };
 
 

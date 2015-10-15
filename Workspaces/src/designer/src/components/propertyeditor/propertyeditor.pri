@@ -15,10 +15,14 @@ FORMS += $$PWD/paletteeditor.ui \
     $$PWD/previewwidget.ui \
     $$PWD/newdynamicpropertydialog.ui \
     ../propertyeditor/singlestatedialog.ui \
-    ../propertyeditor/selectmultiparamdlg.ui \
-    ../propertyeditor/tableitemset.ui \
-    ../propertyeditor/tableset.ui \
-    ../propertyeditor/graphdialog/graphdialog.ui
+    $$PWD/q2wmapobj/q2wmapobjdlg.ui \
+    $$PWD/q2wmapobj/q2wmapobj.ui \
+    $$PWD/selectmultiparamdlg.ui \
+    $$PWD/selectsingleparamdialog.ui \
+    $$PWD/tablepropertysetdialog.ui \
+    $$PWD/tableitemset.ui\
+    $$PWD/graphobj/graphobjdlg.ui \
+    $$PWD/graphobj/graphobj.ui \
 
 HEADERS += $$PWD/propertyeditor.h \
     $$PWD/designerpropertymanager.h \
@@ -31,16 +35,19 @@ HEADERS += $$PWD/propertyeditor.h \
     $$PWD/newdynamicpropertydialog.h \
     $$PWD/brushpropertymanager.h \
     $$PWD/fontpropertymanager.h \
-    $$PWD/selectparamdialog.h \
     ../propertyeditor/singlestatelineeditdelegate.h \
     ../propertyeditor/singlestatespindelegate.h \
     ../propertyeditor/singlestatedialog.h \
-    ../propertyeditor/selectmultiparamdlg.h \
-    ../propertyeditor/tablecell.h \
-    ../propertyeditor/tableitemset.h \
-    ../propertyeditor/tablepropertysetDlg.h \
-    ../propertyeditor/tableset.h \
-    ../propertyeditor/graphdialog/graphdialog.h
+    $$PWD/q2wmapobj/q2wmapobj.h \
+    $$PWD/q2wmapobj/q2wmapobjdlg.h \
+    $$PWD/simpletable/tablepropertysetDlg.h \
+    $$PWD/simpletable/tableproperty.h \
+    $$PWD/simpletable/tableitemset.h \
+    $$PWD/simpletable/tablecell.h \
+    $$PWD/paramselect/selectparamdialog.h \
+    $$PWD/paramselect/selectmultiparamdlg.h\
+    $$PWD/graphobj/graphobj.h \
+    $$PWD/graphobj/graphobjdlg.h \
 
 SOURCES += $$PWD/propertyeditor.cpp \
     $$PWD/designerpropertymanager.cpp \
@@ -53,16 +60,19 @@ SOURCES += $$PWD/propertyeditor.cpp \
     $$PWD/newdynamicpropertydialog.cpp \
     $$PWD/brushpropertymanager.cpp \
     $$PWD/fontpropertymanager.cpp \
-    $$PWD/selectparamdialog.cpp \
     ../propertyeditor/singlestatelineeditdelegate.cpp \
     ../propertyeditor/singlestatespindelegate.cpp \
     ../propertyeditor/singlestatedialog.cpp\
-    ../propertyeditor/selectmultiparamdlg.cpp \
-    ../propertyeditor/tablecell.cpp \
-    ../propertyeditor/tableitemset.cpp \
-    ../propertyeditor/tablepropertysetDlg.cpp \
-    ../propertyeditor/tableset.cpp\
-    ../propertyeditor/graphdialog/graphdialog.cpp \
+    $$PWD/q2wmapobj/q2wmapobj.cpp \
+    $$PWD/q2wmapobj/q2wmapobjdlg.cpp \
+    $$PWD/simpletable/tablepropertysetDlg.cpp \
+    $$PWD/simpletable/tableproperty.cpp \
+    $$PWD/simpletable/tableitemset.cpp \
+    $$PWD/simpletable/tablecell.cpp \
+    $$PWD/paramselect/selectparamdialog.cpp \
+    $$PWD/paramselect/selectmultiparamdlg.cpp\
+    $$PWD/graphobj/graphobj.cpp \
+    $$PWD/graphobj/graphobjdlg.cpp \
 
 HEADERS += \
     $$PWD/propertyeditor_global.h \

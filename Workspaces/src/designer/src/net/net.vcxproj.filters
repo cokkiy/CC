@@ -175,6 +175,9 @@
     <ClCompile Include="selfshare\src\zxparambuffer\zxparambuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="abstractparam.h">
@@ -303,6 +306,9 @@
     <ClInclude Include="..\..\..\..\include\net\netDepends">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="abstractdatacenter.h">
@@ -343,10 +349,14 @@
       <UniqueIdentifier>{692a2afd-44f4-44a1-aad7-542e33d153ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{6337fb50-d1d5-4af1-9873-b26e829a2d94}</UniqueIdentifier>
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+      <ParseFiles>true</ParseFiles>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{6294750d-5c1c-4cf2-85aa-9862cfc5ab52}</UniqueIdentifier>
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+      <ParseFiles>true</ParseFiles>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{c47e9681-93ba-4b58-8062-d2552d89c1c0}</UniqueIdentifier>
