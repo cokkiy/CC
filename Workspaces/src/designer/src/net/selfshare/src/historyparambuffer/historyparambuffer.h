@@ -11,36 +11,32 @@
 
 #include <qsemaphore.h>
 #include <list>
-#include <map>
-#include <vector>
 #include <mutex>
-#include <unordered_map>
+#include <map>
 #include "../historyparam/historyparam.h"
-#include "../baseobject.h"	
 
 using namespace std;
-
+#define INDEX(tn,pn) (((unsigned int)tn<<16)|(unsigned short)pn)
 typedef list<HistoryParam> HistoryParams;
 struct HistoryParamList
 {
     HistoryParams* pParamsBuf;
+    //读取次数
+    int readNum;
+    //限制长度
+    int limitLen;
     HistoryParamList()
     {
         pParamsBuf = new HistoryParams();
+        readNum = 0;
     }
 
     HistoryParamList(const HistoryParamList& ref)
     {
         this->pParamsBuf = ref.pParamsBuf;
     }
-//     ~HistoryParamList()
-//     {
-//         if (pParamsBuf != NULL)
-//             delete pParamsBuf;
-//     }
 };
 typedef map<unsigned int, HistoryParamList > HistoryParamMap;
-typedef map<unsigned int,  int > HistoryParamLimit;
 
 class HistoryParamBuffer : public BaseObject
 {
@@ -50,13 +46,7 @@ private:
 	HistoryParamMap m_HistoryParamBuf;	
 
 	//缓冲区读写同步信号量 cokkiy 09-07 修改
-	//QSemaphore m_binSem;
     mutex lockForWriteBuf;
-
-    //
-    int m_listLimit;
-
-    HistoryParamLimit m_savListLimit;
 
 public:
 
@@ -73,10 +63,7 @@ public:
     HistoryParams GetBuffer(unsigned short tableno, unsigned short paramno);
     //从队列中取出缓冲区
     HistoryParams GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time);
-    map<unsigned short, map<unsigned short, mutex>> locks;
 };
-
-
 
 
 #endif

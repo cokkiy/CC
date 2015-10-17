@@ -15,21 +15,8 @@ extern int errno;
 //功能：初始化各成员变量
 //备注：
 //******************
-HistoryParamBuffer::HistoryParamBuffer()//:m_binSem(1)
+HistoryParamBuffer::HistoryParamBuffer()
 {
-	int res = 0;
-
-    m_listLimit = 50000;
-
-	//初始化缓冲区队列
-	m_HistoryParamBuf.clear();
-
-	//初始化缓冲区操作同步信号量
-	//res = sem_init(&m_binSem, 0, 1);
-	/*if(res != 0)
-	{
-		m_errorCode = errno;
-	}*/
 }
 
 //******************
@@ -39,10 +26,16 @@ HistoryParamBuffer::HistoryParamBuffer()//:m_binSem(1)
 //******************
 HistoryParamBuffer::~HistoryParamBuffer()
 {
+    //释放历史缓冲区空间
+    HistoryParamMap::iterator it = m_HistoryParamBuf.begin();
+    for(;it!=m_HistoryParamBuf.end();it++)
+    {
+        HistoryParamList hpl = it->second;
+        delete hpl.pParamsBuf;
+        hpl.pParamsBuf = NULL;
+    }
 	//清空缓冲区队列
 	m_HistoryParamBuf.clear();
-
-	//sem_destroy(&m_binSem);
 }
 
 //******************
@@ -51,28 +44,11 @@ HistoryParamBuffer::~HistoryParamBuffer()
 //备注：前面进，后面出
 //******************
 void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryParam& buf)
-{
-
-    unsigned int key = tn;
-    key = key << 16 + tn;
-    auto param = m_HistoryParamBuf[key];   
-
+{    
+    auto param = m_HistoryParamBuf[INDEX(tn,pn)];   
     lockForWriteBuf.lock();
     param.pParamsBuf->push_front(buf);
-//     m_HistoryParamBuf[key]->push_front(buf);
-    //m_HistoryParamBuf[key].push_front(buf);
     lockForWriteBuf.unlock();
-    //lockParam.mylock->unlock();
-//     int temp = m_savListLimit[tn][pn];
-//     if (temp >= m_listLimit)
-//     {
-//         //m_HistoryParamBuf[tn][pn].pop_back();
-//     }
-//     else
-//     {
-//         m_savListLimit[tn][pn]++;
-//     }
-    //m_binSem.release();
 }
 
 //******************
@@ -80,35 +56,22 @@ void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryPa
 //功能：从缓冲区队列取出参数
 //备注：前面进，后面出
 //******************
-HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigned short paramno)
+HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn)
 {
 	HistoryParams buf;
-
-	//sem_wait(&m_binSem);
-    //m_binSem.acquire();
-    unsigned int key = tableno;
-    key = key << 16 + paramno;
-    buf = *(m_HistoryParamBuf[key].pParamsBuf);
-    //buf = m_HistoryParamBuf[key];
-
-	//sem_post(&m_binSem);
-    //m_binSem.release();
-
-	return buf;
+    auto param = m_HistoryParamBuf[INDEX(tn,pn)];
+    buf = *(param.pParamsBuf);
+    param.readNum ++;
+    return buf;
 }
 
-list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time)
+list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn,int & date,int & time)
 {
-    //sem_wait(&m_binSem);
-    //m_binSem.acquire();
-    list<HistoryParam> buf;
     list<HistoryParam> retBuf;
     list<HistoryParam>::reverse_iterator it;
-    unsigned int key = tableno;
-    key = key << 16 + paramno;
-    buf = *(m_HistoryParamBuf[key].pParamsBuf);
-    //buf = m_HistoryParamBuf[key];
-    //qDebug()<<"Date " << date << "Time " << time ;
+    auto param = m_HistoryParamBuf[INDEX(tn,pn)];
+    list<HistoryParam> buf = *(param.pParamsBuf);
+    param.readNum ++;
     int t_date,t_time=0;
     //倒序取数据
     for (it = buf.rbegin();it != buf.rend();it++)
@@ -121,7 +84,6 @@ list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigne
                 t_date = (*it).getDate();
                 t_time = (*it).getTime();
             }
-            //qDebug()<<(*it).getValue() ;
         }
     }
     if(t_time!=0)
@@ -129,8 +91,5 @@ list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tableno, unsigne
         date = t_date;
         time = t_time;
     }
-    //qDebug()<<"Size " << retBuf.size();
-    //sem_post(&m_binSem);
-    ///m_binSem.release();
     return retBuf;
 }

@@ -10,6 +10,7 @@
 #include "selfshare/src/config/channelselectconfig.h"
 #include <QDebug>
 #include "SimpleLogger.h"
+#include "GC.h"
 
 extern Config g_cfg;
 
@@ -102,9 +103,14 @@ void NetInstance::run()
 {
     startThread(true);
 }
+
 int NetInstance::start()
 {
     m_thread->start();
+    //start gc
+    GC gc(85);
+    gc.start();
+
     return 1;
 }
 

@@ -210,6 +210,9 @@
     <ClCompile Include="C3IFrame.cpp" />
     <ClCompile Include="C3I\CParamInfo.cpp" />
     <ClCompile Include="C3I\CParamInfoRT.cpp" />
+    <ClCompile Include="GC.cpp" />
+    <ClCompile Include="getMemorySize.cpp" />
+    <ClCompile Include="getRSS.cpp" />
     <ClCompile Include="LFormula.cpp" />
     <ClCompile Include="abstractdatacenter.cpp" />
     <ClCompile Include="abstractinformation.cpp" />
@@ -256,6 +259,7 @@
     <ClInclude Include="C3I\CParamInfo.h" />
     <ClInclude Include="C3I\CParamInfoRT.h" />
     <ClInclude Include="FrameHeader.h" />
+    <ClInclude Include="GC.h" />
     <ClInclude Include="LFormula.h" />
     <ClInclude Include="PDXPFrame.h" />
     <ClInclude Include="selfshare\src\OS_Def.h" />

@@ -178,6 +178,15 @@
     <ClCompile Include="SimpleLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="getRSS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="getMemorySize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="abstractparam.h">
@@ -307,6 +316,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="SimpleLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
