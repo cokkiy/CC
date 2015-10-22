@@ -29,18 +29,18 @@ ZXParamBuffer::ZXParamBuffer(): m_binSem(1)
 ZXParamBuffer::~ZXParamBuffer()
 {
     //释放所有参数申请的内存
-    TableMap::iterator it = m_ZXparamBuf.begin();
-    for(;it != m_ZXparamBuf.end();it++)
-    {
-        ParaMap& parammap = it->second;
-        ParaMap::iterator pit = parammap.begin();
-        for(;pit!= parammap.end();pit++)
-        {
-            (pit->second).FreeParamSpace();
-        }
-    }
-	//清空缓冲区队列
-	m_ZXparamBuf.clear();
+//     TableMap::iterator it = m_ZXparamBuf.begin();
+//     for(;it != m_ZXparamBuf.end();it++)
+//     {
+//         ParaMap& parammap = it->second;
+//         ParaMap::iterator pit = parammap.begin();
+//         for(;pit!= parammap.end();pit++)
+//         {
+//             (pit->second).FreeParamSpace();
+//         }
+//     }
+// 	//清空缓冲区队列
+// 	m_ZXparamBuf.clear();
 }
 
 //******************

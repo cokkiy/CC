@@ -11,7 +11,7 @@
 
 #include "../baseobject.h"	
 
-class HistoryParam : public BaseObject
+class HistoryParam //: public BaseObject
 {
 	private:
 		//参数日期

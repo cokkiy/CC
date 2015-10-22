@@ -30,9 +30,8 @@ HistoryParamBuffer::~HistoryParamBuffer()
     HistoryParamMap::iterator it = m_HistoryParamBuf.begin();
     for(;it!=m_HistoryParamBuf.end();it++)
     {
-        HistoryParamList hpl = it->second;
-        delete hpl.pParamsBuf;
-        hpl.pParamsBuf = NULL;
+        GCWrapper& wrapper = it->second;
+        wrapper.release();
     }
 	//清空缓冲区队列
 	m_HistoryParamBuf.clear();
@@ -45,9 +44,9 @@ HistoryParamBuffer::~HistoryParamBuffer()
 //******************
 void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryParam& buf)
 {    
-    auto param = m_HistoryParamBuf[INDEX(tn,pn)];   
+    auto& param = m_HistoryParamBuf[INDEX(tn,pn)];   
     lockForWriteBuf.lock();
-    param.pParamsBuf->push_front(buf);
+    param.push(buf);
     lockForWriteBuf.unlock();
 }
 
@@ -59,32 +58,30 @@ void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryPa
 HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn)
 {
 	HistoryParams buf;
-    auto param = m_HistoryParamBuf[INDEX(tn,pn)];
-    buf = *(param.pParamsBuf);
-    param.readNum ++;
+    auto& param = m_HistoryParamBuf[INDEX(tn,pn)];
+    buf = *(param.getBuffer());
     return buf;
 }
 
-list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn,int & date,int & time)
+HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn,int & date,int & time)
 {
-    list<HistoryParam> retBuf;
-    list<HistoryParam>::reverse_iterator it;
-    auto param = m_HistoryParamBuf[INDEX(tn,pn)];
-    list<HistoryParam> buf = *(param.pParamsBuf);
-    param.readNum ++;
+    HistoryParams retBuf;
+    HistoryParams::reverse_iterator it;
+    auto& param = m_HistoryParamBuf[INDEX(tn,pn)];
+    HistoryParams buf = *(param.getBuffer());
     int t_date,t_time=0;
     //倒序取数据
     for (it = buf.rbegin();it != buf.rend();it++)
     {
-        if (((*it).getDate() > date)||(((*it).getDate() == date)&&((*it).getTime() > time)))
-        {
-            retBuf.push_back(*it);
-            if(t_time<(*it).getTime())
-            {
-                t_date = (*it).getDate();
-                t_time = (*it).getTime();
-            }
-        }
+//         if (((*it).getDate() > date)||(((*it).getDate() == date)&&((*it).getTime() > time)))
+//         {
+//             retBuf.push_back(*it);
+//             if(t_time<(*it).getTime())
+//             {
+//                 t_date = (*it).getDate();
+//                 t_time = (*it).getTime();
+//             }
+//         }
     }
     if(t_time!=0)
     {

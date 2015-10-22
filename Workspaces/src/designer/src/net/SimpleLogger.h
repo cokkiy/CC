@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <io.h>
 #include <thread>
+#include "selfshare/src/historyparam/historyparam.h"
 
 class SimpleLogger
 {
@@ -31,9 +32,9 @@ private:
     //一次写入多少个包
     const int FlushPacketCount = 13796;
     // size of one packet write to buf
-    //const int packetSize = sizeof(time_t) + sizeof(stru_Param);  // 152 bytes in windows
+    const int packetSize = 16; // double + uint*2
     //buf size
-    //const int bufSize = FlushPacketCount*packetSize;
+    const int bufSize = FlushPacketCount*packetSize;
 
     //写入缓冲区列表
     list<unsigned char*> bufList;
@@ -74,7 +75,7 @@ private:
     std::thread * writer;
 
     //把数据和时间放入到缓冲区
-    //void put2buf(time_t cur, const stru_Param& param);
+    void put2buf(const HistoryParam& param);
 
     //write bufed data to file
     void write2file();

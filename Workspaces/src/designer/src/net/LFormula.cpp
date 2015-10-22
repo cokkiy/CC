@@ -179,14 +179,15 @@ bool LFormula::insertOneHistroyParam()
     while(it!=m_zxparamMap.end())
     {
         unsigned int pn = it->first;
-        list<HistoryParam>* t_buf = &m_tHistoryMap[pn];
+        HistoryParams* t_buf = &m_tHistoryMap[pn];
         if(t_buf->size()>0)
         {
-            HistoryParam t_hp = t_buf->front();
-            t_buf->pop_front();
-            m_zxparamMap[pn].setValue(t_hp.getValue());
-            m_zxparamMap[pn].SetParamTime(t_hp.getTime());
-            bUpdate = true;
+//             HistoryParam t_hp = t_buf->front();
+//             //t_buf->pop_front();
+//             t_buf->erase(t_buf->begin());
+//             m_zxparamMap[pn].setValue(t_hp.getValue());
+//             m_zxparamMap[pn].SetParamTime(t_hp.getTime());
+//             bUpdate = true;
         }
         else
         {
@@ -216,7 +217,7 @@ bool LFormula::updateAllHistroyParam()
         unsigned int pn = it->first;
         time = m_savTime;
         date = m_savDate;
-        list<HistoryParam> buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),date,time);
+        HistoryParams buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),date,time);
         m_tHistoryMap[pn] = buf;
         bUpdate = true;
         it++;

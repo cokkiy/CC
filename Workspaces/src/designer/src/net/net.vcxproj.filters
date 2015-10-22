@@ -321,6 +321,9 @@
     <ClInclude Include="GC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GCWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="abstractdatacenter.h">

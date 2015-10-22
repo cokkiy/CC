@@ -260,6 +260,7 @@
     <ClInclude Include="C3I\CParamInfoRT.h" />
     <ClInclude Include="FrameHeader.h" />
     <ClInclude Include="GC.h" />
+    <ClInclude Include="GCWrapper.h" />
     <ClInclude Include="LFormula.h" />
     <ClInclude Include="PDXPFrame.h" />
     <ClInclude Include="selfshare\src\OS_Def.h" />

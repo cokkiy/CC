@@ -16,12 +16,12 @@
 //功能：初始化各成员变量
 //备注：
 //******************
-HistoryParam::HistoryParam():BaseObject()
+HistoryParam::HistoryParam()//:BaseObject()
 {
     m_Date = 0;
     m_Time = 0;
     m_Val = 0.0;
-	m_errorCode = 0;
+	//m_errorCode = 0;
 }
 
 //******************
@@ -29,12 +29,12 @@ HistoryParam::HistoryParam():BaseObject()
 //功能：通过拷贝初始化一个历史参数类实例
 //备注：主要是在模版类（如list,vector等）中push操作中使用
 //******************
-HistoryParam::HistoryParam(const HistoryParam &a):BaseObject()
+HistoryParam::HistoryParam(const HistoryParam &a)//:BaseObject()
 {
     m_Date = a.m_Date;
     m_Time = a.m_Time;
     m_Val = a.m_Val;
-    m_errorCode = 0;								//复位错误代码
+    //m_errorCode = 0;								//复位错误代码
 }
 
 //******************
@@ -58,6 +58,6 @@ HistoryParam & HistoryParam::operator =(const HistoryParam &a)
     m_Date = a.m_Date;
     m_Time = a.m_Time;
     m_Val = a.m_Val;
-	m_errorCode = 0;															//复位错误代码
+	//m_errorCode = 0;															//复位错误代码
 	return *this;
 }

@@ -14,29 +14,13 @@
 #include <mutex>
 #include <map>
 #include "../historyparam/historyparam.h"
-
+#include "GCWrapper.h"
 using namespace std;
-#define INDEX(tn,pn) (((unsigned int)tn<<16)|(unsigned short)pn)
-typedef list<HistoryParam> HistoryParams;
-struct HistoryParamList
-{
-    HistoryParams* pParamsBuf;
-    //读取次数
-    int readNum;
-    //限制长度
-    int limitLen;
-    HistoryParamList()
-    {
-        pParamsBuf = new HistoryParams();
-        readNum = 0;
-    }
 
-    HistoryParamList(const HistoryParamList& ref)
-    {
-        this->pParamsBuf = ref.pParamsBuf;
-    }
-};
-typedef map<unsigned int, HistoryParamList > HistoryParamMap;
+#define INDEX(tn,pn) (((unsigned int)tn<<16)|(unsigned short)pn)
+
+// defines HistoryParamMap:map<unsigned int, GCWrapper >
+typedef map<unsigned int, GCWrapper > HistoryParamMap;
 
 class HistoryParamBuffer : public BaseObject
 {
@@ -51,8 +35,7 @@ private:
 public:
 
 	//构造函数
-	HistoryParamBuffer();																													//普通缓冲区类无参数构造函数
-
+	HistoryParamBuffer();																													
 	//析构函数
 	~HistoryParamBuffer();
 
@@ -61,8 +44,12 @@ public:
 
 	//从队列中取出缓冲区
     HistoryParams GetBuffer(unsigned short tableno, unsigned short paramno);
+
     //从队列中取出缓冲区
     HistoryParams GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time);
+
+    // GC is friend of HistoryParamBuffer
+    friend class GC;
 };
 
 

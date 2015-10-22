@@ -30,7 +30,7 @@ typedef unsigned long long quint64; /* 64 bit unsigned */
 #define PARAMNO(tp) ((unsigned short)tp)
 typedef unsigned short WORD;
 typedef std::map<unsigned int,AbstractParam>  FormulaZXParamMap;
-typedef std::map<unsigned int,list<HistoryParam>> TempHistoryParamMap;
+typedef std::map<unsigned int,HistoryParams> TempHistoryParamMap;
 
 enum OPERATORDATAType
 {

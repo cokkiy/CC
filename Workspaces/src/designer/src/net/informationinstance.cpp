@@ -47,10 +47,10 @@ TabMap InformationInstance::getTabList()
 ParamMap InformationInstance::getParamMap()
 {
     TableMap* tablemap = g_paramInfoRT.getTableMap();
-    for (auto table : *tablemap)
+    for (auto& table : *tablemap)
     {
         unsigned short tabNo=table.first;
-        for (auto para : table.second)
+        for (auto& para : table.second)
         {
             unsigned short paraNo = para.first;
             m_paramMap[tabNo][paraNo] = para.second;

@@ -107,9 +107,14 @@ void NetInstance::run()
 int NetInstance::start()
 {
     m_thread->start();
-    //start gc
-    GC gc(85);
-    gc.start();
+    
+    if (gc == nullptr)
+    {
+        //create gc
+        gc=new GC(&g_cfg.m_zxHistoryParamBuf);
+        //start gc
+        gc->start();
+    }
 
     return 1;
 }
@@ -117,5 +122,11 @@ int NetInstance::start()
 int NetInstance::stop()
 {
     m_thread->exit();
+    if (gc != nullptr)
+    {
+        gc->stop();
+        delete gc;
+        gc = nullptr;
+    }
     return 1;
 }
