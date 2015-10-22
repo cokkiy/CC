@@ -25,7 +25,7 @@ VS_VERSION_INFO VERSIONINFO
 				VALUE "FileDescription", "C++ application development framework.\0"
 				VALUE "FileVersion", "5.5.0.0\0"
 				VALUE "LegalCopyright", "Copyright (C) 2015 The Qt Company Ltd.\0"
-				VALUE "OriginalFilename", "commandbuttonplugind.dll\0"
+				VALUE "OriginalFilename", "statesendplugind.dll\0"
 				VALUE "ProductName", "Qt5\0"
 				VALUE "ProductVersion", "5.5.0.0\0"
 			END

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <qglobal.h>
+
+
 class staticgraphPrivate;//提前在此声明，加快编译速度，相当于预先定义好数据成员，方便staticgraph类来访问
 
 //这是一个静态曲线类
@@ -12,13 +14,12 @@ class staticgraph : public QWidget
 
 
     //多曲线配置对话框
-    Q_PROPERTY(QString graphdialog READ textString WRITE setTextString)
+    Q_PROPERTY(QString graphobj READ textString WRITE setTextString RESET rsttext)
+
+    //共性部分
 
     //图元矩形
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
-
-    //图元的名字
-    Q_PROPERTY(QString Name READ getName WRITE setName)
 
     //背景属性
     //背景色
@@ -26,37 +27,15 @@ class staticgraph : public QWidget
     //背景图片
     Q_PROPERTY(QPixmap backgroundImage READ backgroundImage WRITE setbackgroundImage)
 
-
-    //2、坐标轴
     //显示网格
     Q_PROPERTY(bool showGrid READ getShowGrid WRITE setShowGrid)
+
     //显示图例
-    Q_PROPERTY(bool showLegend READ getShowLegend WRITE setShowLegend)
-
-    //x轴刻度范围
-    Q_PROPERTY(double xUp READ xUp WRITE setXUp)     //曲线的x轴的最大刻度值
-    Q_PROPERTY(double xDown READ xDown WRITE setXDown) //曲线的x轴的最小刻度值
-
-    //y轴刻度范围
-    Q_PROPERTY(double yUp READ yUp WRITE setYUp)      //曲线的y轴的最大刻度值
-    Q_PROPERTY(double yDown READ yDown WRITE setYDown) //曲线的y轴的最小刻度值
-
-    /*******理论曲线****/
-    //理论曲线文件路径
-    Q_PROPERTY(QString Lgraphfile READ getLgraphTFile WRITE setLgraphTFile)
-    //理论曲线颜色
-    Q_PROPERTY(QColor lgraphColor READ lgraphColor WRITE setlgraphColor)
-    //理论曲线宽度
-    Q_PROPERTY(qint32 LgraphWidth READ LgraphWidth WRITE setLgraphWidth)
-
-    /*******实时曲线****/
-    Q_PROPERTY(int graphWidth READ graphWidth WRITE setgraphWidth)       //实时曲线的宽度
-    Q_PROPERTY(QColor graphColor READ graphColor WRITE setgraphColor)    //实时曲线的颜色
-
-    Q_PROPERTY(QString paramX READ paramX WRITE setParamX)//实时曲线的x变量，用单参数paramX（）输入
-    Q_PROPERTY(QString paramY READ paramY WRITE setParamY)//实时曲线的Y变量，用单参数paramY（）输入
+    Q_PROPERTY(bool showLegend READ getShowLegend WRITE setShowLegend)  
 
 
+
+   //个性部分
 
 
 public:
@@ -65,22 +44,34 @@ public:
     //析构函数
     virtual ~staticgraph();
 
-    //多曲线配置
-    QString textString() const {return m_textString;}
-    void setTextString(const QString string);
 
-   //获取/设置图元的名字
-    QString getName() const;
-    void setName(const QString stringName);
+
+    //多曲线配置
+    QString textString() const
+    {
+        return m_textString;
+    }
+    void setTextString(const QString string);
+    void rsttext(){};
+
+
+    //Json数据解析
+    void parseJsonData();
+
+
+
+
+   //共性部分
 
     //图元背景
-    QColor backgroundColor()const;//图元背景颜色
+    //图元背景颜色
+    QColor backgroundColor()const;
     void setbackgroundColor(const QColor);
 
-    QPixmap backgroundImage()const;//图元背景图片
+    //图元背景图片
+    QPixmap backgroundImage()const;
     void setbackgroundImage(const QPixmap qq);
 
-     //2、坐标轴
     //是否显示网格
     bool getShowGrid() const;
     void setShowGrid(const bool bShow);
@@ -88,46 +79,14 @@ public:
     bool getShowLegend() const;
     void setShowLegend(const bool bShow);
 
-    //x轴参数刻度范围
-    double xUp()const;//曲线的x轴的最大刻度值
-    void setXUp(const double);
-    double xDown()const;//曲线的x轴的最小刻度值
-    void setXDown(const double);
+//    //获取/设置理论曲线颜色
+//    QColor lgraphColor()const;
+//    void setlgraphColor(const QColor co);
+//    //获取/设置理论曲线宽度
+//    qint32 LgraphWidth()const;
+//    void setLgraphWidth(const qint32 wi);
 
-
-    //y轴刻度范围
-    double yUp()const;//曲线的y轴的最大刻度值
-    void setYUp(const double);
-    double yDown()const; //曲线的y轴的最小刻度值
-    void setYDown(const double);
-
-
-    //曲线参数x输入
-    QString paramX()const;//实时曲线的x变量，用单参数paramX（）输入
-    void setParamX(const QString);
-    //曲线参数y输入
-    QString paramY()const;//实时曲线的Y变量，用单参数paramY（）输入
-    void setParamY(const QString);
-
-    //获取/设置理论曲线文件路径
-    QString getLgraphTFile() const;
-    void setLgraphTFile(const QString file);
-    //获取/设置理论曲线颜色
-    QColor lgraphColor()const;
-    void setlgraphColor(const QColor co);
-    //获取/设置理论曲线宽度
-    qint32 LgraphWidth()const;
-    void setLgraphWidth(const qint32 wi);
-
-    QColor graphColor()const;//实时曲线的颜色
-    void setgraphColor(const QColor);
-    int graphWidth()const;//实时曲线的宽度
-    void setgraphWidth(const int);
-
-
-
-
-
+    //个性部分
 
 
 
@@ -154,10 +113,7 @@ protected:
 
 
 private:
-
-    //多曲线配置
     QString m_textString;
-
 
 
 private:

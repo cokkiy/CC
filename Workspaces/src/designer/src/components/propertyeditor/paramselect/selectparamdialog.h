@@ -1,0 +1,67 @@
+ï»¿#ifndef SELECTPARAMDIALOG_H
+#define SELECTPARAMDIALOG_H
+
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QRadioButton>
+#include <QWidget>
+#include <QtGui>
+#include <QHBoxLayout>
+#include <QGridLayout>
+#include "propertyeditor_global.h"
+#include <Net/NetComponents>
+
+QT_BEGIN_NAMESPACE
+
+class QDesignerFormEditorInterface;
+namespace Ui {
+class SelectSingleParamDialog;
+}
+
+namespace qdesigner_internal {
+
+class QT_PROPERTYEDITOR_EXPORT QSelectParamDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit QSelectParamDialog(QWidget *parent = 0);
+    ~QSelectParamDialog();
+	//ÏÔÊ¾´°¿Ú
+    int showDialog();
+	//»ñÈ¡ËùÑ¡ÔñµÄ²ÎÊý×Ö·û´®£¨°üº¬±êºÅ¡¢²ÎÊýºÅ£©»ò¹«Ê½×Ö·û´®
+    QString text() const;
+	//½«µ¥²ÎÊý¿Ø¼þÖÐµÄ×Ö·û´®´«Èë¶Ô»°¿ò
+    void SetText(QString );
+private:
+	//ui ½çÃæ
+    Ui::SelectSingleParamDialog *ui;
+private:
+	//ÐÅÏ¢Ô¼¶¨±í²ÎÊý½Ó¿Ú
+    InformationInterface* net;
+	//³õÊ¼»¯ÐÅÏ¢Ô¼¶¨±í±í²ÎÊý¿Ø¼þ±í¸ñ
+    bool initFormTable();
+private slots:
+	//Ñ¡ÔñÐÅÏ¢Ô¼¶¨±í²ÎÊý±í¿Ø¼þ±í¸ñµ¥±íÐÅÏ¢
+    void OnClickTableForm(int,int);
+	//Ñ¡ÔñÐÅÏ¢Ô¼¶¨±í²ÎÊý¿Ø¼þ±í¸ñµ¥²ÎÊýÐÅÏ¢
+    void OnClickParamForm(int,int);
+    void SelectAllSystemRadioButton(bool);
+    void SelectKELRadioButton(bool);
+    void SelectDFZXRadioButton(bool);
+    void SelectCustomRadioButton(bool);
+    void SelectC3IRadioButton(bool );
+    void SelectCustom();
+private:
+    ushort m_iMaxTableNo;
+    ushort m_iMinTableNo;
+    int m_iCurrentTableNo;
+};
+} // namespace qdesigner_internal
+
+QT_END_NAMESPACE
+
+#endif // SELECTPARAMDIALOG_H

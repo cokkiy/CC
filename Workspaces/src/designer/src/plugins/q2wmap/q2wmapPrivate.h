@@ -2,6 +2,59 @@
 #define Q2WMAPPRIVATE_H
 #include <Net/NetComponents>
 #include "qcustomplot.h"
+#include <QVector>
+
+//目标类
+class Q2wmapObject
+{
+
+public:
+
+    //目标名称
+    QString m_strObjName;
+
+    //是否主目标
+    bool m_bMainObj;
+
+    //参数x的参数名
+    QString m_strParamX;
+
+    //参数y的参数名
+    QString m_strParamY;
+
+    //实时曲线颜色
+    QColor m_ccurveColor;
+
+    //实时曲线宽度
+    qint32 m_icurveWidth;
+
+    //理论曲线颜色
+    QColor m_cLcurveColor;
+
+    //理论曲线宽度
+    qint32 m_iLcurveWidth;
+
+    //理论曲线文件
+    QString m_strLFile;
+
+    //理论曲线
+    QCPGraph* m_pLcurve;
+
+    //实时曲线
+    QCPGraph* m_pcurve;
+
+    //实时曲线数据 注意，更新数据后须使用setData方法才能更新曲线
+    QVector<double> m_Cx, m_Cy;
+
+    //理论曲线数据 注意，更新数据后须使用setData方法才能更新曲线
+    QVector<double> m_Lx, m_Ly;
+
+    //读取理论曲线文件，并生成理论曲线
+    bool ReadLLCv();
+
+    //数据接收类
+    DataCenterInterface* m_dci;
+};
 
 class Q2wmapPrivate : QObject
 {
@@ -17,8 +70,8 @@ public:
     //取数据
     void getData();
 
-    //添加数据
-    void addData(double x, double y);
+    //为第index个目标的实时曲线添加数据：一个点（x，y）
+    void addData(qint32 index, double x, double y);
 
     //设置曲线属性
     void setPlot();
@@ -54,40 +107,15 @@ public:
     //计算视窗的经纬度上下限
     void CalcViewLB(double &VLL, double &VLU, double &VBL, double &VBU);
 
-    //参数x的参数名
-    QString m_paramX;
-    QString getParamX()const{return m_paramX;}
-    void setParamX(const QString px){m_paramX=px;}
-
-    //参数y的参数名
-    QString m_paramY;
-    QString getParamY()const{return m_paramY;}
-    void setParamY(const QString py){m_paramY=py;}
-
-    //实时曲线颜色
-    QColor m_curveColor;
-    QColor getColor()const{return m_curveColor;}
-    void setColor(const QColor cc);
-
-    //实时曲线宽度
-    qint32 m_curveWidth;
-    qint32 getCurveWidth()const{return m_curveWidth;}
-    void setCurveWidth(const qint32 cw);
-
-    //理论曲线颜色
-    QColor m_LcurveColor;
-    QColor getLColor()const{return m_LcurveColor;}
-    void setLColor(const QColor cc);
+    //目标属性
+    QString m_strObj;
+    QString getObj()const{return m_strObj;}
+    void setObj(const QString str);
 
     //坐标轴颜色
     QColor m_AcurveColor;
     QColor getAColor()const{return m_AcurveColor;}
     void setAColor(const QColor cc);
-
-    //理论曲线宽度
-    qint32 m_LcurveWidth;
-    qint32 getLCurveWidth()const{return m_LcurveWidth;}
-    void setLCurveWidth(const qint32 cw);
 
     //地图经度下限
     double m_LLowLimit;
@@ -114,11 +142,6 @@ public:
     QPixmap getPixmap()const{return m_pixmap;}
     void setPixmap(const QPixmap pixmap){m_pixmap = pixmap;}
 
-    //理论曲线文件路径
-    QString m_strTFile;
-    QString getTFile()const{return m_strTFile;}
-    void setTFile(const QString file);
-
     //地图是否显示网格
     bool m_bShowGrid;
     bool getShowGrid() const{ return m_bShowGrid; }
@@ -137,15 +160,15 @@ public:
     bool getEnableDrag() const{ return m_bEnableDrag; }
     void setEnableDrag(const bool bEnableDrag);
 
-    //读取理论曲线文件，并生成理论曲线
-    bool ReadLLCv();
-
     //鼠标拖动
     void Drag(qint32 from_x, qint32 from_y, qint32 to_x, qint32 to_y);
 
 private:
     //父窗口
     QWidget * m_parent;
+
+    //目标数组
+    QVector<Q2wmapObject> m_vctObj;
 
     //视窗左上角相对地图左上角的位移量x
     qint32 m_Pos_x;
@@ -162,20 +185,11 @@ private:
     //图元的高度
     qint32 m_height;
 
-    //数据接收类
-    DataCenterInterface* m_dci;
-
     //工作站类
     StationInterface* m_si;
 
     //定时器类
     TimerInterface* m_ti;
-
-    //实时曲线数据
-    QVector<double> m_x, m_y;
-
-    //理论曲线数据
-    QVector<double> m_Lx, m_Ly;
 
     //视窗的经度下限
     double m_ViewLLow;

@@ -5,5 +5,6 @@
         <file>resource/button_hover.png</file>
         <file>resource/button_normal.png</file>
         <file>resource/button_pressed.png</file>
+        <file>resource/commmandbutton.png</file>
     </qresource>
 </RCC>

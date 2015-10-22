@@ -7,7 +7,7 @@ class QSingleParam : public QWidget
 {
     Q_OBJECT
     //文本属性
-    Q_PROPERTY(QString data READ textString WRITE setTextString)
+    Q_PROPERTY(QString data READ textString WRITE setTextString RESET rstobj)
     Q_PROPERTY(QString showType READ getShowType WRITE setShowType)
     Q_PROPERTY(QFont font READ getFont WRITE setFont)
     Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment)
@@ -25,6 +25,7 @@ public:
     //文本属性
      QString textString() const {return m_textString;}
      void setTextString(const QString string);
+     void rstobj(){};
 
      QString getShowType() const {return showType;}
      void setShowType(const QString string);

@@ -55,7 +55,8 @@ void QSingleParam::ShowPluginText()
 }
 void QSingleParam::timerEvent(QTimerEvent *event)
 {
-    dc->getString(m_textString,showType,dispString);
+    if(dc->getString(m_textString,showType,dispString)==1)
+        update();
 }
 void QSingleParam::ShowPlugin()
 {

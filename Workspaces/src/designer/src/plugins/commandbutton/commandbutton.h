@@ -6,11 +6,12 @@
 #include <Net/NetComponents>
 #include <QStringList>
 #include <QUrl>
+#include <QUdpSocket>
 
 class QRegExpValidator;
 class QComboBox;
 
-class CommandButton : public QPushButton
+class CommandButton : public QWidget
 {
     Q_OBJECT
 
@@ -27,6 +28,8 @@ class CommandButton : public QPushButton
 
     //设置给指定主机发送数据包的IP地址
     Q_PROPERTY(QString destAddress READ destAddress WRITE setDestAddress)
+    //设置本机IP地址
+    Q_PROPERTY(QString localAddress READ localAddress WRITE setLocalAddress)
     //设置UDP数据包的传输端口
     Q_PROPERTY(uint port READ port WRITE setPort)
 
@@ -51,6 +54,13 @@ public:
     enum CommandChoice {OneCommand, NextOne, ListCommand };
 
     CommandButton(QWidget *parent = 0);
+    virtual ~CommandButton();
+
+    QString text() const { return pushButton->text(); }
+    void setText(const QString &newText);
+
+    QFont font() const { return pushButton->font(); }
+    void setFont(const QFont&);
 
     QColor textColor() const { return m_textColor; }
     void setTextColor(const QColor &color);
@@ -66,6 +76,9 @@ public:
 
     QString destAddress() const { return m_destAddress; }
     void setDestAddress(const QString &address);
+
+    QString localAddress() const { return m_localAddress; }
+    void setLocalAddress(const QString &address);
 
     uint port() const { return m_port; }
     void setPort(const uint &newPort);
@@ -94,6 +107,8 @@ signals:
 
 protected:
     void paintEvent(QPaintEvent *event);
+    void timerEvent(QTimerEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 
 private slots:
     void setComboBox();
@@ -101,40 +116,75 @@ private slots:
     void sendDatagram();
 
 private:
-    void addItem(const QString &text);
+//    void addItem(const QString &text);
+    QPushButton *pushButton;
+    QComboBox *comboBox;
 
     QString m_data;
     QString m_secData;
     QString m_file;
     QString m_destAddress;
+    QString m_localAddress;
     QStringList m_commandList;
     uint m_port;
     QColor m_textColor;
     CommandChoice m_command;
-    QComboBox *comboBox;
+
     QUrl m_normalImage;
     QUrl m_hoverImage;
     QUrl m_pressedImage;
     QUrl m_disabledImage;
     QUrl m_focusImage;
 
+    QRegExp commandRegExp;
+
     InformationInterface* net;
+    DataCenterInterface* datacenter;
     AbstractParam* param;
     AbstractParam* param2;
+    int m_timer_id;
+    double receiveValue;
+    bool hasReceiveValue;
+    bool hasStylesheetUpdate;
+
+    QUdpSocket udpSocket;
 };
 
 #endif
 
-inline void CommandButton::setTextColor(const QColor &color)
+inline void CommandButton::setText(const QString &newText)
 {
-    m_textColor = color;
-    emit textColorChanged();
+    pushButton->setText(newText);
 }
 
+inline void CommandButton::setFont(const QFont &newFont)
+{
+    pushButton->setFont(newFont);
+}
+
+inline void CommandButton::setTextColor(const QColor &color)
+{
+    if (m_textColor != color) {
+        m_textColor = color;
+        hasStylesheetUpdate = false;
+        emit textColorChanged();
+    }
+}
 
 inline void CommandButton::setDestAddress(const QString &address)
 {
     m_destAddress = address;
+}
+
+inline void CommandButton::setLocalAddress(const QString &address)
+{
+    if (m_localAddress != address) {
+        m_localAddress = address;
+        QHostAddress ipAddress;
+        if (ipAddress.setAddress(m_localAddress)) {
+            udpSocket.bind(ipAddress);
+        }
+    }
 }
 
 inline void CommandButton::setPort(const uint &newPort)

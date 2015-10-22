@@ -2,28 +2,48 @@
 #include "staticgraphPrivate.h"
 
 
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <string>
+#include <QDebug>
+
+#include <QJsonDocument>
+#include <QByteArray>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
+
+
+
 //主类构造函数
 staticgraph::staticgraph(QWidget *parent) :
    QWidget(parent), d_ptr(new staticgraphPrivate(this))
 {
+
     m_timer_id = startTimer(500);//隔500毫秒间隔将触发超时事件timerEvent()
-    qDebug()<<QString("staticgraph startTimer %1 \n").arg(m_timer_id);
 }
 
 //主类析构函数
 staticgraph::~staticgraph()
 {
     killTimer(m_timer_id);
-    qDebug()<<QString("staticgraph killTimer %1 \n").arg(m_timer_id);
+
 }
 
 
+
+//接收传送的数据，并且将值传到私有类中,再进行Json解析
 void staticgraph::setTextString(const QString string)
 {
-    m_textString = string;
-//    update();
-}
+    Q_D(staticgraph);
 
+    //从多曲线对话框返回的Json数组对应的字符串string被存在了m_textString中
+    m_textString = string;
+
+    //私有类中,将值传到私有类中
+    d->setTextString(m_textString);
+
+}
 
 
 //超时事件处理函数
@@ -36,9 +56,10 @@ void staticgraph::timerEvent(QTimerEvent *event)
     //d指针为创建的私有类指针，自然可以调用私有类函数
     Q_D(staticgraph);
 
-//    d->getData(2);//获取外部数据
-    d->getData(0);//获取理论曲线数据
-    d->getData(1);//获取实时曲线数据
+
+    d->getData_Test();//获取自己设计的测试数据
+
+    d->getData();//获取从外部net模块接收的数据
 
     d->update(); //更新绘图
 }
@@ -47,25 +68,18 @@ void staticgraph::timerEvent(QTimerEvent *event)
 void staticgraph::paintEvent(QPaintEvent *event)
 {
     Q_D(staticgraph);//创建私有类指针d,d为staticgraphPrivate类对象的指针
-    d->setPlot();     //设置理论弹道底图曲线参数
-    d->setPlot2();    //设置实时曲线曲线参数
+
+    d->setPlot();
+
     d->update();      //更新绘图
-    qDebug()<<"QCustomPlot::paintEvent(event)";
 }
 
 
-//获取/设置图元的名字
-QString staticgraph::getName() const//获取/设置图元的名字
-{
-    Q_D(const staticgraph);
-    return d->getName();
-}
 
-void staticgraph::setName(const QString stringName)
-{
-    Q_D(staticgraph);
-    d->setName(stringName);
-}
+
+
+
+//共性部分，只需要整体设置一次
 
 //图元背景颜色
 QColor staticgraph::backgroundColor()const
@@ -78,6 +92,7 @@ void staticgraph::setbackgroundColor(const QColor bb)
     Q_D(staticgraph);
     d->setbackgroundColor(bb);
 }
+
 //图元背景图
 QPixmap staticgraph::backgroundImage()const
 {
@@ -90,7 +105,6 @@ void staticgraph::setbackgroundImage(const QPixmap qq)
     d->setbackgroundImage(qq);
 }
 
-
 //图元是否显示网格
 bool staticgraph::getShowGrid() const
 {
@@ -102,7 +116,6 @@ void staticgraph::setShowGrid(const bool bShow)
     Q_D(staticgraph);
     d->setShowGrid(bShow);
 }
-
 
 //图元是否显示图例
 bool staticgraph::getShowLegend() const
@@ -117,132 +130,15 @@ void staticgraph::setShowLegend(const bool bShow)
 }
 
 
-   //x轴刻度范围
-double staticgraph::xUp()const// x轴最大值
-{
-    Q_D(const staticgraph);
-    return d->xUp();
-}
-void staticgraph::setXUp(const double xu)
-{
-    Q_D(staticgraph);
-    d->setXUp(xu);
-}
-
-double staticgraph::xDown()const// x轴最小值
-{
-    Q_D(const staticgraph);
-    return d->xDown();
-}
-void staticgraph::setXDown(const double xd)
-{
-    Q_D(staticgraph);
-    d->setXDown(xd);
-}
 
 
- //y轴刻度范围
-double staticgraph::yUp()const// y轴最大值
-{
-    Q_D(const staticgraph);
-    return d->yUp();
-}
-void staticgraph::setYUp(const double yu)
-{
-    Q_D(staticgraph);
-    d->setYUp(yu);
-}
 
-double staticgraph::yDown()const//y轴最小值
-{
-    Q_D(const staticgraph);
-    return d->yDown();
-}
-void staticgraph::setYDown(const double yd)
-{
-    Q_D(staticgraph);
-    d->setYDown(yd);
-}
+//个性部分，需要每条曲线单独设置
 
 
-//实时曲线
-QString staticgraph::paramX()const//实时曲线输入单参数数据X变量
-{
-    Q_D(const staticgraph);
-    return d->paramX();
-}
-void staticgraph::setParamX(const QString px)
-{
-    Q_D(staticgraph);
-    d->setParamX(px);
-}
-
-QString staticgraph::paramY()const//实时曲线输入单参数数据Y变量
-{
-    Q_D(const staticgraph);
-    return d->paramY();
-}
-void staticgraph::setParamY(const QString py)
-{
-    Q_D(staticgraph);
-    d->setParamY(py);
-}
-
-QColor staticgraph::graphColor()const//实时曲线颜色
-{
-    Q_D(const staticgraph);
-    return d->graphColor();
-}
-void staticgraph::setgraphColor(const QColor cc)
-{
-    Q_D(staticgraph);
-    d->setgraphColor(cc);
-}
-
-int staticgraph::graphWidth()const//实时曲线宽度
-{
-    Q_D(const staticgraph);
-    return d->graphWidth();
-}
-void staticgraph::setgraphWidth(const int cw)
-{
-    Q_D(staticgraph);
-    d->setgraphWidth(cw);
-}
+//样式显示(曲线按照某种样式进行显示，如某个区间显示某种颜色，某种标记，大小等。)
+//增加到"多曲线配置对话框属性"中
 
 
-//理论曲线
-QString staticgraph::getLgraphTFile() const//获取理论曲线文件路径
-{
-    Q_D(const staticgraph);
-    return d->getTFile();
-}
-void staticgraph::setLgraphTFile(const QString file)//设置理论曲线文件路径
-{
-    Q_D(staticgraph);
-    //d->setTFile(file);
-}
 
-
-QColor staticgraph::lgraphColor()const//获取理论曲线颜色
-{
-    Q_D(const staticgraph);
-    return d->LgraphColor();
-}
-void staticgraph::setlgraphColor(const QColor co)//设置理论曲线颜色
-{
-    Q_D(staticgraph);
-    d->setlgraphColor(co);
-}
-
-qint32 staticgraph::LgraphWidth()const//获取理论曲线宽度
-{
-    Q_D(const staticgraph);
-    return d->LgraphWidth();
-}
-void staticgraph::setLgraphWidth(const qint32 wi)//设置理论曲线宽度
-{
-    Q_D(staticgraph);
-    d->setLgraphWidth(wi);
-}
 

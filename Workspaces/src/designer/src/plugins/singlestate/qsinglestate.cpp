@@ -11,6 +11,7 @@
 #include <QByteArray>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <Net/NetComponents>
 
 QSingleState::QSingleState(QWidget *parent) :
     QWidget(parent)
@@ -18,23 +19,52 @@ QSingleState::QSingleState(QWidget *parent) :
      //插件框架属性
     edgeColor.setRgb(0,0,0);      //设置初始化边框颜色为黑色
     edgeLinewidth = 1;     //设置初始化边框宽度
-    edgePenStyle = Qt::NoPen;     //设置初始化边框画笔为不画线
+    edgePenStyle = Qt::SolidLine;     //设置初始化边框画笔为不画线
     pluginRect.setRect(0,0,0,0);
     m_bgcolor.setColor(Qt::red);   //初始背景为红色
-    m_width=145;
-    m_height=95;
-    m_timer_id = startTimer(500);
+    m_width=150;
+    m_height=100;
+
     m_borderBrush.setStyle(Qt::NoBrush);    //设置背景矩形边框无画刷
     m_borderBrush.setColor(Qt::transparent);     //设置背景矩形边框颜色为透明
+
+    m_timer_id = startTimer(500);
+    m_dc = NetComponents::getDataCenter();
+    netFloatValue = 0;
+    m_bvalidData = false;
+
     connect(this,SIGNAL(backgroundcolorChanged(QBrush)),this,SLOT(update()));
     connect(this,SIGNAL(rectWidthChanged(quint32)),this,SLOT(update()));
     connect(this,SIGNAL(rectHeightChanged(quint32)),this,SLOT(update()));
 }
 
-void QSingleState::SetStates(const QString states)
+QSingleState::~QSingleState()
 {
-    m_states = states;
-    update();
+    killTimer(m_timer_id);//删除定时器
+    if(m_dc)
+    {
+        delete m_dc;
+        m_dc = NULL;
+    }
+}
+
+void QSingleState::resizeEvent(QResizeEvent *event)
+{
+    m_width=width()-1;
+    m_height=height()-1;
+}
+
+//定时器事件
+void QSingleState::timerEvent(QTimerEvent *event)
+{
+    ////使用数据处理中心的接口方法
+    double ret;
+    if(m_dc->getValue(m_data,ret))
+    {
+        netFloatValue = ret;
+        m_bvalidData = true;
+        update();
+    }
 }
 
 void QSingleState::paintEvent(QPaintEvent *)
@@ -50,51 +80,47 @@ void QSingleState::paintEvent(QPaintEvent *)
     pluginRect.setRect(0,0,w-1,h-1);
     painter.drawRect(pluginRect);
 
-    //解析
-    int netValue=2;       //传输的参数
-    QString picPath;    //图片路径
-   QJsonParseError jerr;
-   QJsonDocument parse_document = QJsonDocument::fromJson(m_states.toLatin1(), &jerr);
-   if(jerr.error == QJsonParseError::NoError)
-   {
-       if(parse_document.isArray())
-       {
-           QJsonArray array=parse_document.array();   //将QJsonDocument字符串转换为QJsonArray字符串
-           int size=array.size();     //行数
-           for(int i=0;i<size;i++)
-           {
-               QJsonValue value=array.at(i);   //每一行的QJsonObject类型Json字符串
-               if(value.isObject())
-               {
-                   QJsonObject name=value.toObject();
-                   double minLimit=name.value("0").toDouble();    //下限取值
-                   double maxLimit=name.value("1").toDouble();   //上限取值
-                   QString picPath=name["2"].toString();              //图片路径
-                   if(netValue>=minLimit && netValue <=maxLimit)
-                   {
-                       m_pixmap.load(picPath);
-                   }
-               }
-           }
-       }
-   }
-    painter.drawPixmap(0, 0,width(),height(), m_pixmap);
+    //解析JsonArray字符串
+    QString picPath;      //图片路径
+    QJsonParseError jerr;  //解析报错
+    QJsonDocument parse_document = QJsonDocument::fromJson(m_states.toUtf8(), &jerr);
+    if(jerr.error == QJsonParseError::NoError&&m_bvalidData)
+    {
+        if(parse_document.isArray())
+        {
+            QJsonArray array=parse_document.array();   //将QJsonDocument字符串转换为QJsonArray字符串
+            int size=array.size();     //行数
+            for(int i=0;i<size;i++)
+            {
+                QJsonValue value=array.at(i);   //每一行的QJsonObject类型Json字符串
+                if(value.isObject())
+                {
+                    QJsonObject name=value.toObject();
+                    double minLimit=name.value("down").toDouble();    //下限取值
+                    double maxLimit=name.value("up").toDouble();   //上限取值
+                    QString picPath=name["picPath"].toString();              //图片路径
+                    if(netFloatValue>=minLimit && netFloatValue <=maxLimit)
+                    {
+                        m_pixmap.load(picPath);
+                        painter.drawPixmap(0, 0,width(),height(), m_pixmap); //打开图片并显示在当前对话框
+                        painter.save();
 
-    painter.save();
+                        m_bvalidData = false;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     SetPluginRect();
     ShowPlugin();
 }
 
-
-void QSingleState::resizeEvent(QResizeEvent *event)
+void QSingleState::SetStates(const QString states)
 {
-    m_width=width()-1;
-    m_height=height()-1;
-}
-
-void QSingleState::timerEvent(QTimerEvent *event)
-{
-
+    m_states = states;
+    update();
 }
 
 void QSingleState::SetEdgeColor(const QColor Color)
@@ -110,6 +136,7 @@ void QSingleState::SetEdgePenStyle(const Qt::PenStyle style)
     update();
     updateGeometry();
 }
+
 void QSingleState::SetEdgeLinewidth(const uint width)
 {
     edgeLinewidth = width;
@@ -124,10 +151,12 @@ void QSingleState::ShowPluginFrame()
     painter.setPen(pen);
     painter.drawRect(pluginRect);
 }
+
 void QSingleState::ShowPlugin()
 {
     ShowPluginFrame();
 }
+
 //设置自定义画笔
 QPen QSingleState::SetCustomPen(Qt::PenStyle style,QColor color,uint width)
 {
@@ -137,6 +166,7 @@ QPen QSingleState::SetCustomPen(Qt::PenStyle style,QColor color,uint width)
     pen.setWidth((int)width);
     return pen;
 }
+
 //设置插件矩形区域和背景区域
 void QSingleState::SetPluginRect()
 {

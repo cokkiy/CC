@@ -124,74 +124,18 @@ void Q2wmap::resizeEvent(QResizeEvent *event)
     qDebug()<<"Q2wmap::resizeEvent(event)";
 }
 
-//获取参数x的参数名
-QString Q2wmap::getParamX()const
+//获取目标属性
+QString Q2wmap::getobj()const
 {
     Q_D(const Q2wmap);
-    return d->getParamX();
+    return d->getObj();
 }
 
-//设置参数x的参数名
-void Q2wmap::setParamX(const QString px)
+//设置目标属性
+void Q2wmap::setobj(const QString str)
 {
     Q_D(Q2wmap);
-    d->setParamX(px);
-}
-
-//获取参数y的参数名
-QString Q2wmap::getParamY()const
-{
-    Q_D(const Q2wmap);
-    return d->getParamY();
-}
-
-//设置参数y的参数名
-void Q2wmap::setParamY(const QString py)
-{
-    Q_D(Q2wmap);
-    d->setParamY(py);
-}
-
-//获取曲线颜色
-QColor Q2wmap::getColor()const
-{
-    Q_D(const Q2wmap);
-    return d->getColor();
-}
-
-//设置曲线颜色
-void Q2wmap::setColor(const QColor co)
-{
-    Q_D(Q2wmap);
-    d->setColor(co);
-}
-
-//获取曲线宽度
-qint32 Q2wmap::getCurveWidth()const
-{
-    Q_D(const Q2wmap);
-    return d->getCurveWidth();
-}
-
-//设置曲线宽度
-void Q2wmap::setCurveWidth(const qint32 wi)
-{
-    Q_D(Q2wmap);
-    d->setCurveWidth(wi);
-}
-
-//获取理论曲线颜色
-QColor Q2wmap::getLColor()const
-{
-    Q_D(const Q2wmap);
-    return d->getLColor();
-}
-
-//设置理论曲线颜色
-void Q2wmap::setLColor(const QColor co)
-{
-    Q_D(Q2wmap);
-    d->setLColor(co);
+    d->setObj(str);
 }
 
 //获取坐标轴颜色
@@ -206,20 +150,6 @@ void Q2wmap::setAColor(const QColor co)
 {
     Q_D(Q2wmap);
     d->setAColor(co);
-}
-
-//获取理论曲线宽度
-qint32 Q2wmap::getLCurveWidth()const
-{
-    Q_D(const Q2wmap);
-    return d->getLCurveWidth();
-}
-
-//设置理论曲线宽度
-void Q2wmap::setLCurveWidth(const qint32 wi)
-{
-    Q_D(Q2wmap);
-    d->setLCurveWidth(wi);
 }
 
 //获取地图经度下限
@@ -290,20 +220,6 @@ void Q2wmap::setPixmap(const QPixmap mp)
 {
     Q_D(Q2wmap);
     d->setPixmap(mp);
-}
-
-//获取理论曲线文件路径
-QString Q2wmap::getTFile() const
-{
-    Q_D(const Q2wmap);
-    return d->getTFile();
-}
-
-//设置理论曲线文件路径
-void Q2wmap::setTFile(const QString file)
-{
-    Q_D(Q2wmap);
-    d->setTFile(file);
 }
 
 //右键菜单事件(包括右键点击空白处和使用键盘上的菜单键)

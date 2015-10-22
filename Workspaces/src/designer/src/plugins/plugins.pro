@@ -24,5 +24,7 @@ SUBDIRS +=      \
     reserves\
     codeSource\
     commandbutton \
-    table
+    statesend\
+    table\
+    controlProgram
 

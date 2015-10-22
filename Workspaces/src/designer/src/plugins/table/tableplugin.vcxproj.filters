@@ -40,7 +40,13 @@
     <ClCompile Include="table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\components\propertyeditor\simpletable\tablecell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="tableplugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\components\propertyeditor\simpletable\tableproperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,9 +54,15 @@
     <CustomBuild Include="table.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="..\..\components\propertyeditor\simpletable\tablecell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <CustomBuild Include="tableplugin.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="..\..\components\propertyeditor\simpletable\tableproperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".moc\debug\moc_table.cpp">

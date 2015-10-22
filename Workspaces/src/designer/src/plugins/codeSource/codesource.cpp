@@ -123,32 +123,12 @@ void codeSource::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
     //////**************使用数据处理中心的接口方法 QByteArray 转换不对
-    //    QVariant ret;
-    //    if(m_dc->getValue(m_data,ret))
-    //    {
-    //        if(ret.type()==QVariant::ByteArray)
-    //        {
-    //            QByteArray rr = ret.value<QByteArray>();
-    //            QByteArray rr1 = rr.toHex();//to #16
-    //            // #16 QByteArray to #16 QString
-    //            foreach (char c, rr1) {
-    //                disData += QString(c);
-    //            }
-    //        }
-    //    }
 
-    ////*******通过数据类型转换实现的十六进制源码，数据长度受限，目前只能显示8位源码
-    QByteArray rr,rr1;
-    QString strData = m_data;
-    bool ok;
-    qint64 value = strData.toUInt(&ok,10);
-    strData = strData.setNum(value,16);
-    rr = strData.toLocal8Bit();
-    rr1 = QByteArray::fromHex(rr);
-    //#16 QByteArray to #16 QString
-    disData = rr1.toHex().toUpper();
-    //********************************end
 
+    if(m_dc->getString(m_data,"H",disData)==-1)
+    {
+        return;
+    }
     //get scrollbar position
     int scrl = this->verticalScrollBar()->sliderPosition();
     handleData();//数据处理并写入文本

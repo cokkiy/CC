@@ -93,7 +93,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\plugins\button\buttonplugin_resource.rc" />
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\plugins\button\buttonplugind_resource.rc" />
+    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\plugins\button\buttonplugin_resource.rc" />
+    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\plugins\button\buttonplugind_resource.rc" />
   </ItemGroup>
 </Project>

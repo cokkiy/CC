@@ -1,0 +1,69 @@
+ï»¿#ifndef TABLEPROPERTY_H
+#define TABLEPROPERTY_H
+#include "tablecell.h"
+#include <Net/NetComponents>
+
+typedef enum TableOperateType
+{
+    tp_addRow,
+    tp_insertRow,
+    tp_delRow,
+    tp_addColumn,
+    tp_insertColumn,
+    tp_delColumn,
+}TableOperateType;
+
+class QTableProperty
+{
+public:
+    QTableProperty();
+private:
+	//±í¸ñĞĞÊı
+    qint32 m_iRowNum;
+	//±í¸ñÁĞÊı
+    qint32 m_iColNum;
+	//±í¸ñËùÓĞµ¥Ôª¸ñÊôĞÔÊı×é
+    QVector<QTableCell > m_TableVector;
+public:
+	//»ñÈ¡±í¸ñµÄĞĞÊı
+    qint32 getRowNum() const {return m_iRowNum;}
+	//ÉèÖÃ±í¸ñµÄĞĞÊı
+    void setRowNum(const qint32 num);
+	//»ñÈ¡±í¸ñµÄÁĞÊı
+    qint32 getColNum() const {return m_iColNum;}
+	//ÉèÖÃ±í¸ñµÄÁĞÊı
+    void setColNum(const qint32 num);
+	//»ñÈ¡±í¸ñµÄÊôĞÔÊı×é
+    QVector<QTableCell >* getTableVector();
+	//»ñÈ¡±í¸ñµÄ¸ß¶ÈºÍ¿í¶È
+    QSize size();
+	//½«±í¸ñÊôĞÔ×ª»»ÎªJson×Ö·û´®£¬¸ÃJson×Ö·û´®°üÀ¨±í¸ñµÄĞĞÁĞÊıºÍËùÓĞµ¥Ôª¸ñµÄÊôĞÔ
+    QString toJsonStr(float wr,float hr);
+	//½«´«ÈëµÄ×Ö·û´®×ª»»Îª±í¸ñÊôĞÔ
+    void setTableVector(const QString textStr);
+	//×·¼ÓĞĞ
+    void addRow();
+	//²åÈëĞĞ,Êó±êÎ»ÖÃËùÔÚĞĞµÄÉÏÒ»ĞĞ
+    void insertRow(const int currentRow);
+	//É¾³ıÊó±êÎ»ÖÃËùÔÚĞĞ
+    void delRow(const int currentCol);
+	//×·¼ÓÁĞ
+    void addColumn();
+	//²åÈëÁĞ,Êó±êÎ»ÖÃËùÔÚÁĞµÄ×ó²àÒ»ÁĞ
+    void insertColumn(const int currentCol);
+	//É¾³ıÊó±êÎ»ÖÃËùÔÚÁĞ
+    void delColumn(const int currentCol);
+	//ÉèÖÃÖ¸¶¨ÁĞµÄ¿í¶È
+    void setColumnWidth(int column,int width);
+	//ÉèÖÃÖ¸¶¨ĞĞµÄ¸ß¶È
+    void setRowHeight(int row,int height);
+	//ÉèÖÃ±í¸ñµÄ¸ß¶ÈºÍ¿í¶È
+    void setSize(const int width,const int height);
+private:
+	//½âÎö´«ÈëµÄ×Ö·û´®£¬¸Ã×Ö·û´®°üÀ¨±í¸ñµÄĞĞÁĞÊıºÍËùÓĞµ¥Ôª¸ñµÄÊôĞÔ
+    bool analyzeTextStr(const QString textStr);
+	//½«Json×Ö·û´®×ª»»Îª±í¸ñµ¥ÔªÊôĞÔ
+    bool initTableVector(const QString jsonStr);
+};
+
+#endif // TABLEPROPERTY_H

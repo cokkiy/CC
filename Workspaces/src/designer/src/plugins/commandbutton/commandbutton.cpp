@@ -35,13 +35,16 @@ struct struct_FrameHead
 };
 
 CommandButton::CommandButton(QWidget *parent) :
-    QPushButton(parent)
+    QWidget(parent)
 {
-    comboBox = new QComboBox;
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addStretch();
-    layout->addWidget(comboBox);
-    setLayout(layout);
+    pushButton = new QPushButton(this);
+    pushButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    comboBox = new QComboBox(this);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(pushButton);
+    layout->addWidget(comboBox);  
+
+//    setLayout(layout);
     comboBox->setVisible(false);
 
     m_normalImage = QUrl::fromUserInput(":/resource/button_normal.png");
@@ -53,10 +56,15 @@ CommandButton::CommandButton(QWidget *parent) :
 //    ipRegExp = QRegExp("((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}"
 //                       "(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)");
 
-    this->setDestAddress("192.168.0.107");
-    this->setPort(24709);
+    this->setDestAddress("228.1.1.2");
+    this->setPort(24704);
 
-    m_command = CommandChoice::OneCommand;
+    m_command = OneCommand;
+    hasReceiveValue = false;
+    hasStylesheetUpdate = false;
+    m_timer_id = 0;
+
+    commandRegExp = QRegExp("^(\\d+)\\s*(?::(.*))?$");
 
 //    regExp = new QRegExp("((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}"
 //                         "(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)");
@@ -65,20 +73,58 @@ CommandButton::CommandButton(QWidget *parent) :
     connect(this, SIGNAL(commandChanged()), this, SLOT(setComboBox()));
     connect(this, SIGNAL(commandListChanged()), this, SLOT(setComboBox()));
     connect(this, SIGNAL(textColorChanged()), this, SLOT(update()));
-    connect(this, SIGNAL(clicked()), this, SLOT(sendDatagram()));
+    connect(pushButton, SIGNAL(clicked()), this, SLOT(sendDatagram()));
 
     net = NetComponents::getInforCenter();
+    datacenter = NetComponents::getDataCenter();
+
+    QUdpSocket udpSocket2;
+    pushButton->setText(udpSocket2.localAddress().toString());
+
+}
+
+CommandButton::~CommandButton()
+{
+    if (m_timer_id != 0) {
+        killTimer(m_timer_id);
+        m_timer_id = 0;
+    }
+
+//    if (net) {
+//        delete net;
+//        net = NULL;
+//    }
+    if (datacenter) {
+        delete datacenter;
+        datacenter = NULL;
+    }
 }
 
 void CommandButton::setComboBox()
 {
-    if (m_command == CommandChoice::ListCommand) {
+    if (m_command == ListCommand) {
         comboBox->setVisible(true);
 //        comboBox->clear();
         comboBox->addItems(m_commandList);
+        if (m_timer_id != 0) {
+            killTimer(m_timer_id);
+            m_timer_id = 0;
+        }
+        hasReceiveValue = false;
     }
-    else
+    else if (m_command == OneCommand) {
         comboBox->setVisible(false);
+        if (m_timer_id != 0) {
+            killTimer(m_timer_id);
+            m_timer_id = 0;
+        }
+        hasReceiveValue = false;
+    }
+    else {
+        comboBox->setVisible(false);
+        m_timer_id = startTimer(500);
+    }
+
 }
 
 void CommandButton::setCommand(const CommandChoice &newCommand)
@@ -103,15 +149,45 @@ void CommandButton::setReceiveData(QString data)
     }
 }
 
-void CommandButton::addItem(const QString &text)
-{
-    comboBox->addItem(text);
-}
+//void CommandButton::addItem(const QString &text)
+//{
+//    comboBox->addItem(text);
+//}
 
 void CommandButton::paintEvent(QPaintEvent *event)
 {
-    stylesheetUpdate();
-    QPushButton::paintEvent(event);
+    if (hasStylesheetUpdate == false) {
+        stylesheetUpdate();
+        hasStylesheetUpdate = true;
+    }
+    QWidget::paintEvent(event);
+}
+
+void CommandButton::timerEvent(QTimerEvent *event)
+{
+    if(datacenter->getValue(getReceiveData(),receiveValue) == 1)
+    {
+        bool haveMeaningInCommandList = false;
+        QStringList::const_iterator commandIter;
+        for(commandIter = m_commandList.begin(); commandIter != m_commandList.end(); ++commandIter){
+            commandRegExp.indexIn(*commandIter);
+            if (receiveValue == commandRegExp.cap(1).toDouble()){
+                if (commandRegExp.cap(2).trimmed() != NULL)
+                    pushButton->setText(commandRegExp.cap(2).trimmed());
+                haveMeaningInCommandList = true;
+                break;
+            }
+        }
+        if (haveMeaningInCommandList == false)
+            pushButton->setText(QString::number(receiveValue));
+        hasReceiveValue = true;
+    }
+}
+
+void CommandButton::mouseDoubleClickEvent(QMouseEvent *event)
+{
+//    pushButton->mouseDoubleClickEvent(event);
+//    QPushButton::mouseDoubleClickEvent(event);
 }
 
 void CommandButton::setNormalImage(const QUrl &newUrl)
@@ -126,6 +202,7 @@ void CommandButton::setNormalImage(const QUrl &newUrl)
     }
     if (m_normalImage != tempUrl) {
         m_normalImage = tempUrl;
+        hasStylesheetUpdate = false;
         emit imageChanged();
     }
 }
@@ -142,6 +219,7 @@ void CommandButton::setHoverImage(const QUrl &newUrl)
     }
     if (m_hoverImage != tempUrl) {
         m_hoverImage = tempUrl;
+        hasStylesheetUpdate = false;
         emit imageChanged();
     }
 }
@@ -158,6 +236,7 @@ void CommandButton::setPressedImage(const QUrl &newUrl)
     }
     if (m_pressedImage != tempUrl) {
         m_pressedImage = tempUrl;
+        hasStylesheetUpdate = false;
         emit imageChanged();
     }
 }
@@ -174,6 +253,7 @@ void CommandButton::setDisabledImage(const QUrl &newUrl)
     }
     if (m_disabledImage != tempUrl) {
         m_disabledImage = tempUrl;
+        hasStylesheetUpdate = false;
         emit imageChanged();
     }
 }
@@ -190,6 +270,7 @@ void CommandButton::setFocusImage(const QUrl &newUrl)
     }
     if (m_focusImage != tempUrl) {
         m_focusImage = tempUrl;
+        hasStylesheetUpdate = false;
         emit imageChanged();
     }
 }
@@ -215,13 +296,13 @@ void CommandButton::sendDatagram()
     QRegExp dataRegExp = QRegExp("\\[[1-9]\\d{0,4},[1-9]\\d*\\]");
     //验证data是否不为空且格式符合规范
     if (m_data == NULL) {
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::information(this, tr("Error"),
                           tr("Send data is empty!"),
                           QMessageBox::Ok);
         return;
     }
     else if (!dataRegExp.exactMatch(m_data)) {
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::information(this, tr("Error"),
                           tr("Send data is invalid!"),
                           QMessageBox::Ok);
         return;
@@ -229,105 +310,121 @@ void CommandButton::sendDatagram()
     //验证ip地址是否正确
     QHostAddress ipAddress;
     if (!ipAddress.setAddress(m_destAddress)) {
-        QMessageBox::critical(this, tr("Error"),
+        QMessageBox::information(this, tr("Error"),
                           tr("IP address is invalid!"),
                           QMessageBox::Ok);
         return;
     }
 
     for(int i = 0; i < 2; i++) {
-        QUdpSocket udpSocket;
         param = net->getParam(getSendData());
-        quint16 paramLenth = param->GetZXParamDataLength();
+        quint16 paramLenth = param->GetParamDataLen();
         uint size = 40 + paramLenth;
         char* pBuf = new char[size];
         memset(pBuf, 0, size);
 
-        QRegExp commandRegExp = QRegExp("^(\\d+)(?:\\s*:.*)?$");
         switch(m_command) {
-        case CommandChoice::OneCommand:
+        case OneCommand:
         {
-            setText(comboBox->itemText(0));
+            if (m_commandList.isEmpty()) {
+                QMessageBox::information(this, tr("Error"),
+                                  tr("Command is invalid!"),
+                                  QMessageBox::Ok);
+                return;
+            }
             int pos = commandRegExp.indexIn(m_commandList.at(0));
             if (pos == -1) {
-                QMessageBox::critical(this, tr("Error"),
+                QMessageBox::information(this, tr("Error"),
                                   tr("Command is invalid!"),
                                   QMessageBox::Ok);
                 return;
             }
             char* pCmd = (char*)(pBuf+34);
-            *pCmd = commandRegExp.cap(1).toInt();
+            int t_i = commandRegExp.cap(1).toInt();
+            *pCmd = t_i;
             break;
         }
-        case CommandChoice::NextOne:
+        case NextOne:
         {
             if (m_secData == NULL) {
-                QMessageBox::critical(this, tr("Error"),
+                QMessageBox::information(this, tr("Error"),
                                   tr("Receive data is empty!"),
                                   QMessageBox::Ok);
                 return;
             }
             else if (!dataRegExp.exactMatch(m_secData)) {
-                QMessageBox::critical(this, tr("Error"),
+                QMessageBox::information(this, tr("Error"),
                                   tr("Receive data is invalid!"),
                                   QMessageBox::Ok);
                 return;
             }
-            param2 = net->getParam(getReceiveData());
-            QVariant ret;
-            param2->getValue(ret);
-            if (param->GetZXParamTranType() != param2->GetZXParamTranType()) {
-                QMessageBox::critical(this, tr("Error"),
-                                     tr("Send data has the different translation type with receive data!"),
-                                     QMessageBox::Ok);
+            if (!hasReceiveValue) {
+                QMessageBox::information(this, tr("No Data"),
+                                         tr("Receive no data from receive parameter!"),
+                                         QMessageBox::Ok);
                 return;
             }
-            char* pCmd = (char*)(pBuf+34);
-            *pCmd = ret.value<char>();
-            break;
-    //        switch(param->GetZXParamTranType())
-    //        {
-    //        case tp_char://char，1字节
-    //        case tp_BYTE://Byte，1字节
-    //        {
-    //            char* pCmd = (char*)(pBuf+34);
-    //            *pCmd = ret.value<char>();
-    //            break;
-    //        }
-    //        case tp_short://short，2字节
-    //        case tp_WORD://WORD, 2字节
-    //        case tp_long://long，4字节
-    //        case tp_DWORD://DWORD，4字节
-    //        case tp_PMTime://PMTime，4字节
-    //        case tp_Date://Date，4字节
-    //        case tp_BCDTime://BCDTime，4字节
-    //        case tp_UTCTime://UTCTime，4字节
-    //        {
-    //            char* pCmd = (char*)(pBuf+34);
-    //            *pCmd = ret.value<char>();
-    //            break;
-    //        }
-    //        case tp_float://float，4字节
-    //        {
-    //            float* pCmd = (float*)(pBuf+34);
-    //            *pCmd = ret.value<float>();
-    //            break;
-    //        }
-    //        case tp_double://double, 8字节
-    //        {
-    //            double* pCmd = (double*)(pBuf+34);
-    //            *pCmd = ret.value<double>();
-    //            break;
-    //        }
-    //        }
+//            param2 = net->getParam(getReceiveData());
 
+//            param2->getValue(value);
+//            if (param->GetZXParamTranType() != param2->GetZXParamTranType()) {
+//                QMessageBox::critical(this, tr("Error"),
+//                                     tr("Send data has the different translation type with receive data!"),
+//                                     QMessageBox::Ok);
+//                return;
+//            }
+
+//            char* pCmd = (char*)(pBuf+34);
+//            *pCmd = value;
+//            break;
+            switch(param->GetParamTranType())
+            {
+            case tp_char://char，1字节
+            case tp_BYTE://Byte，1字节
+            {
+                char* pCmd = (char*)(pBuf+34);
+                *pCmd = receiveValue;
+                break;
+            }
+            case tp_short://short，2字节
+            case tp_WORD://WORD, 2字节
+            {
+                quint16* pCmd = (quint16*)(pBuf+34);
+                *pCmd = receiveValue;
+                break;
+            }
+            case tp_long://long，4字节
+            case tp_DWORD://DWORD，4字节
+            case tp_PMTime://PMTime，4字节
+            case tp_Date://Date，4字节
+            case tp_BCDTime://BCDTime，4字节
+            case tp_UTCTime://UTCTime，4字节
+            {
+                quint32* pCmd = (quint32*)(pBuf+34);
+                *pCmd = receiveValue;
+                break;
+            }
+            case tp_float://float，4字节
+            {
+                float* pCmd = (float*)(pBuf+34);
+                *pCmd = receiveValue;
+                break;
+            }
+            case tp_double://double, 8字节
+            {
+                double* pCmd = (double*)(pBuf+34);
+                *pCmd = receiveValue;
+                break;
+            }
+            }
+            break;
         }
-        case CommandChoice::ListCommand:
+        case ListCommand:
         {
             //该正则表达式用来判断命令格式是否规范, 并提取命令码
             int pos = commandRegExp.indexIn(comboBox->currentText());
             if (pos == -1) {
-                QMessageBox::critical(this, tr("Error"),
+                QMessageBox::information(this, tr("Error"),
                                   tr("Command is invalid!"),
                                   QMessageBox::Ok);
                 return;
@@ -368,9 +465,9 @@ void CommandButton::sendDatagram()
         quint32* zztime = (quint32*)(pBuf+26);
         *zztime = pHead->time;
         quint16* pTable = (quint16*)(pBuf+30);
-        *pTable = param->GetZXParamTableNo();
+        *pTable = param->GetTableNo();
         quint16* pCode = (quint16*)(pBuf+32);
-        *pCode = param->GetZXParamNo();
+        *pCode = param->GetParamNo();
 
         quint16* wb = (quint16*)(pBuf+34+paramLenth);
         *wb = 0xffff;

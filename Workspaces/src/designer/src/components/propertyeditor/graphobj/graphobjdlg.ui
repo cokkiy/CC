@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GraphObjDlg</class>
+ <widget class="QDialog" name="GraphObjDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>912</width>
+    <height>509</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>微软雅黑</family>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QGroupBox" name="groupBox_AxisConfig_tab">
+        <property name="title">
+         <string>坐标项配置</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QGroupBox" name="groupBox_xAxisConfig_tab">
+           <property name="title">
+            <string>X轴配置</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_xAxisConfig">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_kedufanwei_x_tab">
+              <property name="text">
+               <string>刻度范围：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_Xmax_tab">
+              <property name="text">
+               <string>最大值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_Xmax_tab"/>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_1_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>48</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_Xmin_tab">
+              <property name="text">
+               <string>最小值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_Xmin_tab"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_wenbenpianyi_x_tab">
+              <property name="text">
+               <string>文本偏移：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="horizontalSpacer__3_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_Xoffset_tab"/>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QLabel" name="label_AxisLabel_x">
+              <property name="text">
+               <string>轴标签（名称及单位）：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_XAxisLabel_tab"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_Scaleplace_x">
+              <property name="text">
+               <string>刻度位置：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <spacer name="horizontalSpacer_5_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>48</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="4" column="2">
+             <widget class="QComboBox" name="comboBox_Scaleplace_x">
+              <item>
+               <property name="text">
+                <string>上</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>中</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>下</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QLabel" name="label_Axisdisplay_x">
+              <property name="text">
+               <string>显示坐标轴：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QCheckBox" name="checkBox_chooseAxisdisplay_x">
+              <property name="text">
+               <string>默认选中显示X轴</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="3">
+             <spacer name="horizontalSpacer_7_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>31</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_yAxisConfig_tab">
+           <property name="title">
+            <string>Y轴配置</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_yAxisconfig">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_kedufanwei_y">
+              <property name="text">
+               <string>刻度范围：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_Ymax">
+              <property name="text">
+               <string>最大值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_Ymax_tab"/>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_2_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>60</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_Ymin">
+              <property name="text">
+               <string>最小值</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_Ymin_tab"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_13_wenbenpianyi_y">
+              <property name="text">
+               <string>文本偏移：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="horizontalSpacer_4_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>60</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_Yoffset_tab"/>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QLabel" name="label_AxisLabel_y">
+              <property name="text">
+               <string>轴标签（名称及单位）：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2" colspan="2">
+             <widget class="QLineEdit" name="lineEdit_YAxisLabel_tab"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_Scaleplace_y">
+              <property name="text">
+               <string>刻度位置：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <spacer name="horizontalSpacer_6_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>60</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="4" column="2" colspan="2">
+             <widget class="QComboBox" name="comboBox_Scaleplace_y">
+              <item>
+               <property name="text">
+                <string>左</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>中</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>右</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QLabel" name="label_Axisdisplay_y">
+              <property name="text">
+               <string>显示坐标轴：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QCheckBox" name="checkBox_chooseAxisdisplay_y">
+              <property name="text">
+               <string>默认选中显示Y轴</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="3">
+             <spacer name="horizontalSpacer_8_tab">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>41</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+           <zorder>label_13_wenbenpianyi_y</zorder>
+           <zorder>horizontalSpacer_4_tab</zorder>
+           <zorder>label_Ymax</zorder>
+           <zorder>label_Axisdisplay_y</zorder>
+           <zorder>horizontalSpacer_2_tab</zorder>
+           <zorder>label_AxisLabel_y</zorder>
+           <zorder>label_Ymin</zorder>
+           <zorder>label_kedufanwei_y</zorder>
+           <zorder>horizontalSpacer_6_tab</zorder>
+           <zorder>label_Scaleplace_y</zorder>
+           <zorder>lineEdit_Ymin_tab</zorder>
+           <zorder>lineEdit_Yoffset_tab</zorder>
+           <zorder>lineEdit_YAxisLabel_tab</zorder>
+           <zorder>comboBox_Scaleplace_y</zorder>
+           <zorder>checkBox_chooseAxisdisplay_y</zorder>
+           <zorder>horizontalSpacer_8_tab</zorder>
+           <zorder>lineEdit_Ymax_tab</zorder>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_9_tab">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_GraphConfig_tab">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>181</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>181</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>曲线自身配置</string>
+        </property>
+        <widget class="QGroupBox" name="groupBox_Data_tab">
+         <property name="geometry">
+          <rect>
+           <x>581</x>
+           <y>10</y>
+           <width>301</width>
+           <height>174</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>数据源相关</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_chooseT0_tab">
+            <property name="text">
+             <string>输入T0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_chooseT0_tab"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="pushButton_chooseT0_tab">
+            <property name="text">
+             <string>选择T0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_chooseGraphbasemap_tab">
+            <property name="text">
+             <string>理论弹道</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_chooseGraphbasemap_tab"/>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="pushButton_chooseGraphbasemap_tab">
+            <property name="text">
+             <string>选择弹道</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_Xparam_tab">
+            <property name="text">
+             <string>X参数</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEdit_inputXparam_tab"/>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="pushButton_chooseXparam_tab">
+            <property name="text">
+             <string>选择X参数</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_Yparam_tab">
+            <property name="text">
+             <string>Y参数</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEdit_inputYparam_tab"/>
+          </item>
+          <item row="3" column="2">
+           <widget class="QPushButton" name="pushButton_chooseYparam_tab">
+            <property name="text">
+             <string>选择Y参数</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QGroupBox" name="groupBox_BaseCharacter_tab">
+         <property name="geometry">
+          <rect>
+           <x>18</x>
+           <y>20</y>
+           <width>501</width>
+           <height>161</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>基本特征</string>
+         </property>
+         <widget class="QLabel" name="label_GraphName_tab">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>33</y>
+            <width>165</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>曲线名称（图例名称）：</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEdit_GraphName_tab">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>34</y>
+            <width>141</width>
+            <height>23</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_GraphColor_tab">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>62</y>
+            <width>75</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>曲线颜色：</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_GraphWidth_tab">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>90</y>
+            <width>75</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>曲线宽度：</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEdit_GraphWidth_tab">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>90</y>
+            <width>141</width>
+            <height>22</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_GraphBuffer_tab">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>116</y>
+            <width>90</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>曲线缓冲区：</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEdit_GraphBuffer_tab">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>116</y>
+            <width>141</width>
+            <height>21</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_chooseGraphColor">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>62</y>
+            <width>21</width>
+            <height>19</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_chooseGraphColor_tab">
+          <property name="geometry">
+           <rect>
+            <x>218</x>
+            <y>62</y>
+            <width>101</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>选择曲线颜色</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label">
+          <property name="geometry">
+           <rect>
+            <x>200</x>
+            <y>10</y>
+            <width>71</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>实时曲线</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_2">
+          <property name="geometry">
+           <rect>
+            <x>400</x>
+            <y>10</y>
+            <width>67</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>理论曲线</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEdit_LGraphWidth_tab">
+          <property name="geometry">
+           <rect>
+            <x>350</x>
+            <y>90</y>
+            <width>141</width>
+            <height>22</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEdit_LGraphBuffer_tab">
+          <property name="geometry">
+           <rect>
+            <x>350</x>
+            <y>116</y>
+            <width>141</width>
+            <height>21</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_chooseLGraphColor">
+          <property name="geometry">
+           <rect>
+            <x>353</x>
+            <y>62</y>
+            <width>21</width>
+            <height>19</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_chooseLGraphColor_tab">
+          <property name="geometry">
+           <rect>
+            <x>390</x>
+            <y>62</y>
+            <width>101</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>选择曲线颜色</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_GraphBuffer_tab_2">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>140</y>
+            <width>121</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>实时曲线样式：</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_Graphmode_tab">
+          <property name="geometry">
+           <rect>
+            <x>350</x>
+            <y>140</y>
+            <width>141</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>选择实时曲线样式</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEdit_Graphmode_tab">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>140</y>
+            <width>141</width>
+            <height>21</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

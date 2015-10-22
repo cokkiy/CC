@@ -14,7 +14,6 @@
     <ProjectGuid>{9302145D-1BAA-3C0B-BECB-B7B8C3AE5CE8}</ProjectGuid>
     <RootNamespace>simplecurveplugin</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -45,7 +44,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\..\plugins\designer</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\..\plugins\designer\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.obj\debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">simplecurveplugind</TargetName>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
@@ -75,8 +74,8 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBased.lib;D:/CodeStores/Workspaces/lib/netd.lib;D:\CodeStores\Workspaces\lib\Qt5DesignerBased.lib;$(QTDIR)\lib\Qt5PrintSupportd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)lib/netd.lib;$(SolutionDir)lib\Qt5DesignerBased.lib;$(QTDIR)\lib\Qt5PrintSupportd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\Workspaces_SVN\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -117,8 +116,8 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBase.dll;D:/CodeStores/Workspaces/lib/net.dll;D:\CodeStores\Workspaces\lib\Qt5DesignerBase.lib;$(QTDIR)\lib\Qt5PrintSupport.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D:/Workspaces_SVN/lib/Qt5DesignerBase.dll;D:/Workspaces_SVN/lib/net.dll;D:\Workspaces_SVN\lib\Qt5DesignerBase.lib;$(QTDIR)\lib\Qt5PrintSupport.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\Workspaces_SVN\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -148,7 +147,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">qcustomplot.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/simplecurve -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore qcustomplot.h -o .moc\debug\moc_qcustomplot.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/simplecurve -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore qcustomplot.h -o .moc\debug\moc_qcustomplot.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC qcustomplot.h</Message>
@@ -156,7 +155,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">qcustomplot.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/simplecurve -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore qcustomplot.h -o .moc\release\moc_qcustomplot.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/simplecurve -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore qcustomplot.h -o .moc\release\moc_qcustomplot.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC qcustomplot.h</Message>
@@ -166,7 +165,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">simplecurve.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/simplecurve -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurve.h -o .moc\debug\moc_simplecurve.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/simplecurve -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurve.h -o .moc\debug\moc_simplecurve.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC simplecurve.h</Message>
@@ -174,7 +173,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">simplecurve.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/simplecurve -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurve.h -o .moc\release\moc_simplecurve.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/simplecurve -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurve.h -o .moc\release\moc_simplecurve.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC simplecurve.h</Message>
@@ -184,7 +183,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">simplecurveplugin.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/simplecurve -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurveplugin.h -o .moc\debug\moc_simplecurveplugin.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/simplecurve -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurveplugin.h -o .moc\debug\moc_simplecurveplugin.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC simplecurveplugin.h</Message>
@@ -192,7 +191,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">simplecurveplugin.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/simplecurve -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurveplugin.h -o .moc\release\moc_simplecurveplugin.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/simplecurve -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore simplecurveplugin.h -o .moc\release\moc_simplecurveplugin.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC simplecurveplugin.h</Message>

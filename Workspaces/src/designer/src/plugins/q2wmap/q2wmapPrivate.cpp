@@ -1,33 +1,20 @@
 ﻿#include "q2wmapPrivate.h"
 #include "qwidget.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
 
 Q2wmapPrivate::Q2wmapPrivate(QWidget*wgt)
 {
+    //父窗口
     m_parent = wgt;
-
-    //参数x、y的默认参数名
-    m_paramX = "[10502,19]";
-    m_paramY = "[10502,20]";
-
-    //实时曲线的默认颜色和粗细
-    m_curveColor = Qt::blue;
-    m_curveWidth = 3;
-
-    //理论曲线的默认颜色和粗细
-    m_LcurveColor = Qt::gray;
-    m_LcurveWidth = 3;
 
     //坐标轴颜色
     m_AcurveColor = Qt::yellow;
 
     //创建曲线
     m_plot = new QCustomPlot(m_parent);
-
-    //添加一个曲线图层-理论曲线
-    m_plot->addGraph();
-
-    //添加一个曲线图层-实时曲线
-    m_plot->addGraph();
 
     //视窗相对地图左上角的位移量初始均为0，即视窗初始在地图左上角
     m_Pos_x = 0;
@@ -51,9 +38,6 @@ Q2wmapPrivate::Q2wmapPrivate(QWidget*wgt)
     //默认禁止鼠标拖动
     m_bEnableDrag = false;
 
-    //数据接收类
-    m_dci = NetComponents::getDataCenter();
-
     //工作站类
     m_si = NetComponents::getStation();
 
@@ -69,15 +53,16 @@ Q2wmapPrivate::Q2wmapPrivate(QWidget*wgt)
 //每一行是一个点的经度和纬度的浮点数值，以空格或制表符隔开
 //非预期格式将无法获得正确的理论曲线
 //如果某个点格式错误，该点将不会加入到理论曲线中
-bool Q2wmapPrivate::ReadLLCv()
+//参数index = 目标的序号
+bool Q2wmapObject::ReadLLCv()
 {
-    if(m_strTFile.isNull())
+    if(m_strLFile.isNull())
     {
-        qWarning()<<"Rika's Warning! Q2wmapPrivate::ReadLLCv() : 读取理论曲线文件失败：未配置文件!";
+        qWarning()<<"Rika's Warning! Q2wmapObject::ReadLLCv() : 读取理论曲线文件失败：未配置文件!";
         return false;
     }
 
-    QFile f(m_strTFile);
+    QFile f(m_strLFile);
 
     //以读方式打开文件
     if(f.open(QIODevice::ReadOnly))
@@ -117,31 +102,25 @@ bool Q2wmapPrivate::ReadLLCv()
             //如转换失败就不添加点了
             if( (rr_ok1 == true) && (rr_ok2 == true) )
             {
-                //添加理论曲线上点的经度向量
-                m_Lx.append(L);
-
-                //添加理论曲线上点的纬度向量
-                m_Ly.append(B);
+                //添加理论曲线的点
+                m_Lx.push_back(L);
+                m_Ly.push_back(B);
             }
             else
             {
-                qWarning()<<"Rika's Warning! Q2wmapPrivate::ReadLLCv() : Convert double from QString failed!";
+                qWarning()<<"Rika's Warning! Q2wmapObject::ReadLLCv() : Convert double from QString failed!";
             }
 
             //读完了
             if(ReadLen == -1)
             {
-                //如曲线存在
-                if(m_plot&&m_plot->graph(0))
-                {
-                    //设置理论曲线点集
-                    m_plot->graph(0)->setData(m_Lx, m_Ly);
-                }
-
                 //跳出循环
                 break;
             }
         }
+
+        //设置理论曲线点集
+        m_pLcurve->setData(m_Lx, m_Ly);
 
         //关闭文件
         f.close();
@@ -149,7 +128,7 @@ bool Q2wmapPrivate::ReadLLCv()
     else
     {
         //文件打不开，返回false
-        qWarning()<<"Rika's Warning! Q2wmapPrivate::ReadLLCv() : 读取理论曲线文件失败：理论曲线文件打不开!";
+        qWarning()<<"Rika's Warning! Q2wmapObject::ReadLLCv() : 读取理论曲线文件失败：理论曲线文件打不开!";
         return false;
     }
 
@@ -166,30 +145,6 @@ Q2wmapPrivate::~Q2wmapPrivate()
     }
 }
 
-//设置实时曲线颜色
-void Q2wmapPrivate::setColor(const QColor cc)
-{
-    m_curveColor=cc;
-    m_plot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, getColor(),getCurveWidth()));
-    update();
-}
-
-//设置实时曲线宽度
-void Q2wmapPrivate::setCurveWidth(const qint32 cw)
-{
-    m_curveWidth=cw;
-    m_plot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, getColor(),getCurveWidth()));
-    update();
-}
-
-//设置理论曲线颜色
-void Q2wmapPrivate::setLColor(const QColor cc)
-{
-    m_LcurveColor=cc;
-    m_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, getLColor(),getLCurveWidth()));
-    update();
-}
-
 //设置坐标轴颜色
 void Q2wmapPrivate::setAColor(const QColor cc)
 {
@@ -197,13 +152,113 @@ void Q2wmapPrivate::setAColor(const QColor cc)
     update();
 }
 
-
-//设置理论曲线宽度
-void Q2wmapPrivate::setLCurveWidth(const qint32 cw)
+//设置目标属性，解析json的工作也在这里完成
+void Q2wmapPrivate::setObj(const QString str)
 {
-    m_LcurveWidth=cw;
-    m_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, getLColor(),getLCurveWidth()));
-    update();
+    if(m_plot == NULL)
+    {
+        return;
+    }
+
+    m_strObj = str;
+
+    //错误信息
+    QJsonParseError jerr;
+
+    //取得json文档
+    QJsonDocument Jdoc = QJsonDocument::fromJson(str.toUtf8(), &jerr);
+
+    //如果没有发生错误，则开始解析
+    if(jerr.error != QJsonParseError::NoError)
+    {
+        qDebug()<<"error in Q2wmapPrivate::setObj : Error json";
+        return;
+    }
+
+    //空文档
+    if(Jdoc.isEmpty())
+    {
+        qDebug()<<"error in Q2wmapPrivate::setObj : Empty json";
+        return;
+    }
+
+    //数组文档(因为多目标，所以必须是数组)
+    if(!Jdoc.isArray())
+    {
+        qDebug()<<"error in Q2wmapPrivate::setObj : Not a json array";
+        return;
+    }
+
+    //清空之前的曲线
+    for(int i=0; i<m_vctObj.size(); i++)
+    {
+        m_vctObj[i].m_pcurve->clearData();
+        m_vctObj[i].m_pLcurve->clearData();
+    }
+
+    m_vctObj.clear();
+
+    //取得数组
+    QJsonArray array = Jdoc.array();
+
+    //循环获取
+    for(int j=0; j<array.size(); j++)
+    {
+        //取得一个数组的值
+        QJsonValue value = array.at(j);
+
+        //如果值是一个对象...?
+        if(value.isObject())
+        {
+            //转换成json对象
+            QJsonObject name = value.toObject();
+
+            //下面开始挨个解析
+
+            Q2wmapObject sj;
+
+            //目标名称
+            sj.m_strObjName = name["Name"].toString();
+
+            //是否主目标
+            sj.m_bMainObj = name["MainObj"].toBool();
+
+            //曲线颜色
+            sj.m_ccurveColor = name["CColor"].toString();
+
+            //曲线粗细
+            sj.m_icurveWidth = name["CWidth"].toInt();
+
+            //理论曲线颜色
+            sj.m_cLcurveColor = name["LColor"].toString();
+
+            //理论曲线粗细
+            sj.m_iLcurveWidth = name["LWidth"].toInt();
+
+            //X轴参数
+            sj.m_strParamX = name["XParam"].toString();
+
+            //Y轴参数
+            sj.m_strParamY = name["YParam"].toString();
+
+            //理论曲线路径
+            sj.m_strLFile = name["LFile"].toString();
+
+            //添加一个曲线图层-理论曲线
+            sj.m_pLcurve = m_plot->addGraph();
+
+            //添加一个曲线图层-实时曲线
+            sj.m_pcurve = m_plot->addGraph();
+
+            //数据接收类
+            sj.m_dci = NetComponents::getDataCenter();
+
+            //读取理论弹道
+            sj.ReadLLCv();
+
+            m_vctObj.push_back(sj);
+        }
+    }
 }
 
 //设置地图经度下限
@@ -253,17 +308,6 @@ void Q2wmapPrivate::setAutoCruise(const bool bAutoCruise, bool type)
 void Q2wmapPrivate::setEnableDrag(const bool bEnableDrag)
 {
     m_bEnableDrag = bEnableDrag;
-    update();
-}
-
-//设置理论曲线文件路径
-void Q2wmapPrivate::setTFile(const QString file)
-{
-    m_strTFile = file;
-
-    //读取理论曲线文件，并生成理论曲线
-    ReadLLCv();
-
     update();
 }
 
@@ -355,11 +399,14 @@ void Q2wmapPrivate::setPlot()
     //曲线及图表可以被选择 QCP::iSelectPlottables
     //m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom| QCP::iSelectPlottables);
 
-    //理论曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
-    m_plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_LcurveColor,m_LcurveWidth));
+    for(int i=0; i<m_vctObj.size(); i++)
+    {
+        //理论曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
+        m_vctObj[i].m_pLcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_vctObj[i].m_cLcurveColor, m_vctObj[i].m_iLcurveWidth));
 
-    //实时曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
-    m_plot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_curveColor,m_curveWidth));
+        //实时曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
+        m_vctObj[i].m_pcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_vctObj[i].m_ccurveColor, m_vctObj[i].m_icurveWidth));
+    }
 
     //是否显示网格
     if(m_bShowGrid)
@@ -411,25 +458,25 @@ void Q2wmapPrivate::setPlot()
     m_plot->yAxis->setOffset(0);
     m_plot->yAxis2->setOffset(0);
 
-    //设置轴线颜色 黄色 (轴线的颜色还不打算允许自由设置)
+    //设置轴线颜色
     m_plot->xAxis->setBasePen(QPen(m_AcurveColor));
     m_plot->xAxis2->setBasePen(QPen(m_AcurveColor));
     m_plot->yAxis->setBasePen(QPen(m_AcurveColor));
     m_plot->yAxis2->setBasePen(QPen(m_AcurveColor));
 
-    //设置刻度颜色 黄色
+    //设置刻度颜色
     m_plot->xAxis->setTickPen(QPen(m_AcurveColor));
     m_plot->xAxis2->setTickPen(QPen(m_AcurveColor));
     m_plot->yAxis->setTickPen(QPen(m_AcurveColor));
     m_plot->yAxis2->setTickPen(QPen(m_AcurveColor));
 
-    //设置子刻度颜色 黄色
+    //设置子刻度颜色
     m_plot->xAxis->setSubTickPen(QPen(m_AcurveColor));
     m_plot->xAxis2->setSubTickPen(QPen(m_AcurveColor));
     m_plot->yAxis->setSubTickPen(QPen(m_AcurveColor));
     m_plot->yAxis2->setSubTickPen(QPen(m_AcurveColor));
 
-    //设置刻度文字颜色 黄色
+    //设置刻度文字颜色
     m_plot->xAxis->setTickLabelColor(m_AcurveColor);
     m_plot->xAxis2->setTickLabelColor(m_AcurveColor);
     m_plot->yAxis->setTickLabelColor(m_AcurveColor);
@@ -440,10 +487,6 @@ void Q2wmapPrivate::setPlot()
     m_plot->xAxis2->setTickLabelSide(QCPAxis::lsInside);
     m_plot->yAxis->setTickLabelSide(QCPAxis::lsInside);
     m_plot->yAxis2->setTickLabelSide(QCPAxis::lsInside);
-
-    //设置坐标轴2可见
-    m_plot->xAxis2->setVisible(1);
-    m_plot->yAxis2->setVisible(1);
 
     if(m_bShowGrid)
     {
@@ -468,8 +511,13 @@ void Q2wmapPrivate::setPlot()
 //B=曲线当前点纬度
 void Q2wmapPrivate::AutoMoveView(const double L, const double B)
 {
+    if(m_plot == NULL)
+    {
+        return;
+    }
+
     //如曲线存在
-    if(m_plot&&m_plot->graph(1))
+    if(m_vctObj.size()>0)
     {
         //如曲线将要超出视窗边界(曲线经纬度中有一个到达1/20边界值)，则移动视窗中心至曲线当前点
         //首先，计算视窗的经纬度边界值
@@ -578,6 +626,11 @@ void Q2wmapPrivate::MoveToPointOfMap(qint32 x, qint32 y)
 //设置曲线的点的x、y值,做为测试,这里用一个正弦曲线
 void Q2wmapPrivate::TestgetData()
 {
+    if(m_plot == NULL)
+    {
+        return;
+    }
+
     static qint32 i = 0;
     static qint32 j = 0;
     if(j>5)
@@ -602,19 +655,10 @@ void Q2wmapPrivate::TestgetData()
     }
 
     //如曲线存在
-    if(m_plot&&m_plot->graph(1))
+    if(m_vctObj.size()>0)
     {
-        //设置曲线点集。两种方法效果一样
-
-        /*方法1：
-        //添加点的经度向量
-        m_x.append(L);
-        //添加点的纬度向量
-        m_y.append(B);
-        //m_plot->graph(1)->setData(m_x, m_y);*/
-
-        /*方法2：*/
-        addData(L, B);
+        //设置曲线点集
+        addData(0, L, B);
 
         if(m_bAutoCruise)
         {
@@ -629,42 +673,48 @@ void Q2wmapPrivate::TestgetData()
 //设置曲线的点的x、y值,使用Net类取数据
 void Q2wmapPrivate::getData()
 {
-    //定义两个数组用于存放取到的数据
-    QVector<double> vx, vy;
-
-    //准备插入到曲线的点
-    double tx, ty;
-
-    //取数据结果 1=成功 -1=失败
-    int res = 0;
-
-    //调用getHistoryDatas方法获取数据。这里采用同时取2个参数的方法
-    res = m_dci->getHistoryDatas(2, &m_paramX, &vx, &m_paramY, &vy);
-
-    //没有接收到数据或发生错误都会返回-1
-    if(res == -1)
+    if(m_plot == NULL)
     {
         return;
     }
 
-    //把取到的全部x的值存入数组m_x
-    foreach (tx, vx)
+    for(int i=0; i<m_vctObj.size(); i++)
     {
-        m_x.append(tx);
-    }
+        //定义两个数组用于存放取到的数据
+        QVector<double> vx, vy;
 
-    //把取到的全部y的值存入数组m_y
-    foreach (ty, vy)
-    {
-        m_y.append(ty);
-    }
+        //准备插入到曲线的点
+        double tx, ty;
 
-    //把曲线的值设置为刚才的两个数组
-    if(m_plot&&m_plot->graph(1))
-    {
-        m_plot->graph(1)->setData(m_x, m_y);
+        //取数据结果 1=成功 -1=失败
+        int res = 0;
 
-        if(m_bAutoCruise)
+        //调用getHistoryDatas方法获取数据。这里采用同时取2个参数的方法
+        res = m_vctObj[i].m_dci->getHistoryDatas(2, &m_vctObj[i].m_strParamX, &vx, &m_vctObj[i].m_strParamY, &vy);
+
+        //没有接收到数据或发生错误都会跳过
+        if(res == -1)
+        {
+            continue;
+        }
+
+        //把取到的全部x的值存入数组m_x
+        foreach (tx, vx)
+        {
+            m_vctObj[i].m_Cx.append(tx);
+        }
+
+        //把取到的全部y的值存入数组m_y
+        foreach (ty, vy)
+        {
+            m_vctObj[i].m_Cy.append(ty);
+        }
+
+        //把曲线的值设置为刚才的两个数组
+        m_vctObj[i].m_pcurve->setData(m_vctObj[i].m_Cx, m_vctObj[i].m_Cy);
+
+        //如果设置了自动漫游，且当前目标为主目标，才自动移动视窗
+        if(m_bAutoCruise && m_vctObj[i].m_bMainObj == true)
         {
             //自动移动视窗
             AutoMoveView(tx, ty);
@@ -672,13 +722,17 @@ void Q2wmapPrivate::getData()
     }
 }
 
-//添加数据,为曲线添加一个点（x，y）
-void Q2wmapPrivate::addData(double x, double y)
+//为第index个目标的实时曲线添加数据：一个点（x，y）
+void Q2wmapPrivate::addData(qint32 index, double x, double y)
 {
-    if(m_plot&&m_plot->graph(1))
+    if(m_plot == NULL)
     {
-        //为第一个曲线添加数据
-        m_plot->graph(1)->addData(x, y);
+        return;
+    }
+
+    if(m_vctObj.size()>index)
+    {
+        m_vctObj[index].m_pcurve->addData(x, y);
 
         //重绘
         m_plot->replot();

@@ -88,12 +88,11 @@
     <None Include="resource\button_pressed.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resource\commmandbutton.png">
+      <Filter>Resource Files</Filter>
+    </None>
     <CustomBuild Include="icons.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\plugins\commandbutton\commandbuttonplugin_resource.rc" />
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\plugins\commandbutton\commandbuttonplugind_resource.rc" />
   </ItemGroup>
 </Project>

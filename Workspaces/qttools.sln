@@ -85,6 +85,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "staticgraphplugin", "src\de
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "codeSourceplugin", "src\designer\src\plugins\codeSource\codeSourceplugin.vcxproj", "{B7FB2706-0E61-3FB4-8D97-F895F21531A5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "controlprogramplugin", "src\designer\src\plugins\controlProgram\controlprogramplugin.vcxproj", "{1B7833C3-89C8-31CD-B948-BBCBA111BED9}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -162,6 +164,10 @@ Global
 		{B7FB2706-0E61-3FB4-8D97-F895F21531A5}.Debug|x64.Build.0 = Debug|x64
 		{B7FB2706-0E61-3FB4-8D97-F895F21531A5}.Release|x64.ActiveCfg = Release|x64
 		{B7FB2706-0E61-3FB4-8D97-F895F21531A5}.Release|x64.Build.0 = Release|x64
+		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Debug|x64.ActiveCfg = Debug|x64
+		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Debug|x64.Build.0 = Debug|x64
+		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Release|x64.ActiveCfg = Release|x64
+		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

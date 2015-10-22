@@ -41,7 +41,7 @@ QString CommandButtonPlugin::group() const
 
 QIcon CommandButtonPlugin::icon() const
 {
-    return QIcon();
+    return QIcon("://resource/commmandbutton.png");
 }
 
 QString CommandButtonPlugin::toolTip() const

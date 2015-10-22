@@ -1,0 +1,52 @@
+ï»¿#ifndef TABLEITEMSET_H
+#define TABLEITEMSET_H
+#include "tablecell.h"
+#include <QDialog>
+
+namespace Ui {
+class tableitemset;
+}
+
+class tableitemset : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit tableitemset(QTableCell ,QWidget *parent = 0);
+    ~tableitemset();
+	//»ñÈ¡ÉèÖÃµÄµ¥Ôª¸ñÊôÐÔ
+    QTableCell getTableCell();
+private slots:
+
+    void on_textFontpushButton_clicked();
+
+    void on_BGColorpushButton_clicked();
+
+    void on_textColorpushButton_clicked();
+
+    void on_buttonBox_accepted();
+
+    void on_moreButton_clicked();
+
+private:
+	//ui½çÃæ
+    Ui::tableitemset *ui;
+	//¸ü¶à²Ù×÷°´Å¥×´Ì¬
+    bool bMoreOperate;
+	//ui ¶Ô»°¿ògeometry
+    QRect uiRect;
+	//Ë®Æ½¶ÔÆë·½Ê½
+    Qt::Alignment m_TextHAlignment;
+	//ÉÏÏÂ¸¡¶¯·½Ê½
+    Qt::Alignment m_TextVAlignment;
+	//ÎÄ±¾×ÖÌå
+    QFont m_TextFont;
+	//ÎÄ±¾ÑÕÉ«
+	QColor m_TextColor;
+	//±³¾°É«
+	QColor m_ItemBGColor;
+	//µ¥Ôª¸ñÊôÐÔ
+    QTableCell m_TableCell;
+};
+
+#endif // TABLEITEMSET_H

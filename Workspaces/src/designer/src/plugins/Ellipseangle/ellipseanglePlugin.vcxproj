@@ -74,8 +74,8 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBased.dll;D:\CodeStores\Workspaces\lib\Qt5DesignerBased.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D:/Workspaces_SVN/lib/Qt5DesignerBased.dll;D:\Workspaces_SVN\lib\Qt5DesignerBased.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\Workspaces_SVN\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -116,8 +116,8 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBase.dll;D:\CodeStores\Workspaces\lib\Qt5DesignerBase.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\CodeStores\Workspaces\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D:/Workspaces_SVN/lib/Qt5DesignerBase.dll;D:\Workspaces_SVN\lib\Qt5DesignerBase.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;.;D:\Workspaces_SVN\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -146,7 +146,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ellipseangle.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/Ellipseangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangle.h -o .moc\debug\moc_ellipseangle.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/Ellipseangle -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangle.h -o .moc\debug\moc_ellipseangle.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ellipseangle.h</Message>
@@ -154,7 +154,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ellipseangle.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/Ellipseangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangle.h -o .moc\release\moc_ellipseangle.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/Ellipseangle -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangle.h -o .moc\release\moc_ellipseangle.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ellipseangle.h</Message>
@@ -164,7 +164,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ellipseangleplugin.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/Ellipseangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangleplugin.h -o .moc\debug\moc_ellipseangleplugin.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/Ellipseangle -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangleplugin.h -o .moc\debug\moc_ellipseangleplugin.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ellipseangleplugin.h</Message>
@@ -172,7 +172,7 @@ endlocal</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ellipseangleplugin.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
-c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/plugins/Ellipseangle -ID:/CodeStores/Workspaces/include -ID:/CodeStores/Workspaces/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangleplugin.h -o .moc\release\moc_ellipseangleplugin.cpp
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PLUGIN -DQT_DESIGNER_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DQDESIGNER_EXPORT_WIDGETS -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/Workspaces_SVN/src/designer/src/plugins/Ellipseangle -ID:/Workspaces_SVN/include -ID:/Workspaces_SVN/include/QtDesignerBase -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore ellipseangleplugin.h -o .moc\release\moc_ellipseangleplugin.cpp
 if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ellipseangleplugin.h</Message>

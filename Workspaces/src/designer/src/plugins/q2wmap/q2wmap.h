@@ -10,29 +10,14 @@ class Q2wmap : public QWidget
 {
     Q_OBJECT
 
+    //目标配置
+    Q_PROPERTY(QString q2wmapobj READ getobj WRITE setobj RESET rstobj)
+
     //图元矩形
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
 
-    //参数x的参数名
-    Q_PROPERTY(QString paramX READ getParamX WRITE setParamX)
-
-    //参数y的参数名
-    Q_PROPERTY(QString paramY READ getParamY WRITE setParamY)
-
-    //曲线颜色
-    Q_PROPERTY(QColor Color READ getColor WRITE setColor)
-
-    //曲线宽度
-    Q_PROPERTY(qint32 CurveWidth READ getCurveWidth WRITE setCurveWidth)
-
-    //理论曲线颜色
-    Q_PROPERTY(QColor LColor READ getLColor WRITE setLColor)
-
     //坐标轴颜色
     Q_PROPERTY(QColor AColor READ getAColor WRITE setAColor)
-
-    //理论曲线宽度
-    Q_PROPERTY(qint32 LCurveWidth READ getLCurveWidth WRITE setLCurveWidth)
 
     //地图经度下限
     Q_PROPERTY(double LLowLimit READ getLLowLimit WRITE setLLowLimit)
@@ -49,44 +34,22 @@ class Q2wmap : public QWidget
     //地图路径
     Q_PROPERTY(QPixmap pixmap READ getPixmap WRITE setPixmap)
 
-    //理论曲线文件路径
-    Q_PROPERTY(QString file READ getTFile WRITE setTFile)
-
 public:
     Q2wmap(QWidget *parent = 0);
     virtual ~Q2wmap();
 
-    //获取/设置参数x的参数名
-    QString getParamX()const;
-    void setParamX(const QString px);
-
-    //获取/设置参数y的参数名
-    QString getParamY()const;
-    void setParamY(const QString py);
-
-    //获取/设置曲线颜色
-    QColor getColor()const;
-    void setColor(const QColor co);
-
-    //获取/设置曲线宽度
-    qint32 getCurveWidth()const;
-    void setCurveWidth(const qint32 wi);
+    //获取/设置目标
+    QString getobj() const;
+    void setobj(const QString str);
+    void rstobj(){};
 
     //获取/设置地图路径
     QPixmap getPixmap() const;
     void setPixmap(const QPixmap mp);
 
-    //获取/设置理论曲线颜色
-    QColor getLColor()const;
-    void setLColor(const QColor co);
-
     //获取/设置坐标轴轴颜色
     QColor getAColor()const;
     void setAColor(const QColor co);
-
-    //获取/设置理论曲线宽度
-    qint32 getLCurveWidth()const;
-    void setLCurveWidth(const qint32 wi);
 
     //获取/设置理论曲线文件路径
     QString getTFile() const;
