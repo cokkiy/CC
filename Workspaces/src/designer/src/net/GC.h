@@ -13,6 +13,7 @@
 #include "selfshare/src/historyparambuffer/historyparambuffer.h"
 using namespace std::chrono;
 
+
 /*Class for garbage collection*/
 class GC
 {
@@ -67,7 +68,7 @@ private:
     bool bQuit=false;
 
     //sleep duration, default is 10s
-    seconds sleepDuration = 5s;
+    seconds sleepDuration=10s;
     
     //history param map
     HistoryParamMap* pParamMap;

@@ -14,13 +14,13 @@
 #include "../infoprocthread/infoprocthread.h"
 #include "../../../selfshare/src/config/config.h"
 #include "FrameHeader.h"
-#include "SimpleLogger.h"
+//#include "SimpleLogger.h"
 
 extern InfoProcThread 	g_InfoProcThread[MAX_THREAD_NUM];
 extern bool g_quitFlag;
 
 // extern var, log for counting
-extern SimpleLogger logger;
+//extern SimpleLogger logger;
 
 //构造函数
 RecvInfoThread::RecvInfoThread():PThread()

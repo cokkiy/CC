@@ -17,11 +17,11 @@
 
 #include "CParamInfoRT.h"
 #include "selfshare/src/config/config.h"
-#include "SimpleLogger.h"
+//#include "SimpleLogger.h"
 
 //外部变量.配置信息和缓存信息
 extern Config g_cfg;
-extern SimpleLogger logger;
+//extern SimpleLogger logger;
 
 //析构函数中释放C3I参数约定表map，同时释放参数所占用的内存空间。
 CParamInfoRT::~CParamInfoRT()
@@ -97,7 +97,7 @@ char* CParamInfoRT::SetParamValue(AbstractParam* pParam,
                 hParam.setTime(pParam->GetParamTime());
                 hParam.setValue(t_value);
                 g_cfg.m_zxHistoryParamBuf.PutBuffer(pParam->GetTableNo(), pParam->GetParamNo(), hParam);
-                logger.logPacketCount();
+                //logger.logPacketCount();
             }
         }
         break;

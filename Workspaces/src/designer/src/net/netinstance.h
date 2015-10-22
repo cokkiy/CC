@@ -5,7 +5,7 @@
 #include "main/src/network/network.h"
 #include "main/src/recvinfothread/recvinfothread.h"
 #include <QThread>
-#include "gc.h"
+#include "GC.h"
 
 class NETSHARED_EXPORT  NetInstance: public NetInterface
 {

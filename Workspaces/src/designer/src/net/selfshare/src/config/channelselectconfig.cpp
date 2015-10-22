@@ -31,7 +31,7 @@ bool ChannelSelectConfig::load(QString dir)
 
     if ((result = doc.Load(&file)))
     {
-        auto& elements = doc.getChild().getChildrenByName(QString::fromLocal8Bit("主备切换"));
+        auto elements = doc.getChild().getChildrenByName(QString::fromLocal8Bit("主备切换"));
         for (XElement& element : elements)
         {
             Channel channel;

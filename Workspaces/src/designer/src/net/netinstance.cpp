@@ -9,7 +9,7 @@
 #include "C3I/CParamInfoRT.h"
 #include "selfshare/src/config/channelselectconfig.h"
 #include <QDebug>
-#include "SimpleLogger.h"
+//#include "SimpleLogger.h"
 #include "GC.h"
 
 extern Config g_cfg;
@@ -24,7 +24,7 @@ CParamInfoRT g_paramInfoRT;
 ChannelSelectConfig channelSelectConfig;
 
 // log fot count
-SimpleLogger logger;
+//SimpleLogger logger;
 
 bool g_quitFlag = false;
 
@@ -70,7 +70,7 @@ int NetInstance::load(QString dir)
     }
 
     //start log
-    logger.start("d:/DataRecord/");
+    //logger.start("d:/DataRecord/");
 
     return 1;
 }
