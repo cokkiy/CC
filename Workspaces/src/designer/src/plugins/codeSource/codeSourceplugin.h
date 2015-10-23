@@ -1,4 +1,4 @@
-﻿#ifndef CODESOURCEPLUGIN_H
+#ifndef CODESOURCEPLUGIN_H
 #define CODESOURCEPLUGIN_H
 
 #include <QtDesigner/QDesignerCustomWidgetInterface>

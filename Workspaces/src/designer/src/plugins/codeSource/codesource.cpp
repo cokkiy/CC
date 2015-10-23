@@ -1,4 +1,4 @@
-﻿#include "codesource.h"
+#include "codesource.h"
 #include <QtMath>
 #include<QMessageBox>
 #include<QScrollBar>

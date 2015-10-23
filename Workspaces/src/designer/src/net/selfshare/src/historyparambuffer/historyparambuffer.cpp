@@ -90,7 +90,11 @@ list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned sho
         if (param.getDate() > date || (param.getDate() == date&&param.getTime() > time))
         {
             //复制该vector中全部数据到list,retBuf是按时间从前到后排序的
-            retBuf.insert(retBuf.begin(), pVector->begin(), pVector->begin() + count-1);
+            for(auto iter=pVector->begin();iter<pVector->begin()+count;iter++)
+            {
+                retBuf.push_back(*iter);
+            }
+            //retBuf.insert(retBuf.begin(), pVector->begin(), pVector->begin() + count-1);
             t_date = param.getDate();
             t_time = param.getTime();
         }
