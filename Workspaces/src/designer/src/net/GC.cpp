@@ -1,6 +1,6 @@
 ﻿#include "GC.h"
-#include <thread>
 #include <QDebug>
+using namespace std;
 using namespace std::literals;
 
 //get total memory size
@@ -30,6 +30,11 @@ GC::~GC()
 {
     //停止回收
     stop();
+    if(gcThread!=nullptr)
+    {
+        delete gcThread;
+        gcThread=nullptr;
+    }
 }
 
 /*!
@@ -48,7 +53,10 @@ void GC::start()
     //估计控制百分比
     estimatePercent();
 
-    std::thread gcThread(&GC::collect, this, pParamMap);
+    if(gcThread==nullptr)
+    {
+        gcThread=new thread(&GC::collect, this, pParamMap);
+    }
 }
 
 /*!

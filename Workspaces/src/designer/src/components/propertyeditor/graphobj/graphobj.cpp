@@ -1,4 +1,4 @@
-﻿#include "graphObj.h"
+﻿#include "graphobj.h"
 #include "ui_graphobj.h"
 #include "graphobjdlg.h"
 #include <QJsonParseError>

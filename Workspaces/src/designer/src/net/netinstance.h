@@ -50,6 +50,7 @@ private:
 
     // 历史缓存区回收对象
     GC* gc=nullptr;
+
 };
 
 #endif // NETINSTANCE_H

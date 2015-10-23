@@ -8,7 +8,7 @@
 #include <sys/resource.h>
 #if defined(__APPLE__)&&defined(__MACH__)
 #include <mach/ach.h>
-#elif (defined(_AIX)||defined(_TOS_AIX__))||(defined(__SUN__)||defined(__sun)||defined(sun)&&(defined(__SVR4)||defined(--svr4__)))
+#elif (defined(_AIX)||defined(_TOS_AIX__))||(defined(__SUN__)||defined(__sun)||defined(sun)&&(defined(__SVR4)||defined(__svr4__)))
 #include <fcntl.h>
 #include <procfs.h>
 #elif defined(__linux__)||defined(__linux)||defined(linux)||defined(__gnu_linux__)
@@ -48,9 +48,9 @@ size_t getPeakRSS()
     struct rusage rusage;
     getrusage(RUSAGE_SELF, &rusage);
 #if defined(__APPLE__)&&defined(__MACH__)
-    return (size_t)rusage_ru_maxrss;
+    return (size_t)rusage.ru_maxrss;
 #else
-    return (size_t)(rusage_ru_maxrss * 1024L);
+    return (size_t)(rusage.ru_maxrss * 1024L);
 #endif
 #else
     /* Unknown OS-------------*/
@@ -76,7 +76,7 @@ size_t getCurrentRSS()
     if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &infocount) != KERN_SUCESS)
         return (size_t)0L;
     return (size_t)info.resident_size;
-#elif defined(__linux__)||define(__linux)||defined(linux)||defined(__gnu_linux__)
+#elif defined(__linux__)||defined(__linux)||defined(linux)||defined(__gnu_linux__)
     /*linux-------------------------------*/
     long rss = 0l;
     FILE* fp = NULL;

@@ -33,4 +33,8 @@ mac {
 
 }
 
+unix:gcc{
+QMAKE_CXXFLAGS+=-std=c++11
+}
+
 include(controlprogram.pri)

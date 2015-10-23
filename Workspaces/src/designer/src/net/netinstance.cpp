@@ -106,8 +106,8 @@ void NetInstance::run()
 
 int NetInstance::start()
 {
-    m_thread->start();
-    
+    m_thread->start();    
+
     if (gc == nullptr)
     {
         //create gc

@@ -143,7 +143,7 @@ bool Buffer::WriteBuffer(const char *src, unsigned short size)
 //******************
 char *Buffer::ReadBuffer(unsigned short size)
 {
-	char *des = (char *)malloc(size);										//分配空间
+    char *des = new char[size];  //(char *)malloc(size);										//分配空间
 
 	if(NULL == des) 																		//内存不足
 	{
