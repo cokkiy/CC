@@ -180,15 +180,24 @@ bool LFormula::insertOneHistroyParam()
     {
         unsigned int pn = it->first;
         HistoryParams* t_buf = &m_tHistoryMap[pn];
-        if(t_buf->size()>0)
+        if (!t_buf->empty())
         {
+            vector<HistoryParam>* paramVector = t_buf->back();
+            HistoryParam param = paramVector->back();
+            paramVector->pop_back();
+            m_zxparamMap[pn].setValue(param.getValue());
+            m_zxparamMap[pn].SetParamTime(param.getTime());
+            bUpdate = true;
+        }
+//         if(t_buf->size()>0)
+//         {
 //             HistoryParam t_hp = t_buf->front();
 //             //t_buf->pop_front();
 //             t_buf->erase(t_buf->begin());
 //             m_zxparamMap[pn].setValue(t_hp.getValue());
 //             m_zxparamMap[pn].SetParamTime(t_hp.getTime());
 //             bUpdate = true;
-        }
+//         }
         else
         {
             break;

@@ -175,9 +175,6 @@
     <ClCompile Include="selfshare\src\zxparambuffer\zxparambuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="getRSS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -314,9 +311,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\net\netDepends">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleLogger.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GC.h">
       <Filter>Header Files</Filter>
