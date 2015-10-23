@@ -172,6 +172,7 @@ void LFormula::updateParam()
     }
 }
 
+
 bool LFormula::insertOneHistroyParam()
 {
     FormulaZXParamMap::iterator it = m_zxparamMap.begin();
@@ -179,25 +180,15 @@ bool LFormula::insertOneHistroyParam()
     while(it!=m_zxparamMap.end())
     {
         unsigned int pn = it->first;
-        HistoryParams* t_buf = &m_tHistoryMap[pn];
-        if (!t_buf->empty())
+        list<HistoryParam>& t_buf = m_tHistoryMap[pn];
+        if(!t_buf.empty())
         {
-            vector<HistoryParam>* paramVector = t_buf->back();
-            HistoryParam param = paramVector->back();
-            paramVector->pop_back();
-            m_zxparamMap[pn].setValue(param.getValue());
-            m_zxparamMap[pn].SetParamTime(param.getTime());
+            HistoryParam t_hp = t_buf.front();
+            t_buf.pop_front();
+            m_zxparamMap[pn].setValue(t_hp.getValue());
+            m_zxparamMap[pn].SetParamTime(t_hp.getTime());
             bUpdate = true;
         }
-//         if(t_buf->size()>0)
-//         {
-//             HistoryParam t_hp = t_buf->front();
-//             //t_buf->pop_front();
-//             t_buf->erase(t_buf->begin());
-//             m_zxparamMap[pn].setValue(t_hp.getValue());
-//             m_zxparamMap[pn].SetParamTime(t_hp.getTime());
-//             bUpdate = true;
-//         }
         else
         {
             break;
@@ -226,7 +217,7 @@ bool LFormula::updateAllHistroyParam()
         unsigned int pn = it->first;
         time = m_savTime;
         date = m_savDate;
-        HistoryParams buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),date,time);
+        list<HistoryParam> buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),date,time);
         m_tHistoryMap[pn] = buf;
         bUpdate = true;
         it++;

@@ -63,26 +63,56 @@ HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn
     return buf;
 }
 
-HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn,int & date,int & time)
+
+/*!
+获取date.time之后的数据?
+@param unsigned short tn 表号
+@param unsigned short pn 参数号
+@param int & date 日期
+@param int & time 时间
+@return list<HistoryParam>按时间从前向后排序的参数列表
+作者：cokkiy（张立民)
+修改时间：2015/10/23 10:25:55
+*/
+list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn, int & date, int & time)
 {
-    HistoryParams retBuf;
+    list<HistoryParam> retBuf;
     HistoryParams::reverse_iterator it;
     auto& param = m_HistoryParamBuf[INDEX(tn,pn)];
-    HistoryParams buf = *(param.getBuffer());
+    HistoryParams* pbuf = param.getBuffer();
     int t_date,t_time=0;
-    //倒序取数据
-    for (it = buf.rbegin();it != buf.rend();it++)
+    //从最后一个vector开始取数据
+    for (it = pbuf->rbegin(); it != pbuf->rend(); it++)
     {
-//         if (((*it).getDate() > date)||(((*it).getDate() == date)&&((*it).getTime() > time)))
-//         {
-//             retBuf.push_back(*it);
-//             if(t_time<(*it).getTime())
-//             {
-//                 t_date = (*it).getDate();
-//                 t_time = (*it).getTime();
-//             }
-//         }
-    }
+        vector<HistoryParam>* pVector = *it;
+        HistoryParam& param = pVector->front();
+        size_t count = pVector->size();
+        if (param.getDate() > date || (param.getDate() == date&&param.getTime() > time))
+        {
+            //复制该vector中全部数据到list,retBuf是按时间从前到后排序的
+            retBuf.insert(retBuf.begin(), pVector->begin(), pVector->begin() + count);
+            t_date = param.getDate();
+            t_time = param.getTime();
+        }
+        else
+        {
+            //找到vector中的某个元素,使其时间小于等于date.time
+            for (auto iter = pVector->end() - 1; iter == pVector->begin(); iter--)
+            {
+                if (iter->getDate() > date || (iter->getDate() == date&&iter->getTime() > time))
+                {
+                    //把该参数放到retBuf前面,retBuf是按时间从前到后排序的
+                    retBuf.push_front(*iter);
+                    t_date = iter->getDate();
+                    t_time = iter->getTime();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+    }    
     if(t_time!=0)
     {
         date = t_date;

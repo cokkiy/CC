@@ -45,8 +45,17 @@ public:
 	//从队列中取出缓冲区
     HistoryParams GetBuffer(unsigned short tableno, unsigned short paramno);
 
-    //从队列中取出缓冲区
-    HistoryParams GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time);
+    /*!
+    获取date.time之后的数据?
+    @param unsigned short tn 表号
+    @param unsigned short pn 参数号
+    @param int & date 日期
+    @param int & time 时间
+    @return list<HistoryParam>按时间从前向后排序的参数列表
+    作者：cokkiy（张立民)
+    修改时间：2015/10/23 10:25:55
+    */
+    list<HistoryParam> GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time);
 
     // GC is friend of HistoryParamBuffer
     friend class GC;
