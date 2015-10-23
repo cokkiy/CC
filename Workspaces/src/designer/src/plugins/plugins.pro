@@ -22,7 +22,7 @@ SUBDIRS +=      \
     rollinggraph \
     image\
     reserves\
-    codeSource\
+    #codeSource\
     commandbutton \
     statesend\
     table\

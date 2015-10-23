@@ -9,6 +9,7 @@
 #pragma once
 #include <chrono>
 #include <list>
+#include <thread>
 #include "GCWrapper.h"
 #include "selfshare/src/historyparambuffer/historyparambuffer.h"
 using namespace std::chrono;
@@ -88,6 +89,8 @@ private:
 
     // adjust the gc sleep time
     void adjustSleepTime();
+
+    std::thread* gcThread=nullptr;
 
     //估计控制百分比
     inline void estimatePercent()

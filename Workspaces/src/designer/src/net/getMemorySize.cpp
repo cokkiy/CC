@@ -27,7 +27,7 @@ size_t getMemorySize()
     status.dwLength = sizeof(status);
     GlobalMemoryStatusEx(&status);
     return (size_t)status.ullTotalPhys;
-#elif defined(__unix__)||defined(__unix)||defined(unix)||defined(__APPLE__)&&defined(__MACK__))
+#elif defined(__unix__)||defined(__unix)||defined(unix)||(defined(__APPLE__)&&defined(__MACK__))
     /*unix variants.....................................................*/
     /* Prefer sysctl() over sysconf() except sysctl() HW_REALMEM and HW_PHYSMEM*/
 #if defined(CTL_HW)&&(defined(HW_MEMSIZE)||defined(HW_PHYMEM64))

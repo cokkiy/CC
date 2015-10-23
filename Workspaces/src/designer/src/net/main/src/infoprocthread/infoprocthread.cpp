@@ -94,16 +94,22 @@ void InfoProcThread::run()
             //PDXP包
             PDXPFrameProc.parse(tempFrame, inFrameLen);
             //处理结束,释放缓冲区
-            if (NULL != tempFrame) free(tempFrame);
-            tempFrame = NULL;           
+            if (NULL != tempFrame)
+            {
+                delete []tempFrame;
+                tempFrame = NULL;
+            }
         }
         else
         {
             // C3I包
             c3iFrame.parse(tempFrame, inFrameLen);
             //处理结束,释放缓冲区
-            if (NULL != tempFrame) free(tempFrame);									
-            tempFrame = NULL;
+            if (NULL != tempFrame)
+            {
+                delete []tempFrame;
+                tempFrame = NULL;
+            }
         }
 	}
 //	pthread_exit(NULL);

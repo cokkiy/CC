@@ -79,7 +79,10 @@ SOURCES += \
     abstracttimer.cpp \
     timerinstance.cpp \
     PDXPFrame.cpp \
-    showtype/coderesultstring.cpp
+    showtype/coderesultstring.cpp \
+    GC.cpp \
+    getMemorySize.cpp \
+    getRSS.cpp
 
 HEADERS += \
         net_global.h \
@@ -130,7 +133,9 @@ HEADERS += \
     abstracttimer.h \
     timerinstance.h \
     PDXPFrame.h \
-    showtype/coderesultstring.h
+    showtype/coderesultstring.h \
+    GC.h \
+    GCWrapper.h
 
 
 unix {
