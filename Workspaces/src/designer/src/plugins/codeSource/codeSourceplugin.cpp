@@ -1,5 +1,5 @@
 ﻿#include "codesource.h"
-#include "codesourceplugin.h"
+#include "codeSourceplugin.h"
 
 #include <QtPlugin>
 

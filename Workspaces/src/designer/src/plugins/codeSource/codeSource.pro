@@ -2,8 +2,10 @@ CONFIG      += plugin debug_and_release
 TARGET      = $$qtLibraryTarget(codeSourceplugin)
 TEMPLATE    = lib
 
-HEADERS     = codeSourceplugin.h
-SOURCES     = codeSourceplugin.cpp
+HEADERS     = codeSourceplugin.h \
+    codesource.h
+SOURCES     = codeSourceplugin.cpp \
+    codesource.cpp
 RESOURCES   = icons.qrc
 LIBS        += -L.
 qtHaveModule(printsupport): QT += printsupport
@@ -33,3 +35,6 @@ mac {
 
 }
 include(codeSource.pri)
+
+OTHER_FILES += \
+    codesource.pri
