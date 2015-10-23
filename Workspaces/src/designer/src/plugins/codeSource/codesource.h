@@ -1,4 +1,4 @@
-﻿#ifndef CODESOURCE_H
+#ifndef CODESOURCE_H
 #define CODESOURCE_H
 #include <QWidget>
 #include <QTextEdit>
