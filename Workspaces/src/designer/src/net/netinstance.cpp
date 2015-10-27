@@ -1,4 +1,4 @@
-﻿#include "netinstance.h"
+#include "netinstance.h"
 #include<iostream>
 #include "selfshare/src/const.h"
 #include "selfshare/src/config/config.h"
@@ -110,7 +110,7 @@ int NetInstance::start()
 int NetInstance::stop()
 {
     g_quitFlag = true;
-    std::this_thread::sleep_for(1s);
+    std::this_thread::sleep_for((std::chrono::seconds)1);
     m_thread->exit();
     HistoryBufferManager::stopGC();
     HistoryBufferManager::releaseAll();

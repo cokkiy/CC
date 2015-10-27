@@ -13,21 +13,14 @@ TARGET = net
 TEMPLATE = lib
 DEFINES += NET_LIBRARY
 load(qt_build_config)
-#load(qt_module)
-load(qt_build_paths)
+load(qt_module)
 DESTDIR = $$MODULE_BASE_OUTDIR/lib
 #begin andrew ,20150324
 win32:CONFIG(release, debug|release){
-    #LIBS += $$MODULE_BASE_OUTDIR/lib/Qt5DesignerBase.dll
     LIBS += $$MODULE_BASE_OUTDIR/lib/WS2_32.lib
 }
 else:win32:CONFIG(debug, debug|release){
-    #LIBS += $$MODULE_BASE_OUTDIR/lib/Qt5DesignerBased.dll
     LIBS += $$MODULE_BASE_OUTDIR/lib/WS2_32.lib
-}
-#else:unix:LIBS += -L$$MODULE_BASE_OUTDIR/lib/ -lQt5DesignerBase
-unix:gcc{
-QMAKE_CXXFLAGS+=-std=gnu++14
 }
 
 #INCLUDEPATH += $$MODULE_BASE_OUTDIR/lib/

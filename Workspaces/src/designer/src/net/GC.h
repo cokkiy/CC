@@ -1,4 +1,4 @@
-﻿/*Class for garbage collection.
+/*Class for garbage collection.
  * Remove all unused param item from history param list.
  * When GC start it detectes how much physocal memory installed in system,
  * and periodcally checking how many memory used by this process.
@@ -67,7 +67,7 @@ private:
     bool bQuit=false;
 
     //sleep duration, default is 10s
-    seconds sleepDuration=10s;
+    seconds sleepDuration=(seconds)10;
     
     //history param map
     HistoryBufferManager::HistoryParamMap* pParamMap;

@@ -1,7 +1,6 @@
-﻿#include "GC.h"
+#include "GC.h"
 #include <QDebug>
 using namespace std;
-using namespace std::literals;
 
 //get total memory size
 extern size_t getMemorySize();
@@ -30,11 +29,6 @@ GC::~GC()
 {
     //停止回收
     stop();
-    if(gcThread!=nullptr)
-    {
-        delete gcThread;
-        gcThread=nullptr;
-    }
 }
 
 /*!
@@ -68,7 +62,6 @@ void GC::start()
 void GC::stop()
 {
     bQuit = true;
-    gcThread->join();
 }
 
 // periodcally collect history param list item
@@ -211,17 +204,17 @@ void GC::adjustSleepTime()
     }
 
     //最小不能小于2s
-    sleepDuration = sleepDuration >= 2s ? sleepDuration : 2s;
+    sleepDuration = sleepDuration >= (seconds)2 ? sleepDuration : (seconds)2;
     
     //最大不能大于30s
-    if (prevPercent != 0 && (prevPercent - curPercent) <= 0.05 && sleepDuration < 30s)
+    if (prevPercent != 0 && (prevPercent - curPercent) <= 0.05 && sleepDuration < (seconds)30)
     {
         sleepDuration++;
     }
 
-    if (curPercent >= (percent - 20) / 100.0&&sleepDuration > 5s)
+    if (curPercent >= (percent - 20) / 100.0&&sleepDuration > (seconds)5)
     {
-        sleepDuration = 5s;
+        sleepDuration = (seconds)5;
     }
 
     prevPercent = curPercent;
