@@ -80,13 +80,17 @@ bool Network::InitSocket()
     //获取本机IP地址 cokkiy 2015-09-06
     getNetworkInterfaceInfo();
     auto niSettings = m_config->getNISettings();
-
+    //初始为没有找到
+    foundNI = false;
     //从配置文件中查找每个网卡的设置
     for (auto i =niSettings->begin(); i !=niSettings->end(); i++)
     {
         QHostAddress host = findHostIP(i->ipAddresses);
         if (host != QHostAddress::Null)
         {
+            //找到配置
+            foundNI = true;
+
             list<int> usedPorts; //本Ip下已经使用了的端口号
 
             //本机IP存在,为本IP下对应的所有端口号创建不同的socket，并加入不同的单播，组播，指定源组播
@@ -104,6 +108,11 @@ bool Network::InitSocket()
         }
     }
 
+    if (!foundNI)
+    {
+        qDebug() << QObject::tr("Can't find any match config in Network config file. Please check Host IP Address Setting and network config file.");
+        qDebug() << QObject::tr("No socket will be created.");
+    }
 	return true;
 }
 

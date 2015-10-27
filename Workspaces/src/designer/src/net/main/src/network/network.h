@@ -133,6 +133,9 @@ private:
 
         //主备通道socket 表,如果为true表示主用通道socket, false表示备用通道socket
         map<SOCKET, bool> socketsMap;
+
+        // 是否找到网卡对应的IP配置信息
+        bool foundNI=false;
 };
 
 #endif
