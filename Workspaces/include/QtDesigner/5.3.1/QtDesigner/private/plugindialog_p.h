@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/plugindialog_p.h"
+#include "../../../../../src/designer/src/lib/shared/plugindialog_p.h"

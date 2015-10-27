@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/uilib/qdesignerexportwidget.h"
+#include "../../src/designer/src/lib/uilib/qdesignerexportwidget.h"

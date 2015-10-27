@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/rcc_p.h"
+#include "../../../../../src/designer/src/lib/shared/rcc_p.h"

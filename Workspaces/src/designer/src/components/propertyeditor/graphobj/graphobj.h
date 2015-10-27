@@ -2,6 +2,8 @@
 #define GRAPHOBJ_H
 #include <QWidget>
 
+
+
 QT_BEGIN_NAMESPACE
 
 namespace Ui {
@@ -45,8 +47,10 @@ private slots:
 
 
 
+
 private:
     Ui::GraphObj *ui;
+
 
 };
 

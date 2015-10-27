@@ -307,6 +307,8 @@ static qdesigner_internal::TextPropertyValidationMode typeStringToType(const QSt
         return qdesigner_internal::ValidationGraphObj;
     if (v ==  QStringLiteral("q2wmapobj"))
         return qdesigner_internal::Validation2wmapObj;
+    if (v ==  QStringLiteral("q2wmapstatic"))
+        return qdesigner_internal::Validation2wmapStatic;
     if (v.endsWith(QStringLiteral("data")))
         return qdesigner_internal::ValidationData;
     if (v.endsWith(QStringLiteral("dataes")))

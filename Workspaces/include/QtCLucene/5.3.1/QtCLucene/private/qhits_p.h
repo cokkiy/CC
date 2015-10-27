@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/clucene/qhits_p.h"
+#include "../../../../../src/assistant/clucene/qhits_p.h"

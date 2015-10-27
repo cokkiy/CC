@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/uitools/quiloader_p.h"
+#include "../../../../../src/designer/src/uitools/quiloader_p.h"

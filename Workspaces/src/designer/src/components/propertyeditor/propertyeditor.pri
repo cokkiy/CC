@@ -23,6 +23,10 @@ FORMS += $$PWD/paletteeditor.ui \
     $$PWD/tableitemset.ui\
     $$PWD/graphobj/graphobjdlg.ui \
     $$PWD/graphobj/graphobj.ui \
+    $$PWD/q2wmapobj/q2wmapstaticelementdlg.ui \
+    $$PWD/q2wmapobj/q2wmappolygondialog.ui \
+    $$PWD/q2wmapobj/q2wmaplabeldlg.ui \
+    $$PWD/q2wmapobj/q2wmapcircledlg.ui
 
 HEADERS += $$PWD/propertyeditor.h \
     $$PWD/designerpropertymanager.h \
@@ -48,6 +52,11 @@ HEADERS += $$PWD/propertyeditor.h \
     $$PWD/paramselect/selectmultiparamdlg.h\
     $$PWD/graphobj/graphobj.h \
     $$PWD/graphobj/graphobjdlg.h \
+    $$PWD/q2wmapobj/q2wmapstaticelementdlg.h \
+    $$PWD/q2wmapobj/q2wmappolygondialog.h \
+    $$PWD/q2wmapobj/q2wmaplabeldlg.h \
+    $$PWD/q2wmapobj/q2wmapcircledlg.h \
+    $$PWD/q2wmapobj/q2wmapelementdlg.h
 
 SOURCES += $$PWD/propertyeditor.cpp \
     $$PWD/designerpropertymanager.cpp \
@@ -73,6 +82,11 @@ SOURCES += $$PWD/propertyeditor.cpp \
     $$PWD/paramselect/selectmultiparamdlg.cpp\
     $$PWD/graphobj/graphobj.cpp \
     $$PWD/graphobj/graphobjdlg.cpp \
+    $$PWD/q2wmapobj/q2wmapstaticelementdlg.cpp \
+    $$PWD/q2wmapobj/q2wmappolygondialog.cpp \
+    $$PWD/q2wmapobj/q2wmaplabeldlg.cpp \
+    $$PWD/q2wmapobj/q2wmapcircledlg.cpp \
+    $$PWD/q2wmapobj/q2wmapelementdlg.cpp
 
 HEADERS += \
     $$PWD/propertyeditor_global.h \

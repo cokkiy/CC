@@ -1,10 +1,13 @@
 ﻿#include "graphobj.h"
 #include "ui_graphobj.h"
 #include "graphobjdlg.h"
+
+
 #include <QJsonParseError>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDebug>
+
 
 QT_BEGIN_NAMESPACE
 
@@ -13,6 +16,7 @@ GraphObj::GraphObj()
     ui = new Ui::GraphObj;
     ui->setupUi(this);
     setWindowTitle(tr("多曲线配置"));
+
 }
 
 GraphObj::~GraphObj()
@@ -20,22 +24,120 @@ GraphObj::~GraphObj()
     delete ui;
 }
 
+
+
+
+
+
 //添加新曲线
 void GraphObj::on_pushButton_AddNewObj_clicked()
 {
+    //将所有当前页面数据保存为一个Json对象，用于在每次插入tab时加载用以构造
     QJsonObject obj;
 
+    //情况1：最原始的情况，什么曲线都没有的情况,一条新曲线赋初值
+    //啥都不干，彻底为空，直接让Graphobjdlg的构造函数的jobj.isEmpty()部分的代码赋初值
+    if(ui->tabWidget->count()==0)
+    {}
+    else  //情况2：此前就有存在的曲线，这里再插入一条新曲线;
+    {
+        //保存当前页面所有标签的数据
+        //用GraphObjDlg * tt取到当前页面的指针（地址）(已配好的数据)
+        GraphObjDlg * tt = (GraphObjDlg*)(ui->tabWidget->widget(ui->tabWidget->currentIndex()));
+
+        //下面在该Json对象中插入各个要保存的属性
+        obj.insert("Xmax",tt->m_Xmax);//第1
+        obj.insert("Xmin",tt->m_Xmin);//第2
+        obj.insert("Ymax",tt->m_Ymax);//第3
+        obj.insert("Ymin",tt->m_Ymin);//第4
+        obj.insert("Xoffset",tt->m_Xoffset);//第5
+        obj.insert("Yoffset",tt->m_Yoffset);//第6
+        obj.insert("XAxisLabel",tt->m_XAxisLabel);//第7
+        obj.insert("YAxisLabel",tt->m_YAxisLabel);//第8
+        obj.insert("XAxisdisplay",tt->m_XAxisdisplay);//第9
+        obj.insert("YAxisdisplay",tt->m_YAxisdisplay);//第10
+        obj.insert("Scaleplace_x",tt->m_Scaleplace_x);//第11
+        obj.insert("Scaleplace_y",tt->m_Scaleplace_y);//第12
+        obj.insert("OriginPlace",tt->m_OriginPlace);//第12
+        obj.insert("Scalelabelplace_x",tt->m_Scalelabelplace_x);//第12
+        obj.insert("Scalelabelplace_y",tt->m_Scalelabelplace_y);//第12
+
+        obj.insert("GraphName",tt->m_GraphName);//第13
+        obj.insert("GraphWidth",tt->m_GraphWidth);//第14
+        obj.insert("GraphBuffer",tt->m_GraphBuffer);//第15
+        obj.insert("strgraphColor",tt->m_strgraphColor);//第16
+
+        obj.insert("LGraphWidth",tt->m_LGraphWidth);//第17
+        obj.insert("LGraphBuffer",tt->m_LGraphBuffer);//第18
+        obj.insert("strLgraphColor",tt->m_strLgraphColor);//第19
+
+        obj.insert("xParam",tt->m_xParam);//第20
+        obj.insert("yParam",tt->m_yParam);//第21
+        obj.insert("Lgraphfile",tt->m_Lgraphfile);//第22
+
+        obj.insert("XAxiswideth",tt->m_XAxiswideth);//第23
+
+        obj.insert("chooseXAxisColor",tt->m_chooseXAxisColor);//第25
+
+        obj.insert("chooseXAxislabeldisplay",tt->m_chooseXAxislabeldisplay);//第31
+        obj.insert("chooseYAxislabeldisplay",tt->m_chooseYAxislabeldisplay);//第32
+        obj.insert("chooseXAxisScalelabeldisplay",tt->m_chooseXAxisScalelabeldisplay);//第33
+        obj.insert("chooseYAxisScalelabeldisplay",tt->m_chooseYAxisScalelabeldisplay);//第34
+        obj.insert("chooseXAxisScaleTickdisplay",tt->m_chooseXAxisScaleTickdisplay);//第35
+        obj.insert("chooseYAxisScaleTickdisplay",tt->m_chooseYAxisScaleTickdisplay);//第36
+
+        obj.insert("XAxislabelFont",tt->m_XAxislabelFont);//第37
+
+        obj.insert("XAxisScalelabelFont",tt->m_XAxisScalelabelFont);//第39
+        obj.insert("YAxisScalelabelFont",tt->m_YAxisScalelabelFont);//第40
+
+        obj.insert("numOfXAxisScale",tt->m_numOfXAxisScale);//第41
+        obj.insert("XAxisScaleRuler",tt->m_XAxisScaleRuler);//第42
+        obj.insert("numOfYAxisScale",tt->m_numOfYAxisScale);//第43
+        obj.insert("YAxisScaleRuler",tt->m_YAxisScaleRuler);//第44
+
+        obj.insert("XAxisScaleprecision",tt->m_XAxisScaleprecision);//第45
+        obj.insert("YAxisScaleprecision",tt->m_YAxisScaleprecision);//第46
+
+        obj.insert("XAxisScalelabeloffset_x",tt->m_XAxisScalelabeloffset_x);//第47
+        obj.insert("XAxisScalelabeloffset_y",tt->m_XAxisScalelabeloffset_y);//第48
+        obj.insert("YAxisScalelabeloffset_x",tt->m_YAxisScalelabeloffset_x);//第47
+        obj.insert("YAxisScalelabeloffset_y",tt->m_YAxisScalelabeloffset_y);//第48
+
+    }
+
+
+    //使用配好的Json对象，进行新的页面的创建
     GraphObjDlg * t = new GraphObjDlg(obj, this);
 
+
     //标注添加曲线的tab名称
-    QString strtabName;
+    QString strtabName;//标注添加曲线的tab名称---不带索引
     strtabName = (t->m_GraphName);
 
-    //添加tab
-    ui->tabWidget->addTab(t, strtabName);
 
+    qint32 currentgraphindex;
+    currentgraphindex = ui->tabWidget->currentIndex();
+    //获取插入曲线的位置，在当前曲线相邻的右侧
+    qint32 insertgraphindexplace = currentgraphindex+1;
+    //添加tab
+    ui->tabWidget->insertTab(insertgraphindexplace,t, strtabName);//插入曲线的tab标签名字
     //设置为当前tab
     ui->tabWidget->setCurrentWidget(t);
+
+
+
+    //获取曲线总数，填充到曲线统计文本框
+    qint32 numOftab=ui->tabWidget->count();
+    QString numOftabstr = QString::number(numOftab);
+    ui->lineEdit_numofgraph->setText(numOftabstr);
+
+    update();
+
+
+
+
+
 }
 
 //删除当前曲线
@@ -43,6 +145,11 @@ void GraphObj::on_pushButton_DelCurrentObj_clicked()
 {
     int currentIndex = ui->tabWidget->currentIndex();
     ui->tabWidget->removeTab(currentIndex);
+
+    //获取曲线总数，填充到曲线统计文本框
+    qint32 numOftab=ui->tabWidget->count();
+    QString numOftabstr = QString::number(numOftab);
+    ui->lineEdit_numofgraph->setText(numOftabstr);
 }
 
 //输出json字符串
@@ -61,6 +168,7 @@ void GraphObj::Show()
 //以字符串初始化控件
 void GraphObj::InitControl(QString str)
 {
+
     //先删除所有标签
     for(int i=0; i<ui->tabWidget->count(); i++)
     {
@@ -91,6 +199,12 @@ void GraphObj::InitControl(QString str)
             //数组的大小
             int size = array.size();
 
+            //获取曲线总数，填充到曲线统计文本框
+            qint32 numOftab=size;
+            QString numOftabstr = QString::number(numOftab);
+            ui->lineEdit_numofgraph->setText(numOftabstr);
+            update();
+
             //循环获取
             for(int i=0;i<size;i++)
             {
@@ -115,6 +229,8 @@ void GraphObj::InitControl(QString str)
 
                     //设置属性分栏标题的文字
                     ui->tabWidget->setTabText(index, t->m_GraphName);
+
+
                 }
             }
         }
@@ -167,15 +283,6 @@ void GraphObj::InitControl(QString str)
 
 //}
 
-//void on_pushButton_leftmove_clicked()
-//{
-
-//}
-
-//void on_pushButton_rightmove_clicked()
-//{
-
-//}
 
 
 //点击 确定
@@ -203,10 +310,15 @@ void GraphObj::on_pushButton_SaveQuit_clicked()
         stateObject.insert("Yoffset",t->m_Yoffset);//第6
         stateObject.insert("XAxisLabel",t->m_XAxisLabel);//第7
         stateObject.insert("YAxisLabel",t->m_YAxisLabel);//第8
+
         stateObject.insert("XAxisdisplay",t->m_XAxisdisplay);//第9
         stateObject.insert("YAxisdisplay",t->m_YAxisdisplay);//第10
+
         stateObject.insert("Scaleplace_x",t->m_Scaleplace_x);//第11
         stateObject.insert("Scaleplace_y",t->m_Scaleplace_y);//第12
+        stateObject.insert("OriginPlace",t->m_OriginPlace);//第12
+        stateObject.insert("Scalelabelplace_x",t->m_Scalelabelplace_x);//第12
+        stateObject.insert("Scalelabelplace_y",t->m_Scalelabelplace_y);//第12
 
         stateObject.insert("GraphName",t->m_GraphName);//第13
         stateObject.insert("GraphWidth",t->m_GraphWidth);//第14
@@ -221,6 +333,38 @@ void GraphObj::on_pushButton_SaveQuit_clicked()
         stateObject.insert("yParam",t->m_yParam);//第21
         stateObject.insert("Lgraphfile",t->m_Lgraphfile);//第22
 
+        stateObject.insert("XAxiswideth",t->m_XAxiswideth);//第23
+
+        stateObject.insert("chooseXAxisColor",t->m_chooseXAxisColor);//第25
+
+        stateObject.insert("chooseXAxislabeldisplay",t->m_chooseXAxislabeldisplay);//第31
+        stateObject.insert("chooseYAxislabeldisplay",t->m_chooseYAxislabeldisplay);//第32
+        stateObject.insert("chooseXAxisScalelabeldisplay",t->m_chooseXAxisScalelabeldisplay);//第33
+        stateObject.insert("chooseYAxisScalelabeldisplay",t->m_chooseYAxisScalelabeldisplay);//第34
+        stateObject.insert("chooseXAxisScaleTickdisplay",t->m_chooseXAxisScaleTickdisplay);//第35
+        stateObject.insert("chooseYAxisScaleTickdisplay",t->m_chooseYAxisScaleTickdisplay);//第36
+
+        stateObject.insert("XAxislabelFont",t->m_XAxislabelFont);//第37
+
+        stateObject.insert("XAxisScalelabelFont",t->m_XAxisScalelabelFont);//第39
+        stateObject.insert("YAxisScalelabelFont",t->m_YAxisScalelabelFont);//第40
+
+
+        stateObject.insert("numOfXAxisScale",t->m_numOfXAxisScale);//第41
+        stateObject.insert("numOfYAxisScale",t->m_numOfYAxisScale);//第42
+
+        stateObject.insert("YAxisScaleRuler",t->m_YAxisScaleRuler);//第43
+        stateObject.insert("XAxisScaleRuler",t->m_XAxisScaleRuler);//第44
+
+
+
+        stateObject.insert("XAxisScaleprecision",t->m_XAxisScaleprecision);//第45
+        stateObject.insert("YAxisScaleprecision",t->m_YAxisScaleprecision);//第46
+
+        stateObject.insert("XAxisScalelabeloffset_x",t->m_XAxisScalelabeloffset_x);//第47
+        stateObject.insert("XAxisScalelabeloffset_y",t->m_XAxisScalelabeloffset_y);//第48
+        stateObject.insert("YAxisScalelabeloffset_x",t->m_YAxisScalelabeloffset_x);//第47
+        stateObject.insert("YAxisScalelabeloffset_y",t->m_YAxisScalelabeloffset_y);//第48
 
         //将每一行Json字符串添加到Json数组
         stateArray.append(stateObject);

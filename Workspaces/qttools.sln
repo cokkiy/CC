@@ -87,6 +87,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "codeSourceplugin", "src\des
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "controlprogramplugin", "src\designer\src\plugins\controlProgram\controlprogramplugin.vcxproj", "{1B7833C3-89C8-31CD-B948-BBCBA111BED9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "q2wmapplugin", "src\designer\src\plugins\q2wmap\q2wmapplugin.vcxproj", "{EE7451F9-209D-37BF-9F58-E17A47397E18}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -168,6 +170,10 @@ Global
 		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Debug|x64.Build.0 = Debug|x64
 		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Release|x64.ActiveCfg = Release|x64
 		{1B7833C3-89C8-31CD-B948-BBCBA111BED9}.Release|x64.Build.0 = Release|x64
+		{EE7451F9-209D-37BF-9F58-E17A47397E18}.Debug|x64.ActiveCfg = Debug|x64
+		{EE7451F9-209D-37BF-9F58-E17A47397E18}.Debug|x64.Build.0 = Debug|x64
+		{EE7451F9-209D-37BF-9F58-E17A47397E18}.Release|x64.ActiveCfg = Release|x64
+		{EE7451F9-209D-37BF-9F58-E17A47397E18}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

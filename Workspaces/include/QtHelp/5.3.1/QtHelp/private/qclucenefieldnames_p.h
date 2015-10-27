@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/help/qclucenefieldnames_p.h"
+#include "../../../../../src/assistant/help/qclucenefieldnames_p.h"

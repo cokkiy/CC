@@ -18,51 +18,51 @@ class QTableProperty
 public:
     QTableProperty();
 private:
-	//±í¸ñĞĞÊı
+    //è¡¨æ ¼è¡Œæ•°
     qint32 m_iRowNum;
-	//±í¸ñÁĞÊı
+    //è¡¨æ ¼åˆ—æ•°
     qint32 m_iColNum;
-	//±í¸ñËùÓĞµ¥Ôª¸ñÊôĞÔÊı×é
+    //è¡¨æ ¼æ‰€æœ‰å•å…ƒæ ¼å±æ€§æ•°ç»„
     QVector<QTableCell > m_TableVector;
 public:
-	//»ñÈ¡±í¸ñµÄĞĞÊı
+    //è·å–è¡¨æ ¼çš„è¡Œæ•°
     qint32 getRowNum() const {return m_iRowNum;}
-	//ÉèÖÃ±í¸ñµÄĞĞÊı
+    //è®¾ç½®è¡¨æ ¼çš„è¡Œæ•°
     void setRowNum(const qint32 num);
-	//»ñÈ¡±í¸ñµÄÁĞÊı
+    //è·å–è¡¨æ ¼çš„åˆ—æ•°
     qint32 getColNum() const {return m_iColNum;}
-	//ÉèÖÃ±í¸ñµÄÁĞÊı
+    //è®¾ç½®è¡¨æ ¼çš„åˆ—æ•°
     void setColNum(const qint32 num);
-	//»ñÈ¡±í¸ñµÄÊôĞÔÊı×é
+    //è·å–è¡¨æ ¼çš„å±æ€§æ•°ç»„
     QVector<QTableCell >* getTableVector();
-	//»ñÈ¡±í¸ñµÄ¸ß¶ÈºÍ¿í¶È
+    //è·å–è¡¨æ ¼çš„é«˜åº¦å’Œå®½åº¦
     QSize size();
-	//½«±í¸ñÊôĞÔ×ª»»ÎªJson×Ö·û´®£¬¸ÃJson×Ö·û´®°üÀ¨±í¸ñµÄĞĞÁĞÊıºÍËùÓĞµ¥Ôª¸ñµÄÊôĞÔ
+    //å°†è¡¨æ ¼å±æ€§è½¬æ¢ä¸ºJsonå­—ç¬¦ä¸²ï¼Œè¯¥Jsonå­—ç¬¦ä¸²åŒ…æ‹¬è¡¨æ ¼çš„è¡Œåˆ—æ•°å’Œæ‰€æœ‰å•å…ƒæ ¼çš„å±æ€§
     QString toJsonStr(float wr,float hr);
-	//½«´«ÈëµÄ×Ö·û´®×ª»»Îª±í¸ñÊôĞÔ
+    //å°†ä¼ å…¥çš„å­—ç¬¦ä¸²è½¬æ¢ä¸ºè¡¨æ ¼å±æ€§
     void setTableVector(const QString textStr);
-	//×·¼ÓĞĞ
+    //è¿½åŠ è¡Œ
     void addRow();
-	//²åÈëĞĞ,Êó±êÎ»ÖÃËùÔÚĞĞµÄÉÏÒ»ĞĞ
+    //æ’å…¥è¡Œ,é¼ æ ‡ä½ç½®æ‰€åœ¨è¡Œçš„ä¸Šä¸€è¡Œ
     void insertRow(const int currentRow);
-	//É¾³ıÊó±êÎ»ÖÃËùÔÚĞĞ
+    //åˆ é™¤é¼ æ ‡ä½ç½®æ‰€åœ¨è¡Œ
     void delRow(const int currentCol);
-	//×·¼ÓÁĞ
+    //è¿½åŠ åˆ—
     void addColumn();
-	//²åÈëÁĞ,Êó±êÎ»ÖÃËùÔÚÁĞµÄ×ó²àÒ»ÁĞ
+    //æ’å…¥åˆ—,é¼ æ ‡ä½ç½®æ‰€åœ¨åˆ—çš„å·¦ä¾§ä¸€åˆ—
     void insertColumn(const int currentCol);
-	//É¾³ıÊó±êÎ»ÖÃËùÔÚÁĞ
+    //åˆ é™¤é¼ æ ‡ä½ç½®æ‰€åœ¨åˆ—
     void delColumn(const int currentCol);
-	//ÉèÖÃÖ¸¶¨ÁĞµÄ¿í¶È
+    //è®¾ç½®æŒ‡å®šåˆ—çš„å®½åº¦
     void setColumnWidth(int column,int width);
-	//ÉèÖÃÖ¸¶¨ĞĞµÄ¸ß¶È
+    //è®¾ç½®æŒ‡å®šè¡Œçš„é«˜åº¦
     void setRowHeight(int row,int height);
-	//ÉèÖÃ±í¸ñµÄ¸ß¶ÈºÍ¿í¶È
+    //è®¾ç½®è¡¨æ ¼çš„é«˜åº¦å’Œå®½åº¦
     void setSize(const int width,const int height);
 private:
-	//½âÎö´«ÈëµÄ×Ö·û´®£¬¸Ã×Ö·û´®°üÀ¨±í¸ñµÄĞĞÁĞÊıºÍËùÓĞµ¥Ôª¸ñµÄÊôĞÔ
+    //è§£æä¼ å…¥çš„å­—ç¬¦ä¸²ï¼Œè¯¥å­—ç¬¦ä¸²åŒ…æ‹¬è¡¨æ ¼çš„è¡Œåˆ—æ•°å’Œæ‰€æœ‰å•å…ƒæ ¼çš„å±æ€§
     bool analyzeTextStr(const QString textStr);
-	//½«Json×Ö·û´®×ª»»Îª±í¸ñµ¥ÔªÊôĞÔ
+    //å°†Jsonå­—ç¬¦ä¸²è½¬æ¢ä¸ºè¡¨æ ¼å•å…ƒå±æ€§
     bool initTableVector(const QString jsonStr);
 };
 

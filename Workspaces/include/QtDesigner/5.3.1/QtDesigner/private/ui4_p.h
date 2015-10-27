@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/uilib/ui4_p.h"
+#include "../../../../../src/designer/src/lib/uilib/ui4_p.h"

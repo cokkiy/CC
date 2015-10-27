@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/dialoggui_p.h"
+#include "../../../../../src/designer/src/lib/shared/dialoggui_p.h"

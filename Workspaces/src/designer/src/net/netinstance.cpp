@@ -8,9 +8,10 @@
 #include "selfshare/src/config/netconfig.h"
 #include "C3I/CParamInfoRT.h"
 #include "selfshare/src/config/channelselectconfig.h"
+#include "HistoryBufferManager.h"
 #include <QDebug>
-//#include "SimpleLogger.h"
-#include "GC.h"
+#include <chrono>
+#include <thread>
 
 extern Config g_cfg;
 
@@ -23,8 +24,6 @@ CParamInfoRT g_paramInfoRT;
 //全局变量,主备信道切换表
 ChannelSelectConfig channelSelectConfig;
 
-// log fot count
-//SimpleLogger logger;
 
 bool g_quitFlag = false;
 
@@ -69,9 +68,6 @@ int NetInstance::load(QString dir)
         return -1;
     }
 
-    //start log
-    //logger.start("d:/DataRecord/");
-
     return 1;
 }
 
@@ -107,26 +103,16 @@ void NetInstance::run()
 int NetInstance::start()
 {
     m_thread->start();    
-
-    if (gc == nullptr)
-    {
-        //create gc
-        gc=new GC(&g_cfg.m_zxHistoryParamBuf);
-        //start gc
-        gc->start();
-    }
-
+    HistoryBufferManager::startGC();
     return 1;
 }
 
 int NetInstance::stop()
 {
+    g_quitFlag = true;
+    std::this_thread::sleep_for(1s);
     m_thread->exit();
-    if (gc != nullptr)
-    {
-        gc->stop();
-        delete gc;
-        gc = nullptr;
-    }
+    HistoryBufferManager::stopGC();
+    HistoryBufferManager::releaseAll();
     return 1;
 }

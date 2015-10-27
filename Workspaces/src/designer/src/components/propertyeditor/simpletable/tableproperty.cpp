@@ -119,6 +119,7 @@ void QTableProperty::insertRow(const int currentRow)
     {
         QTableCell TableCell;
         QTableCell currentTableCell = m_TableVector.at(currentRow*m_iColNum+i*2);
+        TableCell.setTextType(currentTableCell.getTextType());
         TableCell.setHeight(currentTableCell.getHeight());
         TableCell.setWidth(currentTableCell.getWidth());
         m_TableVector.insert(m_TableVector.begin() + currentRow*m_iColNum + i,TableCell);
@@ -156,6 +157,8 @@ void QTableProperty::insertColumn(const int currentCol)
     {
         QTableCell TableCell;
         QTableCell currentTableCell = m_TableVector.at(i*m_iColNum + currentCol + i);
+        TableCell.setParamStr(currentTableCell.getParamStr());
+        TableCell.setFormulaStr(currentTableCell.getFormulaStr());
         TableCell.setHeight(currentTableCell.getHeight());
         TableCell.setWidth(currentTableCell.getWidth());
         m_TableVector.insert(m_TableVector.begin() + i*m_iColNum + currentCol + i,TableCell);
@@ -197,13 +200,7 @@ QString QTableProperty::toJsonStr(float wr,float hr)
                 stateObject[QObject::tr("Text")] = TableCell.getText();
                 stateObject[QObject::tr("TextType")] = TableCell.getTextType();
                 stateObject[QObject::tr("TextColor")] = (int)TableCell.getTextColor().rgb();
-                stateObject[QObject::tr("Fontfamily")] = TableCell.getTextFont().family();
-                stateObject[QObject::tr("FontpointSize")] = TableCell.getTextFont().pointSize();
-                stateObject[QObject::tr("Fontweight")] = TableCell.getTextFont().weight();
-                stateObject[QObject::tr("Fontbold")] = TableCell.getTextFont().bold();
-                stateObject[QObject::tr("Fontunderline")] = (int)TableCell.getTextFont().underline();
-                stateObject[QObject::tr("FontstrikeOut")] = (int)TableCell.getTextFont().strikeOut();
-                stateObject[QObject::tr("Fontitalic")] = (int)TableCell.getTextFont().italic();
+                stateObject[QObject::tr("Font")] = TableCell.getTextFont().toString();
                 stateObject[QObject::tr("TextVAlignment")] = (int)TableCell.getTextVAlignment();
                 stateObject[QObject::tr("TextHAlignment")] = (int)TableCell.getTextHAlignment();
                 stateObject[QObject::tr("BGColor")] = (int)TableCell.getBackgroundColor().rgba();
@@ -294,13 +291,7 @@ bool QTableProperty::initTableVector(const QString jsonStr)
                     color.setRgb(name.value(QObject::tr("TextColor")).toInt());
                     TableCell.setTextColor(color);
                     QFont font;
-                    font.setFamily(name.value(QObject::tr("Fontfamily")).toString());
-                    font.setPointSize(name.value(QObject::tr("FontpointSize")).toInt());
-                    font.setWeight(name.value(QObject::tr("Fontweight")).toInt());
-                    font.setBold(name.value(QObject::tr("Fontbold")).toInt());
-                    font.setUnderline(name.value(QObject::tr("Fontunderline")).toInt());
-                    font.setStrikeOut(name.value(QObject::tr("FontstrikeOut")).toInt());
-                    font.setItalic(name.value(QObject::tr("Fontitalic")).toInt());
+                    font.fromString(name.value(QObject::tr("Font")).toString());
                     TableCell.setTextFont(font);
                     TableCell.setTextHAlignment((Qt::Alignment)name.value(QObject::tr("TextHAlignment")).toInt());
                     TableCell.setTextVAlignment((Qt::Alignment)name.value(QObject::tr("TextVAlignment")).toInt());

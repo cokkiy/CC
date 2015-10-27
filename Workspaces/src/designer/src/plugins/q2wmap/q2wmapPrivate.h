@@ -43,8 +43,11 @@ public:
     //实时曲线
     QCPGraph* m_pcurve;
 
+    //实时曲线(最后收到的点)
+    QCPGraph* m_pcurveLast;
+
     //实时曲线数据 注意，更新数据后须使用setData方法才能更新曲线
-    QVector<double> m_Cx, m_Cy;
+    QVector<double> m_Cx, m_Cy, m_CxLast, m_CyLast;
 
     //理论曲线数据 注意，更新数据后须使用setData方法才能更新曲线
     QVector<double> m_Lx, m_Ly;
@@ -111,6 +114,11 @@ public:
     QString m_strObj;
     QString getObj()const{return m_strObj;}
     void setObj(const QString str);
+
+    //静态元素
+    QString m_strStatic;
+    QString getStatic()const{return m_strStatic;}
+    void setStatic(const QString str);
 
     //坐标轴颜色
     QColor m_AcurveColor;

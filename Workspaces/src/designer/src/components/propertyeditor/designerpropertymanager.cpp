@@ -386,7 +386,8 @@ void TextEditor::setTextPropertyValidationMode(TextPropertyValidationMode vm)
                          || vm == ValidationData || vm == ValidationDataes
                          || vm == ValidationFile|| vm == ValidationStates
                          || vm == ValidationTable
-                         ||vm == Validation2wmapObj||vm == ValidationGraphObj);
+                         ||vm == Validation2wmapObj||vm == Validation2wmapStatic
+                         ||vm == ValidationGraphObj);
 }
 
 void TextEditor::setText(const QString &text)
@@ -465,11 +466,28 @@ void TextEditor::buttonClicked()
         {
             newText = oldText;
         }
-//        dlg.Show() ;//打开对话框
-
      }
 
         break;
+
+    //rika add 20151022
+    case Validation2wmapStatic:
+    {
+        //静态元素配置对话框
+        Q2wmapStaticElementDlg dlg;
+        dlg.InitControl(oldText);
+        if(dlg.exec() == QDialog::Accepted)
+        {
+            newText = dlg.transText();//将构建的Json字符串赋值给传输字符串
+        }
+        else
+        {
+            newText = oldText;
+        }
+     }
+
+        break;
+
     case ValidationData:
         {
             // 单参数选择对话框

@@ -13,8 +13,6 @@
 #include "../const.h"																									//常数定义头文件
 #include "../baseobject.h"																						//基类头文件
 
-using namespace std;
-
 class Buffer :public BaseObject
 {
 	public:
@@ -41,7 +39,7 @@ class Buffer :public BaseObject
 
 };
 
-typedef list<Buffer> BufferList;
+typedef std::list<Buffer> BufferList;
 
 #endif
 

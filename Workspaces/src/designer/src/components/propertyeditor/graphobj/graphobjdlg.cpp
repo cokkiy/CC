@@ -1,9 +1,13 @@
 ﻿#include "graphobjdlg.h"
 #include "ui_graphobjdlg.h"
 
+
 #include <QColorDialog>
-#include "selectparamdialog.h"
+#include "paramselect/selectparamdialog.h"
 #include <QFileDialog>
+#include <QFontDialog>
+#include <QFont>
+
 
 GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
     QDialog(parent),
@@ -15,31 +19,79 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
     {
 
         //给曲线赋默认值
-        m_Xmax = 100 ;
+        m_Xmax = 80 ;
         m_Xmin = 0 ;
-        m_Ymax = 100 ;
+        m_Ymax = 80 ;
         m_Ymin = 0 ;
-        m_Xoffset = 1;
-        m_Yoffset = 1;
+        m_Xoffset = 0;
+        m_Yoffset = 0;
         m_XAxisLabel = QString("X");
         m_YAxisLabel = QString("Y");
         m_XAxisdisplay = true;
         m_YAxisdisplay = true;
         m_Scaleplace_x = QString(tr("上"));//X的刻度位置（上中下）
         m_Scaleplace_y = QString(tr("右")); //Y的刻度位置（左中右）
+        m_OriginPlace = QString(tr("左下")); //原点的位置：（左下、左上、右下、右上、上中、下中、正中）
+        m_Scalelabelplace_x =QString(tr("外侧"));//刻度标签的位置：内侧、外侧
+        m_Scalelabelplace_y =QString(tr("外侧"));//刻度标签的位置：内侧、外侧
 
         m_GraphName  = QString(tr("X-Y曲线"));
         m_GraphWidth = 3;
         m_GraphBuffer = 3000;
-        m_strgraphColor  = QString("rgb(255, 0, 0)");
         m_LGraphWidth = 3;
         m_LGraphBuffer = 3000;
-        m_strLgraphColor = QString("rgb(223, 223, 223)");
+
+        //曲线颜色
+        m_strgraphColor = "#ff0000";  //红色
+        //理论曲线颜色
+        m_strLgraphColor = "#ffaa00"; //金色
+//        //曲线颜色
+//        m_strgraphColor = "#0000ff";  //蓝色
+//        //理论曲线颜色
+//        m_strLgraphColor = "#555555"; //灰色
 
         m_xParam = QString("[10001,2]");
         m_yParam = QString("[10001,2]");
 
         m_Lgraphfile = QString("");//理论曲线文件(路径)
+
+        m_XAxiswideth = 2;
+//        m_YAxiswideth = 2;
+
+        m_chooseXAxisColor ="#FFFFFF"; //白色        
+
+        m_chooseXAxislabeldisplay = true;
+        m_chooseYAxislabeldisplay = true;
+        m_chooseXAxisScalelabeldisplay = true;
+        m_chooseYAxisScalelabeldisplay = true;
+        m_chooseXAxisScaleTickdisplay = true;
+        m_chooseYAxisScaleTickdisplay = true;
+
+        //取到设置的字体
+        m_XAxislabelFont = "Sans Serif,28,-1,5,50,0,0,0,0,0";
+
+        m_XAxisScalelabelFont = "Sans Serif,10,-1,5,50,0,0,0,0,0";
+        m_YAxisScalelabelFont = "Sans Serif,10,-1,5,50,0,0,0,0,0";
+
+        m_numOfXAxisScale = 4;
+        m_numOfYAxisScale = 4;
+
+        //刻度小线段长度的设置
+        m_XAxisScaleRuler =10;
+        m_YAxisScaleRuler =10;
+
+
+        m_XAxisScaleprecision = 2;
+        m_YAxisScaleprecision = 2;
+
+        m_XAxisScalelabeloffset_x = "-15";
+        m_XAxisScalelabeloffset_y = "0";
+        m_YAxisScalelabeloffset_x = "0";
+        m_YAxisScalelabeloffset_y = "0";
+
+
+        //设置控件
+        setControls();
     }
     else
     {
@@ -65,6 +117,11 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
         m_Scaleplace_x =jobj["Scaleplace_x"].toString();
         //y轴刻度位置
         m_Scaleplace_y =jobj["Scaleplace_y"].toString();
+        //原点的位置：左下、左上、右下、右上、上中、下中、正中
+        m_OriginPlace =jobj["OriginPlace"].toString();
+        //刻度标签的位置：内侧、外侧
+        m_Scalelabelplace_x = jobj["Scalelabelplace_x"].toString();
+        m_Scalelabelplace_y = jobj["Scalelabelplace_y"].toString();
         //是否显示x轴
         m_XAxisdisplay =jobj["XAxisdisplay"].toBool();
         //是否显示y轴
@@ -95,10 +152,44 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
 
         //理论曲线路径
         m_Lgraphfile = jobj["Lgraphfile"].toString();
+
+
+        m_XAxiswideth = jobj["XAxiswideth"].toInt();
+
+
+        m_chooseXAxisColor = jobj["chooseXAxisColor"].toString();
+
+        m_chooseXAxislabeldisplay = jobj["chooseXAxislabeldisplay"].toBool();
+        m_chooseYAxislabeldisplay = jobj["chooseYAxislabeldisplay"].toBool();
+        m_chooseXAxisScalelabeldisplay = jobj["chooseXAxisScalelabeldisplay"].toBool();
+        m_chooseYAxisScalelabeldisplay = jobj["chooseYAxisScalelabeldisplay"].toBool();
+        m_chooseXAxisScaleTickdisplay = jobj["chooseXAxisScaleTickdisplay"].toBool();
+        m_chooseYAxisScaleTickdisplay = jobj["chooseYAxisScaleTickdisplay"].toBool();
+
+        m_XAxislabelFont= jobj["XAxislabelFont"].toString();
+
+        m_XAxisScalelabelFont= jobj["XAxisScalelabelFont"].toString();
+        m_YAxisScalelabelFont= jobj["YAxisScalelabelFont"].toString();
+
+        m_numOfXAxisScale = jobj["numOfXAxisScale"].toInt();
+        m_XAxisScaleRuler = jobj["XAxisScaleRuler"].toInt();
+        m_numOfYAxisScale = jobj["numOfYAxisScale"].toInt();
+        m_YAxisScaleRuler = jobj["YAxisScaleRuler"].toInt();
+
+        m_XAxisScaleprecision = jobj["XAxisScaleprecision"].toInt();
+        m_YAxisScaleprecision = jobj["YAxisScaleprecision"].toInt();
+
+        m_XAxisScalelabeloffset_x = jobj["XAxisScalelabeloffset_x"].toString();
+        m_XAxisScalelabeloffset_y = jobj["XAxisScalelabeloffset_y"].toString();
+        m_YAxisScalelabeloffset_x = jobj["YAxisScalelabeloffset_x"].toString();
+        m_YAxisScalelabeloffset_y = jobj["YAxisScalelabeloffset_y"].toString();
+
+        //设置控件
+        setControls();
     }
 
-    //设置控件
-    setControls();
+
+
 }
 
 GraphObjDlg::~GraphObjDlg()
@@ -106,20 +197,11 @@ GraphObjDlg::~GraphObjDlg()
     delete ui;
 }
 
+
+
 //设置控件
 void GraphObjDlg::setControls()
 {
-//    //目标名称
-//    ui->textEdit_targetName->setText(m_strName);
-
-//    //曲线颜色
-//    ui->pushButton_SelectCColor->setStyleSheet(QString("border:2px solid #555555; background-color: %1").arg(m_strCColor));
-
-//    //理论曲线颜色
-//    ui->pushButton_SelectLColor->setStyleSheet(QString("border:2px solid #555555; background-color: %1").arg(m_strLColor));
-
-    //tab名称----目标名称
-
 
     ui->lineEdit_Xmax_tab->setText(QString::number(m_Xmax));
     ui->lineEdit_Xmin_tab->setText(QString::number(m_Xmin));
@@ -133,6 +215,11 @@ void GraphObjDlg::setControls()
     ui->checkBox_chooseAxisdisplay_y->setChecked(m_YAxisdisplay);
     ui->comboBox_Scaleplace_x->setCurrentText(m_Scaleplace_x);
     ui->comboBox_Scaleplace_y->setCurrentText(m_Scaleplace_y);
+    //原点的位置：左下、左上、右下、右上、上中、下中、正中
+    ui->comboBox_OriginPlace->setCurrentText(m_OriginPlace);
+    //刻度标签的位置：内侧、外侧
+    ui->comboBox_Scalelabelplace_x->setCurrentText(m_Scalelabelplace_x);
+    ui->comboBox_Scalelabelplace_y->setCurrentText(m_Scalelabelplace_y);
 
     ui->lineEdit_GraphName_tab->setText(m_GraphName);
     ui->lineEdit_GraphWidth_tab->setText(QString::number(m_GraphWidth));
@@ -143,10 +230,59 @@ void GraphObjDlg::setControls()
     ui->lineEdit_LGraphBuffer_tab->setText(QString::number(m_LGraphBuffer));
     ui->label_chooseLGraphColor->setStyleSheet(QString("background-color: %1").arg(m_strLgraphColor));
 
-
     ui->lineEdit_inputXparam_tab->setText(m_xParam);
     ui->lineEdit_inputYparam_tab->setText(m_yParam);
     ui->lineEdit_chooseGraphbasemap_tab->setText(m_Lgraphfile);
+
+
+    ui->lineEdit_XAxiswideth_tab->setText(QString::number(m_XAxiswideth));
+
+    ui->lineEdit_numOfXAxisScale_tab->setText(QString::number(m_numOfXAxisScale));
+    ui->lineEdit_XAxisScaleRuler_tab->setText(QString::number(m_XAxisScaleRuler));
+    ui->lineEdit_numOfYAxisScale_tab->setText(QString::number(m_numOfYAxisScale));
+    ui->lineEdit_YAxisScaleRuler_tab->setText(QString::number(m_YAxisScaleRuler));
+
+    ui->lineEdit_XAxisScaleprecision_tab->setText(QString::number(m_XAxisScaleprecision));
+    ui->lineEdit_YAxisScaleprecision_tab->setText(QString::number(m_YAxisScaleprecision));
+
+    ui->label_chooseXAxisColor_tab->setStyleSheet(QString("background-color: %1").arg(m_chooseXAxisColor));
+
+    ui->checkBox_chooseXAxislabeldisplay_tab->setChecked(m_chooseXAxislabeldisplay);
+    ui->checkBox_chooseYAxislabeldisplay_tab->setChecked(m_chooseYAxislabeldisplay);
+    ui->checkBox_chooseXAxisScalelabeldisplay_tab->setChecked(m_chooseXAxisScalelabeldisplay);
+    ui->checkBox_chooseYAxisScalelabeldisplay_tab->setChecked(m_chooseYAxisScalelabeldisplay);
+    ui->checkBox_chooseXAxisScaleTickdisplay_tab->setChecked(m_chooseXAxisScaleTickdisplay);
+    ui->checkBox_chooseYAxisScaleTickdisplay_tab->setChecked(m_chooseYAxisScaleTickdisplay);
+
+
+    //准备好向界面的填充文字---字的大小
+    //XAxislabelFont
+    QString m_XAxislabelFontstr = m_XAxislabelFont;
+    QStringList m_XAxislabelFontwords = m_XAxislabelFontstr.split(",");
+    qint32 indexofXAxislabelFontsize = 1;
+    QString m_XAxislabelFont_ui = m_XAxislabelFontwords.at(indexofXAxislabelFontsize);
+
+    QString m_XAxisScalelabelFontstr = m_XAxisScalelabelFont;
+    QStringList m_XAxisScalelabelFontwords = m_XAxisScalelabelFontstr.split(",");
+    qint32 indexofXAxisScalelabelFontsize = 1;
+    QString m_XAxisScalelabelFont_ui = m_XAxisScalelabelFontwords.at(indexofXAxisScalelabelFontsize);
+    //YAxisScalelabelFont
+    QString m_YAxisScalelabelFontstr = m_YAxisScalelabelFont;
+    QStringList m_YAxisScalelabelFontwords = m_YAxisScalelabelFontstr.split(",");
+    qint32 indexofYAxisScalelabelFontsize = 1;
+    QString m_YAxisScalelabelFont_ui = m_YAxisScalelabelFontwords.at(indexofYAxisScalelabelFontsize);
+    //返回字体字符串到空行中
+    ui->lineEdit_XAxislabelFont_tab->setText(m_XAxislabelFont_ui);
+
+    ui->lineEdit_XAxisScalelabelFont_tab->setText(m_XAxisScalelabelFont_ui);
+    ui->lineEdit_YAxisScalelabelFont_tab->setText(m_YAxisScalelabelFont_ui);
+
+
+    ui->lineEdit_XAxisScalelabeloffset_x_tab->setText(m_XAxisScalelabeloffset_x);
+    ui->lineEdit_XAxisScalelabeloffset_y_tab->setText(m_XAxisScalelabeloffset_y);
+    ui->lineEdit_YAxisScalelabeloffset_x_tab->setText(m_YAxisScalelabeloffset_x);
+    ui->lineEdit_YAxisScalelabeloffset_y_tab->setText(m_YAxisScalelabeloffset_y);
+
 }
 
 
@@ -199,13 +335,13 @@ void GraphObjDlg::on_lineEdit_Ymin_tab_textChanged(const QString &arg1)
 
 }
 
-//X轴文本偏移量
+//X轴轴偏移量
 void GraphObjDlg::on_lineEdit_Xoffset_tab_textChanged(const QString &arg1)
 {
     m_Xoffset = arg1.toInt();
 }
 
-//Y轴文本偏移量
+//Y轴轴偏移量
 void GraphObjDlg::on_lineEdit_Yoffset_tab_textChanged(const QString &arg1)
 {
 
@@ -271,7 +407,6 @@ void GraphObjDlg::on_comboBox_Scaleplace_y_currentTextChanged(const QString &arg
 
 }
 
-
 //曲线名称（图例名称）
 void GraphObjDlg::on_lineEdit_GraphName_tab_textChanged(const QString &arg1)
 {
@@ -294,6 +429,7 @@ void GraphObjDlg::on_lineEdit_GraphBuffer_tab_textChanged(const QString &arg1)
 
 }
 
+
 //选择实时曲线颜色
 void GraphObjDlg::on_pushButton_chooseGraphColor_tab_clicked()
 {
@@ -302,23 +438,24 @@ void GraphObjDlg::on_pushButton_chooseGraphColor_tab_clicked()
     QColorDialog graphcolordialog;
 
     //取到设置的颜色
-    QColor m_graphcolor = graphcolordialog.getColor();
-
+    QColor tempgraphcolor = graphcolordialog.getColor();
 
     //无效颜色不处理(例如用户取消了对话框)
-    if(m_graphcolor == QColor::Invalid)
+    if(tempgraphcolor == QColor::Invalid)
     {
         setControls();
         return;
     }
-    m_strgraphColor= m_graphcolor.name();
+    m_strgraphColor= tempgraphcolor.name();
     //将按钮颜色设置为取到的颜色
     //最爽的还是样式表
     //background-color: rgb(255, 0, 0);
     //ui->label_chooseGraphColor->setStyleSheet("background-color: rgb(255, 0, 0)");
-    ui->label_chooseGraphColor->setStyleSheet(QString("background-color: %1").arg(m_graphcolor.name()));
+    ui->label_chooseGraphColor->setStyleSheet(QString("background-color: %1").arg(tempgraphcolor.name()));
 
 }
+
+
 
 //选择实时曲线样式
 void GraphObjDlg::on_pushButton_Graphmode_tab_clicked()
@@ -347,27 +484,23 @@ void GraphObjDlg::on_pushButton_chooseLGraphColor_tab_clicked()
 //    QColor m_graphcolor;
 
     //取到设置的颜色
-    QColor m_Lgraphcolor = graphcolordialog.getColor();
+    QColor tempLgraphcolor = graphcolordialog.getColor();
 
 
     //无效颜色不处理(例如用户取消了对话框)
-    if(m_Lgraphcolor == QColor::Invalid)
+    if(tempLgraphcolor == QColor::Invalid)
     {
-        setControls();
-        return;
+       return;
     }
-    m_strLgraphColor = m_Lgraphcolor.name();
+    m_strLgraphColor = tempLgraphcolor.name();
     //将按钮颜色设置为取到的颜色
     //最爽的还是样式表
     //background-color: rgb(255, 0, 0);
     //ui->label_chooseGraphColor->setStyleSheet("background-color: rgb(255, 0, 0)");
-    ui->label_chooseLGraphColor->setStyleSheet(QString("background-color: %1").arg(m_Lgraphcolor.name()));
+    ui->label_chooseLGraphColor->setStyleSheet(QString("background-color: %1").arg(tempLgraphcolor.name()));
 
 
 }
-
-
-
 
 
 //选择弹道底图（理论弹道）
@@ -416,4 +549,286 @@ void GraphObjDlg::on_pushButton_chooseYparam_tab_clicked()
 
 }
 
+
+
+
+void GraphObjDlg::on_lineEdit_XAxiswideth_tab_textChanged(const QString &arg1)
+{
+    m_XAxiswideth = arg1.toInt();
+
+}
+
+void GraphObjDlg::on_pushButton_chooseXAxisColor_tab_clicked()
+{
+    QColorDialog XAxiscolordialog;
+
+    //取到设置的颜色
+    QColor tempXAxiscolor = XAxiscolordialog.getColor();
+
+    //无效颜色不处理(例如用户取消了对话框)
+    if(tempXAxiscolor == QColor::Invalid)
+    {
+        setControls();
+        return;
+    }
+    m_chooseXAxisColor= tempXAxiscolor.name();
+    //将按钮颜色设置为取到的颜色
+    //最爽的还是样式表
+     ui->label_chooseXAxisColor_tab->setStyleSheet(QString("background-color: %1").arg(tempXAxiscolor.name()));
+
+}
+
+
+
+
+void GraphObjDlg::on_checkBox_chooseXAxislabeldisplay_tab_clicked(bool checked)
+{
+    if(checked)
+    {
+        m_chooseXAxislabeldisplay=true;
+    }
+    else
+    {
+        m_chooseXAxislabeldisplay=false;
+    }
+
+}
+
+
+
+void GraphObjDlg::on_checkBox_chooseYAxislabeldisplay_tab_clicked(bool checked)
+{
+    if(checked)
+    {
+        m_chooseYAxislabeldisplay=true;
+    }
+    else
+    {
+        m_chooseYAxislabeldisplay=false;
+    }
+
+}
+
+
+
+
+void GraphObjDlg::on_lineEdit_numOfXAxisScale_tab_textChanged(const QString &arg1)
+{
+    m_numOfXAxisScale = arg1.toInt();
+}
+
+void GraphObjDlg::on_lineEdit_XAxisScaleRuler_tab_textChanged(const QString &arg1)
+{
+    m_XAxisScaleRuler = arg1.toInt();
+}
+
+
+
+void GraphObjDlg::on_lineEdit_XAxisScaleprecision_tab_textChanged(const QString &arg1)
+{
+    m_XAxisScaleprecision = arg1.toInt();
+}
+
+void GraphObjDlg::on_checkBox_chooseXAxisScalelabeldisplay_tab_clicked(bool checked)
+{
+    if(checked)
+    {
+        m_chooseXAxisScalelabeldisplay=true;
+    }
+    else
+    {
+        m_chooseXAxisScalelabeldisplay=false;
+    }
+
+}
+
+
+
+void GraphObjDlg::on_lineEdit_numOfYAxisScale_tab_textChanged(const QString &arg1)
+{
+    m_numOfYAxisScale = arg1.toDouble();
+}
+
+void GraphObjDlg::on_lineEdit_YAxisScaleRuler_tab_textChanged(const QString &arg1)
+{
+    m_YAxisScaleRuler = arg1.toInt();
+}
+
+
+
+
+void GraphObjDlg::on_lineEdit_YAxisScaleprecision_tab_textChanged(const QString &arg1)
+{
+    m_YAxisScaleprecision = arg1.toInt();
+}
+
+void GraphObjDlg::on_checkBox_chooseYAxisScalelabeldisplay_tab_clicked(bool checked)
+{
+    if(checked)
+    {
+        m_chooseYAxisScalelabeldisplay=true;
+    }
+    else
+    {
+        m_chooseYAxisScalelabeldisplay=false;
+    }
+
+}
+
+
+void GraphObjDlg::on_pushButton_XAxislabelFont_tab_clicked()
+{
+//    bool ok;
+//    QFontDialog XAxislabelfontDialog;
+//    QFont XAxislabelfont = XAxislabelfontDialog.getFont(&ok,this);
+
+    bool ok;
+    //保存用户选中的字体，以便每次作为默认字体载入，且显示在默认栏选中状态
+    bool tempok;
+    QFont firstfont ;
+    tempok = firstfont.fromString(m_XAxislabelFont);
+    //    QFont XAxislabelfont = QFontDialog::getFont(&ok, QFont("Times", 28), this);
+    QFont XAxislabelfont = QFontDialog::getFont(&ok, firstfont, this);
+
+    if (ok) {
+        // 点击"ok",字体设为用户选择的字体
+    } else {
+        // 点击“cancel”,字体设置为初始化的默认字体：Times,28
+        // 取到设置的字体
+        // m_XAxislabelFont = "Sans Serif,28,-1,5,50,0,0,0,0,0";
+        //setControls();
+    }
+
+    //转化为字符串描述
+    m_XAxislabelFont= XAxislabelfont.toString();
+    //准备好向界面的填充文字---字的大小
+    QString m_fontstr = XAxislabelfont.toString();
+    QStringList m_fontwords = m_fontstr.split(",");
+    qint32 indexoffontsize = 1;
+    QString m_XAxislabelFont_ui = m_fontwords.at(indexoffontsize);
+
+    //返回字体字符串到空行中
+    ui->lineEdit_XAxislabelFont_tab->setText(m_XAxislabelFont_ui);
+    //    for (int i = 0; i < m_fontwords.size(); ++i)
+    //         cout << m_fontwords.at(i).toLocal8Bit().constData() << endl;
+}
+
+
+void GraphObjDlg::on_pushButton_XAxisScalelabelFont_tab_clicked()
+{
+    bool ok;
+    //保存用户选中的字体，以便每次作为默认字体载入，且显示在默认栏选中状态
+    bool tempok;
+    QFont firstfont ;
+    tempok = firstfont.fromString(m_XAxisScalelabelFont);
+    QFont XAxisScalelabelfont = QFontDialog::getFont(&ok, firstfont, this);
+
+    if (ok) {
+        // 点击"ok",字体设为用户选择的字体
+    } else {
+        // 点击“cancel”,字体设置为初始化的默认字体：firstfont:Times,28
+        //m_YAxislabelFont = "Sans Serif,28,-1,5,50,0,0,0,0,0";
+    }
+
+    //转化为字符串描述
+    m_XAxisScalelabelFont= XAxisScalelabelfont.toString();
+    //准备好向界面的填充文字---字的大小
+    QString m_fontstr = XAxisScalelabelfont.toString();
+    QStringList m_fontwords = m_fontstr.split(",");
+    qint32 indexoffontsize = 1;
+    QString m_XAxisScalelabelFont_ui = m_fontwords.at(indexoffontsize);
+    //返回字体字符串到空行中
+    ui->lineEdit_XAxisScalelabelFont_tab->setText(m_XAxisScalelabelFont_ui);
+
+}
+
+void GraphObjDlg::on_pushButton_YAxisScalelabelFont_tab_clicked()
+{
+    bool ok;
+    //保存用户选中的字体，以便每次作为默认字体载入，且显示在默认栏选中状态
+    bool tempok;
+    QFont firstfont ;
+    tempok = firstfont.fromString(m_YAxisScalelabelFont);
+    QFont YAxisScalelabelfont = QFontDialog::getFont(&ok, firstfont, this);
+
+    if (ok) {
+        // 点击"ok",字体设为用户选择的字体
+    } else {
+        // 点击“cancel”,字体设置为初始化的默认字体：firstfont:Times,28
+        //m_YAxislabelFont = "Sans Serif,28,-1,5,50,0,0,0,0,0";
+    }
+
+
+    //转化为字符串描述
+    m_YAxisScalelabelFont= YAxisScalelabelfont.toString();
+    //准备好向界面的填充文字---字的大小
+    QString m_fontstr = YAxisScalelabelfont.toString();
+    QStringList m_fontwords = m_fontstr.split(",");
+    qint32 indexoffontsize = 1;
+    QString m_YAxisScalelabelFont_ui = m_fontwords.at(indexoffontsize);
+    //返回字体字符串到空行中
+    ui->lineEdit_YAxisScalelabelFont_tab->setText(m_YAxisScalelabelFont_ui);
+
+}
+
+void GraphObjDlg::on_lineEdit_XAxisScalelabeloffset_x_tab_textChanged(const QString &arg1)
+{
+    m_XAxisScalelabeloffset_x = arg1;
+}
+void GraphObjDlg::on_lineEdit_XAxisScalelabeloffset_y_tab_textChanged(const QString &arg1)
+{
+    m_XAxisScalelabeloffset_y = arg1;
+}
+void GraphObjDlg::on_lineEdit_YAxisScalelabeloffset_x_tab_textChanged(const QString &arg1)
+{
+    m_YAxisScalelabeloffset_x = arg1;
+}
+void GraphObjDlg::on_lineEdit_YAxisScalelabeloffset_y_tab_textChanged(const QString &arg1)
+{
+    m_YAxisScalelabeloffset_y = arg1;
+}
+
+void GraphObjDlg::on_checkBox_chooseXAxisScaleTickdisplay_tab_clicked(bool checked)
+{
+    if(checked)
+    {
+        m_chooseXAxisScaleTickdisplay=true;
+    }
+    else
+    {
+        m_chooseXAxisScaleTickdisplay=false;
+    }
+    
+}
+
+void GraphObjDlg::on_checkBox_chooseYAxisScaleTickdisplay_tab_clicked(bool checked)
+{
+    if(checked)
+    {
+        m_chooseYAxisScaleTickdisplay=true;
+    }
+    else
+    {
+        m_chooseYAxisScaleTickdisplay=false;
+    }
+
+}
+
+
+void GraphObjDlg::on_comboBox_OriginPlace_currentTextChanged(const QString &arg1)
+{
+      m_OriginPlace = arg1;
+
+}
+
+//刻度标签的位置：内侧、外侧
+void GraphObjDlg::on_comboBox_Scalelabelplace_x_currentTextChanged(const QString &arg1)
+{
+    m_Scalelabelplace_x = arg1;
+}
+
+void GraphObjDlg::on_comboBox_Scalelabelplace_y_currentTextChanged(const QString &arg1)
+{
+    m_Scalelabelplace_y = arg1;
+}
 

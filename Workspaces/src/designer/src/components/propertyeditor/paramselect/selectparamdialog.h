@@ -30,24 +30,24 @@ class QT_PROPERTYEDITOR_EXPORT QSelectParamDialog : public QDialog
 public:
     explicit QSelectParamDialog(QWidget *parent = 0);
     ~QSelectParamDialog();
-	//ÏÔÊ¾´°¿Ú
+    //æ˜¾ç¤ºçª—å£
     int showDialog();
-	//»ñÈ¡ËùÑ¡ÔñµÄ²ÎÊý×Ö·û´®£¨°üº¬±êºÅ¡¢²ÎÊýºÅ£©»ò¹«Ê½×Ö·û´®
+    //èŽ·å–æ‰€é€‰æ‹©çš„å‚æ•°å­—ç¬¦ä¸²ï¼ˆåŒ…å«æ ‡å·ã€å‚æ•°å·ï¼‰æˆ–å…¬å¼å­—ç¬¦ä¸²
     QString text() const;
-	//½«µ¥²ÎÊý¿Ø¼þÖÐµÄ×Ö·û´®´«Èë¶Ô»°¿ò
+    //å°†å•å‚æ•°æŽ§ä»¶ä¸­çš„å­—ç¬¦ä¸²ä¼ å…¥å¯¹è¯æ¡†
     void SetText(QString );
 private:
-	//ui ½çÃæ
+    //ui ç•Œé¢
     Ui::SelectSingleParamDialog *ui;
 private:
-	//ÐÅÏ¢Ô¼¶¨±í²ÎÊý½Ó¿Ú
+    //ä¿¡æ¯çº¦å®šè¡¨å‚æ•°æŽ¥å£
     InformationInterface* net;
-	//³õÊ¼»¯ÐÅÏ¢Ô¼¶¨±í±í²ÎÊý¿Ø¼þ±í¸ñ
+    //åˆå§‹åŒ–ä¿¡æ¯çº¦å®šè¡¨è¡¨å‚æ•°æŽ§ä»¶è¡¨æ ¼
     bool initFormTable();
 private slots:
-	//Ñ¡ÔñÐÅÏ¢Ô¼¶¨±í²ÎÊý±í¿Ø¼þ±í¸ñµ¥±íÐÅÏ¢
+    //é€‰æ‹©ä¿¡æ¯çº¦å®šè¡¨å‚æ•°è¡¨æŽ§ä»¶è¡¨æ ¼å•è¡¨ä¿¡æ¯
     void OnClickTableForm(int,int);
-	//Ñ¡ÔñÐÅÏ¢Ô¼¶¨±í²ÎÊý¿Ø¼þ±í¸ñµ¥²ÎÊýÐÅÏ¢
+    //é€‰æ‹©ä¿¡æ¯çº¦å®šè¡¨å‚æ•°æŽ§ä»¶è¡¨æ ¼å•å‚æ•°ä¿¡æ¯
     void OnClickParamForm(int,int);
     void SelectAllSystemRadioButton(bool);
     void SelectKELRadioButton(bool);

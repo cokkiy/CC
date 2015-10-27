@@ -30,29 +30,12 @@ int DataCenterInstance::getValue(QString computeStr,QVariant& result)
 
 int DataCenterInstance::getHistoryData(QString computeStr,QVector<double>& result)
 {
-//    unsigned short tabNo, paramNo;
-//    list<HistoryParam> paramList;
-//    list<HistoryParam>::iterator theIterator;
-//    if(LFormula::getParam(computeStr.toStdString(),tabNo,paramNo))
-//    {
-//        paramList = g_cfg.m_zxHistoryParamBuf.GetBuffer(tabNo, paramNo);
-
-//        if(paramList.empty() == true) return -1;
-
-//        for (theIterator = paramList.begin();theIterator != paramList.end();theIterator++)
-//        {
-//            if (((*theIterator).getDate() > m_savDate)||(((*theIterator).getDate() == m_savDate)&&((*theIterator).getTime() > m_savTime)))
-//            {
-//                double data = (*theIterator).getValue();
-//                result.append(data);
-//                m_savTime = (*theIterator).getTime();
-//                m_savDate = (*theIterator).getDate();
-//            }
-//        }
-//        return 1;
-//    }
-//    return -1;
     return m_LFormula.compute(computeStr.toStdString(),result);
+}
+
+int DataCenterInstance::getHistoryData(QString computeStr,QVector<double>& result,QVector<unsigned int>& time)
+{
+    return m_LFormula.compute(computeStr.toStdString(),result,time);
 }
 
 int DataCenterInstance::getHistoryData(QString computeStrX,QString computeStrY,QVector<double>& resultX,QVector<double>& resultY)

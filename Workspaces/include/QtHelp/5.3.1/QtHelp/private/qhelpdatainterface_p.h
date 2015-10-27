@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/help/qhelpdatainterface_p.h"
+#include "../../../../../src/assistant/help/qhelpdatainterface_p.h"

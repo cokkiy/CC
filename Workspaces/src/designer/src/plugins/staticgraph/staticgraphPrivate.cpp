@@ -1,5 +1,6 @@
 ﻿#include "staticgraphPrivate.h"
 #include "qwidget.h"
+#include <math.h>
 
 //私有类staticgraphPrivate构造函数
 //功能：曲线初始化，主要是私有类成员变量的初始化
@@ -17,11 +18,13 @@ staticgraphPrivate::staticgraphPrivate(QWidget*wgt)
 
     //图元背景色
     //m_backgroundColor.setRgb(0, 0, 255, 255);//蓝色,最后一位0代表透明
+
     m_backgroundColor.setRgb(0, 0, 255);//蓝色
     m_backgroundColor.setAlpha(255);//代表透明度
-//    //理论曲线
-//    m_LgraphColor.setRgb(85,255,127);//初始理论曲线颜色:白色,QColor赋值
-//    m_LgraphWidth = 4;//初始理论曲线宽度
+//    m_backgroundColor.setRgb(255, 255, 255);//白色
+//    m_backgroundColor.setAlpha(255);//代表透明度
+    m_bShowGrid = true; //曲线网格可视
+    m_bShowLegend = true; //曲线图例可视
 
     //数据接收类
     m_dci_x = NetComponents::getDataCenter();
@@ -83,6 +86,7 @@ void staticgraphPrivate::parseJsonData()
         for(int i=0; i<m_vctgraphObj.size(); i++)
         {
             m_vctgraphObj[i].m_pgraph->clearData();
+            m_vctgraphObj[i].m_pgraphLast->clearData();
             m_vctgraphObj[i].m_pLgraph->clearData();
         }
 
@@ -126,7 +130,7 @@ void staticgraphPrivate::parseJsonData()
                     //y轴最大值
                     pgj.m_Ymax_plot = name["Ymax"].toDouble();
                     //y轴最小值
-                    pgj.m_Ymin_plot = name["Xmin"].toDouble();
+                    pgj.m_Ymin_plot = name["Ymin"].toDouble();
                     //x轴标签文本偏移
                     pgj.m_Xoffset_plot =name["Xoffset"].toInt();
                     //y轴标签文本偏移
@@ -139,6 +143,12 @@ void staticgraphPrivate::parseJsonData()
                     pgj.m_Scaleplace_x_plot =name["Scaleplace_x"].toString();
                     //y轴刻度位置
                     pgj.m_Scaleplace_y_plot =name["Scaleplace_y"].toString();
+                    //原点的位置：左下、左上、右下、右上、上中、下中、正中
+                    pgj.m_OriginPlace_plot =name["OriginPlace"].toString();
+                    //刻度标签的位置：内侧、外侧
+                    pgj.m_Scalelabelplace_x_plot =name["Scalelabelplace_x"].toString();
+                    pgj.m_Scalelabelplace_y_plot =name["Scalelabelplace_y"].toString();
+
                     //是否显示x轴
                     pgj.m_XAxisdisplay_plot =name["XAxisdisplay"].toBool();
                     //是否显示y轴
@@ -150,7 +160,7 @@ void staticgraphPrivate::parseJsonData()
                     pgj.m_GraphWidth_plot =name["GraphWidth"].toInt();
                     //实时曲线缓冲区大小
                     pgj.m_GraphBuffer_plot = name["GraphBuffer"].toDouble();
-                    //理论曲线颜色
+                    //实时曲线颜色
                     pgj.m_strgraphColor_plot =name["strgraphColor"].toString();
 
                     //理论曲线名称
@@ -166,14 +176,80 @@ void staticgraphPrivate::parseJsonData()
                     pgj.m_xParam_plot = name["xParam"].toString();
                     //实时曲线y参数
                     pgj.m_yParam_plot = name["yParam"].toString();
-
                     //理论曲线路径
                     pgj.m_Lgraphfile_plot = name["Lgraphfile"].toString();
 
+
+
+                    pgj.m_XAxiswideth_plot = name["XAxiswideth"].toInt();
+
+
+                    pgj.m_chooseXAxisColor_plot = name["chooseXAxisColor"].toString();
+                    //轴标签、轴刻度标签的颜色全部统一成实时曲线的颜色
+                    pgj.m_chooseXAxisLabelColor_plot = name["strgraphColor"].toString();
+                    pgj.m_chooseYAxisLabelColor_plot = name["strgraphColor"].toString();
+                    pgj.m_chooseXAxisScaleLabelColor_plot=name["strgraphColor"].toString();
+                    pgj.m_chooseYAxisScaleLabelColor_plot=name["strgraphColor"].toString();
+
+                    pgj.m_chooseXAxislabeldisplay_plot = name["chooseXAxislabeldisplay"].toBool();
+                    pgj.m_chooseYAxislabeldisplay_plot = name["chooseYAxislabeldisplay"].toBool();
+                    pgj.m_chooseXAxisScalelabeldisplay_plot = name["chooseXAxisScalelabeldisplay"].toBool();
+                    pgj.m_chooseYAxisScalelabeldisplay_plot = name["chooseYAxisScalelabeldisplay"].toBool();
+                    pgj.m_chooseXAxisScaleTickdisplay_plot = name["chooseXAxisScaleTickdisplay"].toBool();
+                    pgj.m_chooseYAxisScaleTickdisplay_plot = name["chooseYAxisScaleTickdisplay"].toBool();
+
+
+                    pgj.m_XAxislabelFont_plot = name["XAxislabelFont"].toString();
+                    pgj.m_XAxisScalelabelFont_plot = name["XAxisScalelabelFont"].toString();
+                    pgj.m_YAxisScalelabelFont_plot = name["YAxisScalelabelFont"].toString();
+
+
+                    pgj.m_numOfXAxisScale_plot = name["numOfXAxisScale"].toInt();
+                    pgj.m_numOfYAxisScale_plot = name["numOfYAxisScale"].toInt();
+
+
+                    //刻度小线段长度的设置
+                    pgj.m_XAxisScaleRuler_plot = name["XAxisScaleRuler"].toInt();
+                    pgj.m_YAxisScaleRuler_plot = name["YAxisScaleRuler"].toInt();
+
+                    pgj.m_XAxisScaleprecision_plot = name["XAxisScaleprecision"].toInt();
+                    pgj.m_YAxisScaleprecision_plot = name["YAxisScaleprecision"].toInt();
+
+                    pgj.m_XAxisScalelabeloffset_x_plot = name["XAxisScalelabeloffset_x"].toString();
+                    pgj.m_XAxisScalelabeloffset_y_plot = name["XAxisScalelabeloffset_y"].toString();
+                    pgj.m_YAxisScalelabeloffset_x_plot = name["YAxisScalelabeloffset_x"].toString();
+                    pgj.m_YAxisScalelabeloffset_y_plot = name["YAxisScalelabeloffset_y"].toString();
+//                    //添加一个曲线图层-理论曲线
+//                    pgj.m_pLgraph = m_plot->addGraph();
+//                    //添加一个曲线图层-实时曲线
+//                    pgj.m_pgraph = m_plot->addGraph();
+//                    //添加一个曲线图层-实时曲线(最后收到的点)---闪烁点
+//                    pgj.m_pgraphLast = m_plot->addGraph();
+
+
+                    //在这里添加增加坐标轴系统的代码
+//                    m_plot->axisRect()->addAxis(QCPAxis::atLeft);
+//                    m_plot->axisRect()->addAxis(QCPAxis::atBottom);
+////                    m_plot->axisRect()->addAxes(QCPAxis::atBottom | QCPAxis::atLeft);
+//                    //设置x轴,对应第i条曲线
+//                    m_plot->axisRect()->axis(QCPAxis::atBottom, i)->setTickLabels(true);// //设置在右边的第i条坐标轴
+//                    //设置y轴,对应第i条曲线
+//                    m_plot->axisRect()->axis(QCPAxis::atLeft, i)->setTickLabels(true);// //设置在右边的第i条坐标轴
+//                    //设置轴偏移，以便让每条增加的坐标轴都看的见
+//                    if(!(i==0))
+//                    {
+//                        m_plot->axisRect()->axis(QCPAxis::atBottom, i)->setOffset(-30+i);
+//                        m_plot->axisRect()->axis(QCPAxis::atLeft, i)->setOffset(-30+i);
+//                    }
+
+
                     //添加一个曲线图层-理论曲线
-                    pgj.m_pLgraph = m_plot->addGraph();
+                    pgj.m_pLgraph = m_plot->addGraph(m_plot->xAxis,m_plot->yAxis);
                     //添加一个曲线图层-实时曲线
-                    pgj.m_pgraph = m_plot->addGraph();
+                    pgj.m_pgraph = m_plot->addGraph(m_plot->xAxis,m_plot->yAxis);
+                    //添加一个曲线图层-实时曲线(最后收到的点)---闪烁点
+                    pgj.m_pgraphLast = m_plot->addGraph(m_plot->xAxis,m_plot->yAxis);
+
 
                     //读取理论弹道
                     pgj.ReadLLGraph();
@@ -201,7 +277,7 @@ bool PlotGraphObject::ReadLLGraph()
 {
     if(m_Lgraphfile_plot.isNull())
     {
-        qWarning()<<"zjb's Warning! Q2wmapObject::ReadLLgraph() : 读取理论曲线文件失败：未配置文件!";
+        qWarning()<<"zjb's Warning! PlotGraphObject::ReadLLgraph() : 读取理论曲线文件失败：未配置文件!";
         return false;
     }
 
@@ -348,19 +424,540 @@ void staticgraphPrivate::setTextString(const QString string)
     }
 
     m_textString=string;
-    //    QString graphstr=string;
     //私有类中,把多曲线配置对话框传过来的数据解析出来
     parseJsonData();//得到赋值的结构体变量dialogdata
 
     setPlot();
+//    setPlot_test();
 
     update();
 }
 
+//试验区域，
+//试验1：轴的高级设置---多轴的设置，主要测试添加多套坐标系统的方法
+//example: multiple axes example
+void staticgraphPrivate::setPlot_test()
+{
+    //如曲线对象为空，则退出
+    if(m_plot==NULL)
+    {
+        return;
+    }
+
+    //设置图元区域
+    m_plot->setGeometry(parent->rect());//视图矩形区
+
+    //设置曲线(控件)交互性:可拖动\可缩放\图表被选定
+    m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables); //曲线交互性
+
+    //    设置曲线可视性:可视
+    m_plot->setVisible(true);    //可视
+
+    //清除默认的坐标区域，这样我们可以乱写
+    m_plot->plotLayout()->clear();
+    QCPAxisRect *wideAxisRect =new QCPAxisRect(m_plot);
+    wideAxisRect->setupFullAxesBox(true);
+    //设置第1套坐标轴
+    wideAxisRect->axis(QCPAxis::atRight,0)->setTickLabels(true);
+    //增加另外一套坐标轴（即第2套），并设置第2套坐标轴
+    wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor("#6050F8"));
+
+    QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+    m_plot->plotLayout()->addElement(0,0,wideAxisRect);//在第一行插入轴矩形wideAxisRect
+    m_plot->plotLayout()->addElement(1,0,subLayout);//子布局在第2行，网格布局将自动因此增长
+    //准备轴矩形们，准备放在子布局中
+    QCPAxisRect *subRectLeft = new QCPAxisRect(m_plot,false);//false意味着不设置为缺省的轴区
+    QCPAxisRect *subRectRight = new QCPAxisRect(m_plot,false);
+    subLayout->addElement(0,0,subRectLeft);//子布局的第1列
+    subLayout->addElement(0,1,subRectRight);//子布局的第2列
+    subRectRight->setMaximumSize(150,150);//使得下面右侧的矩形区固定为150*150
+    subRectRight->setMinimumSize(150,150);
+    //设置轴们在子布局的轴矩形区中
+    subRectLeft->addAxes(QCPAxis::atBottom|QCPAxis::atLeft);
+    subRectRight->addAxes(QCPAxis::atBottom|QCPAxis::atRight);
+    subRectLeft->axis(QCPAxis::atLeft)->setAutoTickCount(2);
+    subRectRight->axis(QCPAxis::atRight)->setAutoTickCount(2);
+    subRectRight->axis(QCPAxis::atBottom)->setAutoTickCount(2);
+    subRectLeft->axis(QCPAxis::atBottom)->grid()->setVisible(true);
+    //同步顶部和底部的轴矩形区的左右页边距
+    QCPMarginGroup *marginGroup = new QCPMarginGroup(m_plot);
+    subRectLeft->setMarginGroup(QCP::msLeft,marginGroup);
+    subRectRight->setMarginGroup(QCP::msRight,marginGroup);
+    wideAxisRect->setMarginGroup(QCP::msLeft|QCP::msRight,marginGroup);
+    //移动新建的轴们在轴图层,和网格们在网格图层
+    foreach (QCPAxisRect *rect, m_plot->axisRects()) {
+        foreach(QCPAxis *axis,rect->axes())
+        {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+        }
+    }
+    //准备数据驱动
+    QVector<double>x1a(20),y1a(20);
+    QVector<double>x1b(50),y1b(50);
+    QVector<double>x3,y3;
+    qsrand(3);
+    for(int i=0;i<x1a.size();++i)
+    {
+        x1a[i]=i/(double)(x1a.size()-1)*10-5.0;
+        y1a[i]=qCos(x1a[i]);
+    }
+    for(int i=0;i<x1b.size();++i)
+    {
+        x1b[i]=1/(double)x1b.size()*10-5.0;
+        y1b[i]=qExp(-x1b[i]*x1b[i]*0.2)*1000;
+    }
+    x3<<1<<2<<3<<4;
+    y3<<2<<2.5<<4<<1.5;
 
 
-//void setPlot()//全新的画图参数配置
-void staticgraphPrivate::setPlot()
+//    QVector<double>x2(100),y2(100);
+//    for(int i=0;i<x2.size();++i)
+//    {
+//        x2[i]=i/(double)x2.size()*10;\
+////        y2[i]=qrand()/(double)RAND_MAX-0.5+y2[qAbs(i-1)];
+//        y2[i]=sin(i);
+
+//    }
+//    QVector<double>x2(100),y2(100);
+//    for(int i=0;i<100;++i)
+//    {
+
+//        x2[i] = i;
+//        y2[i] =5+5*sin((((double)x2[i])/20.0)*2*3.1415);
+//    }
+
+
+
+    //创建和配置图表们
+    QCPGraph *mainGraph1=m_plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom),
+                                          wideAxisRect->axis(QCPAxis::atLeft));
+    mainGraph1->setData(x1a,y1a);
+    mainGraph1->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle,QPen(Qt::black),
+                                QBrush(Qt::white),6));
+    mainGraph1->setPen(QPen(QColor(120,120,120),2));
+    QCPGraph *mainGraph2 =m_plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom),
+                                           wideAxisRect->axis(QCPAxis::atLeft,1));
+    mainGraph2->setData(x1b,y1b);
+    mainGraph2->setPen(QPen(QColor("#8070B8"),2));
+    mainGraph2->setBrush(QColor(110,170,110,30));
+    mainGraph1->setChannelFillGraph((mainGraph2));
+    mainGraph1->setBrush(QColor(255,161,0,50));
+
+    QCPGraph *graph2=m_plot->addGraph(subRectLeft->axis(QCPAxis::atBottom),
+                                      subRectLeft->axis(QCPAxis::atLeft,1));
+//    graph2->setData(x2,y2);
+//    graph2->setLineStyle(QCPGraph::lsImpulse);
+//    graph2->setPen(QPen(QColor("#FFA100")));
+
+    QCPBars *bars1 =new QCPBars(subRectRight->axis(QCPAxis::atBottom),
+                                subRectRight->axis(QCPAxis::atRight));
+    m_plot->addPlottable(bars1);
+    bars1->setWidth(3/(double)x3.size());
+    bars1->setData(x3,y3);
+    bars1->setPen(QPen(Qt::black));
+    bars1->setAntialiased(false);
+    bars1->setAntialiasedFill(false);
+    bars1->setBrush(QColor("#705BE8"));
+    bars1->keyAxis()->setAutoTicks(false);
+    bars1->keyAxis()->setTickVector(x3);
+    bars1->keyAxis()->setSubTickCount(0);
+
+    //重新调节轴们根据曲线的数据
+    mainGraph1->rescaleAxes();
+    mainGraph2->rescaleAxes();
+//    graph2->rescaleAxes();
+    bars1->rescaleAxes();
+    wideAxisRect->axis(QCPAxis::atLeft,1)->setRangeLower(0);
+
+
+
+}
+
+//试验2：试验2：实时性高级设置--图表可滚动和自适应坐标轴
+//Exmaple: realtime data demo
+void staticgraphPrivate::setPlot_test2()
+{
+    /*
+    //蓝色线
+    m_plot->addGraph();
+    m_plot->graph(0)->setPen(QPen(Qt::blue));
+    m_plot->graph(0)->setBrush(QBrush(QColor(240,255,200)));
+    m_plot->graph(0)->setAntialiasedFill(false);
+    //红色线
+    m_plot->addGraph();
+    m_plot->graph(1)->setPen(QPen(Qt::red));
+    m_plot->graph(0)->setChannelFillGraph(m_plot->graph(1));
+    //蓝色点
+    m_plot->addGraph();
+    m_plot->graph(2)->setPen(QPen(Qt::blue));
+    m_plot->graph(2)->setLineStyle(QCPGraph::lsNone);
+    m_plot->graph(2)->setScatterStyle(QCPScatterStyle::ssDisc);
+    //红色点
+    m_plot->addGraph();
+    m_plot->graph(3)->setPen(QPen(Qt::red));
+    m_plot->graph(3)->setLineStyle(QCPGraph::lsNone);
+    m_plot->graph(3)->setScatterStyle(QCPScatterStyle::ssDisc);
+
+    m_plot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    m_plot->xAxis->setDateTimeFormat("hh:mm:ss");
+    m_plot->xAxis->setAutoTickStep(false);
+    m_plot->xAxis->setTickStep(2);
+    m_plot->axisRect()->setupFullAxesBox();
+
+    //使得左下轴们传递他们的范围到右上轴们
+    connect(m_plot->xAxis,SIGNAL(rangeChanged(QCPRange)),
+            m_plot->xAxis2,SLOT(setRange(QCPRange)));
+    connect(m_plot->yAxis,SIGNAL(rangeChanged(QCPRange)),
+            m_plot->yAxis2,SLOT(setRange(QCPRange)));
+    //安装一个定时器这样重复地调用主类的实时数据槽
+    connect(&dataTimer,SIGNAL(timeout()),this,SLOT(realtimeDataSlot()));
+    //间隔0，意味着尽可能快地刷新
+    dataTimer.start(0);
+
+
+    //实时数据槽realtimeDataSlot---通过定时器来调用
+    //计算两个新的数据点
+    double key = QDataTime::currentDataTime().toMSecsSinceEpoch()/1000.0;
+    static double lastPointkey = 0;
+    //至多每10毫秒增加点
+    if(key-lastPointkey > 0.01)
+    {
+        //qSin(key*1.6+qCos(key*1.7)*2)*10+qSin(key*1.2+0.56)*20+26;
+        double value0 = qSin(key);
+        //qSin(key*1.3+qCos(key*1.2)*1.2)*7+qSin(key*0.9+0.26)*24+26;
+        double value1 = qCos(key);
+        //增加数据到线
+        ui->m_plot->graph(0)->addData(key,value0);
+        ui->m_plot->graph(1)->addData(key,value1);
+        //设置点的数据
+        ui->m_plot->graph(2)->clearData();
+        ui->m_plot->graph(2)->addData(key,value0);
+        ui->m_plot->graph(3)->clearData();
+        ui->m_plot->graph(3)->addData(key,value1);
+        //移除那些在显示范围之外线的数据
+        ui->m_plot->graph(0)->removeDataBefore(key-8);
+        ui->m_plot->graph(1)->removeDataBefore(key-8);
+        //重新调节值轴（即纵轴）来适应当前的数据
+        ui->m_plot->graph(0)->rescaleValueAxis();
+        ui->m_plot->graph(1)->rescaleValueAxis(true);
+        lastPointkey = key;
+    }
+    //使得键轴（即横轴）随着数据滚动（在一个大小为8的常数范围内）
+    ui->m_plot->xAxis->setRange(key+0.25,8,Qt::AlignRight);
+    ui->customplot->replot();
+
+    //计算每秒的帧数
+    static double lastFpsky;
+    static int framecount;
+    ++framecount;
+    if(key-lastFpsky >2)//2秒结束的平均帧数
+    {
+        ui->statusBar->showMessage(QString("%1 FPS,Total Data points:%2"))
+                .arg(framecount/(key-lastFpsky),0,'f',0)
+                .arg(ui->m_plot->graph(0)->data()->count()+ui->customPlot->graph(1)->count())
+                ,0);
+        lastFpsky = key;
+        framecount = 0;
+    }
+
+
+*/
+
+}
+
+//试验3：交互性高级设置--图表中各个元件的可选择性，诸如双击选中改图例名称之类
+//Exmaple:the interaction example
+void staticgraphPrivate::setPlot_test3()
+{/*
+    //以下为主类构造函数中
+    XX::XX()
+    {
+    srand(QDateTime::currentDateTime().toTime_t());
+    ui->setupUi(this);
+    ui->m_plot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom
+                                |QCP::iSelectAxes|QCP::iSelectLegend
+                                |QCP::iSelectPlottables)
+    ui->m_plot->xAxis->setRange(-8,8);
+    ui->m_plot->yAxis->setRange(-5,5);
+    ui->m_plot->axisRect()->setupFullAxesBox();
+
+    ui->m_plot->plotLayout()->insertRow(0);
+    ui->m_plot->plotLayout()->addElement(0,0,new QCPPlotTitle(ui->customPlot,
+                                                              "Interaction Example"));
+    ui->m_plot->xAxis->setLabel("x Axis");
+    ui->m_plot->yAxis->setLabel("y Axis");
+    ui->m_plot->lengend->setVisible(true);
+    QFont legendFont = font();
+    legendFont.setPointSize(10);
+    ui->m_plot->legend->setFont(legendFont);
+    ui->m_plot->legend->setSelectedFont(legendFont);
+    ui->m_plot->legend->setSelectableParts(QCPLegend::spItems);
+
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
+
+    //连接那些轴的选择原件的槽，特别是反轴们
+    connect(ui->m_plot,SIGNAL(selectionChangedByUser()),
+            this,SLOT(selectionChanged()));
+    //连接那些槽：当一个轴被选中，仅仅那个方向能被拖动和缩放
+    connect(ui->m_plot,SIGNAL(mousePress(QMouseEvent*)),
+            this,SLOT(mousePress()));
+    connect(ui->m_plot,SIGNAL(mousePress(QWheelEvent*)),
+            this,SLOT(mouseWheel()));
+    //使得左下轴们传递他们的范围给右上轴们
+    connect(ui->m_plot->xAxis,SIGNAL(rangeChanged(QCPRange)),
+            ui->m_plot->xAxis2,SLOT(setRange(QCPRange)));
+    connect(ui->m_plot->yAxis,SIGNAL(rangeChanged(QCPRange)),
+            ui->m_plot->xAxis2,SLOT(setRange(QCPRange)));
+    //连接一些交互性的槽
+    connect(ui->m_plot,SIGNAL(titleDoubleClick(QMouseEvent*,QCPPlotTitle*)),
+            this,SLOT(titleDoubleClick(QMouseEvent*,QCPPlotTitle*)));
+    connect(ui->m_plot,SIGNAL(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)),
+            this,SLOT(axisDoubleClick(QCPAxis*,QCPAxis::SelectablePart)));
+    connect(ui->m_plot,SIGNAL(legendDoubleClick(QCPLegend*,QCPAbstractLegendItem*,QMouseEvent*)),
+            this,SLOT(legendDoubleClick(QCPLegend*,QCPAbstractLegendItem*)));
+    //在状态栏显示一个消息当一个图被单击时
+    connect(ui->m_plot,SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)),
+            this,SLOT(graphClicked(QCPAbstractPlottable*)));
+    //安装方针和连接槽为了上下文弹出菜单
+    ui->m_plot->setContextMenuPolicy(Qt::CustomContextMenu));
+    connect(ui->m_plot,SIGNAL(customContextMenuRequested(QPoint)),
+            this,SLOT(contextMenuRequest(QPoint)));
+    }
+    XX::~XX
+    {
+        delete ui;
+    }
+
+
+    //以下为主类的成员函数
+    void XX::titleDoubleClick(QMouseEvent*event,QCPPlotTitle*title)
+    {
+        Q_UNUSED(event)
+        //设置图的标题通过双击它
+        bool ok;
+        QString newTitle = QInputDialog::getText(this,"QCustomPlot example",
+            "New plot title",QLineEdit::Normal,title->text(),&ok);
+        if(ok)
+        {
+            title->setText(newTitle);
+            ui->m_plot->replot;
+        }
+
+    }
+
+    void XX::axisLabelDoubelClick(QCPAxis *axis,QCPAxis::SelectablePart part)
+    {
+        //设置一个轴标签通过双击它
+        //只有当前的轴标签被点击起作用，而不是刻度标签或者轴线
+        if(part == QCPAxis::spAxisLabel)
+        {
+            bool ok;
+            QString newLabel = QInputDialog::getText(this,"QCustomPlot example",
+               "New axis label",QLineEdit::Normal,axis->label(),&ok);
+            if(ok)
+            {
+                axis->setLabel(newLabel);
+                ui->m_plot->replot();
+            }
+        }
+    }
+
+    void XX::legendDoubleClick(QCPLegend*legend,QCPAbstractLegendItem*itm)
+    {
+        //重命名一个曲线通过双击在他的图例项目上
+        Q_UNUSED(legend)
+        //只有图例项被点击起作用（用户只要点击在这个图例的垫衬框内）
+        if(item)
+        {
+            QCPPlottableLegendItem* plItem =qobject_cast<QCPPlottableLegendItem*>(item);
+            bool ok;
+            QString newname = QInputDialog::getText(this,"QCustomPlot example",
+                    "New graph name",QLineEdit::Normal,plItem->plottable()->name(),&ok);
+            if(ok)
+            {
+                plItem->plottable()->setName(newname);
+                ui->m_plot->replot();
+            }
+
+        }
+
+    }
+
+    void XX::selectionChanged()
+    {
+        //        通常，轴的基本线、轴的刻度标签和轴的标签是可以分开选择的，但是我们
+        //        想要用户只能选择这个轴作为一个整体，所以我们将刻度标签的选中状态和
+        //        轴的基线系在一起。然而，轴标签是能够个别的选中的。
+        //        左右轴的选中状态将和上下轴状态同步。
+        //        此外，我们想要同步曲线的选中状态和属于这个曲线的图例的选中状态，这样用户
+        //        可以选择一个曲线通过点击曲线或者它的图例项目。
+
+        //使得上下轴作为同步选中，并且处理轴和刻度标签作为一个能选中的对象
+        if(ui->m_plot->xAxis->selectedParts().testFlag(QCPAxis::spAxis)
+          ||ui->m_plot->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels)
+          ||ui->m_plot->xAxis2->selectedParts().testFlag(QCPAxis::spAxis)
+          ||ui->m_plot->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+        {
+            ui->m_plot->xAxis2->selectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+            ui->m_plot->xAxis->selectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+
+        }
+        //使得左右轴作为同步选中，并且处理轴和刻度标签作为一个能选中的对象
+        if(ui->m_plot->yAxis->selectedParts().testFlag(QCPAxis::spAxis)
+          ||ui->m_plot->yAxis->selectedParts().testFlag(QCPAxis::spTickLabels)
+          ||ui->m_plot->yAxis2->selectedParts().testFlag(QCPAxis::spAxis)
+          ||ui->m_plot->yAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+        {
+            ui->m_plot->yAxis2->selectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+            ui->m_plot->yAxis->selectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+
+        }
+        //同步选中的曲线和他相应的图例
+        for(int i=0;i<ui->m_plot->graphCount();++i)
+        {
+            QCPGraph *graph =ui->m_plot->graph(i);
+            QCPPlottableLegendItem *item =ui->m_plot->legend->itemWithPlottable(graph);
+            if(item->selected()||graph->selected())
+            {
+                item->setSelected(true);
+                graph->setSelected(true);
+            }
+        }
+    }
+
+
+    void XX::mousePress()
+    {
+        //如果某个轴被选中，仅允许某个方向的轴被拖动
+        //如果没有轴被选中，所有方向都可以被拖动
+        if(ui->m_plot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        {
+            ui->m_plot->axisRect()->setRangeDrag(ui->m_plot->xAxis->orientation());
+        }
+        else if(ui->m_plot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        {
+            ui->m_plot->axisRect()->setRangeDrag(ui->m_plot->yAxis->orientation());
+        }
+        else
+        {
+            ui->m_plot->axisRect()->setRangeDrag(Qt::Horizontal|Qt::Vertical);
+        }
+
+    }
+
+    void XX::mouseWheel()
+    {
+        //如果某个轴被选中，仅允许某个方向的轴被缩放
+        //如果没有轴被选中，所有方向都可以被缩放
+        if(ui->m_plot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        {
+            ui->m_plot->axisRect()->setRangeZoom(ui->m_plot->xAxis->orientation());
+        }
+        else if(ui->m_plot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        {
+            ui->m_plot->axisRect()->setRangeZoom(ui->m_plot->yAxis->orientation());
+        }
+        else
+        {
+            ui->m_plot->axisRect()->setRangeZoom(Qt::Horizontal|Qt::Vertical);
+        }
+
+    }
+
+
+    void XX::addRandomGraph()
+    {
+        ui->m_plot->addGraph();
+        XXXXXX
+        ui->m_plot->replot();
+    }
+
+    void XX::removeSelectedGraph()
+    {
+        if(ui->m_plot->selectedGraphs().size()>0)
+        {
+            ui->m_plot->removeGraph(ui->m_plot->selectedGraphs().first());
+            ui->m_plot->replot();
+        }
+    }
+
+
+    void XX::removeAllGraphs()
+    {
+        ui->m_plot->clearGraphs();
+        ui->m_plot->replot();
+    }
+
+    void XX::contextMenuRequest(QPoint pos)
+    {
+        QMenu *menu = new QMenu(this);
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        //上下文菜单在图例中被请求
+        if(ui->m_plot->legend->selectTest(pos,false)>=0)
+        {
+            menu->addAction("Move to top left",this,
+             SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignLeft));
+            menu->addAction("Move to top center",this,
+             SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignHCenter));
+            menu->addAction("Move to top right",this,
+             SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignRight));
+            menu->addAction("Move to bottom right",this,
+             SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignRight));
+            menu->addAction("Move to bottom left",this,
+             SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignLeft));
+         }
+        else  //收集上下文菜单在曲线中被请求
+        {
+            menu->addAction("Add random graph",this,
+             SLOT(addRandomGraph()));
+            if(ui->m_plot->seletedGraphs().size()>0)
+                menu->addAction("Remove selected graph",this,
+                 SLOT(removeSelectedGraph()));
+            if(ui->m_plot->graphCount()>0)
+                menu->addAction("Remove all graphs",this,
+                 SLOT(removeAllGraphs()));
+        }
+
+        menu->popup(ui->m_plot->mapToGlobal(pos));
+    }
+
+
+
+    void XX::moveLegend()
+    {
+        //确认槽真的被一个上下文菜单动作所调用，这样他就携带了我们需要的信息
+        if(QAction*contextAction = qobject_cast<QAction*>(sender()))
+        {
+            bool ok;
+            int dataInt = contextAction->data().toInt(&ok);
+            if(ok)
+            {
+                ui->m_plot->axisRect()->insertLayout()->setInsetAlignment(0,
+                                           (Qt::Alignment)dataInt);
+                ui->m_plot->replot();
+            }
+        }
+
+    }
+
+
+    void XX::graphClicked(QCPAbstractPlottable *plottable)
+    {
+      ui->statusBar->showMessage(QString("Clicked on graph '%1'.")
+                                 .arg(plottable->name()),1000);
+    }
+
+*/
+
+}
+
+//试验4：试验4：曲线样式高级设置--直线连线类型
+//Exmaple:Line Style Demo
+void staticgraphPrivate::setPlot_test4()
 {
     //如曲线对象为空，则退出
     if(m_plot==NULL)
@@ -373,14 +970,175 @@ void staticgraphPrivate::setPlot()
     //设置图元区域
     m_plot->setGeometry(parent->rect());//视图矩形区
 
-    //设置曲线(控件)交互性:可拖动\可缩放\图表被选定
-    m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables); //曲线交互性
 
+    //直线部分
+    m_plot->legend->setVisible(true);
+    m_plot->legend->setFont(QFont("Hevetica",9));
+    QPen pen;
+    QStringList lineNames;
+    lineNames<<"lsNone"<<"lsLine"<<"lsStepLeft"<<"lsStepRight"<<"lsStepCenter"<<"lsImpulse";
+    //增加曲线用不同的直线风格绘制
+    for(int i = QCPGraph::lsNone;i<=QCPGraph::lsImpulse;++i)
+    {
+        m_plot->addGraph();
+        pen.setColor(QColor(qSin(i*1+1.2)*80+80,qSin(i*0.3+0)*80+80,qSin(i*0.3+1.5)*80+80));
+        m_plot->graph()->setPen(pen);
+        m_plot->graph()->setName(lineNames.at(i-QCPGraph::lsNone));
+        m_plot->graph()->setLineStyle((QCPGraph::LineStyle)i);
+        m_plot->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle,5));
+        //获取数据
+        QVector<double>x(15),y(15);
+        for(int j=0;j<15;++j)
+        {
+            x[j] = j/15.0*5*3.14+0.01;
+            y[j] = 7*qSin(x[j])/x[j]-(i-QCPGraph::lsNone)*5+(QCPGraph::lsImpulse)*5+2;
+        }
+        m_plot->graph()->setData(x,y);
+        m_plot->graph()->rescaleAxes(true);
+
+    }
+    //缩小一点点
+    m_plot->yAxis->scaleRange(1.1,m_plot->yAxis->range().center());
+    m_plot->xAxis->scaleRange(1.1,m_plot->xAxis->range().center());
+    //设置空白的轴线
+    m_plot->xAxis->setTicks(false);
+    m_plot->yAxis->setTicks(true);
+    m_plot->xAxis->setTickLabels(false);
+    m_plot->yAxis->setTickLabels(true);
+    //使得右上轴们是左下轴们的克隆
+    m_plot->axisRect()->setupFullAxesBox();
+
+
+}
+//试验5：试验5：曲线样式高级设置--点的类型
+//Exmaple:Scatter Style demo
+void staticgraphPrivate::setPlot_test5()
+{
+    //如曲线对象为空，则退出
+    if(m_plot==NULL)
+    {
+        return;
+    }
+
+    //共性部分，在主类属性栏进行设置
+
+    //设置图元区域
+    m_plot->setGeometry(parent->rect());//视图矩形区
+
+
+    m_plot->legend->setVisible(true);
+    m_plot->legend->setFont(QFont("Helvetica",9));
+    m_plot->legend->setRowSpacing(-3);
+    QVector<QCPScatterStyle::ScatterShape>shapes;
+    shapes<<QCPScatterStyle::ssCross;
+    shapes<<QCPScatterStyle::ssPlus;
+    shapes<<QCPScatterStyle::ssCircle;
+    shapes<<QCPScatterStyle::ssDisc;
+    shapes<<QCPScatterStyle::ssSquare;
+    shapes<<QCPScatterStyle::ssDiamond;
+    shapes<<QCPScatterStyle::ssStar;
+    shapes<<QCPScatterStyle::ssTriangle;
+    shapes<<QCPScatterStyle::ssTriangleInverted;
+    shapes<<QCPScatterStyle::ssCrossSquare;
+    shapes<<QCPScatterStyle::ssPlusSquare;
+    shapes<<QCPScatterStyle::ssCrossCircle;
+    shapes<<QCPScatterStyle::ssPlusCircle;
+    shapes<<QCPScatterStyle::ssPeace;
+    shapes<<QCPScatterStyle::ssCustom;
+
+    QPen pen;
+    //增加曲线用不同的散点风格绘制
+    for(int i =0;i<shapes.size();++i)
+    {
+        m_plot->addGraph();
+        pen.setColor(QColor(qSin(i*0.3)*100+100,qSin(i*0.6+0.7)*100+100,qSin(i*0.4+0.6)*100+100));
+        //获取数据
+        QVector<double>x(10),y(10);
+        for(int k =0;k<10;++k)
+        {
+            x[k] = k/10.0*4*3.14+0.01;
+            y[k] = 7*qSin(x[k])/x[k]+(shapes.size()-i)*5;
+        }
+        m_plot->graph()->setData(x,y);
+        m_plot->graph()->rescaleAxes(true);
+        m_plot->graph()->setPen(pen);
+        m_plot->graph()->setName(QCPScatterStyle::staticMetaObject
+                                 .enumerator(QCPScatterStyle::staticMetaObject
+                                             .indexOfEnumerator("Scattershape")).valueToKey(shapes.at(i)));
+        m_plot->graph()->setLineStyle(QCPGraph::lsLine);
+        //设置散点类型
+        if(shapes.at(i)!=QCPScatterStyle::ssCustom)
+        {
+            m_plot->graph()->setScatterStyle(QCPScatterStyle(shapes.at(i),10));
+        }
+        else
+        {
+            QPainterPath customScatterPath;
+            for(int i=0;i<3;++i)
+            {
+                customScatterPath.cubicTo(qCos(2*M_PI*i/3.0)*9,qSin(2*M_PI*i/3.0)*9,
+                                          qCos(2*M_PI*i/3.0)*9,qSin(2*M_PI*i/3.0)*9,0,0);
+            }
+            m_plot->graph()->setScatterStyle(QCPScatterStyle(customScatterPath,
+                                                             QPen(Qt::black,0),QColor(40,70,255,50),10));
+        }
+
+    }
+    //设置空白的轴线
+    m_plot->rescaleAxes();
+    m_plot->xAxis->setTicks(false);
+    m_plot->yAxis->setTicks(false);
+    m_plot->xAxis->setTickLabels(false);
+    m_plot->yAxis->setTickLabels(false);
+    //使得右上轴们是左下轴们的克隆
+    m_plot->axisRect()->setupFullAxesBox();
+
+}
+
+
+
+
+
+//void setPlot()//全新的画图参数配置
+void staticgraphPrivate::setPlot()
+{
+
+    //如曲线对象为空，则退出
+    if(m_plot==NULL)
+    {
+        return;
+    }
+
+    //共性部分，在主类属性栏进行设置
+
+    //设置图元区域
+    //父窗口
+//    m_plot->setGeometry(parent->rect());//视图矩形区
+
+    QRect Rect =parent->rect();
+    m_plot->setGeometry(Rect);
+
+
+
+    //设置曲线(控件)交互性:可拖动\可缩放\图表被选定
+    m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom
+                 | QCP::iSelectPlottables|QCP::iSelectLegend); //曲线交互性
+//    m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom
+//                           |QCP::iSelectAxes|QCP::iSelectLegend
+//                           |QCP::iSelectPlottables);//曲线交互性
     //设置曲线可视性:可视
     m_plot->setVisible(true);    //可视
 
+
+
+    //设置滚动曲线需要这个
+    //position:轴的起始点
+    //size:新的轴的范围
+    //alignment:轴线向哪边延伸   Qt::AlignLeft, Qt::AlignRight or Qt::AlignCenter
+    //m_plot->xAxis->setRange(double position, double size, Qt::AlignmentFlag alignment)
+
     //设置网格显示:可视
-//    m_bShowGrid=true;//网格可视
+//    m_bShowGrid = false;
     if(m_bShowGrid)//网格是否可视
     {
         m_plot->xAxis->grid()->setVisible(true);//设置网格可视
@@ -393,7 +1151,7 @@ void staticgraphPrivate::setPlot()
     }
 
      //设置图例显示:可视
-//     m_bShowLegend=true;//曲线图例可视
+//     m_bShowLegend = false;
      m_plot->legend->setVisible(m_bShowLegend);//true可视,false不可视
 
      //设置自动增加图表到图例
@@ -429,71 +1187,92 @@ void staticgraphPrivate::setPlot()
     //设置图例文本对齐方式:放在右上角，采用右对齐方式。
     m_plot->axisRect()->insetLayout()->setInsetAlignment(0,legendAlignment);//图例放置于右上角
 
-    //设置标签文字字体
-    QFont LabelFont;
-    LabelFont.setPointSize(13);
-    //设置标签文字字体:13号
-    m_plot->xAxis->setLabelFont(LabelFont);//设置标签文字字体
-    m_plot->yAxis->setLabelFont(LabelFont);//设置标签文字字体
+    //设置图例交互性
+    m_plot->legend->setSelectableParts(QCPLegend::spItems);
 
-    //设置标签文字颜色
-    QColor LabelColor;
-    LabelColor.setRgb(255,0,0);
-    //设置标签文字颜色:红色
-    m_plot->xAxis->setLabelColor(LabelColor);//设置标签颜色 红色
-    m_plot->yAxis->setLabelColor(LabelColor);//设置标签颜色  红色
 
-    //设置x(或y)轴的刻度台阶
-    qint32 TickStep;
-    TickStep=1;
-    //设置x(或y)轴的刻度台阶
-    //void setTickStep(double step); //设置刻度台阶为2
-    m_plot->xAxis->setTickStep(TickStep);//设置x(或y)轴的刻度台阶为2
-    m_plot->yAxis->setTickStep(TickStep);
+
+
+
+    // /////以下位于预设部分---即没有打开多曲线对话框之前所配的默认值
+
+
+//    QCPAxisRect *AxisRect =new QCPAxisRect(m_plot);
+//    AxisRect->axis(QCPAxis::atRight,0)->setTickLabels(true);
+//    AxisRect->addAxis(QCPAxis::atLeft,0)->setTickLabels(true);
+
+    //  ///////先全部设为可见
+    //设置所有坐标轴的可见性
+    //设置坐标轴1可见
+    //x轴
+    m_plot->xAxis->setVisible(1);//设1为可见,0为不可见
+    //y轴
+    m_plot->yAxis->setVisible(1);
+    //设置坐标轴2不可见
+    m_plot->xAxis2->setVisible(0);//设置坐标轴2轴线不可见
+    m_plot->yAxis2->setVisible(0);//设置坐标轴2轴线不可见
+    m_plot->xAxis2->setTicks(0);//设置坐标轴2刻度不可见
+    m_plot->yAxis2->setTicks(0);//设置坐标轴2刻度不可见
+
+    //是否设置空白的轴线,包括: 轴轴刻度小线段,刻度标签
+    //设置轴刻度小线段的可见性
+    m_plot->xAxis->setTicks(true);
+    m_plot->yAxis->setTicks(true);
+    //设置刻度标签是否显示
+    m_plot->xAxis->setTickLabels(true);
+    m_plot->yAxis->setTickLabels(true);
 
     //设置坐标轴轴线颜色/宽度
-    QPen penAxis;
-    penAxis.setColor(QColor(255,255,255));
-    penAxis.setWidthF(2);
+    QPen penXAxis_temp,penYAxis_temp;
+    penXAxis_temp.setColor(QColor(255,255,255));
+    penXAxis_temp.setWidth(2);
+    penYAxis_temp.setColor(QColor(255,255,255));
+    penYAxis_temp.setWidth(2);
     //设置坐标轴   轴线颜色:白色,轴线宽度:2
-    m_plot->xAxis->setBasePen(penAxis);
-    m_plot->yAxis->setBasePen(penAxis);
-    m_plot->xAxis2->setBasePen(penAxis);
-    m_plot->yAxis2->setBasePen(penAxis);
+    m_plot->xAxis->setBasePen(penXAxis_temp);
+    m_plot->yAxis->setBasePen(penYAxis_temp);
+    m_plot->xAxis2->setBasePen(penXAxis_temp);
+    m_plot->yAxis2->setBasePen(penYAxis_temp);
 
     //设置刻度颜色
-    QPen penTick;
-    penTick.setColor(QColor(255,255,255));
-    penTick.setWidthF(1);
+    QPen penTick_temp;
+    penTick_temp.setColor(QColor(255,255,255));
+    penTick_temp.setWidthF(1);
     //设置刻度  颜色:白色,宽度:1
-    m_plot->xAxis->setTickPen(penTick);
-    m_plot->yAxis->setTickPen(penTick);
+    m_plot->xAxis->setTickPen(penTick_temp);
+    m_plot->yAxis->setTickPen(penTick_temp);
+
+    //设置刻度标签文字颜色
+    m_plot->xAxis->setTickLabelColor(QColor(255,255,255));
+    m_plot->yAxis->setTickLabelColor(QColor(255,255,255));
 
     //设置子刻度 颜色
-    QPen penSubTick;
-    penSubTick.setColor(QColor(255,255,255));
-    penSubTick.setWidthF(1);
+    QPen penSubTick_temp;
+    penSubTick_temp.setColor(QColor(255,255,255));
+    penSubTick_temp.setWidthF(1);
     //设置子刻度 颜色:白色,宽度:1
-    m_plot->xAxis->setSubTickPen(penSubTick);
-    m_plot->yAxis->setSubTickPen(penSubTick);
-
-    //设置刻度文字字体
-    QFont TickLabelFont;
-    TickLabelFont.setPointSize(9);
-    //设置刻度文字字体：9号
-    m_plot->xAxis->setTickLabelFont(TickLabelFont);
-
-    //设置刻度文字颜色
-    QColor TickLabelColor;
-    TickLabelColor.setRgb(255,0,0);
-    //设置刻度文字颜色:红色
-    m_plot->xAxis->setTickLabelColor(TickLabelColor);
-    m_plot->yAxis->setTickLabelColor(TickLabelColor);
+    m_plot->xAxis->setSubTickPen(penSubTick_temp);
+    m_plot->yAxis->setSubTickPen(penSubTick_temp);
 
     //设置x(或y)轴刻度小线段标签显示在坐标轴的哪一边
     //设置坐标Tick显示位置位于坐标轴外侧
     m_plot->xAxis->setTickLabelSide(QCPAxis::lsOutside);//位于坐标轴内侧为QCPAxis::lsInside
     m_plot->yAxis->setTickLabelSide(QCPAxis::lsOutside);
+
+    //设置刻度标签的旋转（-90度到90度之间）
+    double xAxisTickLabeldegrees =0;
+    double yAxisTickLabeldegrees =0;
+    m_plot->xAxis->setTickLabelRotation(xAxisTickLabeldegrees);
+    m_plot->yAxis->setTickLabelRotation(yAxisTickLabeldegrees);
+
+    //设置范围反转
+//    bool xAxisRangereversed =true;
+//    bool yAxisRangereversed =true;
+    bool xAxisRangereversed =false;
+    bool yAxisRangereversed =false;
+    m_plot->xAxis->setRangeReversed(xAxisRangereversed);
+    m_plot->yAxis->setRangeReversed(yAxisRangereversed);
+
 
 
 
@@ -502,104 +1281,455 @@ void staticgraphPrivate::setPlot()
     for(int i=0; i<m_vctgraphObj.size(); i++)
     {
 
+
+        //以下为字体部分
+        //    bool QFont::fromString(const QString & descrip)
+        bool XAxislabelfonttempok;
+        QFont XAxislabelfonttemp;
+        XAxislabelfonttempok = XAxislabelfonttemp.fromString(m_vctgraphObj[0].m_XAxislabelFont_plot);
+        m_plot->xAxis->setLabelFont(XAxislabelfonttemp);//设置标签文字字体
+
+
+        //y轴赋成与x轴一样的字体
+        bool YAxislabelfonttempok;
+        QFont YAxislabelfonttemp;
+        YAxislabelfonttempok = YAxislabelfonttemp.fromString(m_vctgraphObj[0].m_XAxislabelFont_plot);
+        m_plot->yAxis->setLabelFont(YAxislabelfonttemp);//设置标签文字字体
+
+        bool XAxisScalelabelfonttempok;
+        QFont XAxisScalelabelfonttemp;
+        XAxisScalelabelfonttempok = XAxisScalelabelfonttemp.fromString(m_vctgraphObj[0].m_XAxisScalelabelFont_plot);
+        m_plot->xAxis->setTickLabelFont(XAxisScalelabelfonttemp);//设置刻度标签文字字体
+
+        bool YAxisScalelabelfonttempok;
+        QFont YAxisScalelabelfonttemp;
+        YAxisScalelabelfonttempok = YAxisScalelabelfonttemp.fromString(m_vctgraphObj[0].m_YAxisScalelabelFont_plot);
+        m_plot->yAxis->setTickLabelFont(YAxisScalelabelfonttemp);//设置刻度标签文字字体
+
+
         //坐标轴
-        double m_xUp    = m_vctgraphObj[i].m_Xmax_plot;   //x轴最大值
-        m_plot->xAxis->setRangeUpper(m_xUp);
 
-        double m_xDown  = m_vctgraphObj[i].m_Xmin_plot;    //x轴最小值
-        m_plot->xAxis->setRangeLower(m_xDown);
+        //设置坐标轴轴线颜色/宽度
+        //y轴赋成与x轴一样的轴线颜色/宽度
+        QPen penXAxis,penYAxis;
+        qint32 m_XAxiswideth = m_vctgraphObj[0].m_XAxiswideth_plot;
+        qint32 m_YAxiswideth = m_vctgraphObj[0].m_XAxiswideth_plot;
+        QColor m_chooseXAxisColor,m_chooseYAxisColor;
+        m_chooseXAxisColor.setNamedColor(m_vctgraphObj[0].m_chooseXAxisColor_plot);
+        m_chooseYAxisColor.setNamedColor(m_vctgraphObj[0].m_chooseXAxisColor_plot);
+        penXAxis.setColor(m_chooseXAxisColor);
+        penXAxis.setWidth(m_XAxiswideth);
+        penYAxis.setColor(m_chooseYAxisColor);
+        penYAxis.setWidth(m_YAxiswideth);
+        //设置坐标轴
+        m_plot->xAxis->setBasePen(penXAxis);
+        m_plot->yAxis->setBasePen(penYAxis);
+        m_plot->xAxis2->setBasePen(penXAxis);
+        m_plot->yAxis2->setBasePen(penYAxis);
 
-        double m_yUp    = m_vctgraphObj[i].m_Ymax_plot;    //y轴最大值
-        m_plot->yAxis->setRangeUpper(m_yUp);
-
-        double m_yDown  = m_vctgraphObj[i].m_Ymin_plot;   //y轴最小值
-        m_plot->yAxis->setRangeLower(m_yDown);
-
-        //设置x(或y)轴文本偏移
-        qint32 Offset_x,Offset_y;
-        Offset_x=m_vctgraphObj[i].m_Xoffset_plot;//设置x轴文本偏移
-        Offset_y=m_vctgraphObj[i].m_Yoffset_plot;//设置y轴文本偏移
-        //设置x(或y)轴文本偏移
-        //设置坐标轴两端到边框的距离为1
-        m_plot->xAxis->setOffset(Offset_x);
-        m_plot->yAxis->setOffset(Offset_y);
+        //轴标签、轴刻度标签的颜色全部统一成实时曲线的颜色；
+        //设置轴标签文字颜色
+        QColor m_chooseXAxisLabelColor,m_chooseYAxisLabelColor;
+        m_chooseXAxisLabelColor.setNamedColor(m_vctgraphObj[0].m_chooseXAxisLabelColor_plot);
+        m_chooseYAxisLabelColor.setNamedColor(m_vctgraphObj[0].m_chooseYAxisLabelColor_plot);
+        //设置轴标签文字颜色
+        m_plot->xAxis->setLabelColor(m_chooseXAxisLabelColor);//设置标签颜色
+        m_plot->yAxis->setLabelColor(m_chooseYAxisLabelColor);//设置标签颜色
 
 
+
+        //设置刻度标签文字颜色
+        QColor m_chooseXAxisScaleLabelColor,m_chooseYAxisScaleLabelColor;
+        m_chooseXAxisScaleLabelColor.setNamedColor(m_vctgraphObj[0].m_chooseXAxisScaleLabelColor_plot);
+        m_chooseYAxisScaleLabelColor.setNamedColor(m_vctgraphObj[0].m_chooseYAxisScaleLabelColor_plot);
+        //设置刻度标签文字颜色
+        m_plot->xAxis->setTickLabelColor(m_chooseXAxisScaleLabelColor);
+        m_plot->yAxis->setTickLabelColor(m_chooseYAxisScaleLabelColor);
+
+
+
+
+
+        //设置轴轴刻度小线段,刻度标签的可见性
+        //是否设置空白的轴线,包括: 轴轴刻度小线段,刻度标签
+        //设置轴刻度小线段的可见性
+        m_plot->xAxis->setTicks(m_vctgraphObj[0].m_chooseXAxisScaleTickdisplay_plot);
+        m_plot->yAxis->setTicks(m_vctgraphObj[0].m_chooseYAxisScaleTickdisplay_plot);
+        //设置刻度标签是否显示
+        m_plot->xAxis->setTickLabels(m_vctgraphObj[0].m_chooseXAxisScalelabeldisplay_plot);
+        m_plot->yAxis->setTickLabels(m_vctgraphObj[0].m_chooseYAxisScalelabeldisplay_plot);
+
+        //设置轴标签的可见性
         //设置x(或y)轴轴标签名称(包括x(或y)轴单位)
         QString XAxisLabel,YAxisLabel;
-        XAxisLabel = m_vctgraphObj[i].m_XAxisLabel_plot;
-        YAxisLabel = m_vctgraphObj[i].m_YAxisLabel_plot;
-        m_plot->xAxis->setLabel(XAxisLabel);//x轴标签x
-        m_plot->yAxis->setLabel(YAxisLabel);//y轴标签y
-
-        //设置所有坐标轴的可见性
-        qint32 Axis1Visible,Axis2Visible;
-        if(m_vctgraphObj[i].m_XAxisdisplay_plot)
+        XAxisLabel = m_vctgraphObj[0].m_XAxisLabel_plot;
+        YAxisLabel = m_vctgraphObj[0].m_YAxisLabel_plot;
+        if(!(m_vctgraphObj[0].m_chooseXAxislabeldisplay_plot))
         {
-            Axis1Visible=1;
+            m_plot->xAxis->setLabel(" ");
         }
         else
         {
-            Axis1Visible=0;
+            m_plot->xAxis->setLabel(XAxisLabel);//x轴标签x
+        }
+        if(!(m_vctgraphObj[0].m_chooseYAxislabeldisplay_plot))
+        {
+            m_plot->yAxis->setLabel(" ");
+        }
+        else
+        {
+            m_plot->yAxis->setLabel(YAxisLabel);//y轴标签y
+        }
+
+        //设置所有坐标轴的可见性
+        qint32 XAxisVisible,YAxisVisible;
+        if(m_vctgraphObj[0].m_XAxisdisplay_plot)
+        {
+            XAxisVisible=1;
+        }
+        else
+        {
+            XAxisVisible=0;
         }
         if(m_vctgraphObj[i].m_YAxisdisplay_plot)
         {
-            Axis2Visible=1;
+            YAxisVisible=1;
         }
         else
         {
-            Axis2Visible=0;
+            YAxisVisible=0;
         }
         //设置所有坐标轴的可见性
         //设置坐标轴1可见
-        m_plot->xAxis->setVisible(Axis1Visible);//设1为可见,0为不可见
-        m_plot->yAxis->setVisible(Axis1Visible);
+        //x轴
+        m_plot->xAxis->setVisible(XAxisVisible);//设1为可见,0为不可见
+        //y轴
+        m_plot->yAxis->setVisible(YAxisVisible);
         //设置坐标轴2可见
-        m_plot->xAxis2->setVisible(Axis2Visible);//设置坐标轴2轴线可见
-        m_plot->yAxis2->setVisible(Axis2Visible);//设置坐标轴2轴线可见
-        m_plot->xAxis2->setTicks(0);//但隐藏坐标轴2刻度标示等
-        m_plot->yAxis2->setTicks(0);//但隐藏坐标轴2刻度标示等
+        m_plot->xAxis2->setVisible(0);//设置坐标轴2轴线不可见
+        m_plot->yAxis2->setVisible(0);//设置坐标轴2轴线不可见
+        m_plot->xAxis2->setTicks(0);//设置坐标轴2刻度不可见
+        m_plot->yAxis2->setTicks(0);//设置坐标轴2刻度不可见
+
+        //设置x轴起始刻度（最小值）,结束刻度（最大值）
+        double m_xDown  = m_vctgraphObj[0].m_Xmin_plot;    //x轴起始刻度（最小值）
+        m_plot->xAxis->setRangeLower(m_xDown);
+        double m_xUp    = m_vctgraphObj[0].m_Xmax_plot;   //x轴结束刻度（最大值）
+        m_plot->xAxis->setRangeUpper(m_xUp);
+
+        //设置y轴起始刻度（最小值）,结束刻度（最大值）
+        double m_yDown  = m_vctgraphObj[0].m_Ymin_plot;   //y轴起始刻度（最小值）
+        m_plot->yAxis->setRangeLower(m_yDown);
+        double m_yUp    = m_vctgraphObj[0].m_Ymax_plot;    //y轴结束刻度（最大值）
+        m_plot->yAxis->setRangeUpper(m_yUp);
+
+
+        //设置x(或y)轴轴偏移
+        qint32 Offset_x,Offset_y;
+        Offset_x=m_vctgraphObj[0].m_Xoffset_plot;//设置x轴轴偏移
+        Offset_y=m_vctgraphObj[0].m_Yoffset_plot;//设置y轴轴偏移
+        //设置x(或y)轴轴偏移
+        //设置坐标轴到边框的距离为1
+        m_plot->xAxis->setOffset(Offset_x);
+        m_plot->yAxis->setOffset(Offset_y);
+
+        //左下、左上、右下、右上、上中、下中、正中
+
+
+//        void QCPAxis::setRange(double position, double size, Qt::AlignmentFlag alignment)
+//        {
+//          if (alignment == Qt::AlignLeft)
+//            setRange(position, position+size);
+//          else if (alignment == Qt::AlignRight)
+//            setRange(position-size, position);
+//          else // alignment == Qt::AlignCenter
+//            setRange(position-size/2.0, position+size/2.0);
+//        }
+//        m_plot->xAxis->pixelToCoord()
+
+
+//        double pixelToCoord(double value) const;//象素到坐标
+//        double coordToPixel(double value) const;//坐标到象素
+//        //可结合轴偏移和轴范围，坐标与象素的互相转换,来设定初始的坐标轴位置
+//        //象素坐标，左上角为（0，0）越往右下角为越大（xmax_Pixel,ymax_Pixel）
+//        //视图坐标，左下角为（0，0）越往右上角为越大（xmax_coord,ymax_coord）
+        double xmax_Pixel= m_plot->xAxis->coordToPixel(m_xUp);//视图坐标xUp
+        double xmin_Pixel= m_plot->xAxis->coordToPixel(m_xDown);//视图坐标xDown
+        double ymax_Pixel= m_plot->yAxis->coordToPixel(m_yDown);//视图坐标yDown
+        double ymin_Pixel= m_plot->yAxis->coordToPixel(m_yUp);//视图坐标yUp
+//        //初始的原点坐标（位于左下角）
+//        double x_Origin_first = xmin_Pixel;//左下角原点的象素坐标
+//        double y_Origin_first = ymax_Pixel;//左下角原点的象素坐标
+//        //计算各类原点的象素坐标
+//        //原点只是x轴和y轴的交点(定x轴和y轴位置)，不一定是（0，0）
+//        //设置原点位置---在画面定制时的初始位置---轴区的四个角加上轴的中点加上下两边的中点
+//        //原点的位置：左下、左上、右下、右上、上中、下中、正中
+
+        if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("左下"))
+        {
+//            //原点位于左下角
+            //计算x轴和y轴需要的位移量
+            double PixelXAxisOffset =0;
+            double PixelYAxisOffset =0;
+            //象素坐标，往右下角为越大,
+            m_plot->xAxis->setOffset(0);
+            m_plot->yAxis->setOffset(0);
+
+
+//            //左下
+//            m_plot->xAxis->setRange(m_xDown,m_xUp-m_xDown,Qt::AlignLeft);
+//            m_plot->yAxis->setRange(m_yDown,m_yUp-m_yDown,Qt::AlignLeft);
+
+        }
+        else if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("左上"))
+        {
+//            //原点位于左上角
+            //计算x轴和y轴需要的位移量
+            double PixelXAxisOffset = ymin_Pixel-ymax_Pixel;
+            double PixelYAxisOffset = 0;
+            //象素坐标，往右下角为越大,
+            m_plot->xAxis->setOffset((qint32)(PixelXAxisOffset));
+            m_plot->yAxis->setOffset(0);
+//            m_plot->xAxis->setRange(m_xDown,m_xUp-m_xDown,Qt::AlignLeft);
+//            m_plot->yAxis->setRange(m_yUp,m_yUp-m_yDown,Qt::AlignRight);
+
+        }
+        else if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("右下"))
+        {
+//            //原点位于右下角
+//            //计算x轴和y轴需要的位移量
+//            double PixelXAxisOffset = 0;
+//            double PixelYAxisOffset = xmax_Pixel-xmin_Pixel;
+//            //象素坐标，往右下角为越大,
+//            m_plot->xAxis->setOffset(0);
+//            m_plot->yAxis->setOffset((qint32)PixelYAxisOffset);
+            m_plot->xAxis->setRange(m_xUp,m_xUp-m_xDown,Qt::AlignRight);
+            m_plot->yAxis->setRange(m_yDown,m_yUp-m_yDown,Qt::AlignLeft);
+
+        }
+        else if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("右上"))
+        {
+            //原点位于右上角
+//            //计算x轴和y轴需要的位移量
+//            double PixelXAxisOffset = ymin_Pixel-ymax_Pixel;
+//            double PixelYAxisOffset = xmax_Pixel-xmin_Pixel;
+//            //象素坐标，往右下角为越大,
+//            m_plot->xAxis->setOffset(PixelXAxisOffset);
+//            m_plot->yAxis->setOffset((qint32)PixelYAxisOffset);
+            m_plot->xAxis->setRange(m_xUp,m_xUp-m_xDown,Qt::AlignRight);
+            m_plot->yAxis->setRange(m_yUp,m_yUp-m_yDown,Qt::AlignRight);
+
+        }
+        else if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("正中"))                                                       //"正中"
+        {
+            //原点位于正中
+//            //计算x轴和y轴需要的位移量
+//            double PixelXAxisOffset = (ymax_Pixel-ymin_Pixel)/2;
+//            double PixelYAxisOffset = (xmax_Pixel-xmin_Pixel)/2;
+//            //象素坐标，往右下角为越大,
+//            m_plot->xAxis->setOffset((qint32)PixelXAxisOffset);
+//            m_plot->yAxis->setOffset((qint32)PixelYAxisOffset);
+            m_plot->xAxis->setRange((m_xUp-m_xDown)/2,m_xUp-m_xDown,Qt::AlignCenter);
+            m_plot->yAxis->setRange((m_yUp-m_yDown)/2,m_yUp-m_yDown,Qt::AlignCenter);
+
+        }
+        else if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("上中"))
+        {
+//            //原点位于上中
+//            //计算x轴和y轴需要的位移量
+//            double PixelXAxisOffset =  ymin_Pixel-ymax_Pixel;
+//            double PixelYAxisOffset = (xmax_Pixel-xmin_Pixel)/2;
+//            //象素坐标，往右下角为越大,
+//            m_plot->xAxis->setOffset((qint32)PixelXAxisOffset);
+//            m_plot->yAxis->setOffset((qint32)PixelYAxisOffset);
+            m_plot->xAxis->setRange((m_xUp-m_xDown)/2,m_xUp-m_xDown,Qt::AlignCenter);
+            m_plot->yAxis->setRange(m_yUp-m_yDown,m_yUp-m_yDown,Qt::AlignCenter);
+
+        }
+        else //if(QString(m_vctgraphObj[0].m_OriginPlace_plot)==QString("下中"))
+        {
+            //原点位于下中
+//            //计算x轴和y轴需要的位移量
+//            double PixelXAxisOffset = 0;
+//            double PixelYAxisOffset = (xmax_Pixel-xmin_Pixel)/2;
+//            //象素坐标，往右下角为越大,
+//            m_plot->xAxis->setOffset((qint32)PixelXAxisOffset);
+//            m_plot->yAxis->setOffset((qint32)PixelYAxisOffset);
+            m_plot->xAxis->setRange((m_xUp-m_xDown)/2,m_xUp-m_xDown,Qt::AlignCenter);
+            m_plot->yAxis->setRange(m_yUp-m_yDown,m_yUp-m_yDown,Qt::AlignCenter);
+
+        }
+
+
+
+        //获取整个配置范围
+        double XAxisTickRange,YAxisTickRange;
+        XAxisTickRange = m_xUp-m_xDown;
+        YAxisTickRange = m_yUp-m_yDown;
+        //由获取的刻度数计算刻度间距
+        qint32 XAxisnum,YAxisnum;
+        XAxisnum = m_vctgraphObj[0].m_numOfXAxisScale_plot;
+        YAxisnum = m_vctgraphObj[0].m_numOfYAxisScale_plot;
+        //得到设置到曲线的刻度间距（比例尺）的初始值---还未对小数点进行处理
+        double NumberOfXAxisScaleprecision_temp = XAxisTickRange/XAxisnum;
+        double NumberOfYAxisScaleprecision_temp = YAxisTickRange/YAxisnum;
+        //这个很关键，必须设置好，才能很好地控制小数点后面的位数，包括末尾补0!!!
+        m_plot->xAxis->setNumberFormat("fb");
+        m_plot->yAxis->setNumberFormat("fb");
+
+        m_plot->xAxis->setNumberPrecision(m_vctgraphObj[0].m_XAxisScaleprecision_plot);//设置x(或y)轴的刻度数字精度
+        m_plot->yAxis->setNumberPrecision(m_vctgraphObj[0].m_YAxisScaleprecision_plot);
+
+
+        bool openXAxissetAutoTickCount,openYAxissetAutoTickCount;
+        if(!(NumberOfXAxisScaleprecision_temp ==0))
+        {
+            openXAxissetAutoTickCount = false;
+        }
+        if(!(NumberOfXAxisScaleprecision_temp ==0))
+        {
+            openYAxissetAutoTickCount = false;
+        }
+        m_plot->xAxis->setAutoTickStep(openXAxissetAutoTickCount);//设置刻度间距，开关函数setAutoTickStep()必须设置为false
+        m_plot->yAxis->setAutoTickStep(openYAxissetAutoTickCount);//设置刻度间距，开关函数setAutoTickStep()必须设置为false
+        m_plot->xAxis->setTickStep(NumberOfXAxisScaleprecision_temp);//设置x(或y)轴的刻度间距
+        m_plot->yAxis->setTickStep(NumberOfYAxisScaleprecision_temp);
+        //返回x轴共分配了多少个刻度
+        qint32 xAxisTickCount = m_plot->xAxis->autoTickCount();
+        //返回y轴共分配了多少个刻度
+        qint32 yAxisTickCount = m_plot->yAxis->autoTickCount();
+
+
+        //获得设置刻度标签数字的有效位数，以对刻度文本偏移的自动设置提供帮助
+        //先对刻度间距取整获得整数位数，再加上小数位数（精度值）即可
+        //x轴
+        QString str1 =QString::number((qint32)(NumberOfXAxisScaleprecision_temp));
+        qint32 numxOfinteger = str1.length();
+        qint32 numxofall = numxOfinteger + m_vctgraphObj[0].m_XAxisScaleprecision_plot+1;
+        //y轴
+        QString str2 =QString::number((qint32)(NumberOfYAxisScaleprecision_temp));
+        qint32 numyOfinteger = str2.length();
+        qint32 numyofall = numyOfinteger + m_vctgraphObj[0].m_YAxisScaleprecision_plot+1;
+
+        //设置刻度文本偏移
+        //设置刻度标签位移（单位为象素）
+        //在这里从界面设置获取刻度标签的位移量（单位为象素），再在主类中调用私有类指针将位移量传输到私有类中
+        // !!!!!这个特别重要！！！！
+        //QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针
+        //先将QString转化到double类型
+        double XAxisScalelabeloffset_x =(m_vctgraphObj[0].m_XAxisScalelabeloffset_x_plot).toDouble();
+        double XAxisScalelabeloffset_y =(m_vctgraphObj[0].m_XAxisScalelabeloffset_y_plot).toDouble();
+        double YAxisScalelabeloffset_x =(m_vctgraphObj[0].m_YAxisScalelabeloffset_x_plot).toDouble();
+        double YAxisScalelabeloffset_y =(m_vctgraphObj[0].m_YAxisScalelabeloffset_y_plot).toDouble();
+
+        //再将界面设置值赋值到程序中
+        //XAxisScalelabeloffset_x为刻度标签的位移量,numxofall刻度标签数字的有效位数(含小数点)
+        m_plot->xAxis->setXAxisTickLabeloffset_x(XAxisScalelabeloffset_x,numxofall);
+        m_plot->xAxis->setXAxisTickLabeloffset_y(XAxisScalelabeloffset_y,numxofall);
+        m_plot->yAxis->setYAxisTickLabeloffset_x(YAxisScalelabeloffset_x,numyofall);
+        m_plot->yAxis->setYAxisTickLabeloffset_y(YAxisScalelabeloffset_y,numyofall);
+
+
+
+        //刻度、子刻度全部统一成轴颜色；
+        //设置刻度颜色        
+        QPen penTick;
+        QColor m_chooseXAxisTickColor;
+        m_chooseXAxisTickColor.setNamedColor(m_vctgraphObj[0].m_chooseXAxisColor_plot);
+        penTick.setColor(m_chooseXAxisTickColor);
+        double Tickwidthf = (double)((m_vctgraphObj[0].m_XAxiswideth_plot)*0.618);
+        penTick.setWidthF(Tickwidthf);//刻度小线段宽度的设置
+        //设置刻度  颜色:白色,宽度:Tickwidthf
+        m_plot->xAxis->setTickPen(penTick);
+        m_plot->yAxis->setTickPen(penTick);
+
+        //设置子刻度
+        QPen penSubTick;
+        QColor m_chooseXAxisSubTickColor;
+        m_chooseXAxisSubTickColor.setNamedColor(m_vctgraphObj[0].m_chooseXAxisColor_plot);
+        //设置子刻度颜色
+        penSubTick.setColor(m_chooseXAxisSubTickColor);
+        //设置子刻度小线段粗细为刻度小线段粗细的0.618倍
+        double SubTickWidthf = Tickwidthf *0.618;
+        penSubTick.setWidthF(SubTickWidthf);
+        //设置子刻度 颜色:白色,宽度:SubTickWidthf
+        m_plot->xAxis->setSubTickPen(penSubTick);
+        m_plot->yAxis->setSubTickPen(penSubTick);
+
+
+
+        //设置x(或y)轴刻度小线段标签显示在坐标轴的哪一边
+        //设置坐标刻度小线段标签显示于坐标轴外侧        
+        if(QString(m_vctgraphObj[0].m_Scalelabelplace_x_plot)==QString("内侧"))
+        {
+            m_plot->xAxis->setTickLabelSide(QCPAxis::lsInside);//位于坐标轴内侧为QCPAxis::lsInside
+        }
+        else
+        {
+            m_plot->xAxis->setTickLabelSide(QCPAxis::lsOutside);//位于坐标轴外侧为QCPAxis::lsOutside
+
+        }
+
+        if(QString(m_vctgraphObj[0].m_Scalelabelplace_y_plot)==QString("内侧"))
+        {
+            m_plot->yAxis->setTickLabelSide(QCPAxis::lsInside);//位于坐标轴内侧为QCPAxis::lsInside
+        }
+        else
+        {
+            m_plot->yAxis->setTickLabelSide(QCPAxis::lsOutside);//位于坐标轴外侧为QCPAxis::lsOutside
+
+        }
+
 
         //设置刻度小线段位置
+        //刻度小线段长度的设置
+        //qint32 m_XAxisScaleRuler_plot ;
+        //qint32 m_YAxisScaleRuler_plot ;
         //设置刻度小线段长度:向里伸出多少，向外伸出多少
-        qint32 TickLengthinside,TickLengthinoutside;
-        if(QString(m_vctgraphObj[i].m_Scaleplace_x_plot)==QString("上"))
+        qint32 XAxisTickLengthinside,XAxisTickLengthoutside;
+        qint32 YAxisTickLengthinside,YAxisTickLengthoutside;
+        if(QString(m_vctgraphObj[0].m_Scaleplace_x_plot)==QString("上"))
         {
-            TickLengthinside=10;
-            TickLengthinoutside=0;
+            XAxisTickLengthinside = m_vctgraphObj[0].m_XAxisScaleRuler_plot;
+            XAxisTickLengthoutside=0;
         }
-        else if(QString(m_vctgraphObj[i].m_Scaleplace_x_plot)==QString("中"))
+        else if(QString(m_vctgraphObj[0].m_Scaleplace_x_plot)==QString("中"))
         {
-            TickLengthinside=5;
-            TickLengthinoutside=-5;
+            XAxisTickLengthinside=(m_vctgraphObj[0].m_XAxisScaleRuler_plot)/2;
+            XAxisTickLengthoutside=(m_vctgraphObj[0].m_XAxisScaleRuler_plot)/2;
         }
         else                                             //"下"
         {
-            TickLengthinside=0;
-            TickLengthinoutside=-10;
+            XAxisTickLengthinside = 0;
+            XAxisTickLengthoutside = m_vctgraphObj[0].m_XAxisScaleRuler_plot;
         }
-        if(QString(m_vctgraphObj[i].m_Scaleplace_y_plot)==QString("右"))
+
+        if(QString(m_vctgraphObj[0].m_Scaleplace_y_plot)==QString("右"))
         {
-            TickLengthinside=10;
-            TickLengthinoutside=0;
+            YAxisTickLengthinside = m_vctgraphObj[0].m_YAxisScaleRuler_plot;
+            YAxisTickLengthoutside=0;
         }
-        else if(QString(m_vctgraphObj[i].m_Scaleplace_y_plot)==QString("中"))
+        else if(QString(m_vctgraphObj[0].m_Scaleplace_y_plot)==QString("中"))
         {
-            TickLengthinside=5;
-            TickLengthinoutside=-5;
+            YAxisTickLengthinside = (m_vctgraphObj[0].m_YAxisScaleRuler_plot)/2;
+            YAxisTickLengthoutside=(m_vctgraphObj[0].m_YAxisScaleRuler_plot)/2;
         }
-        else                                          //"右"
+        else                                          //"左"
         {
-            TickLengthinside=0;
-            TickLengthinoutside=-10;
+            YAxisTickLengthinside = 0;
+            YAxisTickLengthoutside = m_vctgraphObj[0].m_YAxisScaleRuler_plot;
         }
-        //    TickLengthinside=8;
-        //    TickLengthinoutside=-2;
-        //void setTickLength(int inside, int outside=0);//设置刻度小线段长度:向里伸出多少，向外伸出多少
-        m_plot->xAxis->setTickLength(TickLengthinside,TickLengthinoutside);
-        m_plot->yAxis->setTickLength(TickLengthinside,TickLengthinoutside);
 
 
+        m_plot->xAxis->setTickLengthIn(XAxisTickLengthinside);
+        m_plot->xAxis->setTickLengthOut(XAxisTickLengthoutside);
+        m_plot->yAxis->setTickLengthIn(YAxisTickLengthinside);
+        m_plot->yAxis->setTickLengthOut(YAxisTickLengthoutside);
+        //子刻度的小线段长度设置为刻度的小线段长度的0.618倍
+        m_plot->xAxis->setSubTickLengthIn(XAxisTickLengthinside*0.618);
+        m_plot->xAxis->setSubTickLengthOut(XAxisTickLengthoutside*0.618);
+        m_plot->yAxis->setSubTickLengthIn(YAxisTickLengthinside*0.618);
+        m_plot->yAxis->setSubTickLengthOut(YAxisTickLengthoutside*0.618);
 
         //实时曲线
         //设置实时曲线名称
@@ -609,6 +1739,13 @@ void staticgraphPrivate::setPlot()
         //设置实时曲线宽度/颜色
         qint32 m_graphWidth;
         QColor m_graphColor;
+
+        //设置理论曲线风格:直线/散点
+        QCPGraph::LineStyle GraphStyle;
+        //设置理论特殊显示----显示为散点
+        GraphStyle=QCPGraph::lsNone;
+        m_vctgraphObj[i].m_pgraph->setLineStyle(GraphStyle);
+
         m_graphWidth=m_vctgraphObj[i].m_GraphWidth_plot;
         m_graphColor.setNamedColor(m_vctgraphObj[i].m_strgraphColor_plot);
         m_vctgraphObj[i].m_pgraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_graphColor,m_graphWidth));
@@ -626,6 +1763,11 @@ void staticgraphPrivate::setPlot()
         m_paramY = m_vctgraphObj[i].m_yParam_plot; //初始实时曲线输入单参数数据Y变量
 
 
+        //绘制当前点，以黄色绘制宝石形状---闪烁点
+        m_vctgraphObj[i].m_pgraphLast->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDiamond, Qt::yellow, m_vctgraphObj[i].m_GraphWidth_plot+6));
+
+
+
         //理论曲线
 
         //设置理论曲线名称
@@ -637,17 +1779,151 @@ void staticgraphPrivate::setPlot()
         qint32 m_LgraphWidth;
         QColor m_LgraphColor;
 
+        //设置理论曲线风格:直线/散点
+        QCPGraph::LineStyle LGraphStyle;
+        //设置理论特殊显示----显示为散点
+        LGraphStyle=QCPGraph::lsNone;
+        m_vctgraphObj[i].m_pLgraph->setLineStyle(LGraphStyle);
+
         m_LgraphWidth=m_vctgraphObj[i].m_LGraphWidth_plot;
         m_LgraphColor.setNamedColor(m_vctgraphObj[i].m_strLgraphColor_plot);
-//        m_LgraphWidth=3;
-//        m_LgraphColor.setRgb(223,223,223,223);//灰色
         m_vctgraphObj[i].m_pLgraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_LgraphColor,m_LgraphWidth));
+
 
         //设置理论曲线缓冲区大小
         double m_LGraphBuffer;
         m_LGraphBuffer = m_vctgraphObj[i].m_LGraphBuffer_plot;
 
         //设置理论曲线数据(文件(路径))
+
+        /*
+        //设置实时曲线风格
+        //散点
+        //设置显示实时曲线
+//        m_vctgraphObj[i].m_pgraph->setVisible(true);
+        //设置曲线风格:直线/散点
+        QCPGraph::LineStyle GraphStyle;
+        //设置特殊显示----显示为散点
+        GraphStyle=QCPGraph::lsNone;
+//        //设置特殊显示----显示为直线
+//        GraphStyle=QCPGraph::lsLine;
+
+        if(GraphStyle==QCPGraph::lsNone)//散点
+        {
+            GraphStyle=QCPGraph::lsNone;
+
+            QCPScatterStyle scatterscatterStyle;//设置点散点形式
+            //散点大小
+            scatterscatterStyle.setSize(m_graphWidth);
+            //散点画笔
+            QPen ScatterStylepen;
+            ScatterStylepen.setColor(m_graphColor);
+            ScatterStylepen.setWidth(1);
+            scatterscatterStyle.setPen(ScatterStylepen);
+            //散点画刷
+            QBrush ScatterStylebrush;
+            ScatterStylebrush.setColor(m_graphColor);
+            scatterscatterStyle.setBrush(ScatterStylebrush);
+            //散点形状
+            QCPScatterStyle::ScatterShape scatterShape;
+            scatterShape=QCPScatterStyle::ssDiamond;
+            //散点形状:QCPScatterStyle::ssDiamond(宝石型)，
+            //scatterShape(散点形状)包括以下种类：
+            //     ssNone,ssDot,ssCross,ssPlus,ssCircle,ssDisc,ssSquare,ssDiamond,
+            //     ssStar,ssTriangle,,ssTriangleInverted,,ssCrossSquare,ssPlusSquare,
+            //     ssCrossCircle,ssPlusCircle,ssPeace,ssPixmap,ssCustom
+            scatterscatterStyle.setShape(scatterShape);
+
+            m_vctgraphObj[i].m_pgraph->setScatterStyle(scatterscatterStyle);
+        }
+        else//直线连线
+        {
+            //LineStyle:lsNone,lsLine,lsStepLeft,lsStepRight,lsStepCenter,lsImpulse
+            GraphStyle=QCPGraph::lsLine;
+            m_vctgraphObj[i].m_pgraph->setLineStyle(GraphStyle);
+
+            QCPScatterStyle linescatterStyle;//设置直线点形式
+            //直线点点大小
+            linescatterStyle.setSize(m_graphWidth);
+            //直线点点画笔
+            QPen ScatterStylepen;
+            ScatterStylepen.setColor(m_graphColor);
+            ScatterStylepen.setWidth(1);
+            linescatterStyle.setPen(ScatterStylepen);
+            //直线点点画刷
+            QBrush ScatterStylebrush;
+            ScatterStylebrush.setColor(m_graphColor);
+            linescatterStyle.setBrush(ScatterStylebrush);
+
+            m_vctgraphObj[i].m_pgraph->setScatterStyle(linescatterStyle);
+
+        }
+
+//        //设置理论曲线风格
+//        //散点
+//        //设置显示理论曲线
+////        m_vctgraphObj[i].m_pLgraph->setVisible(true);
+//        //设置曲线风格:直线/散点
+//        QCPGraph::LineStyle LGraphStyle;
+//        //设置特殊显示----显示为直线
+//        LGraphStyle=QCPGraph::lsLine;
+
+//        if(LGraphStyle==QCPGraph::lsNone)//散点
+//        {
+//            LGraphStyle=QCPGraph::lsNone;
+
+//            QCPScatterStyle LscatterscatterStyle;//设置点散点形式
+//            //散点大小
+//            LscatterscatterStyle.setSize(m_LgraphWidth);
+//            //散点画笔
+//            QPen LScatterStylepen;
+//            LScatterStylepen.setColor(m_LgraphColor);
+//            LScatterStylepen.setWidth(1);
+//            LscatterscatterStyle.setPen(LScatterStylepen);
+//            //散点画刷
+//            QBrush LScatterStylebrush;
+//            LScatterStylebrush.setColor(m_LgraphColor);
+//            LscatterscatterStyle.setBrush(LScatterStylebrush);
+//            //散点形状
+//            QCPScatterStyle::ScatterShape LscatterShape;
+//            LscatterShape=QCPScatterStyle::ssDiamond;
+//            //散点形状:QCPScatterStyle::ssDiamond(宝石型)，
+//            //scatterShape(散点形状)包括以下种类：
+//            //     ssNone,ssDot,ssCross,ssPlus,ssCircle,ssDisc,ssSquare,ssDiamond,
+//            //     ssStar,ssTriangle,,ssTriangleInverted,,ssCrossSquare,ssPlusSquare,
+//            //     ssCrossCircle,ssPlusCircle,ssPeace,ssPixmap,ssCustom
+//            LscatterscatterStyle.setShape(LscatterShape);
+
+//            m_vctgraphObj[i].m_pLgraph->setScatterStyle(LscatterscatterStyle);
+//        }
+//        else//直线连线
+//        {
+//            //LineStyle:
+//            //lsNone(点),lsLine(普通线),lsImpulse(以点画脉冲),
+//            //lsStepLeft(点位于台阶左边的连线),
+//            //lsStepRight(点位于台阶右边的连线),
+//            //lsStepCenter(点位于台阶中间的连线),
+//            LGraphStyle=QCPGraph::lsLine;
+//            m_vctgraphObj[i].m_pLgraph->setLineStyle(LGraphStyle);
+
+//            QCPScatterStyle LlinescatterStyle;//设置直线点形式
+//            //直线点点大小
+//            LlinescatterStyle.setSize(m_LgraphWidth);
+//            //直线点点画笔
+//            QPen LScatterStylepen;
+//            LScatterStylepen.setColor(m_LgraphColor);
+//            LScatterStylepen.setWidth(1);
+//            LlinescatterStyle.setPen(LScatterStylepen);
+//            //直线点点画刷
+//            QBrush LScatterStylebrush;
+//            LScatterStylebrush.setColor(m_LgraphColor);
+//            LlinescatterStyle.setBrush(LScatterStylebrush);
+
+//            m_vctgraphObj[i].m_pLgraph->setScatterStyle(LlinescatterStyle);
+
+//        }
+
+*/
 
     }
 }
@@ -725,73 +2001,6 @@ void staticgraphPrivate::setPlot()
 
 }
 
-//个性部分，需要每条曲线单独设置
-//设置个性特征----在多曲线配置对话框进行配置
-
-
-//理论曲线
-void staticgraphPrivate::setPlot1()
-{
-    //显示曲线1
-    m_plot->graph(0)->setVisible(true);
-
-    //设置曲线风格:直线/散点
-    QCPGraph::LineStyle GraphStyle;
-    //设置特殊显示
-    GraphStyle=QCPGraph::lsNone;
-
-    if(!(GraphStyle==QCPGraph::lsNone))//直线连线
-    {
-        //LineStyle:lsNone,lsLine,lsStepLeft,lsStepRight,lsStepCenter,lsImpulse
-        GraphStyle=QCPGraph::lsLine;
-        m_plot->graph(0)->setLineStyle(GraphStyle);
-
-        QCPScatterStyle linescatterStyle;//设置直线散点形式
-        //散点大小
-        linescatterStyle.setSize(LgraphWidth());
-        //散点画笔
-        QPen ScatterStylepen;
-        ScatterStylepen.setColor(LgraphColor());
-        ScatterStylepen.setWidth(1);
-        linescatterStyle.setPen(ScatterStylepen);
-        //散点画刷
-        QBrush ScatterStylebrush;
-        ScatterStylebrush.setColor(LgraphColor());
-        linescatterStyle.setBrush(ScatterStylebrush);
-
-        m_plot->graph(0)->setScatterStyle(linescatterStyle);
-
-    }
-    else//散点
-    {
-        GraphStyle=QCPGraph::lsNone;
-
-        QCPScatterStyle scatterscatterStyle;//设置点散点形式
-        //散点大小
-        scatterscatterStyle.setSize(LgraphWidth());
-        //散点画笔
-        QPen ScatterStylepen;
-        ScatterStylepen.setColor(LgraphColor());
-        ScatterStylepen.setWidth(1);
-        scatterscatterStyle.setPen(ScatterStylepen);
-        //散点画刷
-        QBrush ScatterStylebrush;
-        ScatterStylebrush.setColor(LgraphColor());
-        scatterscatterStyle.setBrush(ScatterStylebrush);
-        //散点形状
-        QCPScatterStyle::ScatterShape scatterShape;
-        scatterShape=QCPScatterStyle::ssDiamond;//散点形状:QCPScatterStyle::ssDiamond
-        //scatterShape:ssNone,ssDot,ssCross,ssPlus,ssCircle,ssDisc,ssSquare,ssDiamond,
-        //     ssStar,ssTriangle,,ssTriangleInverted,,ssCrossSquare,ssPlusSquare,ssCrossCircle,
-        //     ssPlusCircle,ssPeace,ssPixmap,ssCustom
-        scatterscatterStyle.setShape(scatterShape);
-
-        m_plot->graph(0)->setScatterStyle(scatterscatterStyle);
-    }
-
-
-
-}
 
 */
 
@@ -835,13 +2044,21 @@ void staticgraphPrivate::getData()
         //把取到的全部x的值存入数组m_Cx
         foreach (double tx, x) {
             m_vctgraphObj[i].m_Cx.append(tx);//在容器m_Cx末尾添加tx
+
+            m_vctgraphObj[i].m_CxLast.clear();
+            m_vctgraphObj[i].m_CxLast.append(tx);
         }
         //把取到的全部y的值存入数组m_Cy
         foreach (double ty, y) {
-            m_vctgraphObj[i].m_Cy.append(ty);//在容器m_y末尾添加ty
+            m_vctgraphObj[i].m_Cy.append(ty);//在容器m_Cy末尾添加ty
+
+            m_vctgraphObj[i].m_CyLast.clear();
+            m_vctgraphObj[i].m_CyLast.append(ty);
         }
         //把曲线的值设置为刚才的两个数组
         m_vctgraphObj[i].m_pgraph->setData(m_vctgraphObj[i].m_Cx, m_vctgraphObj[i].m_Cy);//键值，值
+        m_vctgraphObj[i].m_pgraphLast->setData(m_vctgraphObj[i].m_CxLast, m_vctgraphObj[i].m_CyLast);
+
     }
 }
 
@@ -912,7 +2129,7 @@ void staticgraphPrivate::getData_Test()
 /*****需求******
 //曲线
 //已实现包括：(1) 曲线风格、曲线画笔、曲线形状、曲线名称、是否显示某条曲线
-//            支持特殊显示(如:直线连线、钻石形标记等)、曲线缓冲区;
+//            支持特殊显示(如:直线连线、钻石形刻度等)、曲线缓冲区;
 //          (2) 目标增减、应用QTabWidget类实现多曲线配置中配置相关函数的添加
 //          (3) 实现多曲线配置对话框的配置数据的封装（json生成），并实现向主类的数据传输;
 //               及在主类的Json数据解析（json解析）,并赋值到到曲线类中。
@@ -922,7 +2139,7 @@ void staticgraphPrivate::getData_Test()
 //1 原始坐标体系。  (右键可选择点击：在实时模式进行了拖动、缩放之后，右键可以选择单击回复到一开始的定制画面。)
 //2 自适应数据。   （右键可选择点击：找出x、y数据各自的最大值最小值，把这个作出的矩形放到画面中间）
 //3 T0获取。      (T0获取并根据T0(靶弹，未定义，拦截弹）计算相对时弹道及清屏。)
-//4 样式显示。     (曲线按照某种样式进行显示，如某个区间显示某种颜色，某种标记，大小等。)(增加到属性中)
+//4 样式显示。     (曲线按照某种样式进行显示，如某个区间显示某种颜色，某种刻度，大小等。)(增加到属性中)
 //5 显示模式。     (固定显示模式（在staticgraph工程）、滚动显示模式（在rollinggraph工程）。)
 //6 界面修改。    （双击修改界面部分简单参数配置的功能。）
 

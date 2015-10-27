@@ -1,6 +1,7 @@
 QT += widgets testlib
 
-SOURCES = testformula.cpp
+SOURCES = \
+    testdatacenter.cpp
 
 load(qt_build_paths)
 DESTDIR = $$MODULE_BASE_OUTDIR/bin
@@ -12,10 +13,10 @@ isEmpty(MODULE_QMAKE_OUTDIR): MODULE_QMAKE_OUTDIR = $$MODULE_BASE_OUTDIR
 
 #begin andrew ,20150327
 win32:CONFIG(release, debug|release){
-    LIBS += $$MODULE_BASE_OUTDIR/lib/Qt5net.dll
+    LIBS += $$MODULE_BASE_OUTDIR/lib/net.dll
 }
 else:win32:CONFIG(debug, debug|release){
-    LIBS += $$MODULE_BASE_OUTDIR/lib/Qt5netd.dll
+    LIBS += $$MODULE_BASE_OUTDIR/lib/netd.dll
 }
 else:unix:LIBS += -L$$MODULE_BASE_OUTDIR/lib/ -lnet
 #INCLUDEPATH += $$MODULE_BASE_OUTDIR/lib/
@@ -29,3 +30,5 @@ INCLUDEPATH += $$MODULE_BASE_INDIR/include/QtDesigner/5.3.1 \
 # install
 #target.path = $$[QT_INSTALL_EXAMPLES]/qtestlib/net_test
 #INSTALLS += target
+
+HEADERS +=

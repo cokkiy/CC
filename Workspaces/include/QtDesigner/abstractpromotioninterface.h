@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractpromotioninterface.h"
+#include "../../src/designer/src/lib/sdk/abstractpromotioninterface.h"

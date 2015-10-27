@@ -96,6 +96,7 @@ public:
     QActionGroup *windowActions() const;
     QActionGroup *toolActions() const;
     QActionGroup *helpActions() const;
+    QActionGroup *functionActions() const;
     QActionGroup *uiMode() const;
     QActionGroup *styleActions() const;
     // file actions
@@ -145,6 +146,7 @@ private slots:
     void closeForm();
     void showDesignerHelp();
     void aboutDesigner();
+    void outData();
     void showWidgetSpecificHelp();
     void backupForms();
     void showNewFormDialog(const QString &fileName);
@@ -173,6 +175,11 @@ private:
     QString fixResourceFileBackupPath(QDesignerFormWindowInterface *fwi, const QDir& backupDir);
     void showStatusBarMessage(const QString &message) const;
     QActionGroup *createHelpActions();
+
+    //添加功能菜单 rika 20151019
+    QActionGroup *createFunctionActions();
+
+
     bool ensureBackupDirectories();
     QPixmap createPreviewPixmap(QDesignerFormWindowInterface *fw);
     qdesigner_internal::PreviewConfiguration previewConfiguration();
@@ -200,6 +207,7 @@ private:
     QActionGroup *m_toolActions;
     QActionGroup *m_helpActions;
     QActionGroup *m_styleActions;
+    QActionGroup *m_functionActions;//Rika add 20151019
 
     QAction *m_editWidgetsAction;
 

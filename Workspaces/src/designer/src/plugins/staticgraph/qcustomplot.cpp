@@ -4764,7 +4764,7 @@ void QCPAxis::setNumberFormat(const QString &formatCode)
   scaling (the redundant "1 [multiplication sign]" part). To only display the decimal power "10
   [superscript] n", set \a precision to zero.
 */
-void QCPAxis::setNumberPrecision(int precision)
+void QCPAxis::setNumberPrecision(int precision)//Sets the precision of the tick label numbers
 {
   if (mNumberPrecision != precision)
   {
@@ -5838,6 +5838,12 @@ void QCPAxis::draw(QCPPainter *painter)
   mAxisPainter->tickPositions = tickPositions;
   mAxisPainter->tickLabels = tickLabels;
   mAxisPainter->subTickPositions = subTickPositions;
+  //在这里将主类中轴的刻度标签的位移量传输到私有类中
+  mAxisPainter->m_XAxisTickLabeloffset_x = getXAxisTickLabeloffset_x();
+  mAxisPainter->m_XAxisTickLabeloffset_y = getXAxisTickLabeloffset_y();
+  mAxisPainter->m_YAxisTickLabeloffset_x = getYAxisTickLabeloffset_x();
+  mAxisPainter->m_YAxisTickLabeloffset_y = getYAxisTickLabeloffset_y();
+
   mAxisPainter->draw(painter);
 }
 
@@ -5983,6 +5989,64 @@ QColor QCPAxis::getLabelColor() const
 {
   return mSelectedParts.testFlag(spAxisLabel) ? mSelectedLabelColor : mLabelColor;
 }
+
+//在这里将主类中轴的刻度标签的位移量传输到私有类中
+void QCPAxis::setXAxisTickLabeloffset_x(double X_x,qint32 numxofall_x)
+{
+    m_numxofall_x = numxofall_x;
+    double X_x_temp1 = X_x;
+    qint32 X_x_temp2 = (qint32)X_x_temp1;
+
+    if(X_x_temp2==-15)//用户保持-15初值未作设置的情况
+    {
+        if(m_numxofall_x <8)//7位及7位有效数字以下，固定设为-15（单位为象素）
+        {
+            m_XAxisTickLabeloffset_x = -15;
+        }
+        else       //8位及8位有效数字以上（含小数点），每增长一位减去5个象素
+        {
+            m_XAxisTickLabeloffset_x = -15-(m_numxofall_x-7)*5;
+        }
+    }
+    else//用户自己设置其他值的情况
+    {
+
+         if(m_numxofall_x >8) //对于8位及8位有效数字以上（含小数点），检查用户的设置是否合法（必须比-15还要多减）
+         {
+             if((qAbs(X_x_temp2))<(qAbs(-15-(m_numxofall_x-7)*5)))
+             {
+                 m_XAxisTickLabeloffset_x = -15-(m_numxofall_x-7)*5;
+             }
+             else
+             {
+                m_XAxisTickLabeloffset_x = X_x;
+             }
+         }
+         else
+         {
+             m_XAxisTickLabeloffset_x = X_x;
+         }
+
+    }
+
+
+}
+void QCPAxis::setXAxisTickLabeloffset_y(double X_y,qint32 numxofall_y)
+{
+    m_numxofall_y = numxofall_y;
+    m_XAxisTickLabeloffset_y = X_y;
+}
+void QCPAxis::setYAxisTickLabeloffset_x(double Y_x,qint32 numyofall_x)
+{
+    m_numyofall_x = numyofall_x;
+    m_YAxisTickLabeloffset_x = Y_x;
+}
+void QCPAxis::setYAxisTickLabeloffset_y(double Y_y,qint32 numyofall_y)
+{
+    m_numyofall_y = numyofall_y;
+    m_YAxisTickLabeloffset_y = Y_y;
+}
+
 
 /*! \internal
 
@@ -6207,7 +6271,13 @@ void QCPAxisPainterPrivate::draw(QCPPainter *painter)
     if (tickLabelSide == QCPAxis::lsInside)
       distanceToAxis = -(qMax(tickLengthIn, subTickLengthIn)+tickLabelPadding);
     for (int i=0; i<maxLabelIndex; ++i)
-      placeTickLabel(painter, tickPositions.at(i), distanceToAxis, tickLabels.at(i), &tickLabelsSize);
+//      placeTickLabel(painter, tickPositions.at(i), distanceToAxis, tickLabels.at(i), &tickLabelsSize);
+     //放置刻度标签 zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+     placeTickLabel(painter, tickPositions.at(i),
+            distanceToAxis,tickLabels.at(i), &tickLabelsSize,
+            m_XAxisTickLabeloffset_x,m_XAxisTickLabeloffset_y,
+            m_YAxisTickLabeloffset_x,m_YAxisTickLabeloffset_y);
+
     if (tickLabelSide == QCPAxis::lsOutside)
       margin += (QCPAxis::orientation(type) == Qt::Horizontal) ? tickLabelsSize.height() : tickLabelsSize.width();
   }
@@ -6381,18 +6451,38 @@ QByteArray QCPAxisPainterPrivate::generateLabelParameterHash() const
   superscripted powers, the font is temporarily made smaller by a fixed factor (see \ref
   getTickLabelData).
 */
+//放置刻度标签
 void QCPAxisPainterPrivate::placeTickLabel(QCPPainter *painter, double position, int distanceToAxis, const QString &text, QSize *tickLabelsSize)
 {
   // warning: if you change anything here, also adapt getMaxTickLabelSize() accordingly!
   if (text.isEmpty()) return;
   QSize finalSize;
   QPointF labelAnchor;
+
+  //zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+  QPointF XAxisPTickLabelDrawOffset;
+  QPointF YAxisPTickLabelDrawOffset;
+  double XAxisTickLabelDrawOffset_x =0.0;
+  double XAxisTickLabelDrawOffset_y =0.0;
+  double YAxisTickLabelDrawOffset_x =0.0;
+  double YAxisTickLabelDrawOffset_y =0.0;
+  //zjb add :水平轴增加XAxisPTickLabelDrawOffset, 单位为象素
+  XAxisPTickLabelDrawOffset = QPointF(XAxisTickLabelDrawOffset_x, XAxisTickLabelDrawOffset_y);
+  //zjb add :垂直轴减少YAxisPTickLabelDrawOffset, 单位为象素
+  YAxisPTickLabelDrawOffset = QPointF(YAxisTickLabelDrawOffset_x, YAxisTickLabelDrawOffset_y);
+
+  //zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+  //type代表不同的轴类型
   switch (type)
   {
-    case QCPAxis::atLeft:   labelAnchor = QPointF(axisRect.left()-distanceToAxis-offset, position); break;
-    case QCPAxis::atRight:  labelAnchor = QPointF(axisRect.right()+distanceToAxis+offset, position); break;
-    case QCPAxis::atTop:    labelAnchor = QPointF(position, axisRect.top()-distanceToAxis-offset); break;
-    case QCPAxis::atBottom: labelAnchor = QPointF(position, axisRect.bottom()+distanceToAxis+offset); break;
+    case QCPAxis::atLeft:
+      labelAnchor = YAxisPTickLabelDrawOffset+QPointF(axisRect.left()-distanceToAxis-offset, position); break;
+    case QCPAxis::atRight:
+      labelAnchor = YAxisPTickLabelDrawOffset+QPointF(axisRect.right()+distanceToAxis+offset, position); break;
+    case QCPAxis::atTop:
+      labelAnchor = XAxisPTickLabelDrawOffset+QPointF(position, axisRect.top()-distanceToAxis-offset); break;
+    case QCPAxis::atBottom:
+      labelAnchor = XAxisPTickLabelDrawOffset+QPointF(position, axisRect.bottom()+distanceToAxis+offset); break;
   }
   if (mParentPlot->plottingHints().testFlag(QCP::phCacheLabels) && !painter->modes().testFlag(QCPPainter::pmNoCaching)) // label caching enabled
   {
@@ -6430,6 +6520,111 @@ void QCPAxisPainterPrivate::placeTickLabel(QCPPainter *painter, double position,
   } else // label caching disabled, draw text directly on surface:
   {
     TickLabelData labelData = getTickLabelData(painter->font(), text);
+
+
+    //zjb add :在这里获取最终的刻度标签坐标  zjbTickLabelDrawOffset 2015-10-23
+    QPointF finalPosition = labelAnchor + getTickLabelDrawOffset(labelData);
+    // if label would be partly clipped by widget border on sides, don't draw it (only for outside tick labels):
+    if (tickLabelSide == QCPAxis::lsOutside)
+    {
+      if (QCPAxis::orientation(type) == Qt::Horizontal)
+      {
+        if (finalPosition.x()+(labelData.rotatedTotalBounds.width()+labelData.rotatedTotalBounds.left()) > viewportRect.right() ||
+            finalPosition.x()+labelData.rotatedTotalBounds.left() < viewportRect.left())
+          return;
+      } else
+      {
+        if (finalPosition.y()+(labelData.rotatedTotalBounds.height()+labelData.rotatedTotalBounds.top()) > viewportRect.bottom() ||
+            finalPosition.y()+labelData.rotatedTotalBounds.top() < viewportRect.top())
+          return;
+      }
+    }
+    drawTickLabel(painter, finalPosition.x(), finalPosition.y(), labelData);
+    finalSize = labelData.rotatedTotalBounds.size();
+  }
+
+  // expand passed tickLabelsSize if current tick label is larger:
+  if (finalSize.width() > tickLabelsSize->width())
+    tickLabelsSize->setWidth(finalSize.width());
+  if (finalSize.height() > tickLabelsSize->height())
+    tickLabelsSize->setHeight(finalSize.height());
+}
+
+//放置刻度标签 zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+void QCPAxisPainterPrivate::placeTickLabel(QCPPainter *painter, double position,
+        int distanceToAxis,const QString &text, QSize *tickLabelsSize,
+        double XAxisTickLabeloffset_x,double XAxisTickLabeloffset_y,
+        double YAxisTickLabeloffset_x,double YAxisTickLabeloffset_y)
+{
+  // warning: if you change anything here, also adapt getMaxTickLabelSize() accordingly!
+  if (text.isEmpty()) return;
+  QSize finalSize;
+  QPointF labelAnchor;
+
+  //zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+  QPointF XAxisPTickLabelDrawOffset;
+  QPointF YAxisPTickLabelDrawOffset;
+  double XAxisTickLabelDrawOffset_x = XAxisTickLabeloffset_x;//-20.0,向左移动20个象素
+  double XAxisTickLabelDrawOffset_y = XAxisTickLabeloffset_y;
+  double YAxisTickLabelDrawOffset_x = YAxisTickLabeloffset_x;
+  double YAxisTickLabelDrawOffset_y = YAxisTickLabeloffset_y;
+  //zjb add :水平轴增加XAxisPTickLabelDrawOffset, 单位为象素
+  XAxisPTickLabelDrawOffset = QPointF(XAxisTickLabelDrawOffset_x, XAxisTickLabelDrawOffset_y);
+  //zjb add :垂直轴减少YAxisPTickLabelDrawOffset, 单位为象素
+  YAxisPTickLabelDrawOffset = QPointF(YAxisTickLabelDrawOffset_x, YAxisTickLabelDrawOffset_y);
+
+  //zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+  //type代表不同的轴类型
+  switch (type)
+  {
+    case QCPAxis::atLeft:
+      labelAnchor = YAxisPTickLabelDrawOffset+QPointF(axisRect.left()-distanceToAxis-offset, position); break;
+    case QCPAxis::atRight:
+      labelAnchor = YAxisPTickLabelDrawOffset+QPointF(axisRect.right()+distanceToAxis+offset, position); break;
+    case QCPAxis::atTop:
+      labelAnchor = XAxisPTickLabelDrawOffset+QPointF(position, axisRect.top()-distanceToAxis-offset); break;
+    case QCPAxis::atBottom:
+      labelAnchor = XAxisPTickLabelDrawOffset+QPointF(position, axisRect.bottom()+distanceToAxis+offset); break;
+  }
+  if (mParentPlot->plottingHints().testFlag(QCP::phCacheLabels) && !painter->modes().testFlag(QCPPainter::pmNoCaching)) // label caching enabled
+  {
+    if (!mLabelCache.contains(text))  // no cached label exists, create it
+    {
+      CachedLabel *newCachedLabel = new CachedLabel;
+      TickLabelData labelData = getTickLabelData(painter->font(), text);
+      newCachedLabel->offset = getTickLabelDrawOffset(labelData)+labelData.rotatedTotalBounds.topLeft();
+      newCachedLabel->pixmap = QPixmap(labelData.rotatedTotalBounds.size());
+      newCachedLabel->pixmap.fill(Qt::transparent);
+      QCPPainter cachePainter(&newCachedLabel->pixmap);
+      cachePainter.setPen(painter->pen());
+      drawTickLabel(&cachePainter, -labelData.rotatedTotalBounds.topLeft().x(), -labelData.rotatedTotalBounds.topLeft().y(), labelData);
+      mLabelCache.insert(text, newCachedLabel, 1);
+    }
+    // draw cached label:
+    const CachedLabel *cachedLabel = mLabelCache.object(text);
+    // if label would be partly clipped by widget border on sides, don't draw it (only for outside tick labels):
+    if (tickLabelSide == QCPAxis::lsOutside)
+    {
+      if (QCPAxis::orientation(type) == Qt::Horizontal)
+      {
+        if (labelAnchor.x()+cachedLabel->offset.x()+cachedLabel->pixmap.width() > viewportRect.right() ||
+            labelAnchor.x()+cachedLabel->offset.x() < viewportRect.left())
+          return;
+      } else
+      {
+        if (labelAnchor.y()+cachedLabel->offset.y()+cachedLabel->pixmap.height() >viewportRect.bottom() ||
+            labelAnchor.y()+cachedLabel->offset.y() < viewportRect.top())
+          return;
+      }
+    }
+    painter->drawPixmap(labelAnchor+cachedLabel->offset, cachedLabel->pixmap);
+    finalSize = cachedLabel->pixmap.size();
+  } else // label caching disabled, draw text directly on surface:
+  {
+    TickLabelData labelData = getTickLabelData(painter->font(), text);
+
+
+    //zjb add :在这里获取最终的刻度标签坐标  zjbTickLabelDrawOffset 2015-10-23
     QPointF finalPosition = labelAnchor + getTickLabelDrawOffset(labelData);
     // if label would be partly clipped by widget border on sides, don't draw it (only for outside tick labels):
     if (tickLabelSide == QCPAxis::lsOutside)
@@ -6661,7 +6856,9 @@ QPointF QCPAxisPainterPrivate::getTickLabelDrawOffset(const TickLabelData &label
       y = 0;
     }
   }
-
+  //zjb add :for test TickLabelDrawOffset
+//  x = x-20;//向左移动20个象素
+//  y = y+20;//向下移动20个象素
   return QPointF(x, y);
 }
 

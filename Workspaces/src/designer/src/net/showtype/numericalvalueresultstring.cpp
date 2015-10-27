@@ -1,6 +1,9 @@
 ﻿#include "numericalvalueresultstring.h"
 #include <math.h>
 #include <string.h>
+#if defined(_WIN32)
+#define  uint unsigned int
+#endif
 QNumericalValueResultString::QNumericalValueResultString()
 {
 }

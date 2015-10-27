@@ -66,6 +66,7 @@
 #include <QtDesigner/QDesignerLanguageExtension>
 #include <QtDesigner/QDesignerMetaDataBaseInterface>
 #include <QtDesigner/QDesignerFormWindowManagerInterface>
+#include <QtDesigner/QDesignerImageExplorerInterface>
 #include <QtDesigner/QDesignerFormWindowCursorInterface>
 #include <QtDesigner/QDesignerFormEditorPluginInterface>
 #include <QtDesigner/QExtensionManager>
@@ -104,6 +105,9 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtXml/QDomDocument>
 
+//outdata
+#include "outdata/dialogoutdataconfig.h"
+#include <Net/NetComponents>
 QT_BEGIN_NAMESPACE
 
 using namespace qdesigner_internal;
@@ -177,13 +181,14 @@ QDesignerActions::QDesignerActions(QDesignerWorkbench *workbench)
       //m_windowActions(createActionGroup(this)),
       m_toolActions(createActionGroup(this, true)),
       m_helpActions(0),
+      m_functionActions(0),
       m_styleActions(0),
       m_editWidgetsAction(new QAction(tr("Edit Widgets"), this)),
       //m_newFormAction(new QAction(qdesigner_internal::createIconSet(QStringLiteral("filenew.png")), tr("&New..."), this)),
       //m_openFormAction(new QAction(qdesigner_internal::createIconSet(QStringLiteral("fileopen.png")), tr("&Open..."), this)),
       m_saveFormAction(new QAction(qdesigner_internal::createIconSet(QStringLiteral("filesave.png")), tr("&Save"), this)),
       //m_saveFormAsAction(new QAction(tr("Save &As..."), this)),
-      m_saveAllFormsAction(new QAction(tr("Save A&ll"), this)),
+      m_saveAllFormsAction(new QAction(qdesigner_internal::createIconSet(QStringLiteral("filesaveall.png")), tr("Save A&ll"), this)),
       m_saveFormAsTemplateAction(new QAction(tr("Save As &Template..."), this)),
       //m_closeFormAction(new QAction(tr("&Close"), this)),
       m_savePreviewImageAction(new QAction(tr("Save &Image..."), this)),
@@ -238,6 +243,9 @@ QDesignerActions::QDesignerActions(QDesignerWorkbench *workbench)
     //m_preferencesAction->setObjectName(QStringLiteral("__qt_preferences_action"));
 
     m_helpActions = createHelpActions();
+
+    //创建功能菜单
+    m_functionActions = createFunctionActions();
 
     //m_newFormAction->setProperty(QDesignerActions::defaultToolbarPropertyName, true);
     //m_openFormAction->setProperty(QDesignerActions::defaultToolbarPropertyName, true);
@@ -524,6 +532,23 @@ QActionGroup *QDesignerActions::createHelpActions()
     return helpActions;
 }
 
+//创建功能菜单
+QActionGroup *QDesignerActions::createFunctionActions()
+{
+    QActionGroup *functionActions = createActionGroup(this);
+
+    //添加导出数据菜单项
+    QAction *outDataAction = new QAction(tr("导出数据"), this);
+
+    //关联菜单动作到导出数据功能
+    connect(outDataAction, SIGNAL(triggered()), this, SLOT(outData()));
+
+    //将导出数据菜单添加到功能菜单
+    functionActions->addAction(outDataAction);
+
+    return functionActions;
+}
+
 QDesignerActions::~QDesignerActions()
 {
 #ifndef QT_NO_PRINTER
@@ -604,6 +629,9 @@ QActionGroup *QDesignerActions::settingsActions() const
 
 QActionGroup *QDesignerActions::helpActions() const
 { return m_helpActions; }
+
+QActionGroup *QDesignerActions::functionActions() const
+{ return m_functionActions; }
 
 QActionGroup *QDesignerActions::styleActions() const
 { return m_styleActions; }
@@ -702,6 +730,10 @@ void QDesignerActions::saveForm()
         if (saveForm(fw))
             showStatusBarMessage(savedMessage(QFileInfo(fw->fileName()).fileName()));
     }
+    //保存画面目录树
+    QDesignerImageExplorerInterface *ifwm = qobject_cast<QDesignerImageExplorerInterface *>(m_core->imageExplorer());
+    Q_ASSERT(ifwm);
+    ifwm->save();
 }
 
 void QDesignerActions::saveAllForms()
@@ -713,7 +745,7 @@ void QDesignerActions::saveAllForms()
         for (int i = 0; i < totalWindows; ++i) {
             QDesignerFormWindowInterface *fw = formWindowManager->formWindow(i);
             if (fw && fw->isDirty()) {
-                formWindowManager->setActiveFormWindow(fw);
+                //formWindowManager->setActiveFormWindow(fw);
                 if (saveForm(fw)) {
                     if (!fileNames.isEmpty())
                         fileNames += separator;
@@ -728,6 +760,10 @@ void QDesignerActions::saveAllForms()
     if (!fileNames.isEmpty()) {
         showStatusBarMessage(savedMessage(fileNames));
     }
+    //保存画面目录树
+    QDesignerImageExplorerInterface *ifwm = qobject_cast<QDesignerImageExplorerInterface *>(m_core->imageExplorer());
+    Q_ASSERT(ifwm);
+    ifwm->save();
 }
 
 bool QDesignerActions::saveForm(QDesignerFormWindowInterface *fw)
@@ -801,6 +837,7 @@ void QDesignerActions::fixActionContext()
     actions += m_toolActions->actions();
     //actions += m_formActions->actions();
     //actions += m_windowActions->actions();
+    actions += m_functionActions->actions();
     actions += m_helpActions->actions();
 
     foreach (QAction *a, actions) {
@@ -1001,7 +1038,11 @@ void QDesignerActions::shutdown()
     QCloseEvent ev;
     QApplication::sendEvent(qDesigner, &ev);
     if (ev.isAccepted())
+    {
+        NetInterface* ni = NetComponents::getNetCenter(this);
+        ni->stop();
         qDesigner->quit();
+    }
 }
 
 void QDesignerActions::activeFormWindowChanged(QDesignerFormWindowInterface *formWindow)
@@ -1135,6 +1176,16 @@ void QDesignerActions::aboutDesigner()
                                QStringLiteral("Easter Egg"), QMessageBox::Ok, core()->topLevel());
         messageBox.setInformativeText(QStringLiteral("The Easter Egg has been removed."));
         messageBox.exec();
+    }
+}
+
+//导出数据的实现
+void QDesignerActions::outData()
+{
+    DialogOutDataConfig dlg;
+    if(dlg.exec() == QDialog::Accepted)
+    {
+
     }
 }
 

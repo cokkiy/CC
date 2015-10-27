@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/morphmenu_p.h"
+#include "../../../../../src/designer/src/lib/shared/morphmenu_p.h"

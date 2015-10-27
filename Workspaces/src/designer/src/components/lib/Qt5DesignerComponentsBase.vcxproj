@@ -57,7 +57,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerComponentsBase;D:/Workspaces_SVN/include/QtDesignerComponentsBase/5.3.1;D:/Workspaces_SVN/include/QtDesignerComponentsBase/5.3.1/QtDesignerComponentsBase;tmp;..\..\..\..\..\include\QtDesigner\5.3.1;..\..\..\..\..\include\QtDesigner;..\..\..\..\..\include\QtDesigner\5.3.1\QtDesigner;..\..\..\..\..\include;.;..;..\..\lib\components;..\..\lib\sdk;..\..\lib\extension;..\..\lib\shared;..\propertyeditor;..\..\..\..\shared\qtpropertybrowser;..\..\..\..\shared\qtgradienteditor;..\..\..\..\shared\findwidget;..\objectinspector;..\signalsloteditor;..\formeditor;..\widgetbox;..\buddyeditor;..\taskmenu;..\propertyeditor;../../../../shared/tools/shared/qtpropertybrowser;..\tabordereditor;..\imageexplorer;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;.uic;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerComponentsBase;D:/CodeStores/Workspaces/include/QtDesignerComponentsBase/5.3.1;D:/CodeStores/Workspaces/include/QtDesignerComponentsBase/5.3.1/QtDesignerComponentsBase;tmp;..\..\..\..\..\include\QtDesigner\5.3.1;..\..\..\..\..\include\QtDesigner;..\..\..\..\..\include\QtDesigner\5.3.1\QtDesigner;..\..\..\..\..\include;.;..;..\..\lib\components;..\..\lib\sdk;..\..\lib\extension;..\..\lib\shared;..\propertyeditor;..\..\..\..\shared\qtpropertybrowser;..\..\..\..\shared\qtgradienteditor;..\..\..\..\shared\findwidget;..\objectinspector;..\signalsloteditor;..\formeditor;..\widgetbox;..\buddyeditor;..\taskmenu;..\propertyeditor;../../../../shared/tools/shared/qtpropertybrowser;..\tabordereditor;..\imageexplorer;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;.uic;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.obj\debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -70,7 +70,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>lib_pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)\Qt5DesignerComponentsBased.pch</PrecompiledHeaderOutputFile>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_BUILD_DESIGNERCOMPONENTS_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QT_STATICPLUGIN;QDESIGNER_COMPONENTS_LIBRARY;QT_NO_EXCEPTIONS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_BUILD_DESIGNERCOMPONENTS_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QT_STATICPLUGIN;QDESIGNER_COMPONENTS_LIBRARY;QT_NO_EXCEPTIONS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -79,7 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)lib/Qt5DesignerBased.lib;$(SolutionDir)lib/netd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBased.lib;D:/CodeStores/Workspaces/lib/netd.lib;D:/CodeStores/Workspaces/lib/Qt5UiToolsd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -90,7 +90,6 @@
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <Version>5.3</Version>
-      <Profile>true</Profile>
     </Link>
     <Midl>
       <DefaultCharType>Unsigned</DefaultCharType>
@@ -103,7 +102,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerComponentsBase;D:/Workspaces_SVN/include/QtDesignerComponentsBase/5.3.1;D:/Workspaces_SVN/include/QtDesignerComponentsBase/5.3.1/QtDesignerComponentsBase;tmp;..\..\..\..\..\include\QtDesigner\5.3.1;..\..\..\..\..\include\QtDesigner;..\..\..\..\..\include\QtDesigner\5.3.1\QtDesigner;..\..\..\..\..\include;.;..;..\..\lib\components;..\..\lib\sdk;..\..\lib\extension;..\..\lib\shared;..\propertyeditor;..\..\..\..\shared\qtpropertybrowser;..\..\..\..\shared\qtgradienteditor;..\..\..\..\shared\findwidget;..\objectinspector;..\signalsloteditor;..\formeditor;..\widgetbox;..\buddyeditor;..\taskmenu;..\propertyeditor;../../../../shared/tools/shared/qtpropertybrowser;..\tabordereditor;..\imageexplorer;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;.uic;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\..\..\..\include;..\..\..\..\..\include\QtDesignerComponentsBase;D:/CodeStores/Workspaces/include/QtDesignerComponentsBase/5.3.1;D:/CodeStores/Workspaces/include/QtDesignerComponentsBase/5.3.1/QtDesignerComponentsBase;tmp;..\..\..\..\..\include\QtDesigner\5.3.1;..\..\..\..\..\include\QtDesigner;..\..\..\..\..\include\QtDesigner\5.3.1\QtDesigner;..\..\..\..\..\include;.;..;..\..\lib\components;..\..\lib\sdk;..\..\lib\extension;..\..\lib\shared;..\propertyeditor;..\..\..\..\shared\qtpropertybrowser;..\..\..\..\shared\qtgradienteditor;..\..\..\..\shared\findwidget;..\objectinspector;..\signalsloteditor;..\formeditor;..\widgetbox;..\buddyeditor;..\taskmenu;..\propertyeditor;../../../../shared/tools/shared/qtpropertybrowser;..\tabordereditor;..\imageexplorer;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtGui\5.5.0\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets\5.5.0\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtWidgets;c:\qt\Qt5.5.0-msvc2015\include\QtGui;c:\qt\Qt5.5.0-msvc2015\include\QtANGLE;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;.uic;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.obj\release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -127,7 +126,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:/Workspaces_SVN/lib/Qt5DesignerBase.dll;D:/Workspaces_SVN/lib/net.dll;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/Qt5DesignerBase.dll;D:/CodeStores/Workspaces/lib/net.dll;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;libEGL.lib;libGLESv2.lib;gdi32.lib;user32.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;c:\qt\Qt5.5.0-msvc2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -201,8 +200,13 @@
     <ClCompile Include="..\propertyeditor\previewframe.cpp" />
     <ClCompile Include="..\propertyeditor\previewwidget.cpp" />
     <ClCompile Include="..\propertyeditor\propertyeditor.cpp" />
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapcircledlg.cpp" />
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapelementdlg.cpp" />
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmaplabeldlg.cpp" />
     <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapobj.cpp" />
     <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.cpp" />
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmappolygondialog.cpp" />
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.cpp" />
     <ClCompile Include="qdesigner_components.cpp" />
     <ClCompile Include="..\formeditor\qdesigner_resource.cpp" />
     <ClCompile Include="..\formeditor\qdesignerundostack.cpp" />
@@ -1165,6 +1169,60 @@ endlocal</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_propertyeditor.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\propertyeditor\propertyeditor_global.h" />
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapcircledlg.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapcircledlg.h;.moc\debug\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/debug/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmapcircledlg.h -o .moc\debug\moc_q2wmapcircledlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapcircledlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_q2wmapcircledlg.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmapcircledlg.h;.moc\release\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/release/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmapcircledlg.h -o .moc\release\moc_q2wmapcircledlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapcircledlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_q2wmapcircledlg.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapelementdlg.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapelementdlg.h;.moc\debug\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/debug/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmapelementdlg.h -o .moc\debug\moc_q2wmapelementdlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapelementdlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_q2wmapelementdlg.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmapelementdlg.h;.moc\release\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/release/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmapelementdlg.h -o .moc\release\moc_q2wmapelementdlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapelementdlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_q2wmapelementdlg.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmaplabeldlg.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmaplabeldlg.h;.moc\debug\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/debug/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmaplabeldlg.h -o .moc\debug\moc_q2wmaplabeldlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../propertyeditor/q2wmapobj/q2wmaplabeldlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_q2wmaplabeldlg.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmaplabeldlg.h;.moc\release\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/release/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmaplabeldlg.h -o .moc\release\moc_q2wmaplabeldlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../propertyeditor/q2wmapobj/q2wmaplabeldlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_q2wmaplabeldlg.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobj.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapobj.h;.moc\debug\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -1200,6 +1258,42 @@ if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapobjdlg.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_q2wmapobjdlg.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmappolygondialog.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmappolygondialog.h;.moc\debug\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/debug/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmappolygondialog.h -o .moc\debug\moc_q2wmappolygondialog.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../propertyeditor/q2wmapobj/q2wmappolygondialog.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_q2wmappolygondialog.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmappolygondialog.h;.moc\release\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/release/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmappolygondialog.h -o .moc\release\moc_q2wmappolygondialog.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../propertyeditor/q2wmapobj/q2wmappolygondialog.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_q2wmappolygondialog.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.h;.moc\debug\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/debug/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.h -o .moc\debug\moc_q2wmapstaticelementdlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapstaticelementdlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_q2wmapstaticelementdlg.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.h;.moc\release\mocinclude.tmp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_BUILD_DESIGNERCOMPONENTS_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_STATICPLUGIN -DQDESIGNER_COMPONENTS_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_XML_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 @.moc/release/mocinclude.tmp ..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.h -o .moc\release\moc_q2wmapstaticelementdlg.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../propertyeditor/q2wmapobj/q2wmapstaticelementdlg.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_q2wmapstaticelementdlg.cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <ClInclude Include="..\formeditor\qdesigner_resource.h" />
     <CustomBuild Include="..\formeditor\qdesignerundostack.h">
@@ -2401,6 +2495,24 @@ endlocal</Command>
     <ClCompile Include=".moc\release\moc_propertyeditor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapcircledlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapcircledlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapelementdlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapelementdlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmaplabeldlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmaplabeldlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include=".moc\debug\moc_q2wmapobj.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -2411,6 +2523,18 @@ endlocal</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".moc\release\moc_q2wmapobjdlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmappolygondialog.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmappolygondialog.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapstaticelementdlg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapstaticelementdlg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".moc\debug\moc_qdesignerundostack.cpp">
@@ -2794,8 +2918,12 @@ endlocal</Command>
     <ClInclude Include=".uic\ui_newdynamicpropertydialog.h" />
     <ClInclude Include=".uic\ui_paletteeditor.h" />
     <ClInclude Include=".uic\ui_previewwidget.h" />
+    <ClInclude Include=".uic\ui_q2wmapcircledlg.h" />
+    <ClInclude Include=".uic\ui_q2wmaplabeldlg.h" />
     <ClInclude Include=".uic\ui_q2wmapobj.h" />
     <ClInclude Include=".uic\ui_q2wmapobjdlg.h" />
+    <ClInclude Include=".uic\ui_q2wmappolygondialog.h" />
+    <ClInclude Include=".uic\ui_q2wmapstaticelementdlg.h" />
     <ClInclude Include=".uic\ui_selectmultiparamdlg.h" />
     <ClInclude Include=".uic\ui_selectsingleparamdialog.h" />
     <ClInclude Include=".uic\ui_singlestatedialog.h" />
@@ -2978,6 +3106,44 @@ endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC ../propertyeditor/previewwidget.ui</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_previewwidget.h;%(Outputs)</Outputs>
     </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapcircledlg.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapcircledlg.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmapcircledlg.ui -o .uic\ui_q2wmapcircledlg.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">UIC ../propertyeditor/q2wmapobj/q2wmapcircledlg.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.uic\ui_q2wmapcircledlg.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmapcircledlg.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmapcircledlg.ui -o .uic\ui_q2wmapcircledlg.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC ../propertyeditor/q2wmapobj/q2wmapcircledlg.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_q2wmapcircledlg.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmaplabeldlg.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmaplabeldlg.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmaplabeldlg.ui -o .uic\ui_q2wmaplabeldlg.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">UIC ../propertyeditor/q2wmapobj/q2wmaplabeldlg.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.uic\ui_q2wmaplabeldlg.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmaplabeldlg.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmaplabeldlg.ui -o .uic\ui_q2wmaplabeldlg.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC ../propertyeditor/q2wmapobj/q2wmaplabeldlg.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_q2wmaplabeldlg.h;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobj.ui">
       <FileType>Document</FileType>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapobj.ui;%(AdditionalInputs)</AdditionalInputs>
@@ -3015,6 +3181,44 @@ if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC ../propertyeditor/q2wmapobj/q2wmapobjdlg.ui</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_q2wmapobjdlg.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmappolygondialog.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmappolygondialog.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmappolygondialog.ui -o .uic\ui_q2wmappolygondialog.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">UIC ../propertyeditor/q2wmapobj/q2wmappolygondialog.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.uic\ui_q2wmappolygondialog.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmappolygondialog.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmappolygondialog.ui -o .uic\ui_q2wmappolygondialog.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC ../propertyeditor/q2wmapobj/q2wmappolygondialog.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_q2wmappolygondialog.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.ui -o .uic\ui_q2wmapstaticelementdlg.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">UIC ../propertyeditor/q2wmapobj/q2wmapstaticelementdlg.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.uic\ui_q2wmapstaticelementdlg.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe ..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.ui -o .uic\ui_q2wmapstaticelementdlg.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC ../propertyeditor/q2wmapobj/q2wmapstaticelementdlg.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_q2wmapstaticelementdlg.h;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\propertyeditor\selectmultiparamdlg.ui">
       <FileType>Document</FileType>
@@ -3275,6 +3479,8 @@ endlocal</Command>
     <None Include="..\formeditor\images\win\fileopen.png" />
     <None Include="..\formeditor\images\mac\filesave.png" />
     <None Include="..\formeditor\images\win\filesave.png" />
+    <None Include="..\formeditor\images\mac\filesaveall.png" />
+    <None Include="..\formeditor\images\win\filesaveall.png" />
     <CustomBuild Include="..\..\..\..\shared\findwidget\findwidget.qrc">
       <FileType>Document</FileType>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\shared\findwidget\findwidget.qrc;..\..\..\..\shared\findwidget\images\wrap.png;..\..\..\..\shared\findwidget\images\win\closetab.png;..\..\..\..\shared\findwidget\images\win\next.png;..\..\..\..\shared\findwidget\images\win\previous.png;..\..\..\..\shared\findwidget\images\win\searchfind.png;..\..\..\..\shared\findwidget\images\mac\closetab.png;..\..\..\..\shared\findwidget\images\mac\next.png;..\..\..\..\shared\findwidget\images\mac\previous.png;..\..\..\..\shared\findwidget\images\mac\searchfind.png;%(AdditionalInputs)</AdditionalInputs>
@@ -3298,7 +3504,7 @@ endlocal</Command>
     <None Include="..\propertyeditor\fontmapping.xml" />
     <CustomBuild Include="..\formeditor\formeditor.qrc">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\formeditor\formeditor.qrc;..\formeditor\images\editdelete-16.png;..\formeditor\images\fileopen-16.png;..\formeditor\images\plus-16.png;..\formeditor\images\color.png;..\formeditor\images\resetproperty.png;..\formeditor\images\emptyicon.png;..\formeditor\images\qt3logo.png;..\formeditor\images\configure.png;..\formeditor\images\leveldown.png;..\formeditor\images\downplus.png;..\formeditor\images\qtlogo.png;..\formeditor\images\reload.png;..\formeditor\images\dropdownbutton.png;..\formeditor\images\filenew-16.png;..\formeditor\images\minus-16.png;..\formeditor\images\levelup.png;..\formeditor\images\cleartext.png;..\formeditor\images\edit.png;..\formeditor\images\submenu.png;..\formeditor\images\prefix-add.png;..\formeditor\images\righttoleft.png;..\formeditor\images\sort.png;..\formeditor\images\win\editraise.png;..\formeditor\images\win\back.png;..\formeditor\images\win\buddytool.png;..\formeditor\images\win\editgrid.png;..\formeditor\images\win\textbold.png;..\formeditor\images\win\textcenter.png;..\formeditor\images\win\editform.png;..\formeditor\images\win\redo.png;..\formeditor\images\win\editcopy.png;..\formeditor\images\win\editvlayout.png;..\formeditor\images\win\plus.png;..\formeditor\images\win\editbreaklayout.png;..\formeditor\images\win\textjustify.png;..\formeditor\images\win\minus.png;..\formeditor\images\win\adjustsize.png;..\formeditor\images\win\editlower.png;..\formeditor\images\win\filenew.png;..\formeditor\images\win\resourceeditortool.png;..\formeditor\images\win\editdelete.png;..\formeditor\images\win\simplifyrichtext.png;..\formeditor\images\win\forward.png;..\formeditor\images\win\insertimage.png;..\formeditor\images\win\down.png;..\formeditor\images\win\textleft.png;..\formeditor\images\win\textsubscript.png;..\formeditor\images\win\filesave.png;..\formeditor\images\win\edithlayoutsplit.png;..\formeditor\images\win\textright.png;..\formeditor\images\win\textsuperscript.png;..\formeditor\images\win\textunder.png;..\formeditor\images\win\textitalic.png;..\formeditor\images\win\textanchor.png;..\formeditor\images\win\undo.png;..\formeditor\images\win\up.png;..\formeditor\images\win\edithlayout.png;..\formeditor\images\win\editvlayoutsplit.png;..\formeditor\images\win\tabordertool.png;..\formeditor\images\win\editpaste.png;..\formeditor\images\win\signalslottool.png;..\formeditor\images\win\fileopen.png;..\formeditor\images\win\editcut.png;..\formeditor\images\win\widgettool.png;..\formeditor\images\cursors\wait.png;..\formeditor\images\cursors\ibeam.png;..\formeditor\images\cursors\sizef.png;..\formeditor\images\cursors\sizeh.png;..\formeditor\images\cursors\cross.png;..\formeditor\images\cursors\closedhand.png;..\formeditor\images\cursors\openhand.png;..\formeditor\images\cursors\sizeall.png;..\formeditor\images\cursors\busy.png;..\formeditor\images\cursors\whatsthis.png;..\formeditor\images\cursors\sizev.png;..\formeditor\images\cursors\hand.png;..\formeditor\images\cursors\no.png;..\formeditor\images\cursors\uparrow.png;..\formeditor\images\cursors\vsplit.png;..\formeditor\images\cursors\arrow.png;..\formeditor\images\cursors\sizeb.png;..\formeditor\images\cursors\hsplit.png;..\formeditor\images\widgets\checkbox.png;..\formeditor\images\widgets\columnview.png;..\formeditor\images\widgets\widget.png;..\formeditor\images\widgets\doublespinbox.png;..\formeditor\images\widgets\calendarwidget.png;..\formeditor\images\widgets\combobox.png;..\formeditor\images\widgets\dialogbuttonbox.png;..\formeditor\images\widgets\fontcombobox.png;..\formeditor\images\widgets\hsplit.png;..\formeditor\images\widgets\hslider.png;..\formeditor\images\widgets\wizard.png;..\formeditor\images\widgets\vscrollbar.png;..\formeditor\images\widgets\plaintextedit.png;..\formeditor\images\widgets\commandlinkbutton.png;..\formeditor\images\widgets\groupbox.png;..\formeditor\images\widgets\dial.png;..\formeditor\images\widgets\spinbox.png;..\formeditor\images\widgets\lineedit.png;..\formeditor\images\widgets\dateedit.png;..\formeditor\images\widgets\toolbox.png;..\formeditor\images\widgets\toolbutton.png;..\formeditor\images\widgets\lcdnumber.png;..\formeditor\images\widgets\line.png;..\formeditor\images\widgets\radiobutton.png;..\formeditor\images\widgets\progress.png;..\formeditor\images\widgets\label.png;..\formeditor\images\widgets\vline.png;..\formeditor\images\widgets\scrollarea.png;..\formeditor\images\widgets\widgetstack.png;..\formeditor\images\widgets\vslider.png;..\formeditor\images\widgets\listview.png;..\formeditor\images\widgets\timeedit.png;..\formeditor\images\widgets\spacer.png;..\formeditor\images\widgets\dockwidget.png;..\formeditor\images\widgets\textedit.png;..\formeditor\images\widgets\datetimeedit.png;..\formeditor\images\widgets\listbox.png;..\formeditor\images\widgets\table.png;..\formeditor\images\widgets\pushbutton.png;..\formeditor\images\widgets\tabwidget.png;..\formeditor\images\widgets\mdiarea.png;..\formeditor\images\widgets\hscrollbar.png;..\formeditor\images\widgets\frame.png;..\formeditor\images\widgets\vspacer.png;..\formeditor\images\widgets\graphicsview.png;..\formeditor\images\mac\editraise.png;..\formeditor\images\mac\back.png;..\formeditor\images\mac\buddytool.png;..\formeditor\images\mac\editgrid.png;..\formeditor\images\mac\textbold.png;..\formeditor\images\mac\textcenter.png;..\formeditor\images\mac\editform.png;..\formeditor\images\mac\redo.png;..\formeditor\images\mac\editcopy.png;..\formeditor\images\mac\editvlayout.png;..\formeditor\images\mac\plus.png;..\formeditor\images\mac\editbreaklayout.png;..\formeditor\images\mac\textjustify.png;..\formeditor\images\mac\minus.png;..\formeditor\images\mac\adjustsize.png;..\formeditor\images\mac\editlower.png;..\formeditor\images\mac\filenew.png;..\formeditor\images\mac\resourceeditortool.png;..\formeditor\images\mac\editdelete.png;..\formeditor\images\mac\forward.png;..\formeditor\images\mac\simplifyrichtext.png;..\formeditor\images\mac\insertimage.png;..\formeditor\images\mac\down.png;..\formeditor\images\mac\textleft.png;..\formeditor\images\mac\textsubscript.png;..\formeditor\images\mac\filesave.png;..\formeditor\images\mac\edithlayoutsplit.png;..\formeditor\images\mac\textright.png;..\formeditor\images\mac\textsuperscript.png;..\formeditor\images\mac\textunder.png;..\formeditor\images\mac\textitalic.png;..\formeditor\images\mac\textanchor.png;..\formeditor\images\mac\undo.png;..\formeditor\images\mac\up.png;..\formeditor\images\mac\edithlayout.png;..\formeditor\images\mac\editvlayoutsplit.png;..\formeditor\images\mac\tabordertool.png;..\formeditor\images\mac\editpaste.png;..\formeditor\images\mac\signalslottool.png;..\formeditor\images\mac\fileopen.png;..\formeditor\images\mac\editcut.png;..\formeditor\images\mac\widgettool.png;..\formeditor\defaultbrushes.xml;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\formeditor\formeditor.qrc;..\formeditor\images\editdelete-16.png;..\formeditor\images\fileopen-16.png;..\formeditor\images\plus-16.png;..\formeditor\images\color.png;..\formeditor\images\resetproperty.png;..\formeditor\images\emptyicon.png;..\formeditor\images\qt3logo.png;..\formeditor\images\configure.png;..\formeditor\images\leveldown.png;..\formeditor\images\downplus.png;..\formeditor\images\qtlogo.png;..\formeditor\images\reload.png;..\formeditor\images\dropdownbutton.png;..\formeditor\images\filenew-16.png;..\formeditor\images\minus-16.png;..\formeditor\images\levelup.png;..\formeditor\images\cleartext.png;..\formeditor\images\edit.png;..\formeditor\images\submenu.png;..\formeditor\images\prefix-add.png;..\formeditor\images\righttoleft.png;..\formeditor\images\sort.png;..\formeditor\images\win\editraise.png;..\formeditor\images\win\back.png;..\formeditor\images\win\buddytool.png;..\formeditor\images\win\editgrid.png;..\formeditor\images\win\textbold.png;..\formeditor\images\win\textcenter.png;..\formeditor\images\win\editform.png;..\formeditor\images\win\redo.png;..\formeditor\images\win\editcopy.png;..\formeditor\images\win\editvlayout.png;..\formeditor\images\win\plus.png;..\formeditor\images\win\editbreaklayout.png;..\formeditor\images\win\textjustify.png;..\formeditor\images\win\minus.png;..\formeditor\images\win\adjustsize.png;..\formeditor\images\win\editlower.png;..\formeditor\images\win\filenew.png;..\formeditor\images\win\resourceeditortool.png;..\formeditor\images\win\editdelete.png;..\formeditor\images\win\simplifyrichtext.png;..\formeditor\images\win\forward.png;..\formeditor\images\win\insertimage.png;..\formeditor\images\win\down.png;..\formeditor\images\win\textleft.png;..\formeditor\images\win\textsubscript.png;..\formeditor\images\win\filesaveall.png;..\formeditor\images\win\filesave.png;..\formeditor\images\win\edithlayoutsplit.png;..\formeditor\images\win\textright.png;..\formeditor\images\win\textsuperscript.png;..\formeditor\images\win\textunder.png;..\formeditor\images\win\textitalic.png;..\formeditor\images\win\textanchor.png;..\formeditor\images\win\undo.png;..\formeditor\images\win\up.png;..\formeditor\images\win\edithlayout.png;..\formeditor\images\win\editvlayoutsplit.png;..\formeditor\images\win\tabordertool.png;..\formeditor\images\win\editpaste.png;..\formeditor\images\win\signalslottool.png;..\formeditor\images\win\fileopen.png;..\formeditor\images\win\editcut.png;..\formeditor\images\win\widgettool.png;..\formeditor\images\cursors\wait.png;..\formeditor\images\cursors\ibeam.png;..\formeditor\images\cursors\sizef.png;..\formeditor\images\cursors\sizeh.png;..\formeditor\images\cursors\cross.png;..\formeditor\images\cursors\closedhand.png;..\formeditor\images\cursors\openhand.png;..\formeditor\images\cursors\sizeall.png;..\formeditor\images\cursors\busy.png;..\formeditor\images\cursors\whatsthis.png;..\formeditor\images\cursors\sizev.png;..\formeditor\images\cursors\hand.png;..\formeditor\images\cursors\no.png;..\formeditor\images\cursors\uparrow.png;..\formeditor\images\cursors\vsplit.png;..\formeditor\images\cursors\arrow.png;..\formeditor\images\cursors\sizeb.png;..\formeditor\images\cursors\hsplit.png;..\formeditor\images\widgets\checkbox.png;..\formeditor\images\widgets\columnview.png;..\formeditor\images\widgets\widget.png;..\formeditor\images\widgets\doublespinbox.png;..\formeditor\images\widgets\calendarwidget.png;..\formeditor\images\widgets\combobox.png;..\formeditor\images\widgets\dialogbuttonbox.png;..\formeditor\images\widgets\fontcombobox.png;..\formeditor\images\widgets\hsplit.png;..\formeditor\images\widgets\hslider.png;..\formeditor\images\widgets\wizard.png;..\formeditor\images\widgets\vscrollbar.png;..\formeditor\images\widgets\plaintextedit.png;..\formeditor\images\widgets\commandlinkbutton.png;..\formeditor\images\widgets\groupbox.png;..\formeditor\images\widgets\dial.png;..\formeditor\images\widgets\spinbox.png;..\formeditor\images\widgets\lineedit.png;..\formeditor\images\widgets\dateedit.png;..\formeditor\images\widgets\toolbox.png;..\formeditor\images\widgets\toolbutton.png;..\formeditor\images\widgets\lcdnumber.png;..\formeditor\images\widgets\line.png;..\formeditor\images\widgets\radiobutton.png;..\formeditor\images\widgets\progress.png;..\formeditor\images\widgets\label.png;..\formeditor\images\widgets\vline.png;..\formeditor\images\widgets\scrollarea.png;..\formeditor\images\widgets\widgetstack.png;..\formeditor\images\widgets\vslider.png;..\formeditor\images\widgets\listview.png;..\formeditor\images\widgets\timeedit.png;..\formeditor\images\widgets\spacer.png;..\formeditor\images\widgets\dockwidget.png;..\formeditor\images\widgets\textedit.png;..\formeditor\images\widgets\datetimeedit.png;..\formeditor\images\widgets\listbox.png;..\formeditor\images\widgets\table.png;..\formeditor\images\widgets\pushbutton.png;..\formeditor\images\widgets\tabwidget.png;..\formeditor\images\widgets\mdiarea.png;..\formeditor\images\widgets\hscrollbar.png;..\formeditor\images\widgets\frame.png;..\formeditor\images\widgets\vspacer.png;..\formeditor\images\widgets\graphicsview.png;..\formeditor\images\mac\editraise.png;..\formeditor\images\mac\back.png;..\formeditor\images\mac\buddytool.png;..\formeditor\images\mac\editgrid.png;..\formeditor\images\mac\textbold.png;..\formeditor\images\mac\textcenter.png;..\formeditor\images\mac\editform.png;..\formeditor\images\mac\redo.png;..\formeditor\images\mac\editcopy.png;..\formeditor\images\mac\editvlayout.png;..\formeditor\images\mac\plus.png;..\formeditor\images\mac\editbreaklayout.png;..\formeditor\images\mac\textjustify.png;..\formeditor\images\mac\minus.png;..\formeditor\images\mac\adjustsize.png;..\formeditor\images\mac\editlower.png;..\formeditor\images\mac\filenew.png;..\formeditor\images\mac\resourceeditortool.png;..\formeditor\images\mac\editdelete.png;..\formeditor\images\mac\forward.png;..\formeditor\images\mac\simplifyrichtext.png;..\formeditor\images\mac\insertimage.png;..\formeditor\images\mac\down.png;..\formeditor\images\mac\textleft.png;..\formeditor\images\mac\textsubscript.png;..\formeditor\images\mac\filesaveall.png;..\formeditor\images\mac\filesave.png;..\formeditor\images\mac\edithlayoutsplit.png;..\formeditor\images\mac\textright.png;..\formeditor\images\mac\textsuperscript.png;..\formeditor\images\mac\textunder.png;..\formeditor\images\mac\textitalic.png;..\formeditor\images\mac\textanchor.png;..\formeditor\images\mac\undo.png;..\formeditor\images\mac\up.png;..\formeditor\images\mac\edithlayout.png;..\formeditor\images\mac\editvlayoutsplit.png;..\formeditor\images\mac\tabordertool.png;..\formeditor\images\mac\editpaste.png;..\formeditor\images\mac\signalslottool.png;..\formeditor\images\mac\fileopen.png;..\formeditor\images\mac\editcut.png;..\formeditor\images\mac\widgettool.png;..\formeditor\defaultbrushes.xml;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 c:\qt\Qt5.5.0-msvc2015\bin\rcc.exe -name formeditor ..\formeditor\formeditor.qrc -o .rcc\debug\qrc_formeditor.cpp
@@ -3306,7 +3512,7 @@ if errorlevel 1 goto VCEnd
 endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RCC ../formeditor/formeditor.qrc</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.rcc\debug\qrc_formeditor.cpp;%(Outputs)</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\formeditor\formeditor.qrc;..\formeditor\images\editdelete-16.png;..\formeditor\images\fileopen-16.png;..\formeditor\images\plus-16.png;..\formeditor\images\color.png;..\formeditor\images\resetproperty.png;..\formeditor\images\emptyicon.png;..\formeditor\images\qt3logo.png;..\formeditor\images\configure.png;..\formeditor\images\leveldown.png;..\formeditor\images\downplus.png;..\formeditor\images\qtlogo.png;..\formeditor\images\reload.png;..\formeditor\images\dropdownbutton.png;..\formeditor\images\filenew-16.png;..\formeditor\images\minus-16.png;..\formeditor\images\levelup.png;..\formeditor\images\cleartext.png;..\formeditor\images\edit.png;..\formeditor\images\submenu.png;..\formeditor\images\prefix-add.png;..\formeditor\images\righttoleft.png;..\formeditor\images\sort.png;..\formeditor\images\win\editraise.png;..\formeditor\images\win\back.png;..\formeditor\images\win\buddytool.png;..\formeditor\images\win\editgrid.png;..\formeditor\images\win\textbold.png;..\formeditor\images\win\textcenter.png;..\formeditor\images\win\editform.png;..\formeditor\images\win\redo.png;..\formeditor\images\win\editcopy.png;..\formeditor\images\win\editvlayout.png;..\formeditor\images\win\plus.png;..\formeditor\images\win\editbreaklayout.png;..\formeditor\images\win\textjustify.png;..\formeditor\images\win\minus.png;..\formeditor\images\win\adjustsize.png;..\formeditor\images\win\editlower.png;..\formeditor\images\win\filenew.png;..\formeditor\images\win\resourceeditortool.png;..\formeditor\images\win\editdelete.png;..\formeditor\images\win\simplifyrichtext.png;..\formeditor\images\win\forward.png;..\formeditor\images\win\insertimage.png;..\formeditor\images\win\down.png;..\formeditor\images\win\textleft.png;..\formeditor\images\win\textsubscript.png;..\formeditor\images\win\filesave.png;..\formeditor\images\win\edithlayoutsplit.png;..\formeditor\images\win\textright.png;..\formeditor\images\win\textsuperscript.png;..\formeditor\images\win\textunder.png;..\formeditor\images\win\textitalic.png;..\formeditor\images\win\textanchor.png;..\formeditor\images\win\undo.png;..\formeditor\images\win\up.png;..\formeditor\images\win\edithlayout.png;..\formeditor\images\win\editvlayoutsplit.png;..\formeditor\images\win\tabordertool.png;..\formeditor\images\win\editpaste.png;..\formeditor\images\win\signalslottool.png;..\formeditor\images\win\fileopen.png;..\formeditor\images\win\editcut.png;..\formeditor\images\win\widgettool.png;..\formeditor\images\cursors\wait.png;..\formeditor\images\cursors\ibeam.png;..\formeditor\images\cursors\sizef.png;..\formeditor\images\cursors\sizeh.png;..\formeditor\images\cursors\cross.png;..\formeditor\images\cursors\closedhand.png;..\formeditor\images\cursors\openhand.png;..\formeditor\images\cursors\sizeall.png;..\formeditor\images\cursors\busy.png;..\formeditor\images\cursors\whatsthis.png;..\formeditor\images\cursors\sizev.png;..\formeditor\images\cursors\hand.png;..\formeditor\images\cursors\no.png;..\formeditor\images\cursors\uparrow.png;..\formeditor\images\cursors\vsplit.png;..\formeditor\images\cursors\arrow.png;..\formeditor\images\cursors\sizeb.png;..\formeditor\images\cursors\hsplit.png;..\formeditor\images\widgets\checkbox.png;..\formeditor\images\widgets\columnview.png;..\formeditor\images\widgets\widget.png;..\formeditor\images\widgets\doublespinbox.png;..\formeditor\images\widgets\calendarwidget.png;..\formeditor\images\widgets\combobox.png;..\formeditor\images\widgets\dialogbuttonbox.png;..\formeditor\images\widgets\fontcombobox.png;..\formeditor\images\widgets\hsplit.png;..\formeditor\images\widgets\hslider.png;..\formeditor\images\widgets\wizard.png;..\formeditor\images\widgets\vscrollbar.png;..\formeditor\images\widgets\plaintextedit.png;..\formeditor\images\widgets\commandlinkbutton.png;..\formeditor\images\widgets\groupbox.png;..\formeditor\images\widgets\dial.png;..\formeditor\images\widgets\spinbox.png;..\formeditor\images\widgets\lineedit.png;..\formeditor\images\widgets\dateedit.png;..\formeditor\images\widgets\toolbox.png;..\formeditor\images\widgets\toolbutton.png;..\formeditor\images\widgets\lcdnumber.png;..\formeditor\images\widgets\line.png;..\formeditor\images\widgets\radiobutton.png;..\formeditor\images\widgets\progress.png;..\formeditor\images\widgets\label.png;..\formeditor\images\widgets\vline.png;..\formeditor\images\widgets\scrollarea.png;..\formeditor\images\widgets\widgetstack.png;..\formeditor\images\widgets\vslider.png;..\formeditor\images\widgets\listview.png;..\formeditor\images\widgets\timeedit.png;..\formeditor\images\widgets\spacer.png;..\formeditor\images\widgets\dockwidget.png;..\formeditor\images\widgets\textedit.png;..\formeditor\images\widgets\datetimeedit.png;..\formeditor\images\widgets\listbox.png;..\formeditor\images\widgets\table.png;..\formeditor\images\widgets\pushbutton.png;..\formeditor\images\widgets\tabwidget.png;..\formeditor\images\widgets\mdiarea.png;..\formeditor\images\widgets\hscrollbar.png;..\formeditor\images\widgets\frame.png;..\formeditor\images\widgets\vspacer.png;..\formeditor\images\widgets\graphicsview.png;..\formeditor\images\mac\editraise.png;..\formeditor\images\mac\back.png;..\formeditor\images\mac\buddytool.png;..\formeditor\images\mac\editgrid.png;..\formeditor\images\mac\textbold.png;..\formeditor\images\mac\textcenter.png;..\formeditor\images\mac\editform.png;..\formeditor\images\mac\redo.png;..\formeditor\images\mac\editcopy.png;..\formeditor\images\mac\editvlayout.png;..\formeditor\images\mac\plus.png;..\formeditor\images\mac\editbreaklayout.png;..\formeditor\images\mac\textjustify.png;..\formeditor\images\mac\minus.png;..\formeditor\images\mac\adjustsize.png;..\formeditor\images\mac\editlower.png;..\formeditor\images\mac\filenew.png;..\formeditor\images\mac\resourceeditortool.png;..\formeditor\images\mac\editdelete.png;..\formeditor\images\mac\forward.png;..\formeditor\images\mac\simplifyrichtext.png;..\formeditor\images\mac\insertimage.png;..\formeditor\images\mac\down.png;..\formeditor\images\mac\textleft.png;..\formeditor\images\mac\textsubscript.png;..\formeditor\images\mac\filesave.png;..\formeditor\images\mac\edithlayoutsplit.png;..\formeditor\images\mac\textright.png;..\formeditor\images\mac\textsuperscript.png;..\formeditor\images\mac\textunder.png;..\formeditor\images\mac\textitalic.png;..\formeditor\images\mac\textanchor.png;..\formeditor\images\mac\undo.png;..\formeditor\images\mac\up.png;..\formeditor\images\mac\edithlayout.png;..\formeditor\images\mac\editvlayoutsplit.png;..\formeditor\images\mac\tabordertool.png;..\formeditor\images\mac\editpaste.png;..\formeditor\images\mac\signalslottool.png;..\formeditor\images\mac\fileopen.png;..\formeditor\images\mac\editcut.png;..\formeditor\images\mac\widgettool.png;..\formeditor\defaultbrushes.xml;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\formeditor\formeditor.qrc;..\formeditor\images\editdelete-16.png;..\formeditor\images\fileopen-16.png;..\formeditor\images\plus-16.png;..\formeditor\images\color.png;..\formeditor\images\resetproperty.png;..\formeditor\images\emptyicon.png;..\formeditor\images\qt3logo.png;..\formeditor\images\configure.png;..\formeditor\images\leveldown.png;..\formeditor\images\downplus.png;..\formeditor\images\qtlogo.png;..\formeditor\images\reload.png;..\formeditor\images\dropdownbutton.png;..\formeditor\images\filenew-16.png;..\formeditor\images\minus-16.png;..\formeditor\images\levelup.png;..\formeditor\images\cleartext.png;..\formeditor\images\edit.png;..\formeditor\images\submenu.png;..\formeditor\images\prefix-add.png;..\formeditor\images\righttoleft.png;..\formeditor\images\sort.png;..\formeditor\images\win\editraise.png;..\formeditor\images\win\back.png;..\formeditor\images\win\buddytool.png;..\formeditor\images\win\editgrid.png;..\formeditor\images\win\textbold.png;..\formeditor\images\win\textcenter.png;..\formeditor\images\win\editform.png;..\formeditor\images\win\redo.png;..\formeditor\images\win\editcopy.png;..\formeditor\images\win\editvlayout.png;..\formeditor\images\win\plus.png;..\formeditor\images\win\editbreaklayout.png;..\formeditor\images\win\textjustify.png;..\formeditor\images\win\minus.png;..\formeditor\images\win\adjustsize.png;..\formeditor\images\win\editlower.png;..\formeditor\images\win\filenew.png;..\formeditor\images\win\resourceeditortool.png;..\formeditor\images\win\editdelete.png;..\formeditor\images\win\simplifyrichtext.png;..\formeditor\images\win\forward.png;..\formeditor\images\win\insertimage.png;..\formeditor\images\win\down.png;..\formeditor\images\win\textleft.png;..\formeditor\images\win\textsubscript.png;..\formeditor\images\win\filesaveall.png;..\formeditor\images\win\filesave.png;..\formeditor\images\win\edithlayoutsplit.png;..\formeditor\images\win\textright.png;..\formeditor\images\win\textsuperscript.png;..\formeditor\images\win\textunder.png;..\formeditor\images\win\textitalic.png;..\formeditor\images\win\textanchor.png;..\formeditor\images\win\undo.png;..\formeditor\images\win\up.png;..\formeditor\images\win\edithlayout.png;..\formeditor\images\win\editvlayoutsplit.png;..\formeditor\images\win\tabordertool.png;..\formeditor\images\win\editpaste.png;..\formeditor\images\win\signalslottool.png;..\formeditor\images\win\fileopen.png;..\formeditor\images\win\editcut.png;..\formeditor\images\win\widgettool.png;..\formeditor\images\cursors\wait.png;..\formeditor\images\cursors\ibeam.png;..\formeditor\images\cursors\sizef.png;..\formeditor\images\cursors\sizeh.png;..\formeditor\images\cursors\cross.png;..\formeditor\images\cursors\closedhand.png;..\formeditor\images\cursors\openhand.png;..\formeditor\images\cursors\sizeall.png;..\formeditor\images\cursors\busy.png;..\formeditor\images\cursors\whatsthis.png;..\formeditor\images\cursors\sizev.png;..\formeditor\images\cursors\hand.png;..\formeditor\images\cursors\no.png;..\formeditor\images\cursors\uparrow.png;..\formeditor\images\cursors\vsplit.png;..\formeditor\images\cursors\arrow.png;..\formeditor\images\cursors\sizeb.png;..\formeditor\images\cursors\hsplit.png;..\formeditor\images\widgets\checkbox.png;..\formeditor\images\widgets\columnview.png;..\formeditor\images\widgets\widget.png;..\formeditor\images\widgets\doublespinbox.png;..\formeditor\images\widgets\calendarwidget.png;..\formeditor\images\widgets\combobox.png;..\formeditor\images\widgets\dialogbuttonbox.png;..\formeditor\images\widgets\fontcombobox.png;..\formeditor\images\widgets\hsplit.png;..\formeditor\images\widgets\hslider.png;..\formeditor\images\widgets\wizard.png;..\formeditor\images\widgets\vscrollbar.png;..\formeditor\images\widgets\plaintextedit.png;..\formeditor\images\widgets\commandlinkbutton.png;..\formeditor\images\widgets\groupbox.png;..\formeditor\images\widgets\dial.png;..\formeditor\images\widgets\spinbox.png;..\formeditor\images\widgets\lineedit.png;..\formeditor\images\widgets\dateedit.png;..\formeditor\images\widgets\toolbox.png;..\formeditor\images\widgets\toolbutton.png;..\formeditor\images\widgets\lcdnumber.png;..\formeditor\images\widgets\line.png;..\formeditor\images\widgets\radiobutton.png;..\formeditor\images\widgets\progress.png;..\formeditor\images\widgets\label.png;..\formeditor\images\widgets\vline.png;..\formeditor\images\widgets\scrollarea.png;..\formeditor\images\widgets\widgetstack.png;..\formeditor\images\widgets\vslider.png;..\formeditor\images\widgets\listview.png;..\formeditor\images\widgets\timeedit.png;..\formeditor\images\widgets\spacer.png;..\formeditor\images\widgets\dockwidget.png;..\formeditor\images\widgets\textedit.png;..\formeditor\images\widgets\datetimeedit.png;..\formeditor\images\widgets\listbox.png;..\formeditor\images\widgets\table.png;..\formeditor\images\widgets\pushbutton.png;..\formeditor\images\widgets\tabwidget.png;..\formeditor\images\widgets\mdiarea.png;..\formeditor\images\widgets\hscrollbar.png;..\formeditor\images\widgets\frame.png;..\formeditor\images\widgets\vspacer.png;..\formeditor\images\widgets\graphicsview.png;..\formeditor\images\mac\editraise.png;..\formeditor\images\mac\back.png;..\formeditor\images\mac\buddytool.png;..\formeditor\images\mac\editgrid.png;..\formeditor\images\mac\textbold.png;..\formeditor\images\mac\textcenter.png;..\formeditor\images\mac\editform.png;..\formeditor\images\mac\redo.png;..\formeditor\images\mac\editcopy.png;..\formeditor\images\mac\editvlayout.png;..\formeditor\images\mac\plus.png;..\formeditor\images\mac\editbreaklayout.png;..\formeditor\images\mac\textjustify.png;..\formeditor\images\mac\minus.png;..\formeditor\images\mac\adjustsize.png;..\formeditor\images\mac\editlower.png;..\formeditor\images\mac\filenew.png;..\formeditor\images\mac\resourceeditortool.png;..\formeditor\images\mac\editdelete.png;..\formeditor\images\mac\forward.png;..\formeditor\images\mac\simplifyrichtext.png;..\formeditor\images\mac\insertimage.png;..\formeditor\images\mac\down.png;..\formeditor\images\mac\textleft.png;..\formeditor\images\mac\textsubscript.png;..\formeditor\images\mac\filesaveall.png;..\formeditor\images\mac\filesave.png;..\formeditor\images\mac\edithlayoutsplit.png;..\formeditor\images\mac\textright.png;..\formeditor\images\mac\textsuperscript.png;..\formeditor\images\mac\textunder.png;..\formeditor\images\mac\textitalic.png;..\formeditor\images\mac\textanchor.png;..\formeditor\images\mac\undo.png;..\formeditor\images\mac\up.png;..\formeditor\images\mac\edithlayout.png;..\formeditor\images\mac\editvlayoutsplit.png;..\formeditor\images\mac\tabordertool.png;..\formeditor\images\mac\editpaste.png;..\formeditor\images\mac\signalslottool.png;..\formeditor\images\mac\fileopen.png;..\formeditor\images\mac\editcut.png;..\formeditor\images\mac\widgettool.png;..\formeditor\defaultbrushes.xml;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 c:\qt\Qt5.5.0-msvc2015\bin\rcc.exe -name formeditor ..\formeditor\formeditor.qrc -o .rcc\release\qrc_formeditor.cpp
@@ -3485,10 +3691,10 @@ endlocal</Command>
     <None Include="..\..\..\..\shared\findwidget\images\wrap.png" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\components\lib\Qt5DesignerComponentsBase_resource.rc">
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\components\lib\Qt5DesignerComponentsBase_resource.rc">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ResourceCompile>
-    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\components\lib\Qt5DesignerComponentsBased_resource.rc">
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\components\lib\Qt5DesignerComponentsBased_resource.rc">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>

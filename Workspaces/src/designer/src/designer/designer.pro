@@ -35,7 +35,8 @@ HEADERS += \
     appfontdialog.h \
     preferencesdialog.h \
     assistantclient.h \
-    mainwindow.h
+    mainwindow.h \
+    outdata/dialogoutdataconfig.h
 
 SOURCES += main.cpp \
     qdesigner.cpp \
@@ -52,13 +53,15 @@ SOURCES += main.cpp \
     appfontdialog.cpp \
     preferencesdialog.cpp \
     assistantclient.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    outdata/dialogoutdataconfig.cpp
 
 PRECOMPILED_HEADER=qdesigner_pch.h
 
 FORMS += saveformastemplate.ui \
     preferencesdialog.ui \
-    qdesigner_appearanceoptions.ui
+    qdesigner_appearanceoptions.ui \
+    outdata/dialogoutdataconfig.ui
 
 win32 {
    RC_FILE      = designer.rc
@@ -103,7 +106,7 @@ else:unix:LIBS += -L$$MODULE_BASE_OUTDIR/lib/ -lQt5DesignerBase -lQt5DesignerCom
 INCLUDEPATH += $$MODULE_BASE_INDIR/include/QtDesigner/5.3.1 \
     $$MODULE_BASE_INDIR/include/QtDesigner \
     $$MODULE_BASE_INDIR/include/QtDesigner/5.3.1/QtDesigner \
-    $$MODULE_BASE_INDIR/include
+    $$MODULE_BASE_INDIR/include\
 #end andrew ,20150310
 
 #win32:CONFIG(release, debug|release): LIBS += -L$$MODULE_BASE_OUTDIR/lib/ -lQt5Designer -lQt5DesignerComponents -lQt5UiTools -lQt5PrintSupport  -lQt5Widgets -lQt5Network -lQt5Xml -lQt5Gui -lQt5Core -lGL -lpthread
@@ -209,3 +212,5 @@ warnings_are_errors:warning_clean {
     }
     unset(ver)
 }
+
+DISTFILES +=

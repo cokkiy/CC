@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/uilib/uilib_global.h"
+#include "../../src/designer/src/lib/uilib/uilib_global.h"

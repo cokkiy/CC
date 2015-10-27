@@ -14,7 +14,7 @@ class tableitemset : public QDialog
 public:
     explicit tableitemset(QTableCell ,QWidget *parent = 0);
     ~tableitemset();
-	//»ñÈ¡ÉèÖÃµÄµ¥Ôª¸ñÊôĞÔ
+    //è·å–è®¾ç½®çš„å•å…ƒæ ¼å±æ€§
     QTableCell getTableCell();
 private slots:
 
@@ -29,23 +29,23 @@ private slots:
     void on_moreButton_clicked();
 
 private:
-	//ui½çÃæ
+    //uiç•Œé¢
     Ui::tableitemset *ui;
-	//¸ü¶à²Ù×÷°´Å¥×´Ì¬
+    //æ›´å¤šæ“ä½œæŒ‰é’®çŠ¶æ€
     bool bMoreOperate;
-	//ui ¶Ô»°¿ògeometry
+    //ui å¯¹è¯æ¡†geometry
     QRect uiRect;
-	//Ë®Æ½¶ÔÆë·½Ê½
+    //æ°´å¹³å¯¹é½æ–¹å¼
     Qt::Alignment m_TextHAlignment;
-	//ÉÏÏÂ¸¡¶¯·½Ê½
+    //ä¸Šä¸‹æµ®åŠ¨æ–¹å¼
     Qt::Alignment m_TextVAlignment;
-	//ÎÄ±¾×ÖÌå
+    //æ–‡æœ¬å­—ä½“
     QFont m_TextFont;
-	//ÎÄ±¾ÑÕÉ«
-	QColor m_TextColor;
-	//±³¾°É«
-	QColor m_ItemBGColor;
-	//µ¥Ôª¸ñÊôĞÔ
+    //æ–‡æœ¬é¢œè‰²
+    QColor m_TextColor;
+    //èƒŒæ™¯è‰²
+    QColor m_ItemBGColor;
+    //å•å…ƒæ ¼å±æ€§
     QTableCell m_TableCell;
 };
 

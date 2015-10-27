@@ -10,11 +10,14 @@ class Q2wmap : public QWidget
 {
     Q_OBJECT
 
+    //图元矩形
+    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+
     //目标配置
     Q_PROPERTY(QString q2wmapobj READ getobj WRITE setobj RESET rstobj)
 
-    //图元矩形
-    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //静态元素配置
+    Q_PROPERTY(QString q2wmapstatic READ getstatic WRITE setstatic RESET rststatic)
 
     //坐标轴颜色
     Q_PROPERTY(QColor AColor READ getAColor WRITE setAColor)
@@ -42,6 +45,11 @@ public:
     QString getobj() const;
     void setobj(const QString str);
     void rstobj(){};
+
+    //获取/设置静态元素
+    QString getstatic() const;
+    void setstatic(const QString str);
+    void rststatic(){};
 
     //获取/设置地图路径
     QPixmap getPixmap() const;

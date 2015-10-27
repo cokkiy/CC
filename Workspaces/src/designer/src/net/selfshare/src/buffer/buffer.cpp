@@ -143,7 +143,7 @@ bool Buffer::WriteBuffer(const char *src, unsigned short size)
 //******************
 char *Buffer::ReadBuffer(unsigned short size)
 {
-    char *des = new char[size];  //(char *)malloc(size);										//分配空间
+    char *des = new char[size];									//分配空间
 
 	if(NULL == des) 																		//内存不足
 	{
@@ -166,7 +166,7 @@ void Buffer::ClearBuffer()
 {
 	if(NULL != m_buffer) 																//如果缓冲区不为空
 		{
-		delete m_buffer;																	//释放缓冲区
+        delete []m_buffer;																	//释放缓冲区
 		m_buffer = NULL;																	//缓冲区指针置为空
 	}
 	m_writePosition = 0;		   													//内容的大小清零
@@ -223,7 +223,7 @@ unsigned short Buffer::GetWritePos()
 Buffer & Buffer::operator =(const Buffer &a)
 {
 	if(this == &a) return *this;									//如果是自赋值，返回自身
-	if(NULL != m_buffer) delete m_buffer;					//释放缓冲区
+    if(NULL != m_buffer) delete []m_buffer;					//释放缓冲区
 	if((0 == a.m_bufSize)&&(NULL == a.m_buffer))	//如果目标缓冲区为空
 	{
 		m_buffer = NULL; 														//自身缓冲区指针置为空

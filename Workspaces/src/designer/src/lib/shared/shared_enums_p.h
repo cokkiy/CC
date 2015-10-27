@@ -79,6 +79,8 @@ namespace qdesigner_internal {
         ValidationGraphObj,
         //2wmapObj
         Validation2wmapObj,
+        //2wmapStatic
+        Validation2wmapStatic,
         // Data
         ValidationData,
         // Dataes

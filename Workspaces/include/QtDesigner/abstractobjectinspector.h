@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractobjectinspector.h"
+#include "../../src/designer/src/lib/sdk/abstractobjectinspector.h"

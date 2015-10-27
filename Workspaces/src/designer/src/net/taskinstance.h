@@ -10,6 +10,7 @@ public:
     TaskInstance();
     virtual QString currentTaskPath();
     virtual QString currentTaskCode();
+    virtual int load(QString dir);
 private:
     QString m_currentTaskPath;
     QString m_currentTaskCode;

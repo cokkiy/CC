@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/shared/const_var.h"
+#include "../../src/designer/src/lib/shared/const_var.h"

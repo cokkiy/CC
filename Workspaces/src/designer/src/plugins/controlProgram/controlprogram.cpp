@@ -1,6 +1,5 @@
 ﻿#include "controlprogram.h"
 #include<QMessageBox>
-#include <thread>
 
 controlProgram::controlProgram(QWidget *parent) :
     QTableWidget(parent)
@@ -8,19 +7,21 @@ controlProgram::controlProgram(QWidget *parent) :
     //init param
     setRowCount(1);
     setColumnCount(2);
-    setPercent(80);
+    setPercent(70);
     setWordWrap(true);//自动换行
 
-    //边框
-    this->setFrameShape(QFrame::Box);
-    this->setFrameShadow(QFrame::Plain);
-    setLineWidth(2);//宽度
+    ////no边框
+    setFrameShape(QFrame::NoFrame);
+    setLineWidth(0);
 
     setBackgroundColor(Qt::gray);//背景色
     setTextColor(Qt::black);//文本颜色
-    setShowGrid(true);//显示网格
-    m_gridlineColor.setRgb(0,0,255);//网格颜色
     setFont(QFont("Times", 15, QFont::Normal));//字体
+
+    //grid
+    setShowGrid(true);//显示网格
+    setGridStyle(Qt::SolidLine);
+    m_gridlineColor.setRgb(0,0,255);//网格颜色
 
     //设置三种状态与三种字体和颜色
     stateList<<"未开始"<<"进行中"<<"已完成";
@@ -31,8 +32,6 @@ controlProgram::controlProgram(QWidget *parent) :
     setDoingFont(QFont("Times", 15, QFont::Bold));
     setDoneFont(QFont("Times", 15, QFont::Black));
 
-    comboBox = new QComboBox;
-
     //行平均高度
     this->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     //隐藏表头
@@ -42,26 +41,29 @@ controlProgram::controlProgram(QWidget *parent) :
     this->setEditTriggers(QAbstractItemView::NoEditTriggers);//no edit
     this->setSelectionMode(QAbstractItemView::NoSelection);//no chose
 
-    ////设置一个500ms定时器
-    m_timer_id = startTimer(500);
-    m_dc = NetComponents::getDataCenter();
-
     //load data
     net = NetComponents::getInforCenter();
     if (m_dataes != NULL) {
         loadData();
     }
 
-    stylesheetUpdate();
+    haspercent = false;
+    hashandlename = false;
     hasStyleSheetUpdate = false;
-    //connect(this, SIGNAL(gridlineColorChanged(QColor)), this, SLOT(stylesheetUpdate()));
-    connect(this,SIGNAL(nameListChanged(QStringList)),this,SLOT(setNameBox()));
-       connect(this, SIGNAL(dataesChanged(QString)), this, SLOT(loadData()));
+
+    stylesheetUpdate();
+    connect(this, SIGNAL(gridlineColorChanged(QColor)), this, SLOT(stylesheetUpdate()));
+
+    //定时器类 //设置一个500ms定时器
+    m_ti = NetComponents::getTimer();
+    m_dc = NetComponents::getDataCenter();
+    //关联定时器500ms的周期信号，这样可以使用全局的周期信号
+    connect(m_ti, SIGNAL(timeout_500()), this, SLOT(timeEvent_500ms()));
 }
 
 controlProgram::~controlProgram()
 {
-    killTimer(m_timer_id);
+    //    killTimer(m_timer_id);
     if(m_dc)
     {
         delete m_dc;
@@ -103,13 +105,11 @@ void controlProgram::loadData()
         QString str = "0";
         datalist2.append(str);
     }
-    
 }
-//定时器
-void controlProgram::timerEvent1(QTimerEvent *e)
-{
-    Q_UNUSED(e);
 
+//定时器
+void controlProgram::timeEvent_500ms()
+{
     ////使用数据处理中心的接口方法
     double ret;
     bool ok;
@@ -131,16 +131,44 @@ void controlProgram::timerEvent1(QTimerEvent *e)
     }
     datalist2 = datalist1;//本帧数据替换上一帧数据
     datalist1.clear();//本帧数据清零
-    
 }
 
 //绘图事件
 void controlProgram::paintEvent(QPaintEvent *e)
 {
     //name 处理参数名以及文本 文本颜色和背景色
+    if(hashandlename == false){
+        handleName();
+        hashandlename = true;
+    }
+
+    //百分比，确定两列的宽度
+    if(m_percent>=0&&m_percent<=100)
+    {
+        int width0 = geometry().width()*m_percent/100;
+        setColumnWidth(0,width0);
+        int width1 = geometry().width()-width0-2*lineWidth();
+        setColumnWidth(1,width1);
+    }
+    else
+    {
+        QMessageBox msgBox;
+        msgBox.setText("不在其数值范围，可选范围为[0,100]!");
+        msgBox.exec();
+        setPercent(80);
+    }
+
+    //用于更新网格颜色
+    stylesheetUpdate();
+    QTableWidget::paintEvent(e);
+}
+
+void controlProgram::handleName()
+{
+    //name 处理参数名以及文本 文本颜色和背景色
     for(int pos=0;pos<rowCount();pos++)
     {
-        QString str = QString::number(pos+1,10)+":";//项目编号
+        QString str = QString::number(pos+1,10)+": ";//项目编号
 
         QTableWidgetItem *item;
         item = new QTableWidgetItem;
@@ -155,27 +183,6 @@ void controlProgram::paintEvent(QPaintEvent *e)
         item->setBackgroundColor(m_backgroundColor);
         this->setItem(pos,0,item);
     }
-
-    //百分比，确定两列的宽度
-    if(m_percent>=0&&m_percent<=100)
-    {
-        int width0 = geometry().width()*m_percent/100;
-        //setColumnWidth(0,width0);
-        int width1 = geometry().width()-width0-2*lineWidth();
-        //setColumnWidth(1,width1);
-    }
-    else
-    {
-        QMessageBox msgBox;
-        msgBox.setText("不在其数值范围，可选范围为[0,100]!");
-        msgBox.exec();
-        //setPercent(80);
-    }
-
-    //用于更新网格颜色
-    stylesheetUpdate();
-    QTableWidget::paintEvent(e);
-
 }
 
 //重写第二列内容，背景色，字体和颜色
@@ -211,8 +218,10 @@ void controlProgram::handleData(int rows,int columns)
 //percent
 void controlProgram::setPercent(const int &newp)
 {
-    m_percent = newp;
-    update();
+    if(m_percent != newp){
+        m_percent = newp;
+        update();
+    }
 }
 
 //gridlinecolor
@@ -244,38 +253,45 @@ void controlProgram::stylesheetUpdate()
 //bgcolor
 void controlProgram::setBackgroundColor(const QColor &newcolor)
 {
-    m_backgroundColor = newcolor;
-    QPalette pll = this->palette();
-    pll.setBrush(QPalette::Base,QBrush(m_backgroundColor));
-    this->setPalette(pll);
-    update();
+    if(m_backgroundColor != newcolor){
+        m_backgroundColor = newcolor;
+        QPalette pll = this->palette();
+        pll.setBrush(QPalette::Base,QBrush(m_backgroundColor));
+        this->setPalette(pll);
+        hashandlename = false;
+        update();
+    }
 }
 
 //txtcolor
 void controlProgram::setTextColor(const QColor &newcolor)
 {
-    m_textColor = newcolor;
-    update();
+    if(m_textColor != newcolor){
+        m_textColor = newcolor;
+        hashandlename = false;
+        update();
+    }
 }
 
 ////data
 void controlProgram::setDataes(const QString &newdata)
 {
-    m_dataes = newdata;
-    emit dataesChanged(m_dataes);
+    if(m_dataes != newdata){
+        m_dataes = newdata;
+        loadData();
+        hashandlename = false;
+        update();
+    }
 }
 
 ////QStringList
-void controlProgram::setNameBox()
-{
-    comboBox->addItems(m_nameList);
-}
 void controlProgram::setNameList(const QStringList &newnameList)
 {
     if (m_nameList != newnameList)
     {
         m_nameList = newnameList;
-        emit nameListChanged(m_nameList);
+        hashandlename = false;
+        update();
     }
 }
 

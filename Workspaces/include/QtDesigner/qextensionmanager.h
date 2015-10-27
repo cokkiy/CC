@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/extension/qextensionmanager.h"
+#include "../../src/designer/src/lib/extension/qextensionmanager.h"

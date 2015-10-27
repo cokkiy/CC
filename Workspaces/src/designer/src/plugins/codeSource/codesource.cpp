@@ -1,4 +1,4 @@
-#include "codesource.h"
+﻿#include "codesource.h"
 #include <QtMath>
 #include<QMessageBox>
 #include<QScrollBar>
@@ -17,19 +17,18 @@ codeSource::codeSource(QWidget *parent) :
     m_txt = center;//初始字体位置为居中对齐
     m_bgcolor.setRgb(210,210,255);//背景颜色
 
-    ////设置一个500ms定时器
-    m_timer_id = startTimer(500);
     m_dc = NetComponents::getDataCenter();
+    m_timer = NetComponents::getTimer();
     //设置为只读模式，不能输入，解决空格键不能全屏显示的问题,andrew,20150919
     setReadOnly(true);
-
+    hasStyleSheetUpdate = false;
     stylesheetUpdate();
-    connect(this, SIGNAL(backgroundColorChanged(QColor)), this, SLOT(stylesheetUpdate()));
+    connect(m_timer, SIGNAL(timeout_500()), this, SLOT(getDataEvent()));
+
 }
 
 codeSource::~codeSource()
 {
-    killTimer(m_timer_id);
     if(m_dc)
     {
         delete m_dc;  m_dc = NULL;
@@ -38,10 +37,14 @@ codeSource::~codeSource()
 
 void codeSource::stylesheetUpdate()
 {
-    QString strColor = QString("rgb(%1, %2, %3)").arg(QString::number(backgroundColor().red()),
-                                                      QString::number(backgroundColor().green()),
-                                                      QString::number(backgroundColor().blue()));
-    this->setStyleSheet( QString("QTextEdit{background-color: %1}").arg(strColor));
+    if(hasStyleSheetUpdate == false)
+    {
+        QString strColor = QString("rgb(%1, %2, %3)").arg(QString::number(backgroundColor().red()),
+                                                          QString::number(backgroundColor().green()),
+                                                          QString::number(backgroundColor().blue()));
+        this->setStyleSheet( QString("QTextEdit{background-color: %1}").arg(strColor));
+        hasStyleSheetUpdate = true;
+    }
 }
 
 void codeSource::setData(const QString newdata)
@@ -60,7 +63,7 @@ void codeSource::settxtalignment(const textAlignment newtxt)
 void codeSource::setBackgroundColor(const QColor newbgcolor)
 {
     m_bgcolor = newbgcolor;
-    emit backgroundColorChanged(m_bgcolor);
+    hasStyleSheetUpdate = false;
     update();
 }
 
@@ -119,9 +122,8 @@ void codeSource::handleData()
 }
 
 //定时器事件
-void codeSource::timerEvent(QTimerEvent *event)
+void codeSource::getDataEvent()
 {
-    Q_UNUSED(event);
     //////**************使用数据处理中心的接口方法 QByteArray 转换不对
 
 

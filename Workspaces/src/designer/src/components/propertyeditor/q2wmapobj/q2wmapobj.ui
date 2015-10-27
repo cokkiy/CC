@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>973</width>
-    <height>575</height>
+    <width>810</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,8 +21,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>973</width>
-    <height>575</height>
+    <width>1</width>
+    <height>1</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -45,17 +45,23 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>971</width>
-     <height>571</height>
+     <width>821</width>
+     <height>411</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>821</width>
+     <height>411</height>
+    </size>
    </property>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>951</width>
-      <height>511</height>
+      <width>791</width>
+      <height>351</height>
      </rect>
     </property>
     <property name="font">
@@ -74,7 +80,7 @@
    <widget class="QPushButton" name="pushButton_AddNewObj">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>60</x>
       <y>10</y>
       <width>121</width>
       <height>29</height>
@@ -87,7 +93,7 @@
    <widget class="QPushButton" name="pushButton_DelCurrentObj">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>210</x>
       <y>10</y>
       <width>141</width>
       <height>29</height>
@@ -100,7 +106,7 @@
    <widget class="QPushButton" name="pushButton_SaveQuit">
     <property name="geometry">
      <rect>
-      <x>650</x>
+      <x>480</x>
       <y>10</y>
       <width>121</width>
       <height>29</height>
@@ -113,7 +119,7 @@
    <widget class="QPushButton" name="pushButton_UnsaveQuit">
     <property name="geometry">
      <rect>
-      <x>800</x>
+      <x>630</x>
       <y>10</y>
       <width>121</width>
       <height>29</height>

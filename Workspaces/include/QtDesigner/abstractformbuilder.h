@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/uilib/abstractformbuilder.h"
+#include "../../src/designer/src/lib/uilib/abstractformbuilder.h"

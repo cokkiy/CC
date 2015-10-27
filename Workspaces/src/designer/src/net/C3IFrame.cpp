@@ -199,6 +199,9 @@ char* C3IFrame::ProcChildFrame_WZ(char *pBuffer, C3IFrameHeader* pFHead,
     pBuffer += 2;
     procFramePos += 2;
 
+    if (childFrameLen + procFramePos > pFHead->datalen)
+        return 0;
+
     if (*(unsigned short*)(pBuffer + childFrameLen) != 0xffff)//子帧尾不对
         return 0;
     //当前为主用线程，表号使用主用信道，则处理
@@ -336,6 +339,9 @@ char* C3IFrame::ProcChildFrame_TD(char *pBuffer, C3IFrameHeader* pFHead, unsigne
     usParamTable = *(unsigned short*)pBuffer;
     pBuffer += 2;
     procFramePos += 2;
+
+    if (lChildFrameLen + procFramePos > pFHead->datalen)
+        return 0;
 
     if (*(unsigned short*)(pBuffer + lChildFrameLen) != 0xffff)//子帧尾不对
         return 0;
@@ -485,6 +491,9 @@ char* C3IFrame::ProcChildFrame_ZH(char *pBuffer, C3IFrameHeader* pFHead, unsigne
     pBuffer += 2;
     procFramePos += 2;
 
+    if (lChildFrameLen + procFramePos > pFHead->datalen)
+        return 0;
+
     if (*(unsigned short*)(pBuffer + lChildFrameLen) != 0xffff)//子帧尾不对
         return 0;
     if (checkChannelToContinue(usParamTable))
@@ -620,6 +629,9 @@ char* C3IFrame::ProcChildFrame_AddLength_TD(char *pBuffer, C3IFrameHeader *pFHea
     usParamTable = *(unsigned short*)pBuffer;
     pBuffer += 2;
     usProcFrameLen += 2;
+
+    if (lChildFrameLen + usProcFrameLen > pFHead->datalen)
+        return 0;
 
     if (*(unsigned short*)(pBuffer + lChildFrameLen) != 0xffff)//子帧尾不对
         return 0;

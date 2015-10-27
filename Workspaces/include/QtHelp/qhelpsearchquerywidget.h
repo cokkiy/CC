@@ -1,1 +1,1 @@
-﻿#include "../../src/assistant/help/qhelpsearchquerywidget.h"
+#include "../../src/assistant/help/qhelpsearchquerywidget.h"

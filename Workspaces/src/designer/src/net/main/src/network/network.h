@@ -31,11 +31,9 @@
 
 #include "../../../selfshare/src/baseobject.h"
 #include "../../../selfshare/src/const.h"
-//#include "../../../selfshare/src/config/config.h"
 #include "../../../selfshare/src/config/netconfig.h"
 #include "net_global.h"
 #include "../../../selfshare/src/OS_Def.h"
-using namespace std;
 
 //***************************************************************
 #ifdef LINUX

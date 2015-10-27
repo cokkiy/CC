@@ -9,13 +9,12 @@
 #ifndef NETBUFFER_H
 #define NETBUFFER_H
 
-#include <QSemaphore>									//线程同步信号量头文件 ,cokkiy 用#include <QSemaphore>代替 semaphore
+//#include <QSemaphore>									//线程同步信号量头文件 ,cokkiy 用#include <QSemaphore>代替 semaphore
 #include<list>
+#include <mutex>
 #include "../const.h"										//常数定义头文件
 #include "../baseobject.h"									//基类头文件
 #include "../buffer/buffer.h"								//基础缓冲区类
-
-using namespace std;
 
 class NetBuffer :public BaseObject
 {
@@ -31,7 +30,7 @@ class NetBuffer :public BaseObject
 		int m_bufLimit;
 
 		//缓冲区读写同步信号量
-		QSemaphore m_binSem;
+		std::mutex m_binSem;
 
 	public:
 

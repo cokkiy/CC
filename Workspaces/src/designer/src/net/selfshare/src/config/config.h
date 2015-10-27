@@ -10,10 +10,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "../buffer/buffer.h"
-#include "../xmlproc/xmlproc.h"
+//#include "../buffer/buffer.h"
+//#include "../xmlproc/xmlproc.h"
 #include "../const.h"
-#include "../datastruct.h"
+//#include "../datastruct.h"
 #include "../baseobject.h"
 //#include "../../../main/src/frame/frame.h"
 #include "../netbuffer/netbuffer.h"
@@ -35,25 +35,6 @@ public:
 
 
 public:
-    int  m_threadNum;  							//设备依据线程的分组
-    //InfoTableProc 	m_infoTabProc;															//信息约定表处理类 主要负责加载信息约定表并提供信息约定表的指针
-    //int m_absoluteTime, m_taskDate;                        //绝对时和任务日期
-
-//	unsigned char m_infoSrc/*信源*/,
-//			      m_taskCode/*任务代号*/,
-//				  m_hlCode/*合练代号*/,
-//				  m_infotype/*信息类别*/;
-
-//	unsigned short m_recvMaxFrameLen;										//接收最大帧长
-//	unsigned short m_sendMaxFrameLen;										//发送最大帧长
-
-//	//网络设置
-//	unsigned int m_ipAddr;			//服务器套接字地址
-//	unsigned short m_port;		//接收端口号
-//	list<unsigned int> m_groupAddr;	//需加入的组地址
-
-								
-
 	//指显参数缓冲区队列
 	ZXParamBuffer m_zxParamBuf;
 

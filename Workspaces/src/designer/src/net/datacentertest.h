@@ -37,6 +37,8 @@ public:
     */
     virtual int getHistoryData(QString computeStr,QVector<double>& result);
 
+    virtual int getHistoryData(QString computeStr,QVector<double>& result,QVector<unsigned int>& time);
+
     virtual int getHistoryData(QString computeStrX,QString computeStrY,QVector<double>& resultX,QVector<double>& resultY);
 
     virtual qint32 getHistoryDatas(qint32 count...);

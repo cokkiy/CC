@@ -81,7 +81,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\plugins\statesend\statesendplugin_resource.rc" />
-    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\plugins\statesend\statesendplugind_resource.rc" />
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\plugins\statesend\statesendplugin_resource.rc" />
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\plugins\statesend\statesendplugind_resource.rc" />
   </ItemGroup>
 </Project>

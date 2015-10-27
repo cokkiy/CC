@@ -90,8 +90,8 @@ QString staticgraphPlugin::domXml() const
     xmls += "       <rect>\n";
     xmls += "       <x>0</x>\n";
     xmls += "       <y>0</y>\n";
-    xmls += "       <width>809</width>\n";
-    xmls += "       <height>500</height>\n";
+    xmls += "       <width>600</width>\n";
+    xmls += "       <height>600</height>\n";
     xmls += "       </rect>\n";
     xmls += "   </property>\n";
     xmls += "</widget>\n";

@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/help/qhelpgenerator_p.h"
+#include "../../../../../src/assistant/help/qhelpgenerator_p.h"

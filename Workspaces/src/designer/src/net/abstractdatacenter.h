@@ -38,6 +38,14 @@ public:
     */
     virtual int getHistoryData(QString computeStr,QVector<double>& result) = 0;
     /*!
+      通过输入公式化的参数表达式获取单数据的计算结果的历史数据
+      @param QString computeStr  字符串，包含参数的公式计算表达式
+      @param QVector<double>  公式计算的历史数据
+      @param QVector<unsigned int>  公式计算的历史数据的时间
+      @return int  获取成功或失败，1为成功，-1为失败
+    */
+    virtual int getHistoryData(QString computeStr,QVector<double>& result,QVector<unsigned int>& time) = 0;
+    /*!
       通过输入公式化的参数表达式获取双数据的计算结果的历史数据
       @param QString computeStrX  字符串X，包含参数的公式计算表达式
       @param QString computeStrY  字符串Y，包含参数的公式计算表达式

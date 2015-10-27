@@ -89,8 +89,8 @@ void QTablePropertySetDlg::resetDialog()
             item->setFont(TableCell.getTextFont());
             item->setTextAlignment(TableCell.getTextHAlignment()|TableCell.getTextVAlignment());
             item->setTextColor(TableCell.getTextColor());
-            item->setText(TableCell.getConfigModeContent());
             item->setBackgroundColor(TableCell.getBackgroundColor());
+            item->setText(TableCell.getConfigModeContent());
             ui->m_TableWidget->setItem(i,j,item);
         }
     }
@@ -203,6 +203,33 @@ bool QTablePropertySetDlg::getMenuState(QCursor cur)
 		return true;
     else
         return false;
+}
+//键盘事件
+void QTablePropertySetDlg::keyPressEvent(QKeyEvent* event)
+{
+    int keyValue = event->key();
+	//键盘Delete按键事件
+    if(keyValue == Qt::Key_Delete)
+    {
+        QList<QTableWidgetItem* > items = ui->m_TableWidget->selectedItems();
+        if(items.count() > 0)
+        {
+            for(int i = 0;i<items.count();i++)
+            {
+                int col = items.at(i)->column();
+                int row = items.at(i)->row();
+                QTableCell TableCell = m_TableProperty.getTableVector()->at(row * m_iColNum + col);
+                TableCell.setText(tr(""));
+                m_TableProperty.getTableVector()->replace(row * m_iColNum + col,TableCell);
+                items.at(i)->setFont(TableCell.getTextFont());
+                items.at(i)->setTextAlignment(TableCell.getTextHAlignment()|TableCell.getTextVAlignment());
+                items.at(i)->setTextColor(TableCell.getTextColor());
+                items.at(i)->setBackgroundColor(TableCell.getBackgroundColor());
+                items.at(i)->setText(TableCell.getConfigModeContent());
+                ui->m_TableWidget->setItem(row,col,items.at(i));
+            }
+        }
+    }
 }
 //右键菜单事件
 void QTablePropertySetDlg::contextMenuEvent(QContextMenuEvent*)

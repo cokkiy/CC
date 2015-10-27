@@ -171,6 +171,8 @@ public:
     void restoreSettings(const QDesignerSettings &s, const DockWidgetList &dws, const QRect &desktopArea);
     void restoreSettings(const QDesignerSettings &s, const QRect &desktopArea);
     void saveSettings(QDesignerSettings &) const;
+    void realTimeMode();
+    void designerMode();
 
 signals:
     void fileDropped(const QString &);
@@ -181,6 +183,9 @@ private slots:
 
 private:
     ToolBarManager *m_toolBarManager;
+    DockWidgetList m_dockWidgetList;
+    QList<QToolBar *> m_toolbars;
+    QByteArray m_status;
 };
 
 QT_END_NAMESPACE

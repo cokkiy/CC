@@ -17,6 +17,12 @@ public:
       @return QString  当前任务的代号
     */
     virtual QString currentTaskCode() = 0;
+    /*!
+      装载"task_global.xml"xml文件,
+      @param QString dir  App路径
+      @return int  获取成功或失败，1为成功，-1为失败
+    */
+    virtual int load(QString dir) = 0;
 };
 
 #endif // TASKINTERFACE_H

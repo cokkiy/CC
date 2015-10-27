@@ -156,10 +156,17 @@ QDesignerPropertyEditor::StringPropertyParameters QDesignerPropertyEditor::textP
     if (propertyName.endsWith(QStringLiteral("graphobj"))) {
         return StringPropertyParameters(ValidationGraphObj, true);
     }
+
     // q2wmapobj: 设置目标选择界面,rika,20150928
     if (propertyName.endsWith(QStringLiteral("q2wmapobj"))) {
         return StringPropertyParameters(Validation2wmapObj, true);
     }
+
+    // q2wmapobj: 静态配置界面,rika,20151022
+    if (propertyName.endsWith(QStringLiteral("q2wmapstatic"))) {
+        return StringPropertyParameters(Validation2wmapStatic, true);
+    }
+
 
     // data: 设置单参数数据的配置类别,andrew,20140421
     if (propertyName.endsWith(QStringLiteral("data"))) {

@@ -1,1 +1,1 @@
-﻿#include "../../src/assistant/help/qhelp_global.h"
+#include "../../src/assistant/help/qhelp_global.h"

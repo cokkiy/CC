@@ -5,7 +5,7 @@ SUBDIRS = \
     lib \
     components \
     designer \
-    net
+    net \
     #net_test
 
 contains(QT_CONFIG, shared): SUBDIRS += plugins

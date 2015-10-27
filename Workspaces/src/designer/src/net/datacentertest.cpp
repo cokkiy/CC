@@ -117,6 +117,10 @@ int DataCenterTest::getHistoryData(QString computeStr,QVector<double>& result)
     Q_D(DataCenterTest);
     return d->getHistoryData(computeStr,result);
 }
+int DataCenterTest::getHistoryData(QString computeStr,QVector<double>& result,QVector<unsigned int>& time)
+{
+    return -1;
+}
 
 int DataCenterTest::getHistoryData(QString computeStrX,QString computeStrY,QVector<double>& resultX,QVector<double>& resultY)
 {

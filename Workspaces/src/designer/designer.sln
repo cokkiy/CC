@@ -1,10 +1,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Qt5UiTools", "src\uitools\Qt5UiTools.vcxproj", "{49EFCC63-5B48-3E4D-BEC4-DCE510B3BFD0}"
+# Visual Studio 2015Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Qt5UiTools", "D:/CodeStores/Workspaces/src/designer/src/uitools\Qt5UiTools.vcxproj", "{30C993FB-3D33-3B6B-85BE-85FED42BD3ED}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "net", "src\net\net.vcxproj", "{95D8AAB9-479F-32B0-BDF0-FECBFA20CC1D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "net", "D:/CodeStores/Workspaces/src/designer/src/net\net.vcxproj", "{1D6E69CD-82AE-34EC-8FF9-4EB03EC0AD9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,16 +11,17 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{49EFCC63-5B48-3E4D-BEC4-DCE510B3BFD0}.Debug|x64.ActiveCfg = Debug|x64
-		{49EFCC63-5B48-3E4D-BEC4-DCE510B3BFD0}.Debug|x64.Build.0 = Debug|x64
-		{49EFCC63-5B48-3E4D-BEC4-DCE510B3BFD0}.Release|x64.ActiveCfg = Release|x64
-		{49EFCC63-5B48-3E4D-BEC4-DCE510B3BFD0}.Release|x64.Build.0 = Release|x64
-		{95D8AAB9-479F-32B0-BDF0-FECBFA20CC1D}.Debug|x64.ActiveCfg = Debug|x64
-		{95D8AAB9-479F-32B0-BDF0-FECBFA20CC1D}.Debug|x64.Build.0 = Debug|x64
-		{95D8AAB9-479F-32B0-BDF0-FECBFA20CC1D}.Release|x64.ActiveCfg = Release|x64
-		{95D8AAB9-479F-32B0-BDF0-FECBFA20CC1D}.Release|x64.Build.0 = Release|x64
+		{30C993FB-3D33-3B6B-85BE-85FED42BD3ED}.Debug|x64.ActiveCfg = Debug|x64
+		{30C993FB-3D33-3B6B-85BE-85FED42BD3ED}.Debug|x64.Build.0 = Debug|x64
+		{30C993FB-3D33-3B6B-85BE-85FED42BD3ED}.Release|x64.ActiveCfg = Release|x64
+		{30C993FB-3D33-3B6B-85BE-85FED42BD3ED}.Release|x64.Build.0 = Release|x64
+		{1D6E69CD-82AE-34EC-8FF9-4EB03EC0AD9B}.Debug|x64.ActiveCfg = Debug|x64
+		{1D6E69CD-82AE-34EC-8FF9-4EB03EC0AD9B}.Debug|x64.Build.0 = Debug|x64
+		{1D6E69CD-82AE-34EC-8FF9-4EB03EC0AD9B}.Release|x64.ActiveCfg = Release|x64
+		{1D6E69CD-82AE-34EC-8FF9-4EB03EC0AD9B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
 	EndGlobalSection
 EndGlobal

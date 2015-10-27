@@ -88,6 +88,11 @@ QDesigner::QDesigner(int &argc, char **argv)
       m_client(0),
       m_workbench(0), m_suppressNewFormShow(false)
 {
+    QString appDir = QApplication::applicationDirPath();
+    TaskInterface * task = NetComponents::getTastCenter();
+    //开始装载任务配置
+    task->load(appDir);
+
     setOrganizationName(QStringLiteral("QtProject"));
     setApplicationName(QLatin1String(designerApplicationName));
     QDesignerComponents::initializeResources();
@@ -98,7 +103,6 @@ QDesigner::QDesigner(int &argc, char **argv)
     initialize();
 
     NetInterface* net = NetComponents::getNetCenter(this);
-    TaskInterface * task = NetComponents::getTastCenter();
     //开始装载网络配置
     net->load(task->currentTaskPath() + g_netConfigRelativeFilePath);
     //开始接收网络数据
@@ -106,7 +110,7 @@ QDesigner::QDesigner(int &argc, char **argv)
 
     //装载指显工作站信息
     StationInterface* si = NetComponents::getStation();
-    si->load(g_privateRelativeFilePath);
+    si->load(appDir+g_privateRelativeFilePath);
 
     //定时器接口
     ti = NetComponents::getTimer();

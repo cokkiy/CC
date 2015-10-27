@@ -5,7 +5,6 @@
 #include "main/src/network/network.h"
 #include "main/src/recvinfothread/recvinfothread.h"
 #include <QThread>
-#include "GC.h"
 
 class NETSHARED_EXPORT  NetInstance: public NetInterface
 {
@@ -47,10 +46,6 @@ private:
 
     //网络配置
     NetConfig netConfig;
-
-    // 历史缓存区回收对象
-    GC* gc=nullptr;
-
 };
 
 #endif // NETINSTANCE_H

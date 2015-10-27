@@ -15,9 +15,24 @@ const QString c_IsCurTask = "true";
 
 TaskInstance::TaskInstance()
 {
-    m_currentTaskPath = QString("../zx_config/");
+
+}
+
+QString TaskInstance::currentTaskPath()
+{
+    return m_currentTaskPath;
+}
+
+QString TaskInstance::currentTaskCode()
+{
+    return m_currentTaskCode;
+}
+
+int TaskInstance::load(QString dir)
+{
+    m_currentTaskPath = dir+QString("/../zx_config/");
     m_currentTaskCode = QString("");
-    QFile file(g_taskConfigRelativeFileName);
+    QFile file(dir+g_taskConfigRelativeFileName);
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         QDomDocument domDocument;
         QString errorStr;
@@ -46,6 +61,8 @@ TaskInstance::TaskInstance()
                     {
                         m_currentTaskPath += child.firstChildElement(c_TaskCode).text();
                         m_currentTaskCode = child.firstChildElement(c_TaskCode).text();
+                        file.close();
+                        return 1;
                     }
                     t_TaskPhase = t_TaskPhase.nextSiblingElement(c_Task);
                 }
@@ -60,14 +77,5 @@ TaskInstance::TaskInstance()
                  << g_taskConfigRelativeFileName
                  << tr(" canot open!!");
     }
-}
-
-QString TaskInstance::currentTaskPath()
-{
-    return m_currentTaskPath;
-}
-
-QString TaskInstance::currentTaskCode()
-{
-    return m_currentTaskCode;
+    return -1;
 }

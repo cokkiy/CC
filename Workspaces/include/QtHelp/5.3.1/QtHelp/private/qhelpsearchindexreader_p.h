@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/help/qhelpsearchindexreader_p.h"
+#include "../../../../../src/assistant/help/qhelpsearchindexreader_p.h"

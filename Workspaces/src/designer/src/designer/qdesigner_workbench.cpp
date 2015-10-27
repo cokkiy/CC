@@ -61,7 +61,7 @@
 #include <QtDesigner/private/actioneditor_p.h>
 #include <QtDesigner/private/qdesigner_formwindowmanager_p.h>
 #include "previewmanager_p.h"
-#include "qdesigner_formbuilder_p.h"
+#include "qdesigner_formbuilder_p.h""
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
@@ -188,7 +188,7 @@ QDesignerWorkbench::QDesignerWorkbench()  :
     m_dockedMainWindow(0),
     m_currentPageContainer(0),
     m_state(StateInitializing),
-    m_formWindowListLength(10),
+    m_formWindowListLength(200),
     m_bFullScreen(false),
     m_uiSettingsChanged(false)
 {
@@ -204,7 +204,7 @@ QDesignerWorkbench::QDesignerWorkbench()  :
     //connect(m_windowActions, SIGNAL(triggered(QAction*)), this, SLOT(formWindowActionTriggered(QAction*)));
 
     // Build main menu bar
-    addMenu(m_globalMenuBar, tr("&File"), m_actionManager->fileActions()->actions());
+    m_fileMenu = addMenu(m_globalMenuBar, tr("&File"), m_actionManager->fileActions()->actions());
 
     m_editMenu = addMenu(m_globalMenuBar, tr("&Edit"), m_actionManager->editActions()->actions());
     m_editMenu->addSeparator();
@@ -217,11 +217,13 @@ QDesignerWorkbench::QDesignerWorkbench()  :
 
     m_viewMenu = m_globalMenuBar->addMenu(tr("&View"));
 
-    addMenu(m_globalMenuBar, tr("&Settings"), m_actionManager->settingsActions()->actions());
+    m_settingMenu = addMenu(m_globalMenuBar, tr("&Settings"), m_actionManager->settingsActions()->actions());
 
     //m_windowMenu = addMenu(m_globalMenuBar, tr("&Window"), m_actionManager->windowActions()->actions());
 
-    addMenu(m_globalMenuBar, tr("&Help"), m_actionManager->helpActions()->actions());
+    m_funMenu = addMenu(m_globalMenuBar, tr("功能(&O)"), m_actionManager->functionActions()->actions());
+
+    m_helpMenu = addMenu(m_globalMenuBar, tr("&Help"), m_actionManager->helpActions()->actions());
 
     //  Add the tools in view menu order
     QActionGroup *viewActions = new QActionGroup(this);
@@ -340,12 +342,22 @@ void QDesignerWorkbench::setAppMode(const AppMode m)
     switch(m_appMode)
     {
     case DesignerMode:
-        m_editMenu->setEnabled(true);
-        m_viewMenu->setEnabled(true);
+        m_globalMenuBar->clear();
+        m_globalMenuBar->addMenu(m_fileMenu);
+        m_globalMenuBar->addMenu(m_editMenu);
+        m_globalMenuBar->addMenu(m_viewMenu);
+        m_globalMenuBar->addMenu(m_settingMenu);
+        m_globalMenuBar->addMenu(m_funMenu);
+        m_globalMenuBar->addMenu(m_helpMenu);
+        m_dockedMainWindow->designerMode();
         break;
     case RealTimeMode:
-        m_editMenu->setEnabled(false);
-        m_viewMenu->setEnabled(false);
+        m_dockedMainWindow->realTimeMode();
+        m_globalMenuBar->clear();
+        m_globalMenuBar->addMenu(m_fileMenu);
+        m_globalMenuBar->addMenu(m_settingMenu);
+        m_globalMenuBar->addMenu(m_funMenu);
+        m_globalMenuBar->addMenu(m_helpMenu);
         break;
     default:
         break;
@@ -406,6 +418,7 @@ void QDesignerWorkbench::fullScreen()
         }
     }
     m_bFullScreen = !m_bFullScreen;
+    m_dockedMainWindow->showMaximized();
     m_dockedMainWindow->centralWidget()->setFocus();
 }
 
@@ -414,6 +427,21 @@ void QDesignerWorkbench::addFormWindow(QDesignerFormWindow *formWindow)
     // ### Q_ASSERT(formWindow->windowTitle().isEmpty() == false);
 
     m_formWindows.append(formWindow);
+    // Create a form
+    QDesignerFormWindowManagerInterface *formWindowManager = m_core->formWindowManager();
+    formWindowManager->addFormWindow(formWindow->editor());
+    m_pageName_formWindow[formWindow->editor()->fileName()] = formWindow;
+    m_formWindow_pageName[formWindow] = formWindow->editor()->fileName();
+    //维持缓存画面列表的长度确保不超过要求的长度
+    if(formWindowCount()>m_formWindowListLength)
+    {
+        QDesignerFormWindow *t_fWindow = m_formWindows.at(0);
+        QString t_pageName = m_formWindow_pageName[t_fWindow];
+        m_pageName_formWindow.remove(t_pageName);
+        m_formWindow_pageName.remove(t_fWindow);
+        removeFormWindow(t_fWindow);
+        formWindowManager->removeFormWindow(formWindow->editor());
+    }
 
 
     m_actionManager->setWindowListSeparatorVisible(true);
@@ -534,7 +562,7 @@ void QDesignerWorkbench::switchToDockedMode()
     connect(m_dockedMainWindow, SIGNAL(fileDropped(QString)), this, SLOT(slotFileDropped(QString)));
     connect(m_dockedMainWindow, SIGNAL(formWindowActivated(QDesignerFormWindow*)), this, SLOT(slotFormWindowActivated(QDesignerFormWindow*)));
     m_dockedMainWindow->restoreSettings(settings, m_dockedMainWindow->addToolWindows(m_toolWindows), desktopGeometry());
-
+    m_dockedMainWindow->showMaximized();
     m_core->setTopLevel(m_dockedMainWindow);
 
 #ifndef Q_OS_MAC
@@ -795,8 +823,6 @@ QDesignerFormWindow *QDesignerWorkbench::getFormWindow(QString pageName)
         qDebug()<<"打开画面文件:"<<fileName<<",出错!";
         return NULL;
     }
-    // Create a form
-    QDesignerFormWindowManagerInterface *formWindowManager = m_core->formWindowManager();
     // 新增获取窗口指针的方法,实现只有一个画面窗口的功能,andrew,20150316
     QDesignerFormWindow *mewCreateformWindow = new QDesignerFormWindow(NULL, this);
     QDesignerFormWindowInterface *editor = mewCreateformWindow->editor();
@@ -815,17 +841,6 @@ QDesignerFormWindow *QDesignerWorkbench::getFormWindow(QString pageName)
     file.close();
     //将画面窗口以及画面名称添加到缓存画面列表及映射
     addFormWindow(mewCreateformWindow);
-    m_pageName_formWindow[pageName] = mewCreateformWindow;
-    m_formWindow_pageName[mewCreateformWindow] = pageName;
-    //维持缓存画面列表的长度确保不超过要求的长度
-    if(formWindowCount()>m_formWindowListLength)
-    {
-        QDesignerFormWindow *t_fWindow = formWindow(0);
-        QString t_pageName = m_formWindow_pageName[t_fWindow];
-        m_pageName_formWindow.remove(t_pageName);
-        m_formWindow_pageName.remove(t_fWindow);
-        removeFormWindow(t_fWindow);
-    }
     return mewCreateformWindow;
 }
 
@@ -1180,6 +1195,8 @@ QDesignerFormWindow * QDesignerWorkbench::openTemplate(const QString &templateFi
 
     rc->editor()->setFileName(editorFileName);
     rc->firstShow();
+    //将画面窗口以及画面名称添加到缓存画面列表及映射
+    addFormWindow(rc);
     return rc;
 }
 

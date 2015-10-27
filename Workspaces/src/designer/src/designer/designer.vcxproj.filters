@@ -53,6 +53,9 @@
     <ClCompile Include="assistantclient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="outdata\dialogoutdataconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\shared\fontpanel\fontpanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -112,6 +115,9 @@
     <ClInclude Include="designer_enums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="outdata\dialogoutdataconfig.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\..\..\shared\fontpanel\fontpanel.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -166,6 +172,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include=".moc\release\moc_appfontdialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_dialogoutdataconfig.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_dialogoutdataconfig.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include=".moc\debug\moc_fontpanel.cpp">
@@ -267,6 +279,9 @@
     <CustomBuild Include=".moc\release\qttoolbardialog.moc">
       <Filter>Generated Files</Filter>
     </CustomBuild>
+    <ClInclude Include=".uic\ui_dialogoutdataconfig.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
     <ClInclude Include=".uic\ui_preferencesdialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -287,6 +302,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="outdata\dialogoutdataconfig.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="preferencesdialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>

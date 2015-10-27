@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractoptionspage.h"
+#include "../../src/designer/src/lib/sdk/abstractoptionspage.h"

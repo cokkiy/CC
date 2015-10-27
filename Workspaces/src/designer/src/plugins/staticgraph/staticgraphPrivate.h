@@ -31,6 +31,11 @@ public:
     QString m_Scaleplace_x_plot;
     //y轴刻度位置
     QString m_Scaleplace_y_plot;
+    //原点的位置：左下、左上、右下、右上、上中、下中、正中
+    QString m_OriginPlace_plot;
+    //刻度标签的位置：内侧、外侧
+    QString m_Scalelabelplace_x_plot;
+    QString m_Scalelabelplace_y_plot;
     //是否显示x轴
     bool m_XAxisdisplay_plot;
     //是否显示y轴
@@ -62,13 +67,54 @@ public:
     //理论曲线弹道文件
     QString m_Lgraphfile_plot;//理论曲线文件(路径)
 
+    qint32 m_XAxiswideth_plot;
+    QString m_chooseXAxisColor_plot ;
+//    qint32 m_YAxiswideth_plot ;
+//    QString m_chooseYAxisColor_plot ;
+    QString m_chooseXAxisLabelColor_plot ;
+
+    bool m_chooseXAxislabeldisplay_plot ;
+    QString m_chooseYAxisLabelColor_plot ;
+    bool m_chooseYAxislabeldisplay_plot ;
+    QString m_chooseXAxisScaleLabelColor_plot;
+
+    qint32 m_numOfXAxisScale_plot ;//设置刻度数
+    qint32 m_numOfYAxisScale_plot ;
+
+    qint32 m_XAxisScaleRuler_plot ;
+    qint32 m_XAxisScaleprecision_plot ;
+    bool m_chooseXAxisScalelabeldisplay_plot ;
+    QString m_chooseYAxisScaleLabelColor_plot;
+
+    qint32 m_YAxisScaleRuler_plot ;
+    qint32 m_YAxisScaleprecision_plot ;
+    bool m_chooseYAxisScalelabeldisplay_plot ;
+    bool m_chooseXAxisScaleTickdisplay_plot ;
+    bool m_chooseYAxisScaleTickdisplay_plot ;
+
+    QString m_XAxislabelFont_plot;
+//    QString m_YAxislabelFont_plot;
+    QString m_XAxisScalelabelFont_plot;
+    QString m_YAxisScalelabelFont_plot;
+
+    QString m_XAxisScalelabeloffset_x_plot ;
+    QString m_XAxisScalelabeloffset_y_plot ;
+    QString m_YAxisScalelabeloffset_x_plot ;
+    QString m_YAxisScalelabeloffset_y_plot ;
+
     //理论曲线图层
     QCPGraph* m_pLgraph;
     //实时曲线图层
     QCPGraph* m_pgraph;
+    //实时曲线(最后收到的点)---闪烁点
+    QCPGraph* m_pgraphLast;
+    //
+
+
+
 
     //实时曲线数据 注意，更新数据后须使用setData方法才能更新曲线
-    QVector<double> m_Cx, m_Cy;
+    QVector<double> m_Cx, m_Cy,m_CxLast, m_CyLast;
     //理论曲线数据 注意，更新数据后须使用setData方法才能更新曲线
     QVector<double> m_Lx, m_Ly;
     //读取理论曲线文件，并生成理论曲线
@@ -83,12 +129,24 @@ public:
     explicit staticgraphPrivate(QWidget*);
     virtual ~staticgraphPrivate();
 public:
+    //工作代码
     void setPlot();
+    //example: multiple axes example
+    void setPlot_test();
+    //Exmaple: realtime data demo
+    void setPlot_test2();
+    //Exmaple:the interaction example
+    void setPlot_test3();
+    //Exmaple:Line Style Demo
+    void setPlot_test4();
+    //Exmaple:Scatter Style demo
+    void setPlot_test5();
+
 
     void update();
 
 
-    //取自己设计的测试数据数据
+    //取自己设计的测试数据数据    
     void getData_Test();
     //取从外部net模块接收的数据
     void getData();

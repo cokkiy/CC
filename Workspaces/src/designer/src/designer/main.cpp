@@ -118,15 +118,6 @@ void customMessgaeHandler(QtMsgType type,const QMessageLogContext &logcont, cons
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(designer);
-    QTime nowTime = QTime::currentTime();
-    QDate nowDate = QDate::currentDate();
-    TaskInterface * task = NetComponents::getTastCenter();
-    s_logFileNamePattern = task->currentTaskPath() + g_logFileNamePattern;
-    s_logFile.setFileName(s_logFileNamePattern
-                          .arg(nowDate.toString(dateFormat))
-                          .arg(nowTime.toString(timeFormat)));
-    s_logFile.open(QIODevice::ReadWrite|QIODevice::Append);
-    qInstallMessageHandler(customMessgaeHandler);
     QDesigner app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
     //构建启动画面
@@ -143,6 +134,17 @@ int main(int argc, char *argv[])
     splash->showMessage(QObject::tr("Load Moudles ..."),showTextAlign,Qt::red);
     splash->finish(app.mainWindow());
     delete splash;
+
+    QTime nowTime = QTime::currentTime();
+    QDate nowDate = QDate::currentDate();
+    TaskInterface * task = NetComponents::getTastCenter();
+    s_logFileNamePattern = task->currentTaskPath() + g_logFileNamePattern;
+    s_logFile.setFileName(s_logFileNamePattern
+                          .arg(nowDate.toString(dateFormat))
+                          .arg(nowTime.toString(timeFormat)));
+    s_logFile.open(QIODevice::ReadWrite|QIODevice::Append);
+    qInstallMessageHandler(customMessgaeHandler);
+
     int ret = app.exec();
     s_logFile.close();
     //恢复告警信息的事件注册,andrew,20150813

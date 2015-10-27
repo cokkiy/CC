@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/clucene/qsort_p.h"
+#include "../../../../../src/assistant/clucene/qsort_p.h"

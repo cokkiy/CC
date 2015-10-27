@@ -1,14 +1,23 @@
 ﻿#ifndef SELECTMULTIPARAMDLG_H
 #define SELECTMULTIPARAMDLG_H
-#include "propertyeditor_global.h"
 #include <Net/NetComponents>
 #include <QDialog>
-
+#include <QtCore/qglobal.h>
 namespace Ui {
-class QSelectMultiParamDlg;
+class QSelectMultiParamDlg_UI;
 }
 
-class QSelectMultiParamDlg : public QDialog
+#if defined(WIN32)
+#if defined(QDESIGNER_COMPONENTS_LIBRARY)
+#define Q_SelectMultiParamDlg_EXPORT Q_DECL_EXPORT
+#else
+#define  Q_SelectMultiParamDlg_EXPORT
+#endif
+#else
+#define Q_SelectMultiParamDlg_EXPORT
+#endif
+
+class Q_SelectMultiParamDlg_EXPORT QSelectMultiParamDlg : public QDialog
 {
     Q_OBJECT
 public:
@@ -64,7 +73,7 @@ private:
     void setButtonState(bool );
     QMap<unsigned short, QString > tablemap;
 private:
-    Ui::QSelectMultiParamDlg *ui;
+    Ui::QSelectMultiParamDlg_UI *ui;
 private:
     QVector<QString> m_SelectingVector;
     QVector<QString> m_SelectedVector;

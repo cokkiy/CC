@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/plaintexteditor_p.h"
+#include "../../../../../src/designer/src/lib/shared/plaintexteditor_p.h"

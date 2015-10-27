@@ -3,7 +3,7 @@
 
 QSelectMultiParamDlg::QSelectMultiParamDlg(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QSelectMultiParamDlg)
+    ui(new Ui::QSelectMultiParamDlg_UI)
 {
     m_iMinTableNo = 1;
     m_iMaxTableNo = 30000;

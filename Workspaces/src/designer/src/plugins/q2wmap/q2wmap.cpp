@@ -138,6 +138,20 @@ void Q2wmap::setobj(const QString str)
     d->setObj(str);
 }
 
+//获取静态元素属性
+QString Q2wmap::getstatic()const
+{
+    Q_D(const Q2wmap);
+    return d->getStatic();
+}
+
+//设置静态元素属性
+void Q2wmap::setstatic(const QString str)
+{
+    Q_D(Q2wmap);
+    d->setStatic(str);
+}
+
 //获取坐标轴颜色
 QColor Q2wmap::getAColor()const
 {

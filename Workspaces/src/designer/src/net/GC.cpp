@@ -20,9 +20,9 @@ extern size_t getPeakRSS();
 作者：cokkiy（张立民)
 创建时间：2015/10/16 15:59:57
 */
-GC::GC(HistoryParamBuffer* pHistoryParamBuffer)
+GC::GC(HistoryBufferManager::HistoryParamMap* pHistoryParamBuffer)
 {
-    this->pParamMap = &pHistoryParamBuffer->m_HistoryParamBuf;
+    this->pParamMap = pHistoryParamBuffer;
 }
 
 //释放资源
@@ -68,11 +68,12 @@ void GC::start()
 void GC::stop()
 {
     bQuit = true;
+    gcThread->join();
 }
 
 // periodcally collect history param list item
 // and remove unused
-void GC::collect(HistoryParamMap* pParamMap)
+void GC::collect(HistoryBufferManager::HistoryParamMap* pParamMap)
 {
     while (true)
     {
@@ -92,6 +93,15 @@ void GC::collect(HistoryParamMap* pParamMap)
         }
 
         curPercent = ((float)current) / total;
+
+        if(collectIndex==0&&curPercent<=prevPercent)
+        {
+            // 解决在linux下，释放内存后，系统仍然让进程占用内存而不释放回去，
+            // 不停回收的问题
+            // 只有实际有增长才再次释放
+            continue;
+        }
+
         // adjust sleep time
         adjustSleepTime();
 
@@ -99,33 +109,33 @@ void GC::collect(HistoryParamMap* pParamMap)
         {
             // 比设置值小于80%前，不做任何清理
             continue;
-        }
+        }        
 
         for (auto &param : *pParamMap)
         {
-            GCWrapper& wrapper = param.second;
+            HistoryBufferManager::GCWrapper& wrapper = param.second;
             if (collectIndex == 0)
             {
                 //第一轮只清理未使用的参数
-//                 if (wrapper.visited == 0)
-//                 {
-//                     // first class collected
-//                     wrapper.noWrite = true;                    
-//                     HistoryParams* org = wrapper.pParamsBuf;
-//                     wrapper.pParamsBuf = new HistoryParams();
-//                     for (auto& item : *org)
-//                     {
-//                         if (item != nullptr)
-//                         {
-//                             item->clear();
-//                             delete item;
-//                             item = nullptr;
-//                         }
-//                     }
-//                     org->clear();
-//                     delete org;
-//                     wrapper.gcTimes++;
-//                 }
+                if (wrapper.visited == 0)
+                {
+                    // first class collected
+                    wrapper.noWrite = true;
+                    HistoryBufferManager::HistoryParams* org = wrapper.pParamsBuf;
+                    wrapper.pParamsBuf = new HistoryBufferManager::HistoryParams();
+                    for (auto& item : *org)
+                    {
+                        if (item != nullptr)
+                        {
+                            item->clear();
+                            delete item;
+                            item = nullptr;
+                        }
+                    }
+                    org->clear();
+                    delete org;
+                    wrapper.gcTimes++;
+                }
             }
             else if (collectIndex == 1)
             {
@@ -145,7 +155,7 @@ void GC::collect(HistoryParamMap* pParamMap)
             }
             else if(collectIndex==2)
             {
-                if (willBeCollected.size() != 0)
+                if (!willBeCollected.empty())
                 {
                     //执行清理工作
                     size_t count = willBeCollected.size();
@@ -203,13 +213,13 @@ void GC::adjustSleepTime()
     //最小不能小于2s
     sleepDuration = sleepDuration >= 2s ? sleepDuration : 2s;
     
-    //最大不能大于1min
+    //最大不能大于30s
     if (prevPercent != 0 && (prevPercent - curPercent) <= 0.05 && sleepDuration < 30s)
     {
         sleepDuration++;
     }
 
-    if (curPercent >= (percent - 20) / 100.0)
+    if (curPercent >= (percent - 20) / 100.0&&sleepDuration > 5s)
     {
         sleepDuration = 5s;
     }

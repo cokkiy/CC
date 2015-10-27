@@ -35,6 +35,9 @@ public:
     bool m_YAxisdisplay;
     QString m_Scaleplace_x;
     QString m_Scaleplace_y;
+    QString m_OriginPlace;
+    QString m_Scalelabelplace_x;
+    QString m_Scalelabelplace_y;
 
     QString m_GraphName;
     qint32  m_GraphWidth;
@@ -45,15 +48,63 @@ public:
     double  m_LGraphBuffer;
     QString m_strLgraphColor;
 
+
     QString m_xParam;
     QString m_yParam;
     QString m_Lgraphfile;//理论曲线文件(路径)
 
+
+
+    qint32 m_XAxiswideth;
+
+    QString m_chooseXAxisColor;
+
+
+    bool m_chooseXAxislabeldisplay;
+    bool m_chooseYAxislabeldisplay;
+    bool m_chooseXAxisScalelabeldisplay;
+    bool m_chooseYAxisScalelabeldisplay;
+    bool m_chooseXAxisScaleTickdisplay;
+    bool m_chooseYAxisScaleTickdisplay;
+
+    qint32 m_numOfXAxisScale;//刻度数的设置
+    qint32 m_numOfYAxisScale;
+
+    qint32 m_XAxisScaleRuler;//刻度小线段长度的设置
+    qint32 m_YAxisScaleRuler;//刻度小线段长度的设置
+
+    qint32 m_XAxisScaleprecision;
+    qint32 m_YAxisScaleprecision;
+
+
+    QString m_XAxislabelFont;
+
+    QString m_XAxisScalelabelFont;
+    QString m_YAxisScalelabelFont;
+
+    QString m_XAxisScalelabeloffset_x;
+    QString m_XAxisScalelabeloffset_y;
+    QString m_YAxisScalelabeloffset_x;
+    QString m_YAxisScalelabeloffset_y;
+    
+
+
     //设置控件
     void setControls();
 
+signals:
+
+
+
+
+
+
 private slots:
 
+
+
+
+    
     void on_lineEdit_Xmax_tab_textChanged(const QString &arg1);//输入X轴最大值
 
     void on_lineEdit_Xmin_tab_textChanged(const QString &arg1);//输入X轴最小值
@@ -74,9 +125,12 @@ private slots:
 
     void on_checkBox_chooseAxisdisplay_y_clicked(bool checked);//Y轴显示
 
-    void on_comboBox_Scaleplace_x_currentTextChanged(const QString &arg1);//X的刻度位置（上中下）
+    void on_comboBox_Scaleplace_x_currentTextChanged(const QString &arg1);//x的刻度位置（上中下）
 
-    void on_comboBox_Scaleplace_y_currentTextChanged(const QString &arg1);//Y的刻度位置（左中右）
+    void on_comboBox_Scaleplace_y_currentTextChanged(const QString &arg1);//y的刻度位置（左中右）
+
+    void on_comboBox_Scalelabelplace_x_currentTextChanged(const QString &arg1);//x的刻度标签位置（内侧、外侧）
+    void on_comboBox_Scalelabelplace_y_currentTextChanged(const QString &arg1);//x的刻度标签位置（内侧、外侧）
 
 
 
@@ -103,6 +157,52 @@ private slots:
     void on_pushButton_chooseXparam_tab_clicked();//选择X参数
 
     void on_pushButton_chooseYparam_tab_clicked();//选择Y参数
+
+
+    
+    void on_lineEdit_XAxiswideth_tab_textChanged(const QString &arg1);
+
+    void on_lineEdit_numOfXAxisScale_tab_textChanged(const QString &arg1);
+    void on_lineEdit_numOfYAxisScale_tab_textChanged(const QString &arg1);
+    void on_lineEdit_XAxisScaleRuler_tab_textChanged(const QString &arg1);
+    void on_lineEdit_YAxisScaleRuler_tab_textChanged(const QString &arg1);
+    void on_lineEdit_XAxisScaleprecision_tab_textChanged(const QString &arg1);
+    void on_lineEdit_YAxisScaleprecision_tab_textChanged(const QString &arg1);
+
+
+
+    void on_pushButton_chooseXAxisColor_tab_clicked();
+
+
+
+    void on_checkBox_chooseXAxislabeldisplay_tab_clicked(bool checked);
+    void on_checkBox_chooseYAxislabeldisplay_tab_clicked(bool checked);
+    void on_checkBox_chooseXAxisScalelabeldisplay_tab_clicked(bool checked);
+    void on_checkBox_chooseYAxisScalelabeldisplay_tab_clicked(bool checked);
+    void on_checkBox_chooseXAxisScaleTickdisplay_tab_clicked(bool checked);
+    void on_checkBox_chooseYAxisScaleTickdisplay_tab_clicked(bool checked);
+
+    void on_pushButton_XAxislabelFont_tab_clicked();
+
+    void on_pushButton_XAxisScalelabelFont_tab_clicked();
+    void on_pushButton_YAxisScalelabelFont_tab_clicked();
+
+    void on_lineEdit_XAxisScalelabeloffset_x_tab_textChanged(const QString &arg1);
+    void on_lineEdit_XAxisScalelabeloffset_y_tab_textChanged(const QString &arg1);
+    void on_lineEdit_YAxisScalelabeloffset_x_tab_textChanged(const QString &arg1);
+    void on_lineEdit_YAxisScalelabeloffset_y_tab_textChanged(const QString &arg1);
+
+
+
+
+
+
+
+
+
+
+
+    void on_comboBox_OriginPlace_currentTextChanged(const QString &arg1);
 
 private:
     Ui::GraphObjDlg *ui;

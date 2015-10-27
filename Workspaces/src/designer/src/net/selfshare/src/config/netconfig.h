@@ -16,8 +16,6 @@
 #include "xelement.h"
 #include "../netbuffer/netbuffer.h"
 
-using namespace std;
-
 
 //网络配置类定义
 class NETSHARED_EXPORT NetConfig
@@ -47,7 +45,7 @@ public:
         QString IPAddress;
 
         //组播源地址列表，只有指定源组播时才有用
-        list<QString> SpecifiedIPList;
+        std::list<QString> SpecifiedIPList;
 
         //接收缓冲区大小
         int RecBuffSize;
@@ -64,13 +62,13 @@ public:
     {
     public:
         // 本机ip地址（包含一个本机ip地址的列表，也可能有其他主机的ip地址，为了方便拷贝到其他工作站）
-        list<QString> ipAddresses;
+        std::list<QString> ipAddresses;
 
         //主用接收设置
-        list<RecSetting> primaryRecSettings;
+        std::list<RecSetting> primaryRecSettings;
 
         //备用接收设置
-        list<RecSetting> backupRecSettings;
+        std::list<RecSetting> backupRecSettings;
     };
 
 public:
@@ -82,7 +80,7 @@ public:
     ~NetConfig();
 
     //获取网卡设置
-    list<NISetting>* getNISettings();
+    std::list<NISetting>* getNISettings();
 
     //加载配置文件
     bool load(const QString&);
@@ -97,7 +95,7 @@ public:
 private:
 
     //网卡设置列表
-    list<NISetting>* m_NISettings;
+    std::list<NISetting>* m_NISettings;
     
     //构建接收设置
     void buildRecSetting(ElementList& recList, NISetting& niSetting, bool isPrimary);

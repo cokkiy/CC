@@ -10,10 +10,8 @@
 #include <chrono>
 #include <list>
 #include <thread>
-#include "GCWrapper.h"
-#include "selfshare/src/historyparambuffer/historyparambuffer.h"
+#include "HistoryBufferManager.h"
 using namespace std::chrono;
-
 
 /*Class for garbage collection*/
 class GC
@@ -27,7 +25,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/10/16 15:59:57
     */
-    GC(HistoryParamBuffer* pHistoryParamBuffer);
+    GC(HistoryBufferManager::HistoryParamMap* pHistoryParamBuffer);
     
     /*Deconstructor*/
     ~GC();
@@ -72,7 +70,7 @@ private:
     seconds sleepDuration=10s;
     
     //history param map
-    HistoryParamMap* pParamMap;
+    HistoryBufferManager::HistoryParamMap* pParamMap;
 
     //实际回收次数
     unsigned int collectIndex = 0;
@@ -85,7 +83,7 @@ private:
    
     // periodcally collect history param list item
     // and remove unused
-    void collect(HistoryParamMap* pParamMap);
+    void collect(HistoryBufferManager::HistoryParamMap* pParamMap);
 
     // adjust the gc sleep time
     void adjustSleepTime();
@@ -114,8 +112,6 @@ private:
         {
             percent = 95;
         }
-
-        percent = 10;
     }
 };
 

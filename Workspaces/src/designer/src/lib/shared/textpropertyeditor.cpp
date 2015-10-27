@@ -269,6 +269,7 @@ namespace qdesigner_internal {
         case ValidationStates:
         case ValidationTable:
         case Validation2wmapObj:
+        case Validation2wmapStatic:
             m_lineEdit->setReadOnly(true);
             break;
         case ValidationSingleLine:

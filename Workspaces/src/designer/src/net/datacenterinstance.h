@@ -12,6 +12,7 @@ public:
     virtual int getValue(QString computeStr,double& result);
     virtual int getValue(QString computeStr,QVariant& result);
     virtual int getHistoryData(QString computeStr,QVector<double>& result);
+    virtual int getHistoryData(QString computeStr,QVector<double>& result,QVector<unsigned int>& time);
     virtual int getHistoryData(QString computeStrX,QString computeStrY,QVector<double>& resultX,QVector<double>& resultY);
     virtual qint32 getHistoryDatas(qint32 count...);
     virtual int getString(QString computeStr,QString dispStr,QString& resultStr);

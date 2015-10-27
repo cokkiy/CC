@@ -2,7 +2,7 @@
 #include "ui_q2wmapobjdlg.h"
 
 #include <QColorDialog>
-#include "selectparamdialog.h"
+#include "paramselect/selectparamdialog.h"
 #include <QFileDialog>
 
 Q2wmapObjDlg::Q2wmapObjDlg(QJsonObject jobj, QWidget *parent) :

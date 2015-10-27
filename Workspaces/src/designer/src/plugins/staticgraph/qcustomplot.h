@@ -263,6 +263,7 @@ inline bool isInvalidData(double value1, double value2)
 //QMargins实际上就是画四种矩形
 inline void setMarginValue(QMargins &margins, QCP::MarginSide side, int value)
 {
+    //
   switch (side)
   {
     case QCP::msLeft: margins.setLeft(value); break;//左边留白
@@ -1083,19 +1084,19 @@ class QCP_LIB_DECL QCPAxis : public QCPLayerable
   Q_PROPERTY(double scaleLogBase READ scaleLogBase WRITE setScaleLogBase)
   Q_PROPERTY(QCPRange range READ range WRITE setRange NOTIFY rangeChanged)//设置范围
   Q_PROPERTY(bool rangeReversed READ rangeReversed WRITE setRangeReversed)//设置刻度反过来
-  Q_PROPERTY(bool autoTicks READ autoTicks WRITE setAutoTicks)//自动标记
-  Q_PROPERTY(int autoTickCount READ autoTickCount WRITE setAutoTickCount)//自动标记计数
-  Q_PROPERTY(bool autoTickLabels READ autoTickLabels WRITE setAutoTickLabels)//自动标记标签
-  Q_PROPERTY(bool autoTickStep READ autoTickStep WRITE setAutoTickStep)//自动标记梯级
-  Q_PROPERTY(bool autoSubTicks READ autoSubTicks WRITE setAutoSubTicks)//自动标记子刻度
-  Q_PROPERTY(bool ticks READ ticks WRITE setTicks)//标记
-  Q_PROPERTY(bool tickLabels READ tickLabels WRITE setTickLabels)//标记标签
-  Q_PROPERTY(int tickLabelPadding READ tickLabelPadding WRITE setTickLabelPadding)//标记标签填充
-  Q_PROPERTY(LabelType tickLabelType READ tickLabelType WRITE setTickLabelType) //标记标签类型
-  Q_PROPERTY(QFont tickLabelFont READ tickLabelFont WRITE setTickLabelFont)//标记标签字体
-  Q_PROPERTY(QColor tickLabelColor READ tickLabelColor WRITE setTickLabelColor)//标记标签颜色
-  Q_PROPERTY(double tickLabelRotation READ tickLabelRotation WRITE setTickLabelRotation)//标记标签旋转
-  Q_PROPERTY(LabelSide tickLabelSide READ tickLabelSide WRITE setTickLabelSide)//标记标签侧面
+  Q_PROPERTY(bool autoTicks READ autoTicks WRITE setAutoTicks)//自动刻度
+  Q_PROPERTY(int autoTickCount READ autoTickCount WRITE setAutoTickCount)//自动刻度计数
+  Q_PROPERTY(bool autoTickLabels READ autoTickLabels WRITE setAutoTickLabels)//自动刻度标签
+  Q_PROPERTY(bool autoTickStep READ autoTickStep WRITE setAutoTickStep)//自动刻度梯级
+  Q_PROPERTY(bool autoSubTicks READ autoSubTicks WRITE setAutoSubTicks)//自动刻度子刻度
+  Q_PROPERTY(bool ticks READ ticks WRITE setTicks)//刻度
+  Q_PROPERTY(bool tickLabels READ tickLabels WRITE setTickLabels)//刻度标签
+  Q_PROPERTY(int tickLabelPadding READ tickLabelPadding WRITE setTickLabelPadding)//刻度标签填充
+  Q_PROPERTY(LabelType tickLabelType READ tickLabelType WRITE setTickLabelType) //刻度标签类型
+  Q_PROPERTY(QFont tickLabelFont READ tickLabelFont WRITE setTickLabelFont)//刻度标签字体
+  Q_PROPERTY(QColor tickLabelColor READ tickLabelColor WRITE setTickLabelColor)//刻度标签颜色
+  Q_PROPERTY(double tickLabelRotation READ tickLabelRotation WRITE setTickLabelRotation)//刻度标签旋转
+  Q_PROPERTY(LabelSide tickLabelSide READ tickLabelSide WRITE setTickLabelSide)//刻度标签侧面
   Q_PROPERTY(QString dateTimeFormat READ dateTimeFormat WRITE setDateTimeFormat)//日期时间格式
   Q_PROPERTY(Qt::TimeSpec dateTimeSpec READ dateTimeSpec WRITE setDateTimeSpec)//日期时间规格
   Q_PROPERTY(QString numberFormat READ numberFormat WRITE setNumberFormat)//数字格式
@@ -1103,14 +1104,14 @@ class QCP_LIB_DECL QCPAxis : public QCPLayerable
   Q_PROPERTY(double tickStep READ tickStep WRITE setTickStep)//台阶记号
   Q_PROPERTY(QVector<double> tickVector READ tickVector WRITE setTickVector)//矢量记号
   Q_PROPERTY(QVector<QString> tickVectorLabels READ tickVectorLabels WRITE setTickVectorLabels)//矢量记号标签
-  Q_PROPERTY(int tickLengthIn READ tickLengthIn WRITE setTickLengthIn)//内侧的标记长度
-  Q_PROPERTY(int tickLengthOut READ tickLengthOut WRITE setTickLengthOut)//内侧的标记长度
-  Q_PROPERTY(int subTickCount READ subTickCount WRITE setSubTickCount)//子标记计数
-  Q_PROPERTY(int subTickLengthIn READ subTickLengthIn WRITE setSubTickLengthIn)//内侧的子标记长度
-  Q_PROPERTY(int subTickLengthOut READ subTickLengthOut WRITE setSubTickLengthOut)//外侧的子标记长度
+  Q_PROPERTY(int tickLengthIn READ tickLengthIn WRITE setTickLengthIn)//内侧的刻度长度
+  Q_PROPERTY(int tickLengthOut READ tickLengthOut WRITE setTickLengthOut)//内侧的刻度长度
+  Q_PROPERTY(int subTickCount READ subTickCount WRITE setSubTickCount)//子刻度计数
+  Q_PROPERTY(int subTickLengthIn READ subTickLengthIn WRITE setSubTickLengthIn)//内侧的子刻度长度
+  Q_PROPERTY(int subTickLengthOut READ subTickLengthOut WRITE setSubTickLengthOut)//外侧的子刻度长度
   Q_PROPERTY(QPen basePen READ basePen WRITE setBasePen)//基本画笔
-  Q_PROPERTY(QPen tickPen READ tickPen WRITE setTickPen)//标记用画笔
-  Q_PROPERTY(QPen subTickPen READ subTickPen WRITE setSubTickPen)//子标记用画笔
+  Q_PROPERTY(QPen tickPen READ tickPen WRITE setTickPen)//刻度用画笔
+  Q_PROPERTY(QPen subTickPen READ subTickPen WRITE setSubTickPen)//子刻度用画笔
   Q_PROPERTY(QFont labelFont READ labelFont WRITE setLabelFont)//标签字体
   Q_PROPERTY(QColor labelColor READ labelColor WRITE setLabelColor)//标签颜色
   Q_PROPERTY(QString label READ label WRITE setLabel) //标签
@@ -1119,13 +1120,13 @@ class QCP_LIB_DECL QCPAxis : public QCPLayerable
   Q_PROPERTY(int offset READ offset WRITE setOffset)//偏移量
   Q_PROPERTY(SelectableParts selectedParts READ selectedParts WRITE setSelectedParts NOTIFY selectionChanged)//可选择的部分
   Q_PROPERTY(SelectableParts selectableParts READ selectableParts WRITE setSelectableParts NOTIFY selectableChanged)
-  Q_PROPERTY(QFont selectedTickLabelFont READ selectedTickLabelFont WRITE setSelectedTickLabelFont) //选择的标记标签字体
+  Q_PROPERTY(QFont selectedTickLabelFont READ selectedTickLabelFont WRITE setSelectedTickLabelFont) //选择的刻度标签字体
   Q_PROPERTY(QFont selectedLabelFont READ selectedLabelFont WRITE setSelectedLabelFont)//选择的标签字体
-  Q_PROPERTY(QColor selectedTickLabelColor READ selectedTickLabelColor WRITE setSelectedTickLabelColor)//选择的标记标签颜色
+  Q_PROPERTY(QColor selectedTickLabelColor READ selectedTickLabelColor WRITE setSelectedTickLabelColor)//选择的刻度标签颜色
   Q_PROPERTY(QColor selectedLabelColor READ selectedLabelColor WRITE setSelectedLabelColor)//选择的标签颜色
   Q_PROPERTY(QPen selectedBasePen READ selectedBasePen WRITE setSelectedBasePen)//选择的基本画笔
-  Q_PROPERTY(QPen selectedTickPen READ selectedTickPen WRITE setSelectedTickPen)//选择的标记画笔
-  Q_PROPERTY(QPen selectedSubTickPen READ selectedSubTickPen WRITE setSelectedSubTickPen)//选择的子标记画笔
+  Q_PROPERTY(QPen selectedTickPen READ selectedTickPen WRITE setSelectedTickPen)//选择的刻度画笔
+  Q_PROPERTY(QPen selectedSubTickPen READ selectedSubTickPen WRITE setSelectedSubTickPen)//选择的子刻度画笔
   Q_PROPERTY(QCPLineEnding lowerEnding READ lowerEnding WRITE setLowerEnding)//下限
   Q_PROPERTY(QCPLineEnding upperEnding READ upperEnding WRITE setUpperEnding)//上限
   Q_PROPERTY(QCPGrid* grid READ grid)//网格
@@ -1193,34 +1194,54 @@ public:
   double scaleLogBase() const { return mScaleLogBase; }//对数刻度类型
   const QCPRange range() const { return mRange; }//范围
   bool rangeReversed() const { return mRangeReversed; }//反转的范围
-  bool autoTicks() const { return mAutoTicks; } //自动标记
-  int autoTickCount() const { return mAutoTickCount; }//自动标记计数
-  bool autoTickLabels() const { return mAutoTickLabels; }//自动标记标签
-  bool autoTickStep() const { return mAutoTickStep; }//自动标记台阶
-  bool autoSubTicks() const { return mAutoSubTicks; }//自动子标记
-  bool ticks() const { return mTicks; }//标记
-  bool tickLabels() const { return mTickLabels; } //标记标签
-  int tickLabelPadding() const;//标记标签衬垫
-  LabelType tickLabelType() const { return mTickLabelType; }//标记标签类型
-  QFont tickLabelFont() const { return mTickLabelFont; }//标记标签字体
-  QColor tickLabelColor() const { return mTickLabelColor; }//标记标签颜色
-  double tickLabelRotation() const;//标记标签颜色旋转
-  LabelSide tickLabelSide() const;//标记标签在哪边
+  bool autoTicks() const { return mAutoTicks; } //自动刻度
+  int autoTickCount() const { return mAutoTickCount; }//自动刻度计数
+  bool autoTickLabels() const { return mAutoTickLabels; }//自动刻度标签
+  bool autoTickStep() const { return mAutoTickStep; }//自动刻度台阶
+  bool autoSubTicks() const { return mAutoSubTicks; }//自动子刻度
+  bool ticks() const { return mTicks; }//刻度
+  bool tickLabels() const { return mTickLabels; } //刻度标签
+  int tickLabelPadding() const;//刻度标签衬垫
+  LabelType tickLabelType() const { return mTickLabelType; }//刻度标签类型
+  QFont tickLabelFont() const { return mTickLabelFont; }//刻度标签字体
+  QColor tickLabelColor() const { return mTickLabelColor; }//刻度标签颜色
+  //在这里从界面设置获取刻度标签的位移量（单位为象素），再在主类中调用私有类指针将位移量传输到私有类中
+  // !!!!!这个特别重要！！！！
+  //QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针
+  double getXAxisTickLabeloffset_x() const
+  {
+      return m_XAxisTickLabeloffset_x;
+  }
+  double getXAxisTickLabeloffset_y() const
+  {
+      return m_XAxisTickLabeloffset_y;
+  }
+  double getYAxisTickLabeloffset_x() const
+  {
+      return m_YAxisTickLabeloffset_x;
+  }
+  double getYAxisTickLabeloffset_y() const
+  {
+      return m_YAxisTickLabeloffset_y;
+  }
+
+  double tickLabelRotation() const;//刻度标签颜色旋转
+  LabelSide tickLabelSide() const;//刻度标签在哪边
   QString dateTimeFormat() const { return mDateTimeFormat; }//日期时间格式
   Qt::TimeSpec dateTimeSpec() const { return mDateTimeSpec; }//日期时间规格
   QString numberFormat() const;//数字格式
   int numberPrecision() const { return mNumberPrecision; }//数字精度
-  double tickStep() const { return mTickStep; }//标记台阶
-  QVector<double> tickVector() const { return mTickVector; }//标记矢量
-  QVector<QString> tickVectorLabels() const { return mTickVectorLabels; }//标记矢量标签
-  int tickLengthIn() const;//内侧的标记长度
-  int tickLengthOut() const;//外侧的标记长度
-  int subTickCount() const { return mSubTickCount; }//子标记计数
-  int subTickLengthIn() const;//内侧的子标记长度
-  int subTickLengthOut() const;//外侧的子标记长度
+  double tickStep() const { return mTickStep; }//刻度台阶
+  QVector<double> tickVector() const { return mTickVector; }//刻度矢量
+  QVector<QString> tickVectorLabels() const { return mTickVectorLabels; }//刻度矢量标签
+  int tickLengthIn() const;//内侧的刻度长度
+  int tickLengthOut() const;//外侧的刻度长度
+  int subTickCount() const { return mSubTickCount; }//子刻度计数
+  int subTickLengthIn() const;//内侧的子刻度长度
+  int subTickLengthOut() const;//外侧的子刻度长度
   QPen basePen() const { return mBasePen; }//基本画笔
-  QPen tickPen() const { return mTickPen; }//标记的画笔
-  QPen subTickPen() const { return mSubTickPen; }//子标记的画笔
+  QPen tickPen() const { return mTickPen; }//刻度的画笔
+  QPen subTickPen() const { return mSubTickPen; }//子刻度的画笔
   QFont labelFont() const { return mLabelFont; } //标签字体
   QColor labelColor() const { return mLabelColor; }//标签颜色
   QString label() const { return mLabel; }//标签
@@ -1229,13 +1250,13 @@ public:
   int offset() const;//位移
   SelectableParts selectedParts() const { return mSelectedParts; }//可选择的部分
   SelectableParts selectableParts() const { return mSelectableParts; }
-  QFont selectedTickLabelFont() const { return mSelectedTickLabelFont; }//选择的标记标签字体
+  QFont selectedTickLabelFont() const { return mSelectedTickLabelFont; }//选择的刻度标签字体
   QFont selectedLabelFont() const { return mSelectedLabelFont; }//选择的标签字体
-  QColor selectedTickLabelColor() const { return mSelectedTickLabelColor; }//选择的标记标签颜色
+  QColor selectedTickLabelColor() const { return mSelectedTickLabelColor; }//选择的刻度标签颜色
   QColor selectedLabelColor() const { return mSelectedLabelColor; }//选择的标签颜色
   QPen selectedBasePen() const { return mSelectedBasePen; }//选择的基本画笔
-  QPen selectedTickPen() const { return mSelectedTickPen; }//选择的标记画笔
-  QPen selectedSubTickPen() const { return mSelectedSubTickPen; }//选择的子标记画笔
+  QPen selectedTickPen() const { return mSelectedTickPen; }//选择的刻度画笔
+  QPen selectedSubTickPen() const { return mSelectedSubTickPen; }//选择的子刻度画笔
   QCPLineEnding lowerEnding() const;//下限
   QCPLineEnding upperEnding() const;//上限
   QCPGrid *grid() const { return mGrid; }//网格
@@ -1249,49 +1270,58 @@ public:
   void setRangeLower(double lower);
   void setRangeUpper(double upper);
   void setRangeReversed(bool reversed);
-  void setAutoTicks(bool on); //设置自动标记
-  void setAutoTickCount(int approximateCount);//设置自动标记计数
-  void setAutoTickLabels(bool on);//设置自动标记标签
-  void setAutoTickStep(bool on);//设置自动标记台阶
-  void setAutoSubTicks(bool on);//设置自动子标记标签
-  void setTicks(bool show);//设置标记
-  void setTickLabels(bool show);//设置标记标签
-  void setTickLabelPadding(int padding);//设置标记标签衬垫
-  void setTickLabelType(LabelType type);//设置标记标签类型
-  void setTickLabelFont(const QFont &font);//设置标记标签字体
-  void setTickLabelColor(const QColor &color);//设置标记标签颜色
-  void setTickLabelRotation(double degrees);//设置标记标签旋转
-  void setTickLabelSide(LabelSide side);//设置标记标签在哪边
+  void setAutoTicks(bool on); //设置自动刻度
+  void setAutoTickCount(int approximateCount);//设置自动刻度计数
+  void setAutoTickLabels(bool on);//设置自动刻度标签
+  void setAutoTickStep(bool on);//设置自动刻度台阶
+  void setAutoSubTicks(bool on);//设置自动子刻度标签
+  void setTicks(bool show);//设置刻度
+  void setTickLabels(bool show);//设置刻度标签
+  void setTickLabelPadding(int padding);//设置刻度标签衬垫
+  void setTickLabelType(LabelType type);//设置刻度标签类型
+  void setTickLabelFont(const QFont &font);//设置刻度标签字体
+  void setTickLabelColor(const QColor &color);//设置刻度标签颜色
+  //设置刻度标签位移（单位为象素）
+  //在这里从界面设置获取刻度标签的位移量（单位为象素），再在主类中调用私有类指针将位移量传输到私有类中
+  // !!!!!这个特别重要！！！！
+  //QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针
+  void setXAxisTickLabeloffset_x(double X_x,qint32 numxofall_x);
+  void setXAxisTickLabeloffset_y(double X_y,qint32 numxofall_y);
+  void setYAxisTickLabeloffset_x(double Y_x,qint32 numyofall_x);
+  void setYAxisTickLabeloffset_y(double Y_y,qint32 numyofall_y);
+
+  void setTickLabelRotation(double degrees);//设置刻度标签旋转
+  void setTickLabelSide(LabelSide side);//设置刻度标签在哪边
   void setDateTimeFormat(const QString &format);//设置日期时间格式
   void setDateTimeSpec(const Qt::TimeSpec &timeSpec);//设置日期时间规格
   void setNumberFormat(const QString &formatCode); //设置数字格式
   void setNumberPrecision(int precision);//设置数字精度
   void setTickStep(double step); //设置刻度间距
-  void setTickVector(const QVector<double> &vec);//设置标记矢量
-  void setTickVectorLabels(const QVector<QString> &vec);//设置标记矢量标签
-  void setTickLength(int inside, int outside=0);//设置标记长度
+  void setTickVector(const QVector<double> &vec);//设置刻度矢量
+  void setTickVectorLabels(const QVector<QString> &vec);//设置刻度矢量标签
+  void setTickLength(int inside, int outside=0);//设置刻度长度
   void setTickLengthIn(int inside);
   void setTickLengthOut(int outside);
-  void setSubTickCount(int count);//设置子标记长度
+  void setSubTickCount(int count);//设置子刻度长度
   void setSubTickLength(int inside, int outside=0);
   void setSubTickLengthIn(int inside);
   void setSubTickLengthOut(int outside);
   void setBasePen(const QPen &pen);//设置基本画笔
-  void setTickPen(const QPen &pen);//设置标记画笔
-  void setSubTickPen(const QPen &pen);//设置子标记画笔
+  void setTickPen(const QPen &pen);//设置刻度画笔
+  void setSubTickPen(const QPen &pen);//设置子刻度画笔
   void setLabelFont(const QFont &font);//设置标签字体
   void setLabelColor(const QColor &color);//设置标签颜色
   void setLabel(const QString &str);//设置标签
   void setLabelPadding(int padding);//设置标签衬垫
   void setPadding(int padding); //设置衬垫
   void setOffset(int offset);//设置位移量
-  void setSelectedTickLabelFont(const QFont &font);//设置选择的标记标签字体
+  void setSelectedTickLabelFont(const QFont &font);//设置选择的刻度标签字体
   void setSelectedLabelFont(const QFont &font);//设置选择的标签字体
-  void setSelectedTickLabelColor(const QColor &color);//设置选择的标记标签颜色
+  void setSelectedTickLabelColor(const QColor &color);//设置选择的刻度标签颜色
   void setSelectedLabelColor(const QColor &color);//设置选择的标签颜色
   void setSelectedBasePen(const QPen &pen);//设置选择的基本画笔
-  void setSelectedTickPen(const QPen &pen);//设置选择的标记画笔
-  void setSelectedSubTickPen(const QPen &pen);//设置选择的子标记画笔
+  void setSelectedTickPen(const QPen &pen);//设置选择的刻度画笔
+  void setSelectedSubTickPen(const QPen &pen);//设置选择的子刻度画笔
   Q_SLOT void setSelectableParts(const QCPAxis::SelectableParts &selectableParts);//设置选择的部分
   Q_SLOT void setSelectedParts(const QCPAxis::SelectableParts &selectedParts);
   void setLowerEnding(const QCPLineEnding &ending);//设置下限
@@ -1321,7 +1351,7 @@ public:
   static AxisType opposite(AxisType type);
 
 signals:
-  void ticksRequest();//标记请求
+  void ticksRequest();//刻度请求
   void rangeChanged(const QCPRange &newRange);//范围改变
   void rangeChanged(const QCPRange &newRange, const QCPRange &oldRange);
   void scaleTypeChanged(QCPAxis::ScaleType scaleType);//刻度类型改变
@@ -1346,11 +1376,19 @@ protected:
   QColor mLabelColor, mSelectedLabelColor;//选择的标签颜色
   // tick labels:
   //int mTickLabelPadding; // in QCPAxisPainter
-  bool mTickLabels, mAutoTickLabels;//标记标签，自动标记标签
+  bool mTickLabels, mAutoTickLabels;//刻度标签，自动刻度标签
   //double mTickLabelRotation; // in QCPAxisPainter
-  LabelType mTickLabelType;//标记标签类型
-  QFont mTickLabelFont, mSelectedTickLabelFont;//标记标签字体，选择的标记标签字体
-  QColor mTickLabelColor, mSelectedTickLabelColor;//标记标签颜色，选择的标记标签颜色
+  LabelType mTickLabelType;//刻度标签类型
+  QFont mTickLabelFont, mSelectedTickLabelFont;//刻度标签字体，选择的刻度标签字体
+  QColor mTickLabelColor, mSelectedTickLabelColor;//刻度标签颜色，选择的刻度标签颜色
+  double m_XAxisTickLabeloffset_x;//存放设置的刻度标签位移量
+  double m_XAxisTickLabeloffset_y;
+  double m_YAxisTickLabeloffset_x;
+  double m_YAxisTickLabeloffset_y;
+  qint32 m_numxofall_x;//存放获得设置刻度标签数字的有效位数，以对刻度文本偏移的自动设置提供帮助
+  qint32 m_numxofall_y;
+  qint32 m_numyofall_x;
+  qint32 m_numyofall_y;
   QString mDateTimeFormat;//日期时间格式
   Qt::TimeSpec mDateTimeSpec;//日期时间规格
   int mNumberPrecision;//数字精度
@@ -1358,13 +1396,13 @@ protected:
   bool mNumberBeautifulPowers;//数字的漂亮开关
   //bool mNumberMultiplyCross; // QCPAxisPainter
   // ticks and subticks:
-  bool mTicks; //标记
-  double mTickStep;//标记台阶
-  int mSubTickCount, mAutoTickCount;//子标记计数，自动标记计数
-  bool mAutoTicks, mAutoTickStep, mAutoSubTicks;//自动标记，自动标记台阶，自动子标记
+  bool mTicks; //刻度
+  double mTickStep;//刻度间距（比例尺）
+  int mSubTickCount, mAutoTickCount;//子刻度计数，自动刻度计数
+  bool mAutoTicks, mAutoTickStep, mAutoSubTicks;//自动刻度，自动刻度台阶，自动子刻度
   //int mTickLengthIn, mTickLengthOut, mSubTickLengthIn, mSubTickLengthOut; // QCPAxisPainter
-  QPen mTickPen, mSelectedTickPen;//标记画笔，选择的标记画笔
-  QPen mSubTickPen, mSelectedSubTickPen;//子标记画笔，选择的子标记画笔
+  QPen mTickPen, mSelectedTickPen;//刻度画笔，选择的刻度画笔
+  QPen mSubTickPen, mSelectedSubTickPen;//子刻度画笔，选择的子刻度画笔
   // scale and range:
   QCPRange mRange;//范围
   bool mRangeReversed;//反转的范围
@@ -1374,17 +1412,17 @@ protected:
   // non-property members:没有属性化的成员
   QCPGrid *mGrid;//网格
   QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针
-  int mLowestVisibleTick, mHighestVisibleTick;//最低的可见标记，最高的可见标记
-  QVector<double> mTickVector;//标记容器
-  QVector<QString> mTickVectorLabels;//标记容器标签
-  QVector<double> mSubTickVector;//子标记容器标签
+  int mLowestVisibleTick, mHighestVisibleTick;//最低的可见刻度，最高的可见刻度
+  QVector<double> mTickVector;//刻度容器
+  QVector<QString> mTickVectorLabels;//刻度容器标签
+  QVector<double> mSubTickVector;//子刻度容器标签
   bool mCachedMarginValid;//页边隐藏的有效性
   int mCachedMargin;//页边隐藏
 
   // introduced virtual methods:   传入的虚方法
-  virtual void setupTickVectors(); //安装标记容器
-  virtual void generateAutoTicks();//产生自动标记
-  virtual int calculateAutoSubTickCount(double tickStep) const;//计算自动子标记计数
+  virtual void setupTickVectors(); //安装刻度容器
+  virtual void generateAutoTicks();//产生自动刻度
+  virtual int calculateAutoSubTickCount(double tickStep) const;//计算自动子刻度计数
   virtual int calculateMargin();//计算页边
 
   // reimplemented virtual methods: 重载的虚方法
@@ -1396,15 +1434,15 @@ protected:
   virtual void deselectEvent(bool *selectionStateChanged);//取消选择事件
 
   // non-virtual methods: 非虚方法
-  void visibleTickBounds(int &lowIndex, int &highIndex) const;//可见的标记范围：最小索引、最大索引
+  void visibleTickBounds(int &lowIndex, int &highIndex) const;//可见的刻度范围：最小索引、最大索引
   double baseLog(double value) const;//基本对数
   double basePow(double value) const;//幂函数
   QPen getBasePen() const;//获取基本画笔
-  QPen getTickPen() const;//获取标记画笔
-  QPen getSubTickPen() const;//获取子标记画笔
-  QFont getTickLabelFont() const;//获取标记标签字体
+  QPen getTickPen() const;//获取刻度画笔
+  QPen getSubTickPen() const;//获取子刻度画笔
+  QFont getTickLabelFont() const;//获取刻度标签字体
   QFont getLabelFont() const;//获取标签字体
-  QColor getTickLabelColor() const;//获取标记标签颜色
+  QColor getTickLabelColor() const;//获取刻度标签颜色
   QColor getLabelColor() const;//获取标签颜色
 
 private:
@@ -1414,9 +1452,9 @@ private:
   friend class QCPGrid;//友元类网格类
   friend class QCPAxisRect; //友元类轴长方区类
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QCPAxis::SelectableParts)//标记的操作声明：选择的哪部分
-Q_DECLARE_OPERATORS_FOR_FLAGS(QCPAxis::AxisTypes)//标记的操作声明：轴的类型
-Q_DECLARE_METATYPE(QCPAxis::SelectablePart)//标记的伴型声明：选择的哪部分
+Q_DECLARE_OPERATORS_FOR_FLAGS(QCPAxis::SelectableParts)//刻度的操作声明：选择的哪部分
+Q_DECLARE_OPERATORS_FOR_FLAGS(QCPAxis::AxisTypes)//刻度的操作声明：轴的类型
+Q_DECLARE_METATYPE(QCPAxis::SelectablePart)//刻度的伴型声明：选择的哪部分
 
 //轴的私有画图类
 class QCPAxisPainterPrivate
@@ -1431,7 +1469,7 @@ public:
   void clearCache();//清缓冲
 
   QRect axisSelectionBox() const { return mAxisSelectionBox; }//轴的选择框
-  QRect tickLabelsSelectionBox() const { return mTickLabelsSelectionBox; }//标记的选择框
+  QRect tickLabelsSelectionBox() const { return mTickLabelsSelectionBox; }//刻度的选择框
   QRect labelSelectionBox() const { return mLabelSelectionBox; }//标签的选择框
 
   // public property members:
@@ -1442,23 +1480,28 @@ public:
   QFont labelFont; //标签字体
   QColor labelColor;//标签颜色
   QString label;//标签
-  int tickLabelPadding; // directly accessed by QCPAxis setters/getters 标记标签衬垫
-  double tickLabelRotation; // directly accessed by QCPAxis setters/getters  标记标签旋转
-  QCPAxis::LabelSide tickLabelSide; // directly accessed by QCPAxis setters/getters 标记标签在哪边
+  int tickLabelPadding; // directly accessed by QCPAxis setters/getters 刻度标签衬垫
+  double tickLabelRotation; // directly accessed by QCPAxis setters/getters  刻度标签旋转
+  QCPAxis::LabelSide tickLabelSide; // directly accessed by QCPAxis setters/getters 刻度标签在哪边
   bool substituteExponent;//子stitute的解释者
   bool numberMultiplyCross; // directly accessed by QCPAxis setters/getters 数字交叉增加
   int tickLengthIn, tickLengthOut, subTickLengthIn, subTickLengthOut; // directly accessed by QCPAxis setters/getters
-  QPen tickPen, subTickPen; //标记画笔，子标记画笔
-  QFont tickLabelFont;//标记标签字体
-  QColor tickLabelColor;//标记标签颜色
+  QPen tickPen, subTickPen; //刻度画笔，子刻度画笔
+  QFont tickLabelFont;//刻度标签字体
+  QColor tickLabelColor;//刻度标签颜色
   QRect axisRect, viewportRect;//轴长方形区，视口区
   double offset; // directly accessed by QCPAxis setters/getters 位移量
   bool abbreviateDecimalPowers;//简化的十进制幂函数
   bool reversedEndings;//反转终点
 
-  QVector<double> subTickPositions;//子标记坐标容器
-  QVector<double> tickPositions;//标记坐标容器
-  QVector<QString> tickLabels;//标记标签容器
+  QVector<double> subTickPositions;//子刻度坐标容器
+  QVector<double> tickPositions;//刻度坐标容器
+  QVector<QString> tickLabels;//刻度标签容器
+
+  double m_XAxisTickLabeloffset_x;
+  double m_XAxisTickLabeloffset_y;
+  double m_YAxisTickLabeloffset_x;
+  double m_YAxisTickLabeloffset_y;
 
 protected:
   struct CachedLabel//隐藏的标签
@@ -1466,7 +1509,7 @@ protected:
     QPointF offset;
     QPixmap pixmap;
   };
-  struct TickLabelData //标记标签数据
+  struct TickLabelData //刻度标签数据
   {
     QString basePart, expPart;
     QRect baseBounds, expBounds, totalBounds, rotatedTotalBounds;
@@ -1476,14 +1519,17 @@ protected:
   //决定是否需要预期改变标签参数的缓冲
   QByteArray mLabelParameterHash; // to determine whether mLabelCache needs to be cleared due to changed parameters
   QCache<QString, CachedLabel> mLabelCache;
-  QRect mAxisSelectionBox, mTickLabelsSelectionBox, mLabelSelectionBox;//轴的选择框，标记标签的选择框，标签选择框
+  QRect mAxisSelectionBox, mTickLabelsSelectionBox, mLabelSelectionBox;//轴的选择框，刻度标签的选择框，标签选择框
 
   virtual QByteArray generateLabelParameterHash() const;//通常的标签参数缓存
-  //放置标记标签
+  //放置刻度标签
   virtual void placeTickLabel(QCPPainter *painter, double position, int distanceToAxis, const QString &text, QSize *tickLabelsSize);
-  //绘制标记标签
+  //放置刻度标签 zjb add :在这里根据不同的轴计算出不同的刻度标签位移量 2015-10-23
+  virtual void placeTickLabel(QCPPainter *painter, double position, int distanceToAxis, const QString &text, QSize *tickLabelsSize,
+          double XAxisTickLabeloffset_x,double XAxisTickLabeloffset_y,double YAxisTickLabeloffset_x,double YAxisTickLabeloffset_y);
+  //绘制刻度标签
   virtual void drawTickLabel(QCPPainter *painter, double x, double y, const TickLabelData &labelData) const;
-  //标记标签数据
+  //刻度标签数据
   virtual TickLabelData getTickLabelData(const QFont &font, const QString &text) const;
   //获取标志标签的绘制位移量
   virtual QPointF getTickLabelDrawOffset(const TickLabelData &labelData) const;

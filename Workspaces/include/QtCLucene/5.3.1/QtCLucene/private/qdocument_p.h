@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/clucene/qdocument_p.h"
+#include "../../../../../src/assistant/clucene/qdocument_p.h"

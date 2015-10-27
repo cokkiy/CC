@@ -808,10 +808,15 @@ void XbelTree::openNextPage()
     if(curItem!=NULL)
     {
         QTreeWidgetItem * belowItem = itemBelow(curItem);
-        if(belowItem!=NULL)
+        while(belowItem!=NULL)
         {
-            setCurrentItem(belowItem);
-            openPage(indexFromItem(belowItem));
+            if(belowItem->type()==Page)
+            {
+                setCurrentItem(belowItem);
+                openPage(indexFromItem(belowItem));
+                break;
+            }
+            belowItem = itemBelow(belowItem);
         }
     }
 }
@@ -821,10 +826,15 @@ void XbelTree::openPrevPage()
     if(curItem!=NULL)
     {
         QTreeWidgetItem * aboveItem = itemAbove(curItem);
-        if(aboveItem!=NULL)
+        while(aboveItem!=NULL)
         {
-            setCurrentItem(aboveItem);
-            openPage(indexFromItem(aboveItem));
+            if(aboveItem->type()==Page)
+            {
+                setCurrentItem(aboveItem);
+                openPage(indexFromItem(aboveItem));
+                break;
+            }
+            aboveItem = itemAbove(aboveItem);
         }
     }
 }

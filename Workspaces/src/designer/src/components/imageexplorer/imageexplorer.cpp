@@ -92,9 +92,9 @@ public:
     QTreeView *pageTreeView() const { return m_pageTreeView; }
     QTreeView *markTreeView() const { return m_markTreeView; }
     QString findPageKey() const { return m_findPageKey; }
-    QString setFindPageKey(QString key) { return m_findPageKey = key; }
+    void setFindPageKey(QString key) { m_findPageKey = key; }
     QString findMarkKey() const { return m_findMarkKey; }
-    QString setFindMarkKey(QString key) { return m_findMarkKey = key; }
+    void setFindMarkKey(QString key) { m_findMarkKey = key; }
     QDesignerFormEditorInterface *core() const { return m_core; }
 
     void setFileName(const QString &file_name);

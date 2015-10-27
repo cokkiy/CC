@@ -51,8 +51,8 @@ class XElement
 
 private:
     //查找指定名称和位置的子节点
-    void findElement(QStringList::const_iterator &strIterator, list<XElement>& result,
-        const list<XElement> &children, const QStringList& nameList) const;
+    void findElement(QStringList::const_iterator &strIterator, std::list<XElement>& result,
+        const std::list<XElement> &children, const QStringList& nameList) const;
 
 
 public:
@@ -69,10 +69,10 @@ public:
     QString Id;
 
     //子节点列表
-    list<XElement> childElements;
+    std::list<XElement> childElements;
 
     //元素的属性列表
-    list<XAttribute> Attributes;
+    std::list<XAttribute> Attributes;
 
 
     //获取第一个子元素
@@ -82,7 +82,7 @@ public:
     //支持以“/"分割的多级元素，如”网卡设置/本机地址“表示获取当前节点下的”网卡设置”下的
     //"本机地址"子节点,如果本级下面有多个"网卡设置"设置子节点，则只获取第一个"网卡设置"下的
     //也可以用"网卡设置@2/本机地址"指定获取第二个"网卡设置"下的"本机地址"子节点
-    list<XElement> getChildrenByName(const QString& /*name*/) const;
+    std::list<XElement> getChildrenByName(const QString& /*name*/) const;
 
     //获取指定名称字节点的，如果有多个相同名称的字节点，则指返回第一个节点的值
     //如果指定名称的节点不错在，则返回空字符串(“”)
@@ -111,7 +111,7 @@ public:
     double getChildDoubleValue(const QString& childName) const;
 
     //获取指定Id的子节点
-    list<XElement> getChildrenById(const QString& /*id*/) const;
+    std::list<XElement> getChildrenById(const QString& /*id*/) const;
 
     //获取本节点指定名称属性的属性值
     //如果属性不存在，返回空字符串
@@ -125,7 +125,7 @@ public:
 };
 
 //定义ElementList 为 list<XElement>
-typedef list<XElement> ElementList;
+typedef std::list<XElement> ElementList;
 
 
 #endif // XELEMENT_H

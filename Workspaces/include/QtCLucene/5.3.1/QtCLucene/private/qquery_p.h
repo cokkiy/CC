@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/clucene/qquery_p.h"
+#include "../../../../../src/assistant/clucene/qquery_p.h"

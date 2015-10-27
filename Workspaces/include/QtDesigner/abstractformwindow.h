@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractformwindow.h"
+#include "../../src/designer/src/lib/sdk/abstractformwindow.h"

@@ -42,7 +42,11 @@ const string DataTypeStrings[DataTypeNum] = {
     长度"决定；"原码结束尾"为1个字节ffh。
     12:""－表示空
 */
-
+#define IvalidTime 0xffffffff
+#define IvalidDate 0xffffffff
+#define IvalidType 0xff
+//参数值最大长度（主要指字符串和原码类型）
+#define MAX_PARAM_VAL_LEN (4096)
 class NETSHARED_EXPORT AbstractParam
 {
 public:
@@ -54,6 +58,7 @@ public:
     };
 public:
     AbstractParam();
+    AbstractParam(const AbstractParam & a);
     ~AbstractParam();
     //是否可以进行公式计算
     bool canCompute();

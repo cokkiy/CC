@@ -13,11 +13,11 @@
 #include <iostream>
 #include <stdio.h>
 #include <QThread>
-#include <QSemaphore>
+#include <condition_variable>
+#include <mutex>
 
-using namespace std;
 
-#include "../datastruct.h"
+//#include "../datastruct.h"
 
 class PThread:public QThread
 {
@@ -29,7 +29,9 @@ class PThread:public QThread
 		void Resume();											//恢复线程运行
 		
 	protected:
-        QSemaphore  m_ctrlBinSem;						//线程控制信号量
+        std::condition_variable  cv;						//线程控制信号量
+        std::mutex mtx;
+        bool ready=false;
 };
 
 

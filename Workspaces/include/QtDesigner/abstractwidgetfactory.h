@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractwidgetfactory.h"
+#include "../../src/designer/src/lib/sdk/abstractwidgetfactory.h"

@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractlanguage.h"
+#include "../../src/designer/src/lib/sdk/abstractlanguage.h"

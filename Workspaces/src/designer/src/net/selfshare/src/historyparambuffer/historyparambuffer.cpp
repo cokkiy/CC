@@ -4,12 +4,12 @@
 // 
 // 原始版本：1.0
 // 作    者：肖胜杰
+// 修改： cokkiy 2015-10-24
 // 完成日期：
 
 #include "historyparambuffer.h"
-#include <errno.h>
-#include <QDebug>
-extern int errno;
+#include "HistoryBufferManager.h"
+
 //******************
 //说明：缓冲区类构造函数
 //功能：初始化各成员变量
@@ -26,15 +26,6 @@ HistoryParamBuffer::HistoryParamBuffer()
 //******************
 HistoryParamBuffer::~HistoryParamBuffer()
 {
-    //释放历史缓冲区空间
-    HistoryParamMap::iterator it = m_HistoryParamBuf.begin();
-    for(;it!=m_HistoryParamBuf.end();it++)
-    {
-        GCWrapper& wrapper = it->second;
-        wrapper.release();
-    }
-	//清空缓冲区队列
-	m_HistoryParamBuf.clear();
 }
 
 //******************
@@ -42,12 +33,9 @@ HistoryParamBuffer::~HistoryParamBuffer()
 //功能：将一个参数加入缓冲区队列
 //备注：前面进，后面出
 //******************
-void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryParam& buf)
-{    
-    auto& param = m_HistoryParamBuf[INDEX(tn,pn)];   
-    lockForWriteBuf.lock();
-    param.push(buf);
-    lockForWriteBuf.unlock();
+void HistoryParamBuffer::PutBuffer(unsigned short tn, unsigned short pn, HistoryParam& buf)
+{
+    HistoryBufferManager::PushParam(tn, pn, buf);
 }
 
 //******************
@@ -55,13 +43,13 @@ void HistoryParamBuffer::PutBuffer(unsigned short tn,unsigned short pn,HistoryPa
 //功能：从缓冲区队列取出参数
 //备注：前面进，后面出
 //******************
-HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn)
-{
-	HistoryParams buf;
-    auto& param = m_HistoryParamBuf[INDEX(tn,pn)];
-    buf = *(param.getBuffer());
-    return buf;
-}
+// HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn)
+// {
+// 	HistoryParams buf;
+//     auto& param = m_HistoryParamBuf[INDEX(tn,pn)];
+//     buf = *(param.getBuffer());
+//     return buf;
+// }
 
 
 /*!
@@ -76,51 +64,5 @@ HistoryParams HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn
 */
 list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn, int & date, int & time)
 {
-    list<HistoryParam> retBuf;
-    HistoryParams::reverse_iterator it;
-    auto& param = m_HistoryParamBuf[INDEX(tn,pn)];
-    HistoryParams* pbuf = param.getBuffer();
-    int t_date,t_time=0;
-    //从最后一个vector开始取数据
-    for (it = pbuf->rbegin(); it != pbuf->rend(); it++)
-    {
-        vector<HistoryParam>* pVector = *it;
-        HistoryParam& param = pVector->front();
-        size_t count = pVector->size();
-        if (param.getDate() > date || (param.getDate() == date&&param.getTime() > time))
-        {
-            //复制该vector中全部数据到list,retBuf是按时间从前到后排序的
-            for(auto iter=pVector->begin();iter<pVector->begin()+count;iter++)
-            {
-                retBuf.push_back(*iter);
-            }
-            //retBuf.insert(retBuf.begin(), pVector->begin(), pVector->begin() + count-1);
-            t_date = param.getDate();
-            t_time = param.getTime();
-        }
-        else
-        {
-            //找到vector中的某个元素,使其时间小于等于date.time
-            for (auto iter = pVector->end() - 1; iter == pVector->begin(); iter--)
-            {
-                if (iter->getDate() > date || (iter->getDate() == date&&iter->getTime() > time))
-                {
-                    //把该参数放到retBuf前面,retBuf是按时间从前到后排序的
-                    retBuf.push_front(*iter);
-                    t_date = iter->getDate();
-                    t_time = iter->getTime();
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-    }    
-    if(t_time!=0)
-    {
-        date = t_date;
-        time = t_time;
-    }
-    return retBuf;
+    return HistoryBufferManager::getParams(tn, pn, date, time);
 }

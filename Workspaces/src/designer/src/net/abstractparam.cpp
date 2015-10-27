@@ -1,22 +1,32 @@
 ﻿#include "abstractparam.h"
 #include <QDebug>
-//参数值最大长度（主要指字符串和原码类型）
-const unsigned short MAX_PARAM_VAL_LEN = 4*1024;
 AbstractParam::AbstractParam()
 {
     m_val = 0.0;
-    m_transType = 0xff;
-    m_changeType = 0xff;
-    m_paramDate = 0xffffffff;
-    m_paramTime = 0xffffffff;
+    m_transType = IvalidType;
+    m_changeType = IvalidType;
+    m_paramDate = IvalidDate;
+    m_paramTime = IvalidTime;
     m_paramVal = NULL;
     m_paramQuotiety = 1.0;
     m_ucNew = First;
 }
+AbstractParam::AbstractParam(const AbstractParam &a)
+{
+    m_val = 0.0;
+    m_transType = IvalidType;
+    m_changeType = IvalidType;
+    m_paramDate = IvalidDate;
+    m_paramTime = IvalidTime;
+    m_paramVal = NULL;
+    m_paramQuotiety = 1.0;
+    m_ucNew = First;
+    *this = a;
+}
 //析构函数
 AbstractParam::~AbstractParam()
 {
-
+    FreeParamSpace();
 }
 bool AbstractParam::canCompute()
 {
@@ -326,7 +336,7 @@ AbstractParam & AbstractParam::operator =(const AbstractParam &aParam)
     if(NULL != aParam.m_paramVal)
     {
         //给本对象的变量指针分配空间
-        m_paramVal = malloc(m_paramDataLen);
+        InitParamSpace();
         //如果内存不足
         if(NULL == m_paramVal)
         {

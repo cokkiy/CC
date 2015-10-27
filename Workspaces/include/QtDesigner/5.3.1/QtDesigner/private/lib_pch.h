@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/lib_pch.h"
+#include "../../../../../src/designer/src/lib/lib_pch.h"

@@ -1,1 +1,1 @@
-﻿#include "../../src/assistant/help/qhelpenginecore.h"
+#include "../../src/assistant/help/qhelpenginecore.h"

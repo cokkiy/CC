@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/clucene/qanalyzer_p.h"
+#include "../../../../../src/assistant/clucene/qanalyzer_p.h"

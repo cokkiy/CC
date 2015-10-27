@@ -154,8 +154,8 @@ struct stru_SoftLockInfo
 //	char aValidFlag;   //密码数据有效标志
 };
 
-typedef list<unsigned char> OutNode;
-typedef vector<NetParameter> NetworkSet;
+typedef std::list<unsigned char> OutNode;
+typedef std::vector<NetParameter> NetworkSet;
 //typedef map<unsigned short, struct NetWatchData> NetWatchDataMap;
 
 

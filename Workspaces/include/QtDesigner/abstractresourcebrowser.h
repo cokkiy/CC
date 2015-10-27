@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractresourcebrowser.h"
+#include "../../src/designer/src/lib/sdk/abstractresourcebrowser.h"

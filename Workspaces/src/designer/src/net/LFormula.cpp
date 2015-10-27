@@ -14,6 +14,7 @@ const char* fun_name[FUN_NAME_NUM]={"JT0","JD1","JD2","JD3","YCC","ABS","DJS","S
 // 1 表示 后面的比前面的优先
 // 0 表示 前面的比后面的优先
 // 2 表示 ( ) { }  [ ]
+// 3 表示 ,
 //运算符关系表
 const int OPERATOR_NUM = 17;
 const char OperatorRelation[OPERATOR_NUM][OPERATOR_NUM]={
@@ -21,16 +22,16 @@ const char OperatorRelation[OPERATOR_NUM][OPERATOR_NUM]={
 	/* ; */		{4,  4,  4,  4,  4,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,  0},
 	/* } */		{4,  4,  4,  0,  0,  4,  4,  4,   4,  0,  0,  0,  0,  0,  0,  0,  0},
 	/* ] */		{0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,  0},
-	/* ) */		{0,  4,  4,  1,  1,  4,  4,  4,   4,  0,  0,  0,  0,  0,  0,  0,  0},
-	/* , */		{0,  0,  0,  0,  1,  1,  1,  1,   1,  0,  0,  0,  0,  0,  0,  0,  0},
-	/*fun*/		{0,  4,  4,  4,  1,  1,  1,  1,   1,  1,  1,  1,  1,  1,  1,  1,  1},
-	/* ( */		{4,  4,  4,  2,  1,  1,  1,  1,   1,  1,  1,  1,  1,  1,  1,  1,  1},
+    /* ) */		{0,  4,  4,  1,  3,  0,  2,  4,   4,  0,  0,  0,  0,  0,  0,  0,  0},
+    /* , */		{0,  0,  0,  3,  1,  1,  1,  1,   1,  0,  0,  0,  0,  0,  0,  0,  0},
+    /*fun*/		{0,  4,  4,  0,  1,  1,  1,  1,   1,  0,  0,  0,  0,  0,  0,  0,  0},
+    /* ( */		{4,  4,  4,  2,  1,  1,  1,  1,   1,  1,  1,  1,  0,  1,  1,  1,  1},
 	/* [ */		{4,  4,  2,  4,  1,  4,  4,  4,   4,  0,  0,  0,  0,  1,  1,  1,  1},
 	/* { */		{4,  2,  4,  4,  1,  4,  4,  4,   4,  0,  0,  0,  0,  1,  1,  1,  1},
 	/* + */		{0,  4,  4,  0,  0,  1,  1,  1,   1,  0,  0,  1,  1,  1,  1,  1,  1},
 	/* - */		{0,  4,  4,  0,  0,  1,  1,  1,   1,  0,  0,  1,  1,  1,  1,  1,  1},
 	/* * */		{0,  4,  4,  0,  1,  1,  1,  1,   1,  0,  0,  0,  0,  0,  0,  0,  0},
-	/* / */		{0,  4,  4,  0,  1,  1,  1,  1,   1,  0,  0,  0,  0,  0,  0,  0,  0},
+    /* / */		{0,  4,  4,  0,  1,  1,  1,  0,   1,  0,  0,  0,  0,  0,  0,  0,  0},
 	/* & */		{0,  0,  0,  0,  1,  1,  1,  1,   1,  1,  1,  0,  0,  0,  0,  0,  0},
 	/* | */		{0,  0,  0,  0,  1,  1,  1,  1,   1,  1,  1,  0,  0,  0,  0,  0,  0},
 	/* >>*/		{0,  0,  0,  0,  1,  1,  1,  1,   1,  1,  1,  0,  0,  0,  0,  0,  0},
@@ -172,7 +173,6 @@ void LFormula::updateParam()
     }
 }
 
-
 bool LFormula::insertOneHistroyParam()
 {
     FormulaZXParamMap::iterator it = m_zxparamMap.begin();
@@ -187,6 +187,38 @@ bool LFormula::insertOneHistroyParam()
             t_buf.pop_front();
             m_zxparamMap[pn].setValue(t_hp.getValue());
             m_zxparamMap[pn].SetParamTime(t_hp.getTime());
+            bUpdate = true;
+        }
+        else
+        {
+            break;
+        }
+        it++;
+    }
+    if(bUpdate)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+bool LFormula::insertOneHistroyParam(unsigned int& time)
+{
+    FormulaZXParamMap::iterator it = m_zxparamMap.begin();
+    bool bUpdate = false;
+    while(it!=m_zxparamMap.end())
+    {
+        unsigned int pn = it->first;
+        list<HistoryParam>* t_buf = &m_tHistoryMap[pn];
+        if(t_buf->size()>0)
+        {
+            HistoryParam t_hp = t_buf->front();
+            t_buf->pop_front();
+            m_zxparamMap[pn].setValue(t_hp.getValue());
+            time = t_hp.getTime();
+            m_zxparamMap[pn].SetParamTime(time);
             bUpdate = true;
         }
         else
@@ -292,6 +324,34 @@ int LFormula::compute(std::string formula,QVector<double>& result)
     return -1;
 }
 
+int LFormula::compute(std::string formula,QVector<double>& result,QVector<unsigned int>& time)
+{
+    if(parse(formula,HistoryData))
+    {
+        bool b_compute = false;
+        //get All data
+        if(updateAllHistroyParam())
+        {
+            unsigned int t_time = 0xffffffff;
+            //insert A data
+            while(insertOneHistroyParam(t_time))
+            {
+                //compute once
+                double t_result = 0.0;
+                if(compute(t_result))
+                {
+                    result.push_back(t_result);
+                    time.push_back(t_time);
+                    b_compute = true;
+                }
+            }
+            if(b_compute)
+                return 1;
+        }
+    }
+    return -1;
+}
+
 int LFormula::compute(std::string formulaX,std::string formulaY,QVector<double>& resultX,QVector<double>& resultY)
 {
     return -1;
@@ -318,7 +378,7 @@ bool LFormula::compute(double& ret_d)
 		for (int pos=0;pos<m_OperData.size();pos++)
 		{
 			OperatorData t_OD = m_OperData[pos];
-			OperatorData t_OD_a,t_OD_b,t_OD_c;
+            OperatorData t_OD_a,t_OD_b,t_OD_c,t_OD_ret;
 			switch(t_OD.type)
 			{
 			case DATA:
@@ -568,16 +628,20 @@ bool LFormula::compute(double& ret_d)
 					fun_param_num =0;
 				    break;
 				case TIM:
-					if (t_Data_Stack.size()<2)
+                    if (t_Data_Stack.size()<1)
 					{
                         return false;
-                        //throw(formula_error,NOENOUGHFUNPARAM);
 					}
-					t_OD_b = t_Data_Stack.top();
+                    t_OD_a = t_Data_Stack.top();
 					t_Data_Stack.pop();
-					t_OD_a = t_Data_Stack.top();
-					t_Data_Stack.pop();
-					fun_TIM(t_OD_a,t_OD_b,t_ret_d);
+                    if(fun_TIM(t_OD_a,t_ret_d))
+                    {
+                        t_OD_ret.type = DATA;
+                        t_OD_ret.data = t_ret_d;
+                        t_Data_Stack.push(t_OD_ret);
+                    }
+                    else
+                        return false;
 					fun_param_num =0;
 				    break;
 				default:
@@ -618,7 +682,7 @@ bool LFormula::compute(QVariant& ret_d)
         for (int pos=0;pos<m_OperData.size();pos++)
         {
             OperatorData t_OD = m_OperData[pos];
-            OperatorData t_OD_a,t_OD_b,t_OD_c;
+            OperatorData t_OD_a,t_OD_b,t_OD_c,t_OD_ret;
             switch(t_OD.type)
             {
             case DATA:
@@ -847,6 +911,9 @@ bool LFormula::compute(QVariant& ret_d)
                     t_OD_a = t_Data_Stack.top();
                     t_Data_Stack.pop();
                     fun_ABS(t_OD_a,t_ret_d);
+                    t_OD_ret.type = DATA;
+                    t_OD_ret.data = t_ret_d;
+                    t_Data_Stack.push(t_OD_ret);
                     fun_param_num =0;
                     break;
                 case DJS:
@@ -876,16 +943,21 @@ bool LFormula::compute(QVariant& ret_d)
                     fun_param_num =0;
                     break;
                 case TIM:
-                    if (t_Data_Stack.size()<2)
+                    if (t_Data_Stack.size()<1)
                     {
                         qDebug()<<NOENOUGHFUNPARAM;
                         return false;
                     }
-                    t_OD_b = t_Data_Stack.top();
-                    t_Data_Stack.pop();
                     t_OD_a = t_Data_Stack.top();
                     t_Data_Stack.pop();
-                    fun_TIM(t_OD_a,t_OD_b,t_ret_d);
+                    if(fun_TIM(t_OD_a,t_ret_d))
+                    {
+                        t_OD_ret.type = DATA;
+                        t_OD_ret.data = t_ret_d;
+                        t_Data_Stack.push(t_OD_ret);
+                    }
+                    else
+                        return false;
                     fun_param_num =0;
                     break;
                 default:
@@ -985,7 +1057,7 @@ bool LFormula::parse(std::string formula,ParseType type)
                 if(commaPos>0)
                     pParam = addParam(atoi(data.substr(0,commaPos).c_str()),
                                   atoi(data.substr(commaPos+1,nextpos-pos-1).c_str())
-                                      ,type);
+                                      ,CurData);
                 else
                     return false;
             }
@@ -1169,6 +1241,9 @@ bool LFormula::HandleOperator(std::stack<OperatorData >& ostack,const OperatorDa
 		case 2:// (  )
 			ostack.pop();
             return true;
+        case 3:// (  )
+            ostack.pop();
+            break;
 		case 4://错误
             return false;
 		    break;
@@ -1453,22 +1528,22 @@ void LFormula::fun_SET(OperatorData sour,OperatorData judge,OperatorData cont,do
 //	}
 }
 //将sour的参数时间设置到dest参数值上,
-void LFormula::fun_TIM(OperatorData dest,OperatorData sour,double &ret)
+bool LFormula::fun_TIM(OperatorData sour,double &ret)
 {
-//	if (sour.type==PARAM&&dest.type==PARAM)
-//	{
-//		stru_Param* pa = NULL;
-//		stru_Param* pb = NULL;
-//		pa = (stru_Param*)dest.param;
-//		pb = (stru_Param*)sour.param;
-//		::SetValue(pa,pb->ulParamTime);
-//		::SetParamTime(pa);
-//		ret = pb->ulParamTime;
-//	}
-//	else
-//	{
-//        throw(formula_error,INVALIDPARAM);
-//	}
+    if (sour.type==PARAM)
+    {
+        AbstractParam* pb = (AbstractParam*)sour.param;
+        if(pb!=NULL)
+        {
+            double t_ret = pb->GetParamTime();
+            if(t_ret != IvalidTime)
+            {
+                ret = t_ret;
+                return true;
+            }
+        }
+    }
+    return false;
 }
 bool LFormula::ParseData(std::stack<OperatorData >& ostack,std::string data, OperatorData &opdataD)
 {
@@ -1500,7 +1575,7 @@ bool LFormula::ParseData(std::stack<OperatorData >& ostack,std::string data, Ope
         char pos=0;
 		for (;pos<FUN_NAME_NUM;pos++)
 		{
-            if(data.find(fun_name[pos]))
+            if(data.compare(fun_name[pos])==0)
             {
                 find_fun = true;
                 break;

@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/extension/default_extensionfactory.h"
+#include "../../src/designer/src/lib/extension/default_extensionfactory.h"

@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/promotionmodel_p.h"
+#include "../../../../../src/designer/src/lib/shared/promotionmodel_p.h"

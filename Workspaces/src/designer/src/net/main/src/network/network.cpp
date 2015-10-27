@@ -16,8 +16,6 @@
 #include "network.h"
 #include <QNetworkInterface>
 #include <list>
-using namespace std;
-
 
 //*****************************************************************
 //析构函数
@@ -206,7 +204,7 @@ bool Network::createSocket(const QHostAddress& host, list<NetConfig::RecSetting>
         addr.sin_port = htons(recSetting->Port);
 
         int len = sizeof(addr);			//绑定udp套接字
-        int result = bind(s, (struct sockaddr *)&addr, len);
+        int result = ::bind(s, (struct sockaddr *)&addr, len);
         if (result < 0)
         {
             qCritical() << "socket bind error！ IP:" << host.toString()

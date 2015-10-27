@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/grid_p.h"
+#include "../../../../../src/designer/src/lib/shared/grid_p.h"

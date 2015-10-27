@@ -14,7 +14,7 @@
 //
 //
 //*********************************
-PThread::PThread() :QThread(), m_ctrlBinSem(1)
+PThread::PThread() :QThread()
 {
 }
 	
@@ -45,7 +45,12 @@ void PThread::run()
 //*********************************
 void PThread::OnHold()								
 {
-    m_ctrlBinSem.acquire();
+    ready = false;
+    std::unique_lock<std::mutex> lck(mtx);
+    while (!ready)
+    {
+        cv.wait(lck);
+    }
 }
 
 //*********************************
@@ -53,9 +58,11 @@ void PThread::OnHold()
 //
 //
 //*********************************		
-void PThread::Resume()										
+void PThread::Resume()
 {
-    m_ctrlBinSem.release();
+    std::unique_lock <std::mutex> lck(mtx);
+    ready = true;
+    cv.notify_one();
 }
 
 

@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QDebug>
 #include "config.h"
+#include "selfshare/src/xmlproc/xmlproc.h"
 
 //**********************************************************************
 //构造函数 

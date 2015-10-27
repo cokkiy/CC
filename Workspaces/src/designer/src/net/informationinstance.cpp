@@ -100,8 +100,9 @@ SingleTableParamVector InformationInstance::getParamVector(unsigned short tabNo)
     ParamMap::iterator it = m_paramMap.find(tabNo);
     if(it!=m_paramMap.end())
     {
-        foreach (AbstractParam tmpParam, it.value()) {
-            tmpParamVector.push_back(tmpParam);
+        for (AbstractParam& para : *it)
+        {
+            tmpParamVector.push_back(para);
         }
     }
     return tmpParamVector;

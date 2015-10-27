@@ -1,4 +1,4 @@
-#ifndef CODESOURCE_H
+﻿#ifndef CODESOURCE_H
 #define CODESOURCE_H
 #include <QWidget>
 #include <QTextEdit>
@@ -61,18 +61,20 @@ private:
     QColor m_bgcolor;
     textAlignment m_txt;
     // //定时器 用于更新图形绘制
-    int m_timer_id;//
+    TimerInterface* m_timer;
     DataCenterInterface* m_dc;//
+    bool hasStyleSheetUpdate;
 
 protected:
     void handleData();//写入数据到text
 
 public slots:
     //样式表
-    void stylesheetUpdate();//用于更新背景颜色
-    //事件-定时器触发
-    void timerEvent(QTimerEvent *event);
+    void stylesheetUpdate();//用于更新背景颜色    
     virtual void paintEvent(QPaintEvent *e);
+private slots:
+    //事件-定时器触发
+    void getDataEvent();
 };
 
 #endif

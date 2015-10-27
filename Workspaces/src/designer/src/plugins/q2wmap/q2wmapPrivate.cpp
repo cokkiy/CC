@@ -193,6 +193,7 @@ void Q2wmapPrivate::setObj(const QString str)
     for(int i=0; i<m_vctObj.size(); i++)
     {
         m_vctObj[i].m_pcurve->clearData();
+        m_vctObj[i].m_pcurveLast->clearData();
         m_vctObj[i].m_pLcurve->clearData();
     }
 
@@ -250,6 +251,9 @@ void Q2wmapPrivate::setObj(const QString str)
             //添加一个曲线图层-实时曲线
             sj.m_pcurve = m_plot->addGraph();
 
+            //添加一个曲线图层-实时曲线(最后收到的点)
+            sj.m_pcurveLast = m_plot->addGraph();
+
             //数据接收类
             sj.m_dci = NetComponents::getDataCenter();
 
@@ -259,6 +263,11 @@ void Q2wmapPrivate::setObj(const QString str)
             m_vctObj.push_back(sj);
         }
     }
+}
+
+//设置静态元素，解析json的工作也在这里完成
+void Q2wmapPrivate::setStatic(const QString str)
+{
 }
 
 //设置地图经度下限
@@ -352,7 +361,6 @@ void Q2wmapPrivate::setPlot()
         //Qt::SmoothTransformation 缩放时平滑
         //QBrush brush(m_pixmap.scaled(m_parent->size(),Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
-
         //视窗的移动不能超出左边界
         if(m_Pos_x < 0)
         {
@@ -393,7 +401,6 @@ void Q2wmapPrivate::setPlot()
     //设置窗口外形
     m_plot->setGeometry(rect);
 
-
     //坐标轴为可拖动 QCP::iRangeDrag
     //坐标轴为可缩放 QCP::iRangeZoom
     //曲线及图表可以被选择 QCP::iSelectPlottables
@@ -402,10 +409,40 @@ void Q2wmapPrivate::setPlot()
     for(int i=0; i<m_vctObj.size(); i++)
     {
         //理论曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
+        m_vctObj[i].m_pLcurve->setLineStyle(QCPGraph::lsNone);
+
         m_vctObj[i].m_pLcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_vctObj[i].m_cLcurveColor, m_vctObj[i].m_iLcurveWidth));
 
+        QPen LPen;
+
+        LPen.setColor(m_vctObj[i].m_cLcurveColor);
+
+        LPen.setWidth(m_vctObj[i].m_iLcurveWidth);
+
+        LPen.setStyle(Qt::SolidLine);
+
+        m_vctObj[i].m_pLcurve->setPen(LPen);
+    }
+
+    for(int j=0; j<m_vctObj.size(); j++)
+    {
         //实时曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
-        m_vctObj[i].m_pcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_vctObj[i].m_ccurveColor, m_vctObj[i].m_icurveWidth));
+        m_vctObj[j].m_pcurve->setLineStyle(QCPGraph::lsNone);
+
+        m_vctObj[j].m_pcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_vctObj[j].m_ccurveColor, m_vctObj[j].m_icurveWidth));
+
+        QPen cPen;
+
+        cPen.setColor(m_vctObj[j].m_ccurveColor);
+
+        cPen.setWidth(m_vctObj[j].m_icurveWidth);
+
+        cPen.setStyle(Qt::SolidLine);
+
+        m_vctObj[j].m_pcurve->setPen(cPen);
+
+        //绘制当前点，以十字圆形绘制
+        m_vctObj[j].m_pcurveLast->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, m_vctObj[j].m_ccurveColor, m_vctObj[j].m_icurveWidth+8));
     }
 
     //是否显示网格
@@ -504,6 +541,26 @@ void Q2wmapPrivate::setPlot()
         m_plot->xAxis2->setVisible(false);
         m_plot->yAxis2->setVisible(false);
     }
+
+    static bool bMoveFirst = false;
+
+    //没收到数据时，视窗自动移动到主目标的理论弹道的第一个点处(仅首次需要移动)
+    if(!bMoveFirst)
+    {
+        for(int k=0; k<m_vctObj.size(); k++)
+        {
+            if(m_vctObj[k].m_bMainObj == true)//主目标
+            {
+                if(m_vctObj[k].m_Cx.size() == 0)//没收到数据
+                {
+                     double L = m_vctObj[k].m_Lx[0];
+                     double B = m_vctObj[k].m_Ly[0];
+                     MoveToPointOfMapLB(L,B);
+                     bMoveFirst = true;
+                }
+            }
+        }
+    }
 }
 
 //自动移动视窗，防止曲线当前点绘制到可见区域外
@@ -595,7 +652,7 @@ void Q2wmapPrivate::MoveToPointOfMapLB(double L, double B)
         double B_per_pix = (m_BUpLimit - m_BLowLimit) /  m_pixmap.height();
 
         //y=纬度差对应的像素个数
-        y = qint32( (B - m_BUpLimit) / B_per_pix);
+        y = qint32( (m_BUpLimit - B) / B_per_pix);
     }
 
     //调用按xy移动函数进行移动
@@ -702,16 +759,26 @@ void Q2wmapPrivate::getData()
         foreach (tx, vx)
         {
             m_vctObj[i].m_Cx.append(tx);
+
+            m_vctObj[i].m_CxLast.clear();
+
+            m_vctObj[i].m_CxLast.append(tx);
         }
 
         //把取到的全部y的值存入数组m_y
         foreach (ty, vy)
         {
             m_vctObj[i].m_Cy.append(ty);
+
+            m_vctObj[i].m_CyLast.clear();
+
+            m_vctObj[i].m_CyLast.append(ty);
         }
 
         //把曲线的值设置为刚才的两个数组
         m_vctObj[i].m_pcurve->setData(m_vctObj[i].m_Cx, m_vctObj[i].m_Cy);
+
+        m_vctObj[i].m_pcurveLast->setData(m_vctObj[i].m_CxLast, m_vctObj[i].m_CyLast);
 
         //如果设置了自动漫游，且当前目标为主目标，才自动移动视窗
         if(m_bAutoCruise && m_vctObj[i].m_bMainObj == true)
@@ -733,6 +800,11 @@ void Q2wmapPrivate::addData(qint32 index, double x, double y)
     if(m_vctObj.size()>index)
     {
         m_vctObj[index].m_pcurve->addData(x, y);
+
+        //清空最后点并添加
+        m_vctObj[index].m_pcurveLast->clearData();
+
+        m_vctObj[index].m_pcurveLast->addData(x, y);
 
         //重绘
         m_plot->replot();

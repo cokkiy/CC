@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/extension/extension_global.h"
+#include "../../src/designer/src/lib/extension/extension_global.h"

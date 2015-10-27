@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/designer/src/lib/shared/invisible_widget_p.h"
+#include "../../../../../src/designer/src/lib/shared/invisible_widget_p.h"

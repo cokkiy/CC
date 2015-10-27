@@ -125,6 +125,8 @@ private slots:
 	//设置表格行列数确认按钮事件
     void on_TableSetBotton_clicked();
 private:
+	//键盘事件
+    void keyPressEvent(QKeyEvent*);
     //右键菜单事件
     void contextMenuEvent(QContextMenuEvent* );
 	//处理右键菜单

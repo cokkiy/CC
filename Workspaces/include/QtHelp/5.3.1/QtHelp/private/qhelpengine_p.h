@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/help/qhelpengine_p.h"
+#include "../../../../../src/assistant/help/qhelpengine_p.h"

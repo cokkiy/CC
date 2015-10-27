@@ -82,7 +82,8 @@ SOURCES += \
     showtype/coderesultstring.cpp \
     GC.cpp \
     getMemorySize.cpp \
-    getRSS.cpp
+    getRSS.cpp \
+    HistoryBufferManager.cpp
 
 HEADERS += \
         net_global.h \
@@ -135,7 +136,8 @@ HEADERS += \
     PDXPFrame.h \
     showtype/coderesultstring.h \
     GC.h \
-    GCWrapper.h
+    GCWrapper.h \
+    HistoryBufferManager.h
 
 
 unix {

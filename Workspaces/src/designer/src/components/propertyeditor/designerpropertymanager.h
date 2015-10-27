@@ -50,6 +50,7 @@
 #include "singlestatedialog.h"
 
 #include "../propertyeditor/q2wmapobj/q2wmapobj.h"
+#include "../propertyeditor/q2wmapobj/q2wmapstaticelementdlg.h"
 
 #include "../propertyeditor/graphobj/graphobj.h"
 

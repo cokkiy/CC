@@ -8,14 +8,14 @@
 
 #include "netbuffer.h"
 #include <errno.h>
-
+using namespace std;
 extern int errno;
 //******************
 //说明：缓冲区类构造函数
 //功能：初始化各成员变量
 //备注：
 //******************
-NetBuffer::NetBuffer(): m_binSem(1) 
+NetBuffer::NetBuffer()
 {
 	int res = 0;
 
@@ -69,7 +69,7 @@ void NetBuffer::SetBufListLimit(int limit)
 void NetBuffer::PutBuffer(Buffer& buf)
 {
 	//sem_wait(&m_binSem);
-    m_binSem.acquire();
+    m_binSem.lock();
 
 	m_netBuf.push_front(buf);
 	m_listNum++;
@@ -80,7 +80,7 @@ void NetBuffer::PutBuffer(Buffer& buf)
 	}
 
 	//sem_post(&m_binSem);
-    m_binSem.release();
+    m_binSem.unlock();
 }
 
 //******************
@@ -93,7 +93,7 @@ Buffer NetBuffer::GetBuffer()
 	Buffer buf;
 
 	//sem_wait(&m_binSem);
-    m_binSem.acquire();
+    m_binSem.lock();
 	if(false == m_netBuf.empty())
 	{
 		buf = m_netBuf.back();
@@ -101,7 +101,7 @@ Buffer NetBuffer::GetBuffer()
 		m_listNum--;
 	}
 	//sem_post(&m_binSem);
-    m_binSem.release();
+    m_binSem.unlock();
 
 	return buf;
 }

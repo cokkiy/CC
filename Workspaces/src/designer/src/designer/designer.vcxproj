@@ -79,7 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)lib\netd.lib;c:\qt\Qt5.5.0-msvc2015\lib\qtmaind.lib;shell32.lib;c:/qt/Qt5.5.0-msvc2015/lib\Qt5Cored.lib;D:/CodeStores/Workspaces/lib/Qt5DesignerBased.lib;D:/CodeStores/Workspaces/lib/Qt5DesignerComponentsBased.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5PrintSupportd.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Widgetsd.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Guid.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Xmld.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Networkd.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:/CodeStores/Workspaces/lib/netd.lib;c:\qt\Qt5.5.0-msvc2015\lib\qtmaind.lib;shell32.lib;c:/qt/Qt5.5.0-msvc2015/lib\Qt5Cored.lib;D:/CodeStores/Workspaces/lib/Qt5DesignerBased.lib;D:/CodeStores/Workspaces/lib/Qt5DesignerComponentsBased.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5PrintSupportd.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Widgetsd.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Guid.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Xmld.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Networkd.lib;c:\qt\Qt5.5.0-msvc2015\lib\Qt5Cored.lib;libEGLd.lib;libGLESv2d.lib;gdi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>c:\qt\Qt5.5.0-msvc2015\lib;c:/qt/Qt5.5.0-msvc2015/lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -89,7 +89,6 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <Profile>true</Profile>
     </Link>
     <Midl>
       <DefaultCharType>Unsigned</DefaultCharType>
@@ -100,7 +99,7 @@
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_EXCEPTIONS;QT_PRINTSUPPORT_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;QT_OPENGL_ES_2;QT_OPENGL_ES_2_ANGLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <PreBuildEvent>
-      <Command>xcopy /y $(SolutionDir)lib\*.dll $(SolutionDir)bin</Command>
+      <Command>xcopy $(SolutionDir)lib\*.dll  $(SolutionDir)bin /y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="appfontdialog.cpp" />
     <ClCompile Include="assistantclient.cpp" />
+    <ClCompile Include="outdata\dialogoutdataconfig.cpp" />
     <ClCompile Include="..\..\..\shared\fontpanel\fontpanel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
@@ -191,6 +191,24 @@ endlocal</Command>
     </CustomBuild>
     <ClInclude Include="assistantclient.h" />
     <ClInclude Include="designer_enums.h" />
+    <CustomBuild Include="outdata\dialogoutdataconfig.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">outdata\dialogoutdataconfig.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/designer -ID:/CodeStores/Workspaces/src/designer/src/lib/sdk -ID:/CodeStores/Workspaces/src/designer/src/lib/extension -ID:/CodeStores/Workspaces/src/designer/src/lib/shared -ID:/CodeStores/Workspaces/src/designer/src/designer/extra -ID:/CodeStores/Workspaces/src/shared/fontpanel -ID:/CodeStores/Workspaces/src/shared/qttoolbardialog -ID:/CodeStores/Workspaces/include/QtDesigner/5.3.1 -ID:/CodeStores/Workspaces/include/QtDesigner -ID:/CodeStores/Workspaces/include/QtDesigner/5.3.1/QtDesigner -ID:/CodeStores/Workspaces/include -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore/5.5.0 -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore/5.5.0/QtCore -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtNetwork -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore outdata\dialogoutdataconfig.h -o .moc\debug\moc_dialogoutdataconfig.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC outdata/dialogoutdataconfig.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.moc\debug\moc_dialogoutdataconfig.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">outdata\dialogoutdataconfig.h;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\moc.exe  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -D_MSC_VER=1900 -D_WIN32 -D_WIN64 -Ic:/qt/Qt5.5.0-msvc2015/mkspecs/win32-msvc2015 -ID:/CodeStores/Workspaces/src/designer/src/designer -ID:/CodeStores/Workspaces/src/designer/src/lib/sdk -ID:/CodeStores/Workspaces/src/designer/src/lib/extension -ID:/CodeStores/Workspaces/src/designer/src/lib/shared -ID:/CodeStores/Workspaces/src/designer/src/designer/extra -ID:/CodeStores/Workspaces/src/shared/fontpanel -ID:/CodeStores/Workspaces/src/shared/qttoolbardialog -ID:/CodeStores/Workspaces/include/QtDesigner/5.3.1 -ID:/CodeStores/Workspaces/include/QtDesigner -ID:/CodeStores/Workspaces/include/QtDesigner/5.3.1/QtDesigner -ID:/CodeStores/Workspaces/include -Ic:/qt/Qt5.5.0-msvc2015/include -Ic:/qt/Qt5.5.0-msvc2015/include/QtPrintSupport -Ic:/qt/Qt5.5.0-msvc2015/include/QtWidgets -Ic:/qt/Qt5.5.0-msvc2015/include/QtGui -Ic:/qt/Qt5.5.0-msvc2015/include/QtANGLE -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore/5.5.0 -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore/5.5.0/QtCore -Ic:/qt/Qt5.5.0-msvc2015/include/QtXml -Ic:/qt/Qt5.5.0-msvc2015/include/QtNetwork -Ic:/qt/Qt5.5.0-msvc2015/include/QtCore outdata\dialogoutdataconfig.h -o .moc\release\moc_dialogoutdataconfig.cpp
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC outdata/dialogoutdataconfig.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\moc_dialogoutdataconfig.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Include="..\..\..\shared\fontpanel\fontpanel.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\shared\fontpanel\fontpanel.h;%(AdditionalInputs)</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -520,6 +538,12 @@ endlocal</Command>
     <ClCompile Include=".moc\release\moc_appfontdialog.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include=".moc\debug\moc_dialogoutdataconfig.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_dialogoutdataconfig.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include=".moc\debug\moc_fontpanel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -642,6 +666,7 @@ endlocal</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MOC ../../../shared/qttoolbardialog/qttoolbardialog.cpp</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.moc\release\qttoolbardialog.moc;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include=".uic\ui_dialogoutdataconfig.h" />
     <ClInclude Include=".uic\ui_preferencesdialog.h" />
     <ClInclude Include=".uic\ui_qdesigner_appearanceoptions.h" />
     <ClInclude Include=".uic\ui_qttoolbardialog.h" />
@@ -672,6 +697,25 @@ endlocal</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="outdata\dialogoutdataconfig.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">outdata\dialogoutdataconfig.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe outdata\dialogoutdataconfig.ui -o .uic\ui_dialogoutdataconfig.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">UIC outdata/dialogoutdataconfig.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.uic\ui_dialogoutdataconfig.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">outdata\dialogoutdataconfig.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+c:\qt\Qt5.5.0-msvc2015\bin\uic.exe outdata\dialogoutdataconfig.ui -o .uic\ui_dialogoutdataconfig.h
+if errorlevel 1 goto VCEnd
+endlocal</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">UIC outdata/dialogoutdataconfig.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.uic\ui_dialogoutdataconfig.h;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Include="preferencesdialog.ui">
       <FileType>Document</FileType>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">preferencesdialog.ui;%(AdditionalInputs)</AdditionalInputs>

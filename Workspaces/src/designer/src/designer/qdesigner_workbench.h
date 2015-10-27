@@ -191,8 +191,12 @@ private:
     //QMenu *m_windowMenu;
 
     QMenuBar *m_globalMenuBar;
+    QMenu *m_fileMenu;
     QMenu *m_editMenu;
     QMenu *m_viewMenu;
+    QMenu *m_settingMenu;
+    QMenu *m_funMenu;
+    QMenu *m_helpMenu;
 
     struct TopLevelData {
         ToolBarManager *toolbarManager;

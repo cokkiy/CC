@@ -129,6 +129,14 @@ public:
     int compute(std::string formula,QVector<double>& result);
     /*!
       通过输入公式化的参数表达式获取历史数据的计算结果
+      @param string formula  字符串，包含参数的公式计算表达式
+      @param QVector<double>& result 历史数据的计算结果，为浮点数的QVector
+      @param QVector<unsigned int>& time 历史数据的计算结果，为浮点数的QVector
+      @return int  获取成功或失败，1为成功，-1为失败
+    */
+    int compute(std::string formula,QVector<double>& result,QVector<unsigned int>& time);
+    /*!
+      通过输入公式化的参数表达式获取历史数据的计算结果
       @param string formulaX  字符串，包含参数的公式计算表达式
       @param string formulaY  字符串，包含参数的公式计算表达式
       @param QVector<double>& resultX 历史数据的计算结果，为浮点数的QVector
@@ -230,6 +238,10 @@ private:
     /*!
       更新公式中包含参数的数据
     */
+    bool insertOneHistroyParam(unsigned int& time);
+    /*!
+      更新公式中包含参数的数据
+    */
     bool updateAllHistroyParam();
     //no use
     int getParamCount();
@@ -273,10 +285,8 @@ private:
 	void fun_DJS(OperatorData a,double &ret);
 	//设置参数值,判断参数judge如果等于常量cont，则设置源参数sour的值，否则不更新值
 	void fun_SET(OperatorData sour,OperatorData judge,OperatorData cont,double &ret);
-	//将sour的参数时间设置到dest参数值上,
-	//参数dest 是目标设置参数，
 	//参数sour是源参数，取该参数的参数时间
-	void fun_TIM(OperatorData dest,OperatorData sour,double &ret);
+    bool fun_TIM(OperatorData sour,double &ret);
 };
 
 #endif // !defined(PARAMFORMULA_H)

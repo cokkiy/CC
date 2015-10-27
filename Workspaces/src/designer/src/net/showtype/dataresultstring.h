@@ -4,7 +4,7 @@
 #include "../selfshare/src/datastruct.h"
 #include "LFormula.h"
 #include<string>
-using namespace std;
+
 class QDataResultString
 {
 public:

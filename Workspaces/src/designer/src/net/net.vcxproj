@@ -24,7 +24,7 @@
     <CharacterSet>NotSet</CharacterSet>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <IntermediateDirectory>.obj\debug\</IntermediateDirectory>
-    <PrimaryOutput>netd</PrimaryOutput>
+    <PrimaryOutput>net</PrimaryOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <PlatformToolSet>v140</PlatformToolSet>
@@ -55,26 +55,18 @@
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <CodeAnalysisRuleSet>..\..\..\..\my.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\..\..\..\include;..\..\..\..\include\net;D:/CodeStores/Workspaces/include/net/5.3.1;D:/CodeStores/Workspaces/include/net/5.3.1/net;tmp;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtNetwork;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtNetwork;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\debug;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.obj\debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>false</ExceptionHandling>
-      <ForcedIncludeFiles>..\..\..\..\include\net\netDepends;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)\netd.pch</PrecompiledHeaderOutputFile>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_BUILD_NET_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QT_NO_EXCEPTIONS;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_NO_EXCEPTIONS;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -82,8 +74,6 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <DisableLanguageExtensions>
-      </DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>D:/CodeStores/Workspaces/lib/WS2_32.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -96,8 +86,6 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <Version>5.3</Version>
-      <Profile>true</Profile>
     </Link>
     <Midl>
       <DefaultCharType>Unsigned</DefaultCharType>
@@ -105,28 +93,24 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_BUILD_NET_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QT_NO_EXCEPTIONS;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_NO_EXCEPTIONS;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>xcopy /y $(OutDir)net*.dll $(SolutionDir)bin</Command>
+      <Command>xcopy /y $(SolutionDir)lib\net*.dll $(SolutionDir)bin</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;..\..\..\..\include;..\..\..\..\include\net;D:/CodeStores/Workspaces/include/net/5.3.1;D:/CodeStores/Workspaces/include/net/5.3.1/net;tmp;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtNetwork;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;c:\qt\Qt5.5.0-msvc2015\include;c:\qt\Qt5.5.0-msvc2015\include\QtNetwork;c:\qt\Qt5.5.0-msvc2015\include\QtXml;c:\qt\Qt5.5.0-msvc2015\include\QtCore;.moc\release;c:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:strictStrings -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.obj\release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>None</DebugInformationFormat>
       <ExceptionHandling>false</ExceptionHandling>
-      <ForcedIncludeFiles>..\..\..\..\include\net\netDepends;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>..\..\..\..\include\net\netDepends</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)\net.pch</PrecompiledHeaderOutputFile>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_BUILD_NET_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -147,7 +131,6 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <Version>5.3</Version>
     </Link>
     <Midl>
       <DefaultCharType>Unsigned</DefaultCharType>
@@ -155,7 +138,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_BUILD_NET_LIB;QT_BUILDING_QT;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;QT_NO_CAST_TO_ASCII;QT_ASCII_CAST_WARNINGS;QT_MOC_COMPAT;QT_USE_QSTRINGBUILDER;QT_DEPRECATED_WARNINGS;QT_DISABLE_DEPRECATED_BEFORE=0x040800;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_WINDOWS;UNICODE;WIN32;WIN64;NET_LIBRARY;QT_NO_EXCEPTIONS;QT_NO_DEBUG;QT_NETWORK_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -211,9 +194,9 @@
     <ClCompile Include="C3I\CParamInfo.cpp" />
     <ClCompile Include="C3I\CParamInfoRT.cpp" />
     <ClCompile Include="GC.cpp" />
-    <ClCompile Include="getMemorySize.cpp" />
-    <ClCompile Include="getRSS.cpp" />
+    <ClCompile Include="HistoryBufferManager.cpp" />
     <ClCompile Include="LFormula.cpp" />
+    <ClCompile Include="PDXPFrame.cpp" />
     <ClCompile Include="abstractdatacenter.cpp" />
     <ClCompile Include="abstractinformation.cpp" />
     <ClCompile Include="abstractnet.cpp" />
@@ -221,15 +204,16 @@
     <ClCompile Include="abstractstation.cpp" />
     <ClCompile Include="abstracttask.cpp" />
     <ClCompile Include="abstracttimer.cpp" />
-    <ClCompile Include="PDXPFrame.cpp" />
     <ClCompile Include="selfshare\src\buffer\buffer.cpp" />
     <ClCompile Include="selfshare\src\config\channelselectconfig.cpp" />
+    <ClCompile Include="showtype\coderesultstring.cpp" />
     <ClCompile Include="selfshare\src\config\config.cpp" />
     <ClCompile Include="datacenterinstance.cpp" />
     <ClCompile Include="datacentertest.cpp" />
-    <ClCompile Include="showtype\coderesultstring.cpp" />
     <ClCompile Include="showtype\dataresultstring.cpp" />
     <ClCompile Include="showtype\dateresultstring.cpp" />
+    <ClCompile Include="getMemorySize.cpp" />
+    <ClCompile Include="getRSS.cpp" />
     <ClCompile Include="selfshare\src\historyparam\historyparam.cpp" />
     <ClCompile Include="selfshare\src\historyparambuffer\historyparambuffer.cpp" />
     <ClCompile Include="main\src\infoprocthread\infoprocthread.cpp" />
@@ -257,25 +241,26 @@
     <ClInclude Include="C3IFrame.h" />
     <ClInclude Include="C3I\CParamInfo.h" />
     <ClInclude Include="C3I\CParamInfoRT.h" />
-    <ClInclude Include="FrameHeader.h" />
     <ClInclude Include="GC.h" />
     <ClInclude Include="GCWrapper.h" />
+    <ClInclude Include="HistoryBufferManager.h" />
     <ClInclude Include="LFormula.h" />
-    <ClInclude Include="PDXPFrame.h" />
     <ClInclude Include="selfshare\src\OS_Def.h" />
+    <ClInclude Include="PDXPFrame.h" />
     <CustomBuild Include="abstractdatacenter.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing abstractdatacenter.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../abstractdatacenter.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing abstractdatacenter.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -285,16 +270,17 @@ endlocal
     <CustomBuild Include="abstractinformation.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing abstractinformation.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../abstractinformation.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing abstractinformation.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -304,16 +290,17 @@ endlocal
     <CustomBuild Include="abstractnet.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing abstractnet.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../abstractnet.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing abstractnet.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -324,16 +311,17 @@ endlocal
     <CustomBuild Include="abstractstation.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing abstractstation.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../abstractstation.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing abstractstation.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -343,16 +331,17 @@ endlocal
     <CustomBuild Include="abstracttask.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing abstracttask.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../abstracttask.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing abstracttask.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -362,30 +351,32 @@ endlocal
     <CustomBuild Include="abstracttimer.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing abstracttimer.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../abstracttimer.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing abstracttimer.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="abstractudpclient.h" />
     <ClInclude Include="selfshare\src\baseobject.h" />
     <ClInclude Include="selfshare\src\buffer\buffer.h" />
     <ClInclude Include="selfshare\src\config\channelselectconfig.h" />
+    <ClInclude Include="showtype\coderesultstring.h" />
     <ClInclude Include="selfshare\src\config\config.h" />
     <ClInclude Include="selfshare\src\const.h" />
     <ClInclude Include="datacenterinstance.h" />
     <ClInclude Include="datacentertest.h" />
-    <ClInclude Include="showtype\coderesultstring.h" />
     <ClInclude Include="showtype\dataresultstring.h" />
     <ClInclude Include="selfshare\src\datastruct.h" />
     <ClInclude Include="showtype\dateresultstring.h" />
@@ -395,23 +386,23 @@ endlocal
     <CustomBuild Include="informationinstance.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing informationinstance.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../informationinstance.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing informationinstance.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
-    <ClInclude Include="..\..\..\..\include\net\netDepends" />
     <ClInclude Include="net_global.h" />
     <ClInclude Include="selfshare\src\netbuffer\netbuffer.h" />
     <ClInclude Include="netcomponents.h" />
@@ -426,16 +417,17 @@ endlocal
     <CustomBuild Include="taskinstance.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
+
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\debug" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing taskinstance.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp" "-f../../../../include/net/netDepends" "-f../../taskinstance.h"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_BUILD_NET_LIB -DQT_BUILDING_QT -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DQT_NO_CAST_TO_ASCII -DQT_ASCII_CAST_WARNINGS -DQT_MOC_COMPAT -DQT_USE_QSTRINGBUILDER -DQT_DEPRECATED_WARNINGS -DQT_DISABLE_DEPRECATED_BEFORE=0x040800 -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-I.\..\..\..\..\include" "-I.\..\..\..\..\include\net" "-ID:\CodeStores\Workspaces\include\net\5.3.1" "-ID:\CodeStores\Workspaces\include\net\5.3.1\net" "-I.\tmp" "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.moc\$(ConfigurationName)\moc_%(Filename).cpp"  -D_HAS_EXCEPTIONS=0 -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DNET_LIBRARY -DQT_NO_EXCEPTIONS -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL "-I." "-Ic:\qt\Qt5.5.0-msvc2015\include" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtNetwork" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtXml" "-Ic:\qt\Qt5.5.0-msvc2015\include\QtCore" "-I.\.moc\release" "-Ic:\qt\Qt5.5.0-msvc2015\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing taskinstance.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.moc\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -450,14 +442,6 @@ endlocal
     <ClInclude Include="selfshare\src\config\xelement.h" />
     <ClInclude Include="selfshare\src\xmlproc\xmlproc.h" />
     <ClInclude Include="selfshare\src\zxparambuffer\zxparambuffer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\net\net_resource.rc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ResourceCompile>
-    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\net\netd_resource.rc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ResourceCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

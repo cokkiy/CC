@@ -324,8 +324,8 @@ DockedMainWindow::DockedMainWindow(QDesignerWorkbench *wb,
     setObjectName(QStringLiteral("MDIWindow"));
     setWindowTitle(mainWindowTitle());
 
-    const QList<QToolBar *> toolbars = createToolBars(wb->actionManager(), false);
-    foreach (QToolBar *tb, toolbars)
+    m_toolbars = createToolBars(wb->actionManager(), false);
+    foreach (QToolBar *tb, m_toolbars)
         addToolBar(tb);
     DockedMdiArea *dma = new DockedMdiArea(wb->actionManager()->uiExtension());
     connect(dma, SIGNAL(fileDropped(QString)),
@@ -337,7 +337,7 @@ DockedMainWindow::DockedMainWindow(QDesignerWorkbench *wb,
     QStatusBar *sb = statusBar();
     Q_UNUSED(sb)
 
-    m_toolBarManager = new ToolBarManager(this, this, toolBarMenu, wb->actionManager(), toolbars, toolWindows);
+    m_toolBarManager = new ToolBarManager(this, this, toolBarMenu, wb->actionManager(), m_toolbars, toolWindows);
 }
 
 QMdiArea *DockedMainWindow::mdiArea() const
@@ -398,6 +398,7 @@ DockedMainWindow::DockWidgetList DockedMainWindow::addToolWindows(const Designer
         dockWidget->setWidget(tw);
         rc.push_back(dockWidget);
     }
+    m_dockWidgetList = rc;
     return rc;
 }
 
@@ -441,6 +442,26 @@ void DockedMainWindow::saveSettings(QDesignerSettings &s) const
     s.setToolBarsState(DockedMode, m_toolBarManager->saveState(version));
     s.saveGeometryFor(this);
     s.setMainWindowState(DockedMode, saveState(version));
+}
+
+void DockedMainWindow::realTimeMode()
+{
+    m_status = saveState();
+    foreach(QToolBar* tb ,m_toolbars)
+    {
+        tb->hide();
+    }
+    m_dockWidgetList.at(QDesignerToolWindow::WidgetBox)->hide();
+    m_dockWidgetList.at(QDesignerToolWindow::PropertyEditor)->hide();
+    m_dockWidgetList.at(QDesignerToolWindow::SignalSlotEditor)->hide();
+    m_dockWidgetList.at(QDesignerToolWindow::ResourceEditor)->hide();
+    m_dockWidgetList.at(QDesignerToolWindow::ActionEditor)->hide();
+    m_dockWidgetList.at(QDesignerToolWindow::ObjectInspector)->hide();
+}
+
+void DockedMainWindow::designerMode()
+{
+    restoreState(m_status);
 }
 
 QT_END_NAMESPACE

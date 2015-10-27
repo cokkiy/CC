@@ -25,7 +25,7 @@ public:
         QString ChannelName;
 
         //表号列表
-        list<quint32> tableNoList;
+        std::list<quint32> tableNoList;
 
         //是否使用主用信道，true为使用主用通道,false为使用备用通道
         bool usingPrimaryChannel;
@@ -36,13 +36,13 @@ public:
 
 
     //获取信道列表开始位置
-    list<Channel>::const_iterator begin()
+    std::list<Channel>::const_iterator begin()
     {
         return m_channelList.begin();
     }
 
     //获取信道列表结束位置
-    list<Channel>::const_iterator end()
+    std::list<Channel>::const_iterator end()
     {
         return m_channelList.end();
     }
@@ -59,9 +59,9 @@ public:
 
 private:
     //主备信道切换配置信息，包含每个信道的主备切换信息
-    list<Channel> m_channelList;
+    std::list<Channel> m_channelList;
     //备用通道列表,不在备用通道列表内的全部用主用通道
-    list<quint32> m_backupChannelList;
+    std::list<quint32> m_backupChannelList;
 };
 
 #endif // CHANNELSELECTCONFIG_H

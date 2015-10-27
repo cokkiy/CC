@@ -69,7 +69,12 @@ void staticgraph::paintEvent(QPaintEvent *event)
 {
     Q_D(staticgraph);//创建私有类指针d,d为staticgraphPrivate类对象的指针
 
-    d->setPlot();
+    d->setPlot();//工作代码
+//    d->setPlot_test();//多轴
+//    d->setPlot_test2();//实时性及自适应性
+//    d->setPlot_test3();//交互性
+//    d->setPlot_test4();//直线
+//    d->setPlot_test5();//散点
 
     d->update();      //更新绘图
 }
@@ -136,7 +141,7 @@ void staticgraph::setShowLegend(const bool bShow)
 //个性部分，需要每条曲线单独设置
 
 
-//样式显示(曲线按照某种样式进行显示，如某个区间显示某种颜色，某种标记，大小等。)
+//样式显示(曲线按照某种样式进行显示，如某个区间显示某种颜色，某种刻度，大小等。)
 //增加到"多曲线配置对话框属性"中
 
 

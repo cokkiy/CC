@@ -1,1 +1,1 @@
-﻿#include "../../src/designer/src/lib/sdk/abstractsettings.h"
+#include "../../src/designer/src/lib/sdk/abstractsettings.h"

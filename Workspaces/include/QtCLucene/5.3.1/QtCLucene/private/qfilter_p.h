@@ -1,1 +1,1 @@
-﻿#include "../../../../../src/assistant/clucene/qfilter_p.h"
+#include "../../../../../src/assistant/clucene/qfilter_p.h"

@@ -21,6 +21,7 @@ signals:
     void timeout_200();
     void timeout_500();
     void timeout_1000();
+
 };
 
 #endif // ABSTRACTTIMER_H

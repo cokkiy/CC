@@ -200,10 +200,25 @@
     <ClCompile Include="..\propertyeditor\propertyeditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapcircledlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapelementdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmaplabeldlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapobj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmappolygondialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="qdesigner_components.cpp">
@@ -541,10 +556,25 @@
     <ClInclude Include="..\propertyeditor\propertyeditor_global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapcircledlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapelementdlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmaplabeldlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobj.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmappolygondialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="..\formeditor\qdesigner_resource.h">
@@ -1005,6 +1035,24 @@
     <ClCompile Include=".moc\release\moc_propertyeditor.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapcircledlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapcircledlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapelementdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapelementdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmaplabeldlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmaplabeldlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClCompile Include=".moc\debug\moc_q2wmapobj.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
@@ -1015,6 +1063,18 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include=".moc\release\moc_q2wmapobjdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmappolygondialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmappolygondialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\debug\moc_q2wmapstaticelementdlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".moc\release\moc_q2wmapstaticelementdlg.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include=".moc\debug\moc_qdesignerundostack.cpp">
@@ -1344,10 +1404,22 @@
     <ClInclude Include=".uic\ui_previewwidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include=".uic\ui_q2wmapcircledlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_q2wmaplabeldlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
     <ClInclude Include=".uic\ui_q2wmapobj.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include=".uic\ui_q2wmapobjdlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_q2wmappolygondialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".uic\ui_q2wmapstaticelementdlg.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include=".uic\ui_selectmultiparamdlg.h">
@@ -1406,10 +1478,22 @@
     <CustomBuild Include="..\propertyeditor\previewwidget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapcircledlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmaplabeldlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobj.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapobjdlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmappolygondialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\propertyeditor\q2wmapobj\q2wmapstaticelementdlg.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\propertyeditor\selectmultiparamdlg.ui">
@@ -1697,6 +1781,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\formeditor\images\win\filesave.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\formeditor\images\mac\filesaveall.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\formeditor\images\win\filesaveall.png">
       <Filter>Resource Files</Filter>
     </None>
     <CustomBuild Include="..\..\..\..\shared\findwidget\findwidget.qrc">
@@ -2055,7 +2145,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\components\lib\Qt5DesignerComponentsBase_resource.rc" />
-    <ResourceCompile Include="D:\Workspaces_SVN\src\designer\src\components\lib\Qt5DesignerComponentsBased_resource.rc" />
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\components\lib\Qt5DesignerComponentsBase_resource.rc" />
+    <ResourceCompile Include="D:\CodeStores\Workspaces\src\designer\src\components\lib\Qt5DesignerComponentsBased_resource.rc" />
   </ItemGroup>
 </Project>
