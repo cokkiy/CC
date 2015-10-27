@@ -70,11 +70,9 @@ void staticgraph::paintEvent(QPaintEvent *event)
     Q_D(staticgraph);//创建私有类指针d,d为staticgraphPrivate类对象的指针
 
     d->setPlot();//工作代码
-//    d->setPlot_test();//多轴
-//    d->setPlot_test2();//实时性及自适应性
-//    d->setPlot_test3();//交互性
-//    d->setPlot_test4();//直线
-//    d->setPlot_test5();//散点
+//    d->setPlot_test1();//交互性
+//    d->setPlot_test2();//直线
+//    d->setPlot_test3();//散点
 
     d->update();      //更新绘图
 }
@@ -134,8 +132,52 @@ void staticgraph::setShowLegend(const bool bShow)
     d->setShowLegend(bShow);
 }
 
-
-
+//获取/设置理论页边距属性
+//leftMargin
+qint32 staticgraph::getleftMargin()const
+{
+    Q_D(const staticgraph);
+    return d->getleftMargin();
+}
+//rightMargin
+qint32 staticgraph::getrightMargin()const
+{
+    Q_D(const staticgraph);
+    return d->getrightMargin();
+}
+//topMargin
+qint32 staticgraph::gettopMargin()const
+{
+    Q_D(const staticgraph);
+    return d->gettopMargin();
+}
+//bottomMargin
+qint32 staticgraph::getbottomMargin()const
+{
+    Q_D(const staticgraph);
+    return d->getbottomMargin();
+}
+//统一设置margins
+void staticgraph::setleftMargin(const qint32 lm)
+{
+    Q_D(staticgraph);
+    d->setleftMargin(lm);
+}
+void staticgraph::setrightMargin(const qint32 rm)
+{
+    Q_D(staticgraph);
+    d->setrightMargin(rm);
+}
+void staticgraph::settopMargin(const qint32 tm)
+{
+    Q_D(staticgraph);
+    d->settopMargin(tm);
+}
+void staticgraph::setbottomMargin(const qint32 bm)
+{
+    Q_D(staticgraph);
+    d->setbottomMargin(bm);
+}
 
 
 //个性部分，需要每条曲线单独设置

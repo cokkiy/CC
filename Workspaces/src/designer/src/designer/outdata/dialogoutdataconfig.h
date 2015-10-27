@@ -10,6 +10,33 @@ namespace Ui {
 class DialogOutDataConfig_UI;
 }
 
+//带时间参数类
+class ParamWithTime
+{
+public:
+    ParamWithTime()
+    {
+        m_strParam = "";
+        m_time =  0;
+        m_value = 0;
+    }
+
+    ~ParamWithTime()
+    {
+    };
+
+    //参数名称字符串
+    QString m_strParam;
+
+    //参数时间
+    unsigned int m_time;
+
+    //参数值
+    double m_value;
+};
+
+bool cmp(const ParamWithTime p1, const ParamWithTime p2 );
+
 class DialogOutDataConfig : public QDialog
 {
     Q_OBJECT
@@ -50,6 +77,10 @@ private:
 
     //导成一个文件还是多个文件
     bool m_bMultiOutFile;
+
+    //时间转成可视格式
+    QString CvTime(unsigned int time);
+
 };
 
 #endif // DIALOGOUTDATACONFIG_H

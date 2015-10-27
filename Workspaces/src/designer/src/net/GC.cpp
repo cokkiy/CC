@@ -1,4 +1,4 @@
-#include "GC.h"
+﻿#include "GC.h"
 #include <QDebug>
 using namespace std;
 

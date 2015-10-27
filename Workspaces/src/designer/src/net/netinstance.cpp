@@ -1,4 +1,4 @@
-#include "netinstance.h"
+﻿#include "netinstance.h"
 #include<iostream>
 #include "selfshare/src/const.h"
 #include "selfshare/src/config/config.h"

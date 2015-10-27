@@ -131,16 +131,12 @@ public:
 public:
     //工作代码
     void setPlot();
-    //example: multiple axes example
-    void setPlot_test();
-    //Exmaple: realtime data demo
-    void setPlot_test2();
     //Exmaple:the interaction example
-    void setPlot_test3();
+    void setPlot_test1();
     //Exmaple:Line Style Demo
-    void setPlot_test4();
+    void setPlot_test2();
     //Exmaple:Scatter Style demo
-    void setPlot_test5();
+    void setPlot_test3();
 
 
     void update();
@@ -179,6 +175,37 @@ public:
     bool getShowLegend() const{ return m_bShowLegend; }
     void setShowLegend(const bool bShowLegend);
 
+    //页边距属性配置
+    //获取/设置理论页边距属性
+    //leftMargin
+    qint32 m_leftmargin;
+    qint32 getleftMargin()const
+    {
+        return m_leftmargin;
+    }
+    //rightMargin
+    qint32 m_rightmargin;
+    qint32 getrightMargin()const
+    {
+        return m_rightmargin;
+    }
+    //topMargin
+    qint32 m_topmargin;
+    qint32 gettopMargin()const
+    {
+        return m_topmargin;
+    }
+    //bottomMargin
+    qint32 m_bottommargin;
+    qint32 getbottomMargin()const
+    {
+        return m_bottommargin;
+    }
+    //统一设置margins
+    void setleftMargin(const qint32 lm);
+    void setrightMargin(const qint32 rm);
+    void settopMargin(const qint32 tm);
+    void setbottomMargin(const qint32 bm);
 
 
 
@@ -194,6 +221,9 @@ public:
 
     //Json数据解析
     void parseJsonData();
+    //配置范围是不断变化的
+    double XAxisTickRange,YAxisTickRange ;
+
 
 
 private:

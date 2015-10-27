@@ -5,6 +5,15 @@
 #include <Net/NetComponents>
 #include <QMessageBox>
 
+bool cmp(const ParamWithTime p1, const ParamWithTime p2 )
+{
+    if(p1.m_time > p2.m_time)
+    {
+        return true;
+    }
+    return false;
+}
+
 DialogOutDataConfig::DialogOutDataConfig(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogOutDataConfig_UI())
@@ -80,6 +89,12 @@ void DialogOutDataConfig::on_pushButtonOutData_clicked()
     //导出文件名
     QString strFileName;
 
+    QTextStream xin(&f);
+
+    QString strWrite;
+
+    list<ParamWithTime> list_p;
+
     //单文件模式
     if(!m_bMultiOutFile)
     {
@@ -88,7 +103,7 @@ void DialogOutDataConfig::on_pushButtonOutData_clicked()
 
         f.setFileName(strFileName);
 
-        if(!f.open(QIODevice::ReadWrite))
+        if(!f.open(QIODevice::ReadWrite|QIODevice::Truncate))
         {
             QMessageBox::information(this,"提示","创建导出文件失败，请检查是否有可用的磁盘空间!");
             return;
@@ -98,7 +113,19 @@ void DialogOutDataConfig::on_pushButtonOutData_clicked()
     //v2.size()就是要导出的参数的个数
     for(i =0; i<m_v2.size(); i++)
     {
-        //多文件模式
+        //取得数据接口
+        DataCenterInterface * datacenter = NetComponents::getDataCenter();
+
+        //将要导出的数据
+        QVector<double> outdata;
+
+        //数据的时间
+        QVector<unsigned int> time;
+
+        //取历史数据
+        datacenter->getHistoryData(m_v2[i],outdata, time);
+
+        //多文件模式，每个文件存放一个参数
         if(m_bMultiOutFile)
         {
             //导出文件名
@@ -107,31 +134,53 @@ void DialogOutDataConfig::on_pushButtonOutData_clicked()
             f.setFileName(strFileName);
 
             //创建并打开导出文件
-            if(!f.open(QIODevice::ReadWrite))
+            if(!f.open(QIODevice::ReadWrite|QIODevice::Truncate))
             {
-
                 iFailCount++;
                 continue;
             }
-        }
 
-        //取得数据接口
-        DataCenterInterface * datacenter = NetComponents::getDataCenter();
-
-        //将要导出的数据
-        QVector<double> outdata;
-
-        //取历史数据
-        datacenter->getHistoryData(m_v2[i],outdata);
-
-        //把导出的数据写入导出文件
-        for(j=0;j<outdata.size();j++)
-        {
-            QTextStream xin(&f);
-
-            QString strWrite = QString("%1\r\n").arg(outdata[j]);
+            strWrite = "time        \t" + m_v2[i] + "\r\n";
 
             xin<<strWrite;
+
+            //把导出的数据写入导出文件
+            for(j=0;j<outdata.size();j++)
+            {
+                strWrite = QString("%1\t%2\r\n").arg(CvTime(time[j])).arg(outdata[j]);
+
+                xin<<strWrite;
+            }
+
+            //关闭文件
+            f.close();
+        }
+        else//单文件模式，一个文件存放所有参数，先把所有文件存到list
+        {
+            //把导出的数据存入list
+            for(j=0;j<outdata.size();j++)
+            {
+                ParamWithTime pa;
+                pa.m_strParam = m_v2[i];
+                pa.m_time = time[j];
+                pa.m_value = outdata[j];
+                list_p.push_back(pa);
+            }
+//            QTextStream xin(&f);
+
+//            QString strWrite;
+
+//            strWrite = "time        \t" + m_v2[i] + "\r\n";
+
+//            xin<<strWrite;
+
+//            //把导出的数据写入导出文件
+//            for(j=0;j<outdata.size();j++)
+//            {
+//                strWrite = QString("%1\t%2\r\n").arg(CvTime(time[j])).arg(outdata[j]);
+
+//                xin<<strWrite;
+//            }
         }
 
         delete datacenter;
@@ -151,10 +200,50 @@ void DialogOutDataConfig::on_pushButtonOutData_clicked()
     }
     else//单文件模式
     {
+        //先排序
+        list_p.sort(cmp);
+
+        //输出文件头部
+        strWrite = "time        ";
+
+        for(i =0; i<m_v2.size(); i++)
+        {
+            strWrite = strWrite + "\t" + m_v2[i];
+        }
+
+        //补一个换行
+        strWrite = strWrite + "\r\n";
+
+        //写输出文件头部
+        xin<<strWrite;
+
+        //写输出文件
+        for(auto it=list_p.begin(); it!=list_p.end(); it++)
+        {
+            //时间 + 制表符 + 值
+            strWrite = QString("%1\t%2\r\n").arg(CvTime(it->m_time)).arg(it->m_value);
+            xin<<strWrite;
+        }
+
+        //关闭文件
+        f.close();
+
+        //再导出
         QMessageBox::information(this,"提示","导出文件成功!");
     }
 
     this->accept();
+}
+
+//时间转成可视格式
+QString DialogOutDataConfig::CvTime(unsigned int time)
+{
+    qint32 hor = time / 10000 / 3600;
+    qint32 min = (time % ( 3600 * 10000) ) / 10000 / 60;
+    qint32 sec = (time % ( 60 * 10000) ) / 10000;
+    qint32 msc = (time % 10000) /10;
+    QString strRst = QString("%1:%2:%3.%4").arg(hor,2,10,QChar('0')).arg(min,2,10,QChar('0')).arg(sec,2,10,QChar('0')).arg(msc,3,10,QChar('0'));
+    return strRst;
 }
 
 //点击取消按钮

@@ -1044,6 +1044,15 @@ public:
   QPen pen() const { return mPen; }//画笔
   QPen subGridPen() const { return mSubGridPen; }//子网格画笔
   QPen zeroLinePen() const { return mZeroLinePen; }//零线画笔
+  qint32 getGridnumofXAxis() const   //zjb add :传入固定的刻度数
+  {
+      return m_GridnumofXAxis;
+  }
+  qint32 getGridnumofYAxis() const   //zjb add :传入固定的刻度数
+  {
+      return m_GridnumofYAxis;
+  }
+
 
   // setters:
   void setSubGridVisible(bool visible);//设置子网格可见性
@@ -1052,6 +1061,8 @@ public:
   void setPen(const QPen &pen);//设置画笔
   void setSubGridPen(const QPen &pen);//设置子网格画笔
   void setZeroLinePen(const QPen &pen);//设置零线画笔
+  void setGridnumofXAxis(qint32 numofTickx);//zjb add :传入固定的刻度数 m_GridnumofXAxis
+  void setGridnumofYAxis(qint32 numofTicky);
 
 protected:
   // property members: 属性成员
@@ -1060,6 +1071,8 @@ protected:
   QPen mPen, mSubGridPen, mZeroLinePen;//画笔
   // non-property members:
   QCPAxis *mParentAxis;//轴的指针
+  //zjb add
+  qint32 m_GridnumofXAxis,m_GridnumofYAxis;//zjb add :传入固定的刻度数
 
   // reimplemented virtual methods:重写虚方法
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const;//应用缺省的抗锯齿
@@ -1067,6 +1080,7 @@ protected:
 
   // non-virtual methods: 非虚方法
   void drawGridLines(QCPPainter *painter) const;//画网格线
+  void drawGridLines(QCPPainter *painter,qint32 numofTickx_plot,qint32 numofTicky_plot) const;//画网格线  zjb add 传入固定的刻度数
   void drawSubGridLines(QCPPainter *painter) const;//画子网格线
 
   friend class QCPAxis;//友元类坐标轴类
@@ -1224,7 +1238,10 @@ public:
   {
       return m_YAxisTickLabeloffset_y;
   }
-
+  bool getCenterOrigin() const
+  {
+      return m_originatCenter;
+  }
   double tickLabelRotation() const;//刻度标签颜色旋转
   LabelSide tickLabelSide() const;//刻度标签在哪边
   QString dateTimeFormat() const { return mDateTimeFormat; }//日期时间格式
@@ -1273,7 +1290,7 @@ public:
   void setAutoTicks(bool on); //设置自动刻度
   void setAutoTickCount(int approximateCount);//设置自动刻度计数
   void setAutoTickLabels(bool on);//设置自动刻度标签
-  void setAutoTickStep(bool on);//设置自动刻度台阶
+  void setAutoTickStep(bool on);//设置自动刻度间距
   void setAutoSubTicks(bool on);//设置自动子刻度标签
   void setTicks(bool show);//设置刻度
   void setTickLabels(bool show);//设置刻度标签
@@ -1288,7 +1305,8 @@ public:
   void setXAxisTickLabeloffset_x(double X_x,qint32 numxofall_x);
   void setXAxisTickLabeloffset_y(double X_y,qint32 numxofall_y);
   void setYAxisTickLabeloffset_x(double Y_x,qint32 numyofall_x);
-  void setYAxisTickLabeloffset_y(double Y_y,qint32 numyofall_y);
+  void setYAxisTickLabeloffset_y(double Y_y,qint32 numyofall_y);  
+  bool setCenterOrigin(bool m_setoriginatCenter);
 
   void setTickLabelRotation(double degrees);//设置刻度标签旋转
   void setTickLabelSide(LabelSide side);//设置刻度标签在哪边
@@ -1297,12 +1315,12 @@ public:
   void setNumberFormat(const QString &formatCode); //设置数字格式
   void setNumberPrecision(int precision);//设置数字精度
   void setTickStep(double step); //设置刻度间距
-  void setTickVector(const QVector<double> &vec);//设置刻度矢量
-  void setTickVectorLabels(const QVector<QString> &vec);//设置刻度矢量标签
+  void setTickVector(const QVector<double> &vec);//设置刻度容器
+  void setTickVectorLabels(const QVector<QString> &vec);//设置刻度容器标签
   void setTickLength(int inside, int outside=0);//设置刻度长度
   void setTickLengthIn(int inside);
   void setTickLengthOut(int outside);
-  void setSubTickCount(int count);//设置子刻度长度
+  void setSubTickCount(int count);//设置子刻度数
   void setSubTickLength(int inside, int outside=0);
   void setSubTickLengthIn(int inside);
   void setSubTickLengthOut(int outside);
@@ -1350,6 +1368,8 @@ public:
   //相反的轴的类型
   static AxisType opposite(AxisType type);
 
+  virtual int calculateMargin();//计算页边
+
 signals:
   void ticksRequest();//刻度请求
   void rangeChanged(const QCPRange &newRange);//范围改变
@@ -1385,6 +1405,7 @@ protected:
   double m_XAxisTickLabeloffset_y;
   double m_YAxisTickLabeloffset_x;
   double m_YAxisTickLabeloffset_y;
+  bool   m_originatCenter;
   qint32 m_numxofall_x;//存放获得设置刻度标签数字的有效位数，以对刻度文本偏移的自动设置提供帮助
   qint32 m_numxofall_y;
   qint32 m_numyofall_x;
@@ -1411,7 +1432,8 @@ protected:
 
   // non-property members:没有属性化的成员
   QCPGrid *mGrid;//网格
-  QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针
+  QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针  
+//  int mLowestGridUsedTick,mHighestGridUsedTick;//zjb add
   int mLowestVisibleTick, mHighestVisibleTick;//最低的可见刻度，最高的可见刻度
   QVector<double> mTickVector;//刻度容器
   QVector<QString> mTickVectorLabels;//刻度容器标签
@@ -1423,7 +1445,7 @@ protected:
   virtual void setupTickVectors(); //安装刻度容器
   virtual void generateAutoTicks();//产生自动刻度
   virtual int calculateAutoSubTickCount(double tickStep) const;//计算自动子刻度计数
-  virtual int calculateMargin();//计算页边
+//  virtual int calculateMargin();//计算页边
 
   // reimplemented virtual methods: 重载的虚方法
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const;//应用缺省的抗锯齿
@@ -1502,6 +1524,8 @@ public:
   double m_XAxisTickLabeloffset_y;
   double m_YAxisTickLabeloffset_x;
   double m_YAxisTickLabeloffset_y;
+
+  bool m_originatCenter ;
 
 protected:
   struct CachedLabel//隐藏的标签
@@ -2224,6 +2248,7 @@ public:
   // reimplemented virtual methods:  重写的虚方法
   virtual void update(UpdatePhase phase);//更新
   virtual QList<QCPLayoutElement*> elements(bool recursive) const;//可布局的元素类的列表
+//  virtual int calculateAutoMargin(QCP::MarginSide side);//计算自动的页边留白
 
 protected:
   // property members:

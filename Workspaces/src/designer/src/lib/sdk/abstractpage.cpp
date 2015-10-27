@@ -1,4 +1,4 @@
-﻿#include "abstractpage.h"
+#include "abstractpage.h"
 #include "qimage.h"
 #include "qbitmap.h"
 #include "qpicture.h"

@@ -223,6 +223,9 @@
     <ClCompile Include=".moc\Release\moc_taskinstance.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3IFrame.h">
@@ -379,6 +382,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="selfshare\src\zxparambuffer\zxparambuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

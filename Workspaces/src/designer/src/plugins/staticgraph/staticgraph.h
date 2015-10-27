@@ -31,10 +31,13 @@ class staticgraph : public QWidget
     Q_PROPERTY(bool showGrid READ getShowGrid WRITE setShowGrid)
 
     //显示图例
-    Q_PROPERTY(bool showLegend READ getShowLegend WRITE setShowLegend)  
+    Q_PROPERTY(bool showLegend READ getShowLegend WRITE setShowLegend)
 
-
-
+    //页边距属性
+    Q_PROPERTY(qint32 leftMargin READ getleftMargin WRITE setleftMargin)
+    Q_PROPERTY(qint32 topMargin READ gettopMargin WRITE settopMargin)
+    Q_PROPERTY(qint32 rightMargin READ getrightMargin WRITE setrightMargin)
+    Q_PROPERTY(qint32 bottomMargin READ getbottomMargin WRITE setbottomMargin)
    //个性部分
 
 
@@ -52,6 +55,7 @@ public:
         return m_textString;
     }
     void setTextString(const QString string);
+    //用于点击时什么都不干
     void rsttext(){};
 
 
@@ -67,24 +71,24 @@ public:
     //图元背景颜色
     QColor backgroundColor()const;
     void setbackgroundColor(const QColor);
-
     //图元背景图片
     QPixmap backgroundImage()const;
     void setbackgroundImage(const QPixmap qq);
-
     //是否显示网格
     bool getShowGrid() const;
     void setShowGrid(const bool bShow);
     //是否显示图例
     bool getShowLegend() const;
     void setShowLegend(const bool bShow);
-
-//    //获取/设置理论曲线颜色
-//    QColor lgraphColor()const;
-//    void setlgraphColor(const QColor co);
-//    //获取/设置理论曲线宽度
-//    qint32 LgraphWidth()const;
-//    void setLgraphWidth(const qint32 wi);
+    //获取/设置理论页边距属性
+    qint32 getleftMargin()const;
+    qint32 getrightMargin()const;
+    qint32 gettopMargin()const;
+    qint32 getbottomMargin()const;
+    void setleftMargin(const qint32 lm);
+    void setrightMargin(const qint32 rm);
+    void settopMargin(const qint32 tm);
+    void setbottomMargin(const qint32 bm);
 
     //个性部分
 
