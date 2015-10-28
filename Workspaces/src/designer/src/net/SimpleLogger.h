@@ -14,8 +14,15 @@ public:
     SimpleLogger();
     ~SimpleLogger();
 
-    //记录接收到的数据包
-    //void log(const stru_Param& param);
+    /*!
+    记录接收到的网络数据
+    @param char* buf  接收到的网络原始数据
+    @param unsigned int size  接收到的网络原始数据大小
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/10/08 21:59:26
+    */
+    void log(char* buf, unsigned int size);
 
     //记录分析处理后的数据包个数
     void logPacketCount();
@@ -23,27 +30,64 @@ public:
     //记录接收到的数据包个数
     void logReceivedPacketCount();
 
-    //开始记录数据
-    void start(string path);
 
+    /*!
+    初始化
+    @param string path 记录文件存放路径
+    @return bool 初始化是否成功
+    作者：cokkiy（张立民)
+    创建时间：2015/10/28 9:59:28
+    */
+    bool init(string path);
+
+    /*!
+    开始记录数据
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/10/08 21:59:12
+    */
+    void start();
+
+
+    /*!
+    停止记录数据
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/10/28 9:58:48
+    */
     void stop();
-    
+
 private:
-    //一次写入多少个包
-    const int FlushPacketCount = 13796;
-    // size of one packet write to buf
-    const int packetSize = 16; // double + uint*2
+    //Buf结构,指向缓冲区的指针和大小
+    struct Buf
+    {
+        char* pBuf = nullptr;
+        unsigned int size = 0;
+
+        Buf(char* pBuf, unsigned int size)
+        {
+            this->pBuf = pBuf;
+            this->size = size;
+        }
+
+        Buf(const Buf& ref)
+        {
+            this->pBuf = ref.pBuf;
+            this->size = ref.size;
+        }
+    };
+
     //buf size
-    const int bufSize = FlushPacketCount*packetSize;
+    const unsigned int bufSize = 1024*1024U; //1024K Bytes
 
     //写入缓冲区列表
-    list<unsigned char*> bufList;
+    list<Buf> bufList;
 
     //当前写入缓存区指针
-    unsigned char* buf;
+    char* buf = nullptr;
 
     // current write index of current buf
-    int index;
+    unsigned int index;
 
     //mutex for sync buf rw
     mutex mutexForBuf;
@@ -57,12 +101,12 @@ private:
 
     // has item condition
     condition_variable hasItemCV;
-    
+
     //is stop?
     bool bStop = false;
 
     //file to record data
-    int file;   
+    int file;
 
     //接收数据计数
     unsigned int receivedDataCount = 0;
@@ -72,10 +116,10 @@ private:
     //file path 
     string path;
     // thread for writing data to file
-    std::thread * writer;
+    std::thread * writer = nullptr;
 
-    //把数据和时间放入到缓冲区
-    void put2buf(const HistoryParam& param);
+    //把数据放入到缓冲区
+    void put2buf(char* buf, unsigned int size);
 
     //write bufed data to file
     void write2file();

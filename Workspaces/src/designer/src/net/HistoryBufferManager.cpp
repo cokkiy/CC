@@ -142,6 +142,7 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
         date = t_date;
         time = t_time;
     }
+    retBuf.reverse();
     return retBuf;
 }
 

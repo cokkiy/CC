@@ -9,7 +9,7 @@
 SimpleLogger::SimpleLogger() :file(-1)
 {
     //初始化第一个写入缓存区
-    //buf = new unsigned char[FlushPacketCount*packetSize];
+    buf = new char[bufSize];
 }
 
 //析构函数,释放资源
@@ -17,35 +17,29 @@ SimpleLogger::SimpleLogger() :file(-1)
  {
      //stop first
      stop();
-     //释放全部缓存区
-     for (auto buf:bufList)
+
+     if (buf != nullptr)
      {
-         if (buf != NULL)
-         {
-             delete[] buf;
-             buf = NULL;
-         }
+         delete[] buf;
+         buf = nullptr;
      }
-     delete buf;    
+
  }
 
 
 /*!
 记录接收到的网络数据
-@param const stru_Param & param  接收到的网络数据
+@param char* buf  接收到的网络原始数据
+@param unsigned int size  接收到的网络原始数据大小
 @return void
 作者：cokkiy（张立民)
 创建时间：2015/10/08 21:59:26
 */
-// void SimpleLogger::log(/*const stru_Param& param*/)
-// {
-//     // get current time
-//     time_t cur;
-//     time(&cur);  
-// 
-//     //put to buffer
-//     //put2buf(cur, param);  
-// }
+ void SimpleLogger::log(char* buf, unsigned int size)
+ {
+     //put to buffer
+     put2buf(buf, size);
+ }
 
 /*!
 开始记录数据
@@ -53,43 +47,34 @@ SimpleLogger::SimpleLogger() :file(-1)
 作者：cokkiy（张立民)
 创建时间：2015/10/08 21:59:12
 */
-void SimpleLogger::start(string path)
-{
-    time_t cur;
-    time(&cur);
-    char* filename = new char[path.length() + 32];
-    sprintf(filename, "%s/net-received-%d.dat", path.c_str(), cur);
-    file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE);
-    delete filename;
+void SimpleLogger::start()
+{    
     if (file != -1)
     {
-        //writer = new std::thread(&SimpleLogger::write2file, this);
+        writer = new std::thread(&SimpleLogger::write2file, this);
     }
-
-    //save path
-    this->path = path;
 }
 
 // stop record
 void SimpleLogger::stop()
 {
     bStop = true;
-    if (writer != NULL)
+    if (writer != nullptr)
     {
         writer->join();
         delete writer;
-        writer = NULL;
+        writer = nullptr;
     }
 
-//     if (index < bufSize)
-//     {
-//         //还有数据没有写入
-//         if (file != -1)
-//         {
-//             _write(file, buf, index);            
-//         }
-//     }
-    //_close(file);    //关闭文件
+    if (index < bufSize)
+        {
+            //还有数据没有写入
+            if (file != -1)
+            {
+                _write(file, buf, index);            
+            }
+        }
+        _close(file);    //关闭文件
 
     time_t cur;
     time(&cur);
@@ -126,59 +111,84 @@ void SimpleLogger::logReceivedPacketCount()
     mutexForReceivedCount.unlock();
 }
 
+/*!
+初始化
+@param string path 记录文件存放路径
+@return bool 初始化是否成功
+作者：cokkiy（张立民)
+创建时间：2015/10/28 9:59:28
+*/
+bool SimpleLogger::init(string path)
+{
+    time_t cur;
+    time(&cur);
+    char* filename = new char[path.length() + 32];
+    sprintf(filename, "%s/net-received-%d.dat", path.c_str(), cur);
+    file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE);
+    delete filename;
+
+    //save path
+    this->path = path;
+
+    return file != -1;
+}
 
 //把数据和时间放入到缓冲区
-// void SimpleLogger::put2buf(time_t cur, const stru_Param& param)
-// {
-//     int curIndex = index;
-//     mutexForBuf.lock();
-//     if (index + packetSize < bufSize)
-//     {
-//         // move index to next header
-//         index += packetSize;
-//     }
-//     else
-//     {
-//         unique_lock<mutex> lock(mutexForNotify);
-//         //put old buf to buf list
-//         bufList.push_back(buf);
-//         //notify 
-//         hasItemCV.notify_one();
-//         // then, create new buf
-//         buf = new unsigned char[FlushPacketCount*packetSize];
-//         index = 0;
-//     }
-//     mutexForBuf.unlock();
-// 
-//     // put to buf
-//     memcpy(buf + curIndex, &cur, sizeof(time_t));
-//     curIndex += sizeof(time_t);
-//     
-//     memcpy(buf + curIndex, &param, sizeof(stru_Param));
-//     curIndex += sizeof(stru_Param);    
-// }
-// 
-// // write buffered data to file
-// void SimpleLogger::write2file()
-// {
-//     while (!bStop)
-//     {
-//         unique_lock<mutex> lock(mutexForNotify);
-//         while (bufList.empty())
-//         {
-//             hasItemCV.wait_for(lock, std::chrono::milliseconds(100));
-//             if (bStop)
-//             {
-//                 break;
-//             }
-//         }        
-// 
-//         unsigned char* tempBuf = bufList.front();
-//         if (_write(file, tempBuf, bufSize) == -1)
-//         {
-//         }
-//         bufList.pop_front();
-//         delete[] tempBuf;
-//     }
-//    
-// }
+void SimpleLogger::put2buf(char* src, unsigned int size)
+{
+    int curIndex = index;
+    mutexForBuf.lock();
+    if (index + size < bufSize)
+    {
+        // move index to next header
+        index += size;
+    }
+    else
+    {
+        unique_lock<mutex> lock(mutexForNotify);
+        //put old buf to buf list
+        bufList.push_back(Buf{ buf,index });
+        //notify 
+        hasItemCV.notify_one();
+        //create new buf
+        buf = new char[bufSize];
+        index = 0;
+        curIndex = 0;
+    }
+    mutexForBuf.unlock();
+
+    // put to buf    
+    memcpy(buf + curIndex, src, size);
+}
+
+// write buffered data to file
+void SimpleLogger::write2file()
+{
+    bool quit = false;
+    while (!quit)
+    {
+        unique_lock<mutex> lock(mutexForNotify);
+        while (bufList.empty())
+        {
+            hasItemCV.wait_for(lock, std::chrono::milliseconds(100));
+            if (bStop)
+            {
+                //退出
+                quit = true;
+                break;
+            }
+        }
+
+        if (!bufList.empty())
+        {
+            Buf & tempBuf = bufList.front();
+            if (_write(file, tempBuf.pBuf, tempBuf.size) == -1)
+            {
+            }
+            delete[] tempBuf.pBuf;
+            tempBuf.pBuf = nullptr;
+            bufList.pop_front();
+        }
+    }
+   
+}

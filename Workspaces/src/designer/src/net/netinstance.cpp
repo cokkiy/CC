@@ -9,6 +9,7 @@
 #include "C3I/CParamInfoRT.h"
 #include "selfshare/src/config/channelselectconfig.h"
 #include "HistoryBufferManager.h"
+#include "SimpleLogger.h"
 #include <QDebug>
 #include <chrono>
 #include <thread>
@@ -24,6 +25,8 @@ CParamInfoRT g_paramInfoRT;
 //全局变量,主备信道切换表
 ChannelSelectConfig channelSelectConfig;
 
+//全局变量,数据记录
+SimpleLogger simpleLogger;
 
 bool g_quitFlag = false;
 
@@ -68,6 +71,12 @@ int NetInstance::load(QString dir)
         return -1;
     }
 
+    //启动记录器
+    if (!simpleLogger.init((dir + "../private/Data").toStdString()))
+    {
+        qDebug() << QObject::tr("Create data record file error.");
+    }
+
     return 1;
 }
 
@@ -102,6 +111,8 @@ void NetInstance::run()
 
 int NetInstance::start()
 {
+    //启动数据记录
+    simpleLogger.start();
     m_thread->start();    
     HistoryBufferManager::startGC();
     return 1;
@@ -114,5 +125,6 @@ int NetInstance::stop()
     m_thread->exit();
     HistoryBufferManager::stopGC();
     HistoryBufferManager::releaseAll();
+    simpleLogger.stop();
     return 1;
 }
