@@ -33,11 +33,12 @@ public:
     /*!
     初始化
     @param string path 记录文件存放路径
+    @param bool isPrimaryChannel  是主用通道数据吗?默认是
     @return bool 初始化是否成功
     作者：cokkiy（张立民)
     创建时间：2015/10/28 9:59:28
     */
-    bool init(string path);
+    bool init(string path, bool isPrimaryChannel = true);
 
     /*!
     开始记录数据

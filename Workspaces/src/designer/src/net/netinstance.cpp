@@ -27,7 +27,8 @@ CParamInfoRT g_paramInfoRT;
 ChannelSelectConfig channelSelectConfig;
 
 //全局变量,数据记录
-SimpleLogger simpleLogger;
+SimpleLogger primaryChannelLogger;
+SimpleLogger backupChannelLogger;
 
 bool g_quitFlag = false;
 
@@ -79,9 +80,14 @@ int NetInstance::load(QString dir)
     {
         dataDir.mkdir(path);
     }
-    if (!simpleLogger.init(QString("%1../private/Data").arg(dir).toStdString()))
+    if (!primaryChannelLogger.init(QString("%1../private/Data").arg(dir).toStdString(), true))
     {
-        qDebug() << QObject::tr("Create data record file error.");
+        qDebug() << QObject::tr("Create primary channel data record file error.");
+    }
+
+    if (!backupChannelLogger.init(QString("%1../private/Data").arg(dir).toStdString(), false))
+    {
+        qDebug() << QObject::tr("Create backup channel data record file error.");
     }
 
     return 1;
@@ -119,7 +125,8 @@ void NetInstance::run()
 int NetInstance::start()
 {
     //启动数据记录
-    simpleLogger.start();
+    primaryChannelLogger.start();
+    backupChannelLogger.start();
     m_thread->start();    
     HistoryBufferManager::startGC();
     return 1;
@@ -132,6 +139,7 @@ int NetInstance::stop()
     m_thread->exit();
     HistoryBufferManager::stopGC();
     HistoryBufferManager::releaseAll();
-    simpleLogger.stop();
+    primaryChannelLogger.stop();
+    backupChannelLogger.stop();
     return 1;
 }

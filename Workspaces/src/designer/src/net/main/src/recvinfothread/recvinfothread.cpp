@@ -19,7 +19,10 @@
 
 extern InfoProcThread 	g_InfoProcThread[MAX_THREAD_NUM];
 extern bool g_quitFlag;
-extern SimpleLogger simpleLogger; //外部变量,记录原始数据
+
+//外部变量,记录数据线程
+extern SimpleLogger primaryChannelLogger;  //主用通道记录
+extern SimpleLogger backupChannelLogger;  //备用通道记录
 
 //构造函数
 RecvInfoThread::RecvInfoThread():PThread()
@@ -163,8 +166,7 @@ void RecvInfoThread::run()
                     continue;
                 }
                
-                //记录数据
-                simpleLogger.log(udpbuf, result);
+                
                 //判断是否是有效的包
                 if (!isValidPacket(result, udpbuf))
                 {
@@ -197,6 +199,9 @@ void RecvInfoThread::run()
                     {
                         m_primaryThreadNo = 0;
                     }
+
+                    //记录数据
+                    primaryChannelLogger.log(udpbuf, result);
                 }
                 else
                 {
@@ -210,6 +215,9 @@ void RecvInfoThread::run()
                     {
                         m_backupThreadNo = 0;
                     }
+
+                    //记录数据
+                    backupChannelLogger.log(udpbuf, result);
                 }                   
                 
             }

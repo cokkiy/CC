@@ -131,16 +131,24 @@ void SimpleLogger::logReceivedPacketCount()
 /*!
 初始化
 @param string path 记录文件存放路径
+@param bool isPrimaryChannel  是主用通道数据吗?默认是
 @return bool 初始化是否成功
 作者：cokkiy（张立民)
 创建时间：2015/10/28 9:59:28
 */
-bool SimpleLogger::init(string path)
+bool SimpleLogger::init(string path, bool isPrimaryChannel)
 {
     time_t cur;
     time(&cur);
-    char* filename = new char[path.length() + 32];
-    sprintf(filename, "%s/net-received-%d.dat", path.c_str(), cur);
+    char* filename = new char[path.length() + 64];
+    if (isPrimaryChannel)
+    {
+        sprintf(filename, "%s/net-received-%d-primary-channel.dat", path.c_str(), cur);
+    }
+    else
+    {
+        sprintf(filename, "%s/net-received-%d-backup-channel.dat", path.c_str(), cur);
+    }
     file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE);
     delete filename;
 
