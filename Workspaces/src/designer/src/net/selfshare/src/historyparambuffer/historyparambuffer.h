@@ -50,7 +50,7 @@ public:
     作者：cokkiy（张立民)
     修改时间：2015/10/29 16:18:57
     */
-    std::list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn, size_t& index);
+    std::list<HistoryParam> GetBuffer(unsigned short tn, unsigned short pn, size_t& index);
 };
 
 
