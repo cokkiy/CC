@@ -127,7 +127,6 @@ void GC::collect(HistoryBufferManager::HistoryParamMap* pParamMap)
                     }
                     org->clear();
                     delete org;
-                    wrapper.gcTimes++;
                 }
             }
             else if (collectIndex == 1)
@@ -144,7 +143,9 @@ void GC::collect(HistoryBufferManager::HistoryParamMap* pParamMap)
                     auto item = wrapper.pParamsBuf->front();
                     wrapper.pParamsBuf->pop_front();
                     willBeCollected.push_back(item);
-                }                
+                } 
+
+                wrapper.collectedCount = count;
             }
             else if(collectIndex==2)
             {

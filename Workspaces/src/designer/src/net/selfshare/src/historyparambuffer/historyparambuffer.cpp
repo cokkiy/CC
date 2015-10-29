@@ -9,6 +9,7 @@
 
 #include "historyparambuffer.h"
 #include "HistoryBufferManager.h"
+using namespace std;
 
 //******************
 //说明：缓冲区类构造函数
@@ -65,4 +66,18 @@ void HistoryParamBuffer::PutBuffer(unsigned short tn, unsigned short pn, History
 list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn, int & date, int & time)
 {
     return HistoryBufferManager::getParams(tn, pn, date, time);
+}
+
+/*!
+获取index之后的数据
+@param unsigned short tn 表号
+@param unsigned short pn 参数号
+@param size_t index 顺序号
+@return list<HistoryParam>按时间从前向后排序的参数列表
+作者：cokkiy（张立民)
+修改时间：2015/10/29 16:18:57
+*/
+list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn, size_t& index)
+{
+    return HistoryBufferManager::getParams(tn, pn, index);
 }

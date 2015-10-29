@@ -30,22 +30,22 @@ private:
         // indicate no write?
         bool noWrite = false;
         //是指针所有者?
-        bool isOwner = false;
-
-        //垃圾回收次数
-        unsigned short  gcTimes = 0;
+        bool isOwner = false;        
 
         // GC is frient class for GCWrapper
-        friend class GC;
+        friend class GC;      
+
+    public:
         //vector size, 20000
         const unsigned short vectorSize = 20000u;
-    public:
+        //垃圾回收数量,指回收了多少个list
+        unsigned short collectedCount = 0;
         //当前写入的Vector
         std::vector<HistoryParam>* currentVector;
         //当前Verctor写入计数
         unsigned short curVectorIndex;
-    public:
 
+    public:
         /*!
         默认构造函数,创建GCWrapper实例
         @return
@@ -60,7 +60,7 @@ private:
             visited = 0;
             writed = 0;
             noWrite = false;
-            gcTimes = 0;
+            collectedCount = 0;
             isOwner = true;
         }
 
@@ -78,7 +78,7 @@ private:
             visited = ref.visited;
             writed = ref.writed;
             noWrite = ref.noWrite;
-            gcTimes = ref.gcTimes;
+            collectedCount = ref.collectedCount;
             curVectorIndex = ref.curVectorIndex;
             currentVector = ref.currentVector;
             isOwner = false;
@@ -157,7 +157,16 @@ public:
     */
     static std::list<HistoryParam> getParams(unsigned short tabNo, unsigned short paramNo, int & date, int & time);
 
-
+    /*!
+    获取指定表号,参数号的index之后的历史数据
+    @param unsigned short tabNo 表号
+    @param unsigned short paramNo 参数号
+    @param size_t index 当前索引
+    @return std::list<HistoryParam>
+    作者：cokkiy（张立民)
+    创建时间：2015/10/29 12:20:25
+    */
+    static std::list<HistoryParam> getParams(unsigned short tabNo, unsigned short paramNo, size_t& index);
     /*!
     启动历史缓存区回收管理工作
     @return void

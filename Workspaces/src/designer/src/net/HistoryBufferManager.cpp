@@ -155,6 +155,65 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
 }
 
 /*!
+获取指定表号,参数号的index之后的历史数据
+@param unsigned short tabNo 表号
+@param unsigned short paramNo 参数号
+@param size_t index 当前索引
+@return std::list<HistoryParam> index之后的历史数据
+作者：cokkiy（张立民)
+创建时间：2015/10/29 12:20:25
+*/
+std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, unsigned short paramNo, size_t & index)
+{
+    list<HistoryParam> retBuf; 
+    GCWrapper& wrapper = m_historyParamBuffer[INDEX(tabNo, paramNo)];
+    
+    //根据GC修正index
+    size_t realIndex = index - ((size_t)wrapper.collectedCount)* wrapper.vectorSize;
+    if (realIndex < 0)
+        realIndex = 0; 
+
+    //计算可以跳过的Vector个数
+    size_t omitted_vector_count = realIndex / wrapper.vectorSize;
+    //开始位置（跳过omitted_vector_count个vector后的开始位置)
+    unsigned short indexInVector = realIndex%wrapper.vectorSize;
+
+    HistoryParams* pbuf = wrapper.getBuffer();
+    HistoryParams::iterator iter = pbuf->begin();
+    //移动到omitted_vector_count处
+    for (int i = 0; i < omitted_vector_count; i++)
+    {
+        if (iter != pbuf->end())
+            iter++;
+        else
+            return retBuf; //超出范围,返回空
+    }
+    for (; iter != pbuf->end();iter++)
+    {
+        //开始取数据
+        vector<HistoryParam>* pVector = *iter;
+        size_t count = 0;
+        if (wrapper.currentVector == pVector)
+        {
+            count = wrapper.curVectorIndex;
+        }
+        else
+        {
+            count = pVector->size();
+        }
+        for (size_t i = indexInVector; i < count; i++)
+        {
+            HistoryParam& t_param = pVector->at(i);
+            retBuf.push_back(t_param);  //从前向后顺序放
+            index++;
+        }
+        indexInVector = 0; //取完第一个vector的数据后,从头开始取
+    }
+    
+    return retBuf;
+}
+
+/*!
 启动历史缓存区回收管理工作
 @return void
 作者：cokkiy（张立民)

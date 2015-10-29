@@ -15,9 +15,6 @@
 #include <map>
 #include "../historyparam/historyparam.h"
 
-using namespace std;
-
-
 #define INDEX(tn,pn) (((unsigned int)tn<<16)|(unsigned short)pn)
 
 class HistoryParamBuffer : public BaseObject
@@ -43,6 +40,17 @@ public:
     修改时间：2015/10/23 10:25:55
     */
     std::list<HistoryParam> GetBuffer(unsigned short tableno, unsigned short paramno,int & date,int & time);
+
+    /*!
+    获取index之后的数据
+    @param unsigned short tn 表号
+    @param unsigned short pn 参数号
+    @param size_t index 顺序号
+    @return list<HistoryParam>按时间从前向后排序的参数列表
+    作者：cokkiy（张立民)
+    修改时间：2015/10/29 16:18:57
+    */
+    std::list<HistoryParam> HistoryParamBuffer::GetBuffer(unsigned short tn, unsigned short pn, size_t& index);
 };
 
 
