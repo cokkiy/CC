@@ -1,4 +1,4 @@
-﻿#include "table.h"
+#include "table.h"
 #include <QDebug>
 QTable::QTable(QWidget *parent) :
     QWidget(parent)
@@ -6,7 +6,7 @@ QTable::QTable(QWidget *parent) :
     //文本属性
     m_textString = tr("");
     m_lastTextString = tr("");
-    dispString = m_textString;
+    dispString = tr("");
     zebraLineColor.setRgb(255,255,255,127);
 
     //网格线属性
@@ -15,13 +15,16 @@ QTable::QTable(QWidget *parent) :
 	gridLineStyle = Qt::SolidLine;
 
     //插件框架属性
-    backgroundColor.setRgb(0,0,0,0);
+    QColor Color;
+    Color.setAlpha(255);
+    Color.setRgb(0);
+    backgroundBrush.setColor(Color);
     borderColor.setRgb(0,0,0);
     borderWidth = 1;
     borderStyle = Qt::SolidLine;
     pluginRect.setRect(0,0,0,0);
     m_timer_id = startTimer(500);
-    m_fWidthRatio = 1.0;
+	m_fWidthRatio = 1.0;
     m_fHeightRatio = 1.0;
 	dc = NetComponents::getDataCenter();
     paramInformation = NetComponents::getInforCenter();
@@ -43,7 +46,7 @@ void QTable::paintEvent(QPaintEvent *)
 //改变图元大小事件
 void QTable::resizeEvent(QResizeEvent *event)
 {
-    if(m_TableProperty.getRowNum() == 0 || m_TableProperty.getColNum() == 0)
+	if(m_TableProperty.getRowNum() == 0 || m_TableProperty.getColNum() == 0)
         return;
     QSize newSize = event->size();
     if(m_TableProperty.getTableVector()->count() != 0 )
@@ -75,7 +78,7 @@ void QTable::showPluginBackgroud()
 {
     setPluginRect();
     QPainter painter(this);
-    painter.fillRect(pluginRect,backgroundColor);
+    painter.fillRect(pluginRect,backgroundBrush);
 }
 //显示表格文本
 void QTable::showTableText(float wr,float hr)
@@ -94,12 +97,16 @@ void QTable::showTableText(float wr,float hr)
         {
             TableCell = m_TableProperty.getTableVector()->at(i*m_TableProperty.getColNum() + j);
             width += TableCell.getWidth()*wr;
-            painter.setFont(TableCell.getTextFont());
-            painter.setPen(TableCell.getTextColor());
             QRect rect(lastwidth + TableCell.getLeftMargin(),lastheight + TableCell.getTopMargin() ,
-                       width - lastwidth - TableCell.getRightMargin(),height - lastheight - TableCell.getBottomMargin());
+                                   width - lastwidth - TableCell.getRightMargin(),height - lastheight - TableCell.getBottomMargin());
             painter.fillRect(rect,TableCell.getBackgroundColor());
-            painter.drawText(rect,TableCell.getTextAlignment()|Qt::TextWrapAnywhere,getCellShowStr(TableCell));
+            dispString = getCellShowStr(TableCell);
+            QFont styleFont = TableCell.getTextFont();
+            QColor styleColor = TableCell.getTextColor();
+            analyzeDisplayStr(styleFont,styleColor);
+            painter.setFont(styleFont);
+            painter.setPen(styleColor);
+            painter.drawText(rect,TableCell.getTextAlignment()|Qt::TextWrapAnywhere,dispString);
             lastwidth = width;
         }
         lastheight = height;
@@ -198,9 +205,9 @@ void QTable::setBorderStyle(const Qt::PenStyle style)
     updateGeometry();
 }
 //插件背景色
-void QTable::setBackgroundColor(const QColor Color)
+void QTable::setBackgroundBrush(const QBrush Brush)
 {
-    backgroundColor = Color;
+    backgroundBrush = Brush;
     update();
     updateGeometry();
 }
@@ -357,4 +364,52 @@ QString QTable::getCellShowStr(QTableCell TableCell)
         break;
     }
     return showStr;
+}
+
+//解析显示字符串，字符串中包括字体、颜色、文本
+void QTable::analyzeDisplayStr(QFont &styleFont, QColor &styleColor)
+{
+    QString str = dispString;
+    if(str.indexOf("{{") == 0)
+    {
+        str = str.right(str.length() - 2);
+        int pos = str.indexOf("}");
+        QString fontStr = str.left(pos);
+        str = str.right(str.length() - pos - 1);
+        //解析字体
+        if(fontStr.length() > 4)
+        {
+            pos = fontStr.indexOf(",");
+            if(pos > 0)
+                styleFont.setFamily(fontStr.left(pos));
+            fontStr = fontStr.right(fontStr.length() - pos - 1);
+            pos = fontStr.indexOf(",");
+            if(pos > 0)
+                styleFont.setPointSize(fontStr.left(pos).toInt());
+            fontStr = fontStr.right(fontStr.length() - pos - 1);
+            pos = fontStr.indexOf(",");
+            if(pos > 0)
+                styleFont.setBold((bool)(fontStr.left(pos).toInt()));
+            fontStr = fontStr.right(fontStr.length() - pos - 1);
+            if(fontStr.length() > 0)
+                styleFont.setItalic((bool)(fontStr.toInt()));
+        }
+        //解析颜色
+        pos = str.indexOf("}");
+        QString colorStr = str.left(pos);
+        colorStr = colorStr.right(colorStr.length() - 1);
+        if(colorStr.length()>1)
+        {
+            styleColor.setRgb(colorStr.toInt(0,16));
+        }
+        //解析文本
+        str = str.right(str.length() - pos - 1);
+        str = str.left(str.length() - 2);
+        dispString = str.right(str.length() - 1);
+    }
+}
+
+void QTable::resetTable()
+{
+
 }

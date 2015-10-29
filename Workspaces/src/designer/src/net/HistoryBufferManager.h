@@ -39,6 +39,7 @@ private:
         friend class GC;
         //vector size, 20000
         const unsigned short vectorSize = 20000u;
+    public:
         //当前写入的Vector
         std::vector<HistoryParam>* currentVector;
         //当前Verctor写入计数

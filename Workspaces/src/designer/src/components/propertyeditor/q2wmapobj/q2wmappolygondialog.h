@@ -20,9 +20,6 @@ public:
     explicit Q2wmapPolygonDialog(QJsonObject jobj);
     ~Q2wmapPolygonDialog();
 
-    //元素名称
-    QString m_strName;
-
 private:
     Ui::Q2wmapPolygonDialog *ui;
 };

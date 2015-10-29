@@ -1172,16 +1172,6 @@
         </item>
         <item>
          <property name="text">
-          <string>上中</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>下中</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>正中</string>
          </property>
         </item>

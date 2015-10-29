@@ -226,6 +226,15 @@
     <ClCompile Include="SimpleLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C3I\paramstyle\paramstyleconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C3I\paramstyle\paramindex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C3I\paramstyle\paramstyle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3IFrame.h">
@@ -385,6 +394,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SimpleLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3I\paramstyle\paramindex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3I\paramstyle\paramstyle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C3I\paramstyle\paramstyleconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>593</width>
+    <height>199</height>
    </rect>
   </property>
   <property name="font">
@@ -22,8 +22,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>80</y>
+     <x>40</x>
+     <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -35,28 +35,28 @@
   <widget class="QLineEdit" name="lineEditAreaName">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>80</y>
+     <x>120</x>
+     <y>59</y>
      <width>161</width>
-     <height>20</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEditCCL">
+  <widget class="QLineEdit" name="lineEditPosL">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>120</y>
+     <x>120</x>
+     <y>100</y>
      <width>161</width>
-     <height>20</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>120</y>
+     <x>40</x>
+     <y>100</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -68,8 +68,8 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>160</y>
+     <x>40</x>
+     <y>140</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -78,37 +78,108 @@
     <string>圆心纬度</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEditCCB">
+  <widget class="QLineEdit" name="lineEditPosB">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>160</y>
+     <x>120</x>
+     <y>140</y>
      <width>161</width>
-     <height>20</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEditRadius">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>200</y>
+     <x>390</x>
+     <y>60</y>
      <width>161</width>
-     <height>20</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>200</y>
+     <x>310</x>
+     <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
     <string>半径(Km)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>100</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>边线粗细</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>140</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>边线颜色</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditWidth">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>100</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_SelectColor">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>140</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>20</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>类型：圆形区域</string>
    </property>
   </widget>
  </widget>

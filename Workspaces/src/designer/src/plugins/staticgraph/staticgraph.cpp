@@ -1,4 +1,4 @@
-﻿#include "staticgraph.h"
+#include "staticgraph.h"
 #include "staticgraphPrivate.h"
 
 
@@ -70,9 +70,6 @@ void staticgraph::paintEvent(QPaintEvent *event)
     Q_D(staticgraph);//创建私有类指针d,d为staticgraphPrivate类对象的指针
 
     d->setPlot();//工作代码
-//    d->setPlot_test1();//交互性
-//    d->setPlot_test2();//直线
-//    d->setPlot_test3();//散点
 
     d->update();      //更新绘图
 }

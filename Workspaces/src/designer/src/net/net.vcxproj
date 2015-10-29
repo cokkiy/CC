@@ -193,6 +193,9 @@
     <ClCompile Include="C3IFrame.cpp" />
     <ClCompile Include="C3I\CParamInfo.cpp" />
     <ClCompile Include="C3I\CParamInfoRT.cpp" />
+    <ClCompile Include="C3I\paramstyle\paramindex.cpp" />
+    <ClCompile Include="C3I\paramstyle\paramstyle.cpp" />
+    <ClCompile Include="C3I\paramstyle\paramstyleconfig.cpp" />
     <ClCompile Include="GC.cpp" />
     <ClCompile Include="HistoryBufferManager.cpp" />
     <ClCompile Include="LFormula.cpp" />
@@ -242,6 +245,9 @@
     <ClInclude Include="C3IFrame.h" />
     <ClInclude Include="C3I\CParamInfo.h" />
     <ClInclude Include="C3I\CParamInfoRT.h" />
+    <ClInclude Include="C3I\paramstyle\paramindex.h" />
+    <ClInclude Include="C3I\paramstyle\paramstyle.h" />
+    <ClInclude Include="C3I\paramstyle\paramstyleconfig.h" />
     <ClInclude Include="GC.h" />
     <ClInclude Include="GCWrapper.h" />
     <ClInclude Include="HistoryBufferManager.h" />

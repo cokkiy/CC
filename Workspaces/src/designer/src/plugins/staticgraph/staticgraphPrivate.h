@@ -1,4 +1,4 @@
-﻿#ifndef STATICGRAPHPRIVATE_H
+#ifndef STATICGRAPHPRIVATE_H
 #define STATICGRAPHPRIVATE_H
 
 #include <Net/NetComponents>
@@ -131,13 +131,6 @@ public:
 public:
     //工作代码
     void setPlot();
-    //Exmaple:the interaction example
-    void setPlot_test1();
-    //Exmaple:Line Style Demo
-    void setPlot_test2();
-    //Exmaple:Scatter Style demo
-    void setPlot_test3();
-
 
     void update();
 

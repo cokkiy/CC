@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -162,8 +162,8 @@ QDesignerPropertyEditor::StringPropertyParameters QDesignerPropertyEditor::textP
         return StringPropertyParameters(Validation2wmapObj, true);
     }
 
-    // q2wmapobj: 静态配置界面,rika,20151022
-    if (propertyName.endsWith(QStringLiteral("q2wmapstatic"))) {
+    // q2wmapstatic: 静态配置界面,rika,20151022
+    if (propertyName == (QStringLiteral("q2wmapstatic"))) {
         return StringPropertyParameters(Validation2wmapStatic, true);
     }
 

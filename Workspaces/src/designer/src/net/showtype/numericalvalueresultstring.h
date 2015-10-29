@@ -25,6 +25,8 @@ private:
     //格式：?偏远%.1f公里:偏近%.0f公里:正中靶心
     //格式：?偏远:偏近:正中靶心
     string getQuestionMarkString(const double ,const string );
+	//#域名.样式名称。通过该格式获取结果字符串，结果中包括字体、颜色、文本。
+    string getStyleResultString(const double ,const string );
     string getDefaultString(const double fParamValue);
 };
 

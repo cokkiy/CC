@@ -1,4 +1,4 @@
-﻿#ifndef Q2WMAP_H
+#ifndef Q2WMAP_H
 #define Q2WMAP_H
 
 #include <QWidget>
@@ -44,12 +44,12 @@ public:
     //获取/设置目标
     QString getobj() const;
     void setobj(const QString str);
-    void rstobj(){};
+    void rstobj(){}
 
     //获取/设置静态元素
     QString getstatic() const;
     void setstatic(const QString str);
-    void rststatic(){};
+    void rststatic(){}
 
     //获取/设置地图路径
     QPixmap getPixmap() const;

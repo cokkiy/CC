@@ -1,4 +1,4 @@
-﻿#include "qsingleparam.h"
+#include "qsingleparam.h"
 #include <QRect>
 QSingleParam::QSingleParam(QWidget *parent) :
     QWidget(parent)
@@ -6,11 +6,15 @@ QSingleParam::QSingleParam(QWidget *parent) :
     //文本属性
     showType = tr("");
     m_textString = tr("");
-    dispString = m_textString;
+    dispString = tr("");
+    resultString = tr("");
     textColor.setBlue(255);
     alignment = Qt::AlignCenter;
     //插件框架属性
-    backgroundColor.setRgb(0,0,0,0);
+    QColor Color;
+    Color.setAlpha(255);
+    Color.setRgb(0);
+    backgroundBrush.setColor(Color);
     borderColor.setRgb(0,0,0);
     borderWidth = 1;
     borderStyle = Qt::SolidLine;
@@ -30,38 +34,86 @@ QSingleParam::~QSingleParam()
 
 void QSingleParam::paintEvent(QPaintEvent *)
 {
-    SetPluginRect();
-    ShowPlugin();
+    showPlugin();
 }
 void QSingleParam::setTextString(const QString string)
 {
     m_textString = string;
     update();
 }
-void QSingleParam::ShowPluginFrame()
+void QSingleParam::showPluginFrame()
 {
     QPainter painter(this);
-    QPen pen = SetCustomPen(borderStyle,borderColor,borderWidth);
+    QPen pen = setCustomPen(borderStyle,borderColor,borderWidth);
     painter.setPen(pen);
-    painter.fillRect(pluginRect,backgroundColor);
+    painter.fillRect(pluginRect,backgroundBrush);
     painter.drawRect(pluginRect);
 }
-void QSingleParam::ShowPluginText()
+//解析显示字符串，字符串中包括字体、颜色、文本
+void QSingleParam::analyzeDisplayStr(QFont &styleFont, QColor &styleColor)
+{
+    QString str = resultString;
+    styleFont = font;
+    styleColor = textColor;
+    dispString = resultString;
+    if(str.indexOf("{{") == 0)
+    {
+        str = str.right(str.length() - 2);
+        int pos = str.indexOf("}");
+        QString fontStr = str.left(pos);
+        str = str.right(str.length() - pos - 1);
+		//解析字体
+        if(fontStr.length() > 4)
+        {
+            pos = fontStr.indexOf(",");
+            if(pos > 0)
+                styleFont.setFamily(fontStr.left(pos));
+            fontStr = fontStr.right(fontStr.length() - pos - 1);
+            pos = fontStr.indexOf(",");
+            if(pos > 0)
+                styleFont.setPointSize(fontStr.left(pos).toInt());
+            fontStr = fontStr.right(fontStr.length() - pos - 1);
+            pos = fontStr.indexOf(",");
+            if(pos > 0)
+                styleFont.setBold((bool)(fontStr.left(pos).toInt()));
+            fontStr = fontStr.right(fontStr.length() - pos - 1);
+            if(fontStr.length() > 0)
+                styleFont.setItalic((bool)(fontStr.toInt()));
+        }
+		//解析颜色
+        pos = str.indexOf("}");
+        QString colorStr = str.left(pos);
+        colorStr = colorStr.right(colorStr.length() - 1);
+        if(colorStr.length()>1)
+        {
+            styleColor.setRgb(colorStr.toInt(0,16));
+        }
+		//解析文本
+        str = str.right(str.length() - pos - 1);
+        str = str.left(str.length() - 2);
+        dispString = str.right(str.length() - 1);
+    }
+}
+void QSingleParam::showPluginText()
 {
     QPainter painter(this);
-    painter.setFont(font);
-    painter.setPen(textColor);
+    QFont styleFont;
+    QColor styleColor;
+    analyzeDisplayStr(styleFont,styleColor);
+    painter.setFont(styleFont);
+    painter.setPen(styleColor);
     painter.drawText(pluginRect,alignment,dispString);
 }
-void QSingleParam::timerEvent(QTimerEvent *event)
+void QSingleParam::timerEvent(QTimerEvent *)
 {
-    if(dc->getString(m_textString,showType,dispString)==1)
-        update();
+    dc->getString(m_textString,showType,resultString);
+    update();
 }
-void QSingleParam::ShowPlugin()
+void QSingleParam::showPlugin()
 {
-    ShowPluginFrame();
-    ShowPluginText();
+    setPluginRect();
+    showPluginFrame();
+    showPluginText();
 }
 
 void QSingleParam::setTextColor(const QColor Color)
@@ -85,14 +137,12 @@ void QSingleParam::setBorderStyle(const Qt::PenStyle style)
     updateGeometry();
 }
 
-void QSingleParam::setBackgroundColor(const QColor Color)
+void QSingleParam::setBackgroundBrush(const QBrush brush)
 {
-    backgroundColor = Color;
+    backgroundBrush = brush;
     update();
     updateGeometry();
 }
-
-
 
 void QSingleParam::setAlignment(const Qt::Alignment flag)
 {
@@ -101,9 +151,9 @@ void QSingleParam::setAlignment(const Qt::Alignment flag)
     updateGeometry();
 }
 
-void QSingleParam::setFont(const QFont Font)
+void QSingleParam::setFont(const QFont f)
 {
-    font = Font;
+    font = f;
     update();
     updateGeometry();
 }
@@ -123,7 +173,7 @@ void QSingleParam::setShowType(const QString string)
 }
 
 //设置自定义画笔
-QPen QSingleParam::SetCustomPen(Qt::PenStyle style,QColor color,uint width)
+QPen QSingleParam::setCustomPen(Qt::PenStyle style,QColor color,uint width)
 {
     QPen pen;
     pen.setColor(color);
@@ -133,11 +183,15 @@ QPen QSingleParam::SetCustomPen(Qt::PenStyle style,QColor color,uint width)
 }
 
 //设置插件矩形区域和背景区域
-void QSingleParam::SetPluginRect()
+void QSingleParam::setPluginRect()
 {
-    QRect Rect = this->geometry();
-    qint16 w = Rect.width();
-    qint16 h = Rect.height();
-    pluginRect.setRect(1,1,w-3,h-3);
+    QRect rect = this->geometry();
+    qint16 w = rect.width();
+    qint16 h = rect.height();
+    pluginRect.setRect(borderWidth/2,borderWidth/2,w-borderWidth,h-borderWidth);
 }
 
+void QSingleParam::resetData()
+{
+    return;
+}

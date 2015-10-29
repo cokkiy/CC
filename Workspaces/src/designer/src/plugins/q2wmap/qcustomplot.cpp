@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+/***************************************************************************
 **                                                                        **
 **  QCustomPlot, an easy to use, modern plotting widget for Qt            **
 **  Copyright (C) 2011, 2012, 2013, 2014 Emanuel Eichhammer               **
@@ -380,6 +380,27 @@ QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, double
 {
 }
 
+//以绘制文本方式创建构造函数
+QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, QString str):
+    mShape(shape),
+    mPen(QPen(color)),
+    mBrush(Qt::NoBrush),
+    mPenDefined(true),
+    mText(str)
+{
+}
+
+//以绘制椭圆方式创建构造函数
+QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, double w, double h):
+    mEllipseW(w),
+    mEllipseH(h),
+    mShape(shape),
+    mPen(QPen(color)),
+    mBrush(Qt::NoBrush),
+    mPenDefined(true)
+{
+}
+
 /*!
   Creates a new QCPScatterStyle instance with shape set to \a shape, the pen color set to \a color,
   the brush color to \a fill (with a solid pattern), and size to \a size.
@@ -458,6 +479,30 @@ QCPScatterStyle::QCPScatterStyle(const QPainterPath &customPath, const QPen &pen
 void QCPScatterStyle::setSize(double size)
 {
   mSize = size;
+}
+
+//设置文本
+void QCPScatterStyle::setText(const QString &str)
+{
+    mText = str;
+}
+
+//设置字体
+void QCPScatterStyle::setFont(const QFont &font)
+{
+    mFont = font;
+}
+
+//设置椭圆长轴
+void QCPScatterStyle::setEllipseW(double w)
+{
+  mEllipseW = w;
+}
+
+//设置椭圆短轴
+void QCPScatterStyle::setEllipseH(double h)
+{
+  mEllipseH = h;
 }
 
 /*!
@@ -579,6 +624,17 @@ void QCPScatterStyle::drawShape(QCPPainter *painter, double x, double y) const
     case ssCircle:
     {
       painter->drawEllipse(QPointF(x , y), w, w);
+      break;
+    }
+    case ssText:
+    {
+      painter->setFont(mFont);
+      painter->drawText(QPointF(x , y), mText);
+      break;
+    }
+    case ssEllipse:
+    {
+      painter->drawEllipse(QPointF(x , y), mEllipseW/2.0, mEllipseH/2.0);
       break;
     }
     case ssDisc:

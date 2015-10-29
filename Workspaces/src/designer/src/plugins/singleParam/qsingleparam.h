@@ -1,4 +1,4 @@
-﻿#ifndef QSINGLEPARAM_H
+#ifndef QSINGLEPARAM_H
 #define QSINGLEPARAM_H
 #include <Net/NetComponents>
 #include <QWidget>
@@ -7,13 +7,13 @@ class QSingleParam : public QWidget
 {
     Q_OBJECT
     //文本属性
-    Q_PROPERTY(QString data READ textString WRITE setTextString RESET rstobj)
+    Q_PROPERTY(QString data READ textString WRITE setTextString RESET resetData)
     Q_PROPERTY(QString showType READ getShowType WRITE setShowType)
     Q_PROPERTY(QFont font READ getFont WRITE setFont)
     Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor )
     //插件框架属性
-    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor )
+    Q_PROPERTY(QBrush backgroundBrush READ getBackgroundBrush WRITE setBackgroundBrush )
 
     Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
     Q_PROPERTY(qint32 borderWidth READ getBorderWidth WRITE setBorderWidth)
@@ -25,7 +25,7 @@ public:
     //文本属性
      QString textString() const {return m_textString;}
      void setTextString(const QString string);
-     void rstobj(){};
+     void resetData();
 
      QString getShowType() const {return showType;}
      void setShowType(const QString string);
@@ -39,8 +39,8 @@ public:
      QColor getTextColor() const {return textColor;}
      void setTextColor(const QColor Color);
 
-     QColor getBackgroundColor() const {return backgroundColor;}
-     void setBackgroundColor(const QColor Color);
+     QBrush getBackgroundBrush() const {return backgroundBrush;}
+     void setBackgroundBrush(const QBrush Brush);
 
     //插件框架属性
      QColor getBorderColor() const {return borderColor;}
@@ -57,13 +57,12 @@ private:
     QString m_textString;//输入参数
     QString showType;
     QString dispString;//显示参数
-
+    QString resultString;//显示参数
     QFont font;//文本字体
     Qt::Alignment alignment;//文本对齐方式
     QColor textColor;//文本颜色
-
     //插件框架属性
-    QColor backgroundColor;//插件背景颜色
+    QBrush backgroundBrush;//插件背景颜色
     QColor borderBrush;//边框画笔
     QColor borderColor;//插件边框颜色
     qint32 borderWidth;//插件边框宽度
@@ -74,13 +73,15 @@ private:
     QPen textPen;//文本画笔
     int m_timer_id;
 protected slots:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *);
 private:
-    void ShowPluginFrame();//显示插件矩形区域
-    void ShowPluginText();//显示插件文本
-    void ShowPlugin();//显示插件
-    QPen SetCustomPen(Qt::PenStyle style,QColor color,uint width);//设置自定义画笔
-	void SetPluginRect();//设置插件矩形区域和背景区域
+    void showPluginFrame();//显示插件矩形区域
+    void showPluginText();//显示插件文本
+    void showPlugin();//显示插件
+    QPen setCustomPen(Qt::PenStyle style,QColor color,uint width);//设置自定义画笔
+    void setPluginRect();//设置插件矩形区域和背景区域
+	//解析显示字符串，字符串中包括字体、颜色、文本
+    void analyzeDisplayStr(QFont &,QColor &);
 public:
     QSingleParam(QWidget *parent = 0);
     ~QSingleParam();

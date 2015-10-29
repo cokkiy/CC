@@ -1,4 +1,4 @@
-﻿#include "q2wmapPrivate.h"
+#include "q2wmapPrivate.h"
 #include "qwidget.h"
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -155,12 +155,12 @@ void Q2wmapPrivate::setAColor(const QColor cc)
 //设置目标属性，解析json的工作也在这里完成
 void Q2wmapPrivate::setObj(const QString str)
 {
+    m_strObj = str;
+
     if(m_plot == NULL)
     {
         return;
     }
-
-    m_strObj = str;
 
     //错误信息
     QJsonParseError jerr;
@@ -268,6 +268,136 @@ void Q2wmapPrivate::setObj(const QString str)
 //设置静态元素，解析json的工作也在这里完成
 void Q2wmapPrivate::setStatic(const QString str)
 {
+    m_strStatic = str;
+
+    if(m_plot == NULL)
+    {
+        return;
+    }
+
+    //错误信息
+    QJsonParseError jerr;
+
+    //取得json文档
+    QJsonDocument Jdoc = QJsonDocument::fromJson(str.toUtf8(), &jerr);
+
+    //如果没有发生错误，则开始解析
+    if(jerr.error != QJsonParseError::NoError)
+    {
+        qDebug()<<"error in Q2wmapPrivate::setStatic : Error json";
+        return;
+    }
+
+    //空文档
+    if(Jdoc.isEmpty())
+    {
+        qDebug()<<"error in Q2wmapPrivate::setStatic : Empty json";
+        return;
+    }
+
+    //数组文档(因为多目标，所以必须是数组)
+    if(!Jdoc.isArray())
+    {
+        qDebug()<<"error in Q2wmapPrivate::setStatic : Not a json array";
+        return;
+    }
+
+    //清空之前的静态元素
+    Q2wmapStatic ss;
+    foreach(ss, m_vctSta)
+    {
+        ss.m_pStaticGraph->clearData();
+    }
+
+    m_vctSta.clear();
+
+    //取得数组
+    QJsonArray array = Jdoc.array();
+
+    //循环获取
+    for(int j=0; j<array.size(); j++)
+    {
+        //取得一个数组的值
+        QJsonValue value = array.at(j);
+
+        //如果值是一个对象...?
+        if(value.isObject())
+        {
+            //转换成json对象
+            QJsonObject name = value.toObject();
+
+            //下面开始挨个解析
+            Q2wmapStatic sj;
+
+            sj.m_strType = name["Type"].toString();
+
+            //下面是通用属性
+
+            //元素名称
+            sj.m_strName = name["Name"].toString();
+
+            //边线颜色
+            sj.m_Color = name["Color"].toString();
+
+            //边线宽度
+            sj.m_iWidth = name["Width"].toInt();
+
+
+            if(sj.m_strType == "Circle")//圆形区域
+            {
+                //添加静态元素的图层
+                sj.m_pStaticGraph = m_plot->addGraph();
+
+                //圆心经度
+                sj.m_dbPosL = name["PosL"].toDouble();
+
+                //圆心纬度
+                sj.m_dbPosB = name["PosB"].toDouble();
+
+                //半径(Km)
+                sj.m_dbRadius = name["Radius"].toDouble();
+
+                //清空数据
+                sj.m_pStaticGraph->clearData();
+
+                //添加圆心点
+                sj.m_pStaticGraph->addData(sj.m_dbPosL, sj.m_dbPosB);
+
+            }else if( sj.m_strType == "Label")//标签
+            {
+                //添加静态元素的图层
+                sj.m_pStaticGraph = m_plot->addGraph();
+
+                //位置经度
+                sj.m_dbPosL = name["PosL"].toDouble();
+
+                //位置纬度
+                sj.m_dbPosB = name["PosB"].toDouble();
+
+                //字体
+                sj.m_strFont = name["Font"].toString();
+
+                //清空数据
+                sj.m_pStaticGraph->clearData();
+
+                //添加标定点
+                sj.m_pStaticGraph->addData(sj.m_dbPosL, sj.m_dbPosB);
+
+            }else if( sj.m_strType == "Polygon")//不规则区域
+            {
+                //添加静态元素的图层
+                sj.m_pStaticGraph = m_plot->addGraph();
+            }
+            else
+            {
+                //如果都不是则跳过
+                continue;
+            }
+
+
+            m_vctSta.push_back(sj);
+        }
+    }
 }
 
 //设置地图经度下限
@@ -406,24 +536,76 @@ void Q2wmapPrivate::setPlot()
     //曲线及图表可以被选择 QCP::iSelectPlottables
     //m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom| QCP::iSelectPlottables);
 
-    for(int i=0; i<m_vctObj.size(); i++)
+
+    //绘制理论曲线
+    Q2wmapObject t_Obj;
+
+    foreach(t_Obj, m_vctObj)
     {
         //理论曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
-        m_vctObj[i].m_pLcurve->setLineStyle(QCPGraph::lsNone);
+        t_Obj.m_pLcurve->setLineStyle(QCPGraph::lsNone);
 
-        m_vctObj[i].m_pLcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, m_vctObj[i].m_cLcurveColor, m_vctObj[i].m_iLcurveWidth));
+        t_Obj.m_pLcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, t_Obj.m_cLcurveColor, t_Obj.m_iLcurveWidth));
 
         QPen LPen;
 
-        LPen.setColor(m_vctObj[i].m_cLcurveColor);
+        LPen.setColor(t_Obj.m_cLcurveColor);
 
-        LPen.setWidth(m_vctObj[i].m_iLcurveWidth);
+        LPen.setWidth(t_Obj.m_iLcurveWidth);
 
         LPen.setStyle(Qt::SolidLine);
 
-        m_vctObj[i].m_pLcurve->setPen(LPen);
+        t_Obj.m_pLcurve->setPen(LPen);
     }
 
+    //绘制静态元素
+    Q2wmapStatic t_Sta;
+
+    foreach(t_Sta, m_vctSta)
+    {
+      if(t_Sta.m_strType == "Circle")//圆形区域
+      {
+          //每像素的纬度值
+          double B_per_pix = (m_BUpLimit - m_BLowLimit) /  m_pixmap.height();
+
+          //每像素的长度值(Km)
+          double pixWidth = B_per_pix * 110.94;
+
+          //圆形区域半径(像素)
+          quint32 r_radius = quint32( t_Sta.m_dbRadius / pixWidth );
+
+          //新建一个Style
+          QCPScatterStyle styleCircle(QCPScatterStyle(QCPScatterStyle::ssCircle, t_Sta.m_Color, r_radius*2.0));
+
+          //取画笔并修改粗细
+          QPen penCircle = styleCircle.pen();
+
+          penCircle.setWidth(t_Sta.m_iWidth);
+
+          //应用修改
+          styleCircle.setPen(penCircle);
+
+          //以圆形绘制
+          t_Sta.m_pStaticGraph->setScatterStyle(styleCircle);
+
+      }else if(t_Sta.m_strType == "Label")//标签
+      {
+          //新建一个Style
+          QCPScatterStyle styleLabel(QCPScatterStyle(QCPScatterStyle::ssText, t_Sta.m_Color, t_Sta.m_strName));
+
+          //设置字体
+          QFont font;
+
+          font.fromString(t_Sta.m_strFont);
+
+          styleLabel.setFont(font);
+
+          //设置风格
+          t_Sta.m_pStaticGraph->setScatterStyle(styleLabel);
+      }
+    }
+
+    //绘制实时曲线及当前点
     for(int j=0; j<m_vctObj.size(); j++)
     {
         //实时曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
@@ -445,13 +627,18 @@ void Q2wmapPrivate::setPlot()
         m_vctObj[j].m_pcurveLast->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, m_vctObj[j].m_ccurveColor, m_vctObj[j].m_icurveWidth+8));
     }
 
-    //是否显示网格
+    //是否显示坐标轴/网格
     if(m_bShowGrid)
     {
         m_plot->xAxis->grid()->setVisible(true);
         m_plot->xAxis2->grid()->setVisible(true);
         m_plot->yAxis->grid()->setVisible(true);
         m_plot->yAxis2->grid()->setVisible(true);
+
+        m_plot->xAxis->setVisible(true);
+        m_plot->yAxis->setVisible(true);
+        m_plot->xAxis2->setVisible(true);
+        m_plot->yAxis2->setVisible(true);
     }
     else
     {
@@ -459,6 +646,11 @@ void Q2wmapPrivate::setPlot()
         m_plot->xAxis2->grid()->setVisible(false);
         m_plot->yAxis->grid()->setVisible(false);
         m_plot->yAxis2->grid()->setVisible(false);
+
+        m_plot->xAxis->setVisible(false);
+        m_plot->yAxis->setVisible(false);
+        m_plot->xAxis2->setVisible(false);
+        m_plot->yAxis2->setVisible(false);
     }
 
     //是否自动分配每两个Tick之间的间距,默认为true
@@ -525,38 +717,25 @@ void Q2wmapPrivate::setPlot()
     m_plot->yAxis->setTickLabelSide(QCPAxis::lsInside);
     m_plot->yAxis2->setTickLabelSide(QCPAxis::lsInside);
 
-    if(m_bShowGrid)
-    {
-        //设置坐标轴不可见
-        m_plot->xAxis->setVisible(true);
-        m_plot->yAxis->setVisible(true);
-        m_plot->xAxis2->setVisible(true);
-        m_plot->yAxis2->setVisible(true);
-    }
-    else
-    {
-        //设置坐标轴不可见
-        m_plot->xAxis->setVisible(false);
-        m_plot->yAxis->setVisible(false);
-        m_plot->xAxis2->setVisible(false);
-        m_plot->yAxis2->setVisible(false);
-    }
-
     static bool bMoveFirst = false;
 
     //没收到数据时，视窗自动移动到主目标的理论弹道的第一个点处(仅首次需要移动)
     if(!bMoveFirst)
     {
-        for(int k=0; k<m_vctObj.size(); k++)
+        Q2wmapObject t_o2;
+        foreach(t_o2, m_vctObj)
         {
-            if(m_vctObj[k].m_bMainObj == true)//主目标
+            if(t_o2.m_bMainObj == true)//主目标
             {
-                if(m_vctObj[k].m_Cx.size() == 0)//没收到数据
+                if(t_o2.m_Cx.size() == 0)//没收到数据
                 {
-                     double L = m_vctObj[k].m_Lx[0];
-                     double B = m_vctObj[k].m_Ly[0];
-                     MoveToPointOfMapLB(L,B);
-                     bMoveFirst = true;
+                    if(t_o2.m_Lx.size()>0 && t_o2.m_Ly.size()>0)//理论弹道至少有1个点
+                    {
+                        double L = t_o2.m_Lx[0];
+                        double B = t_o2.m_Ly[0];
+                        MoveToPointOfMapLB(L,B);
+                        bMoveFirst = true;
+                    }
                 }
             }
         }

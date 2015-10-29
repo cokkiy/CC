@@ -77,7 +77,10 @@ SOURCES += \
     getMemorySize.cpp \
     getRSS.cpp \
     HistoryBufferManager.cpp \
-    SimpleLogger.cpp
+    SimpleLogger.cpp \
+    C3I/paramstyle/paramstyleconfig.cpp \
+    C3I/paramstyle/paramstyle.cpp \
+    C3I/paramstyle/paramindex.cpp
 
 HEADERS += \
         net_global.h \
@@ -132,7 +135,10 @@ HEADERS += \
     GC.h \
     GCWrapper.h \
     HistoryBufferManager.h \
-    SimpleLogger.h
+    SimpleLogger.h \
+    C3I/paramstyle/paramstyleconfig.h \
+    C3I/paramstyle/paramstyle.h \
+    C3I/paramstyle/paramindex.h
 
 
 unix {

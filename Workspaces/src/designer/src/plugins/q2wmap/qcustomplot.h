@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+/***************************************************************************
 **                                                                        **
 **  QCustomPlot, an easy to use, modern plotting widget for Qt            **
 **  Copyright (C) 2011, 2012, 2013, 2014 Emanuel Eichhammer               **
@@ -327,6 +327,7 @@ public:
                       ,ssCircle    ///< \enumimage{ssCircle.png} a circle
                       ,ssDisc      ///< \enumimage{ssDisc.png} a circle which is filled with the pen's color (not the brush as with ssCircle)
                       ,ssSquare    ///< \enumimage{ssSquare.png} a square
+                      ,ssEllipse   ///< \enumimage{ssEllipse.png} a ellipse
                       ,ssDiamond   ///< \enumimage{ssDiamond.png} a diamond
                       ,ssStar      ///< \enumimage{ssStar.png} a star with eight arms, i.e. a combination of cross and plus
                       ,ssTriangle  ///< \enumimage{ssTriangle.png} an equilateral triangle, standing on baseline
@@ -338,12 +339,15 @@ public:
                       ,ssPeace     ///< \enumimage{ssPeace.png} a circle, with one vertical and two downward diagonal lines
                       ,ssPixmap    ///< a custom pixmap specified by \ref setPixmap, centered on the data point coordinates
                       ,ssCustom    ///< custom painter operations are performed per scatter (As QPainterPath, see \ref setCustomPath)
+                      ,ssText      //绘制文字
                     };
 
   //构造函数
   QCPScatterStyle();
   QCPScatterStyle(ScatterShape shape, double size=6);
   QCPScatterStyle(ScatterShape shape, const QColor &color, double size);
+  QCPScatterStyle(ScatterShape shape, const QColor &color, QString str);
+  QCPScatterStyle(ScatterShape shape, const QColor &color, double w, double h);
   QCPScatterStyle(ScatterShape shape, const QColor &color, const QColor &fill, double size);
   QCPScatterStyle(ScatterShape shape, const QPen &pen, const QBrush &brush, double size);
   QCPScatterStyle(const QPixmap &pixmap);
@@ -351,19 +355,35 @@ public:
 
   // getters:
   double size() const { return mSize; }//散点大小
+  double EllipseW() const { return mEllipseW; }//椭圆长轴
+  double EllipseH() const { return mEllipseH; }//椭圆短轴
   ScatterShape shape() const { return mShape; }//散点形状
   QPen pen() const { return mPen; }//画笔
   QBrush brush() const { return mBrush; }//画刷
   QPixmap pixmap() const { return mPixmap; }//象素映射
   QPainterPath customPath() const { return mCustomPath; }//规定的路径
 
+  //获取文本
+  QString text() const { return mText; }
+
+  //获取字体
+  QFont font() const { return mFont; }
+
   // setters:
   void setSize(double size);//设置散点大小
+  void setEllipseW(double w);//设置椭圆长轴
+  void setEllipseH(double h);//设置椭圆短轴
   void setShape(ScatterShape shape);//设置散点形状
   void setPen(const QPen &pen);//设置画笔
   void setBrush(const QBrush &brush);//设置画刷
   void setPixmap(const QPixmap &pixmap);//设置象素映射
   void setCustomPath(const QPainterPath &customPath);//设置规定的路径
+
+  //设置文本
+  void setText(const QString &str);
+
+  //设置字体
+  void setFont(const QFont &font);
 
   // non-property methods:
   bool isNone() const { return mShape == ssNone; }//没有散点类型
@@ -380,6 +400,18 @@ protected:
   QBrush mBrush;//设置画刷
   QPixmap mPixmap;//设置象素映射
   QPainterPath mCustomPath;//设置规定的路径
+
+  //文本
+  QString mText;
+
+  //字体
+  QFont mFont;
+
+  //椭圆的长轴
+  double mEllipseW;
+
+  //椭圆的短轴
+  double mEllipseH;
 
   // non-property members:
   bool mPenDefined;//画笔定义

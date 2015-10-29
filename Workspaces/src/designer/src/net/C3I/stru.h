@@ -787,5 +787,19 @@ struct BCDTime
 // 		pParamTemp = NULL;
 // 	}
 // };
-
-
+//子样式
+struct stru_ParamStyle
+{
+    //索引名称
+    QString m_IndexName;
+     //数据下限
+    double m_Lorlmt;
+    //数据上限
+    double m_Uprlmt;
+    stru_ParamStyle()
+    {
+        m_IndexName = QObject::tr("");
+        m_Lorlmt = 0.0;
+        m_Uprlmt = 0.0;
+    }
+};

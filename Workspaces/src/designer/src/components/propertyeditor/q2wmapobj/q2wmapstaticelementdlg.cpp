@@ -35,6 +35,12 @@ void Q2wmapStaticElementDlg::InitControl(QString str)
         ui->tabWidget->removeTab(i);
     }
 
+    //空字符串不再解析
+    if(str.isEmpty())
+    {
+        return;
+    }
+
     //错误信息
     QJsonParseError jerr;
 
@@ -75,7 +81,6 @@ void Q2wmapStaticElementDlg::InitControl(QString str)
 
                     //元素类型
                     QString strType = name["Type"].toString();
-
 
                     if(strType == "Circle")
                     {
@@ -206,26 +211,54 @@ void Q2wmapStaticElementDlg::on_pushButtonOK_clicked()
 
             //下面在json中插入各个要保存的属性
 
-            //目标名称
+            //元素类型
+            stateObject.insert("Type", tc->m_strType);
+
+            //元素名称
             stateObject.insert("Name", tc->m_strName);
-        }
-        else if(t->m_strType == "Polygon")
-        {
-            Q2wmapPolygonDialog *tp = (Q2wmapPolygonDialog*)t;
 
-            //下面在json中插入各个要保存的属性
+            //元素线条颜色
+            stateObject.insert("Color", tc->m_strColor);
 
-            //目标名称
-            stateObject.insert("Name", tp->m_strName);
+            //元素线条粗细
+            stateObject.insert("Width", tc->m_iWidth);
+
+            //圆心经度
+            stateObject.insert("PosL", tc->m_dbPosL);
+
+            //圆心纬度
+            stateObject.insert("PosB", tc->m_dbPosB);
+
+            //圆心半径
+            stateObject.insert("Radius", tc->m_dbRadius);
         }
-        else if(t->m_strType == "Lable")
+        else if(t->m_strType == "Label")
         {
             Q2wmapLabelDlg * tl = (Q2wmapLabelDlg*)t;
 
             //下面在json中插入各个要保存的属性
 
-            //目标名称
+            //元素类型
+            stateObject.insert("Type", tl->m_strType);
+
+            //元素名称
             stateObject.insert("Name", tl->m_strName);
+
+            //元素线条颜色
+            stateObject.insert("Color", tl->m_strColor);
+
+            //字体
+            stateObject.insert("Font", tl->m_strFont);
+
+            //位置经度
+            stateObject.insert("PosL", tl->m_dbPosL);
+
+            //位置纬度
+            stateObject.insert("PosB", tl->m_dbPosB);
+        }
+        else if(t->m_strType == "Polygon")
+        {
+
         }
 
         //将每一行Json字符串添加到Json数组

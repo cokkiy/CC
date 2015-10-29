@@ -220,6 +220,12 @@ void QDataResultString::analysisShowAttrString()
         m_ShowAttrType = Value;
         return;
     }
+	//格式：#域名.样式名称
+    if(m_ShowAttrString.find('#',0) == 0)
+    {
+        m_ShowAttrType = Value;
+        return;
+    }
     if(!strcmp(m_ShowAttrString.c_str(), "T1"))
     {
         m_ShowAttrType = Time;

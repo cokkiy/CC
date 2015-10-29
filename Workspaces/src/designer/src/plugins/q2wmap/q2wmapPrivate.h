@@ -1,4 +1,4 @@
-﻿#ifndef Q2WMAPPRIVATE_H
+#ifndef Q2WMAPPRIVATE_H
 #define Q2WMAPPRIVATE_H
 #include <Net/NetComponents>
 #include "qcustomplot.h"
@@ -58,6 +58,51 @@ public:
     //数据接收类
     DataCenterInterface* m_dci;
 };
+
+//静态元素类
+class Q2wmapStatic
+{
+public:
+
+    //构造函数
+    Q2wmapStatic()
+    {
+        m_pStaticGraph = NULL;
+    }
+
+    //析构函数
+    ~Q2wmapStatic()
+    {
+    }
+
+    //元素类型 Circle=圆形区域 Label=标签 Polygon=不规则区域
+    QString m_strType;
+
+    //元素名称
+    QString m_strName;
+
+    //边线颜色
+    QColor m_Color;
+
+    //边线粗细
+    qint32 m_iWidth;
+
+    //位置经度(仅圆形区域/标签 使用)
+    double m_dbPosL;
+
+    //位置纬度(仅圆形区域/标签 使用)
+    double m_dbPosB;
+
+    //半径(Km)(仅圆形区域使用)
+    double m_dbRadius;
+
+    //字体(仅标签使用)
+    QString m_strFont;
+
+    //绘制的图形
+    QCPGraph* m_pStaticGraph;
+};
+
 
 class Q2wmapPrivate : QObject
 {
@@ -177,6 +222,9 @@ private:
 
     //目标数组
     QVector<Q2wmapObject> m_vctObj;
+
+    //静态元素数组
+    QVector<Q2wmapStatic> m_vctSta;
 
     //视窗左上角相对地图左上角的位移量x
     qint32 m_Pos_x;

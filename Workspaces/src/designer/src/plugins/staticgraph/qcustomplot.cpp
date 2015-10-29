@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+/***************************************************************************
 **                                                                        **
 **  QCustomPlot, an easy to use, modern plotting widget for Qt            **
 **  Copyright (C) 2011, 2012, 2013, 2014 Emanuel Eichhammer               **
@@ -12576,12 +12576,12 @@ QCPAxis *QCPAxisRect::addAxis(QCPAxis::AxisType type, QCPAxis *axis)
       return 0;
     }
   }
-  if (mAxes[type].size() > 0) // multiple axes on one side, add half-bar axis ending to additional axes with offset
-  {
-    bool invert = (type == QCPAxis::atRight) || (type == QCPAxis::atBottom);
-    newAxis->setLowerEnding(QCPLineEnding(QCPLineEnding::esHalfBar, 6, 10, !invert));
-    newAxis->setUpperEnding(QCPLineEnding(QCPLineEnding::esHalfBar, 6, 10, invert));
-  }
+//  if (mAxes[type].size() > 0) // multiple axes on one side, add half-bar axis ending to additional axes with offset
+//  {
+//    bool invert = (type == QCPAxis::atRight) || (type == QCPAxis::atBottom);
+//    newAxis->setLowerEnding(QCPLineEnding(QCPLineEnding::esHalfBar, 6, 10, !invert));
+//    newAxis->setUpperEnding(QCPLineEnding(QCPLineEnding::esHalfBar, 6, 10, invert));
+//  }
   mAxes[type].append(newAxis);
   return newAxis;
 }

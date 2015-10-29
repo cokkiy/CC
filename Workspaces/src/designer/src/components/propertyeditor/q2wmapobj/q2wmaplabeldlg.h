@@ -20,8 +20,28 @@ public:
     explicit Q2wmapLabelDlg(QJsonObject jobj);
     ~Q2wmapLabelDlg();
 
-    //元素名称
-    QString m_strName;
+    //位置经度
+    double m_dbPosL;
+
+    //位置纬度
+    double m_dbPosB;
+
+    //标签字体
+    QString m_strFont;
+
+    //设置控件
+    void setControls();
+
+private slots:
+    void on_lineEditLabelName_textChanged(const QString &arg1);
+
+    void on_lineEditPosL_textChanged(const QString &arg1);
+
+    void on_lineEditPosB_textChanged(const QString &arg1);
+
+    void on_pushButton_SelectColor_clicked();
+
+    void on_pushButton_Font_clicked();
 
 private:
     Ui::Q2wmapLabelDlg *ui;

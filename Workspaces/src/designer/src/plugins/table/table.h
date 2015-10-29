@@ -1,4 +1,4 @@
-﻿#ifndef TABLE_H
+#ifndef TABLE_H
 #define TABLE_H
 #include <Net/NetComponents>
 #include "../../components/propertyeditor/simpletable/tablecell.h"
@@ -10,7 +10,7 @@ class QTable : public QWidget
 {
     Q_OBJECT
     //文本属性
-    Q_PROPERTY(QString table READ textString WRITE setTextString RESET rstobj)
+    Q_PROPERTY(QString table READ textString WRITE setTextString RESET resetTable)
 	//斑马线显示
 	Q_PROPERTY(QColor zebraLineColor READ getZebraLineColor WRITE setZebraLineColor )
 
@@ -20,7 +20,7 @@ class QTable : public QWidget
     Q_PROPERTY(Qt::PenStyle gridLineStyle READ getGridLineStyle WRITE setGridLineStyle)
 
     //插件框架属性
-    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor )
+    Q_PROPERTY(QBrush backgroundBrush READ getBackgroundBrush WRITE setBackgroundBrush )
     Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
     Q_PROPERTY(qint32 borderWidth READ getBorderWidth WRITE setBorderWidth)
     Q_PROPERTY(Qt::PenStyle borderStyle READ getBorderStyle WRITE setBorderStyle)
@@ -34,7 +34,7 @@ public:
     //文本属性
 	QString textString() const {return m_textString;}
 	void setTextString(const QString string);
-	void rstobj(){};
+    void resetTable();
 
 	//斑马线属性
 	QColor getZebraLineColor() const {return zebraLineColor;}
@@ -52,8 +52,8 @@ public:
 	void setGridLineStyle(const Qt::PenStyle style);
     //插件框架属性
 	//插件背景色
-	QColor getBackgroundColor() const {return backgroundColor;}
-	void setBackgroundColor(const QColor Color);
+    QBrush getBackgroundBrush() const {return backgroundBrush;}
+    void setBackgroundBrush(const QBrush Brush);
 	//插件边框颜色
 	QColor getBorderColor() const {return borderColor;}
 	void setBorderColor(const QColor Color);
@@ -79,7 +79,7 @@ private:
 	Qt::PenStyle gridLineStyle;//网格线样式
 
     //表格框架属性
-    QColor backgroundColor;//插件背景颜色
+    QBrush backgroundBrush;//插件背景颜色
     QColor borderColor;//插件边框颜色
     qint32 borderWidth;//插件边框宽度
     Qt::PenStyle borderStyle;//插件边框样式
@@ -87,6 +87,9 @@ private:
     QRect pluginRect;//插件大小区域
     QPen textPen;//文本画笔
     int m_timer_id;
+	//表格宽度和高度的放大倍数
+    float m_fWidthRatio;
+    float m_fHeightRatio;
 protected slots:
     void timerEvent(QTimerEvent *event);
 private:
@@ -116,12 +119,11 @@ private:
     void setPluginGeometry();
 	//初始化表格属性
     void initTableProperty();
+    //解析显示字符串，字符串中包括字体、颜色、文本
+    void analyzeDisplayStr(QFont &,QColor &);
 private:
 	//表格属性
     QTableProperty m_TableProperty;
-	//表格宽度和高度的放大倍数
-    float m_fWidthRatio;
-    float m_fHeightRatio;
 public:
     QTable(QWidget *parent = 0);
     ~QTable();

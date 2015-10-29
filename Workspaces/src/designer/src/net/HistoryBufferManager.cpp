@@ -99,7 +99,7 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
 {
     list<HistoryParam> retBuf;
     HistoryParams::reverse_iterator it;
-    auto& wrapper = m_historyParamBuffer[INDEX(tabNo, paramNo)];
+    GCWrapper& wrapper = m_historyParamBuffer[INDEX(tabNo, paramNo)];
     HistoryParams* pbuf = wrapper.getBuffer();
     int t_date, t_time = 0;
     //从最后一个vector开始取数据
@@ -107,28 +107,37 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
     {
         vector<HistoryParam>* pVector = *it;
         HistoryParam& param = pVector->front();
-        size_t count = pVector->size();
-        if (param.getDate() > date || (param.getDate() == date&&param.getTime() > time))
+        size_t count = 0;
+        if(wrapper.currentVector==pVector)
         {
-            //复制该vector中全部数据到list,retBuf是按时间从前到后排序的
-            for (auto iter = pVector->begin(); iter < pVector->begin() + count; iter++)
-            {
-                retBuf.push_back(*iter);
-            }
-            t_date = param.getDate();
-            t_time = param.getTime();
+            count = wrapper.curVectorIndex;
         }
         else
         {
-            //找到vector中的某个元素,使其时间小于等于date.time
-            for (auto iter = pVector->end() - 1; iter == pVector->begin(); iter--)
+            count = pVector->size();
+        }
+        if (param.getDate() > date || (param.getDate() == date&&param.getTime() > time))
+        {
+            //复制该vector中全部数据到list,retBuf是按时间从前到后排序的
+            for(int pos = count-1;pos >= 0;pos--)
             {
-                if (iter->getDate() > date || (iter->getDate() == date&&iter->getTime() > time))
+                HistoryParam& t_param = pVector->at(pos);
+                retBuf.push_front(t_param);
+                t_date = t_date>t_param.getDate()?t_date:t_param.getDate();
+                t_time = t_time>t_param.getTime()?t_time:t_param.getTime();
+            }
+        }
+        else
+        {
+            for(int pos = count-1;pos >= 0;pos--)
+            {
+                HistoryParam& t_param = pVector->at(pos);
+                if (t_param.getDate() > date || (t_param.getDate() == date&&t_param.getTime() > time))
                 {
                     //把该参数放到retBuf前面,retBuf是按时间从前到后排序的
-                    retBuf.push_front(*iter);
-                    t_date = iter->getDate();
-                    t_time = iter->getTime();
+                    retBuf.push_front(t_param);
+                    t_date = t_date>t_param.getDate()?t_date:t_param.getDate();
+                    t_time = t_time>t_param.getTime()?t_time:t_param.getTime();
                 }
                 else
                 {
@@ -142,7 +151,6 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
         date = t_date;
         time = t_time;
     }
-    retBuf.reverse();
     return retBuf;
 }
 

@@ -73,6 +73,12 @@ void Q2wmapObj::InitControl(QString str)
         ui->tabWidget->removeTab(i);
     }
 
+    //空字符串不再解析
+    if(str.isEmpty())
+    {
+        return;
+    }
+
     //错误信息
     QJsonParseError jerr;
 

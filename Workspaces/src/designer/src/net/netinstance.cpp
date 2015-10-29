@@ -8,6 +8,7 @@
 #include "selfshare/src/config/netconfig.h"
 #include "C3I/CParamInfoRT.h"
 #include "selfshare/src/config/channelselectconfig.h"
+#include "C3I/paramstyle/paramstyleconfig.h"
 #include "HistoryBufferManager.h"
 #include "SimpleLogger.h"
 #include <QDebug>
@@ -26,6 +27,7 @@ CParamInfoRT g_paramInfoRT;
 //全局变量,主备信道切换表
 ChannelSelectConfig channelSelectConfig;
 
+QParamStyleConfig Paramstyleconfig;
 //全局变量,数据记录
 SimpleLogger primaryChannelLogger;
 SimpleLogger backupChannelLogger;
@@ -57,6 +59,11 @@ int NetInstance::load(QString dir)
     {
         qCritical()<<"Loading net config file failure. Please check then restart.";
         return -1;
+    }
+
+    if (!Paramstyleconfig.LoadParamFromXML(dir))
+    {
+        qWarning() << QObject::tr("Atleast one config file loading failure.Please check prior log.");
     }
 
     if (!g_paramInfoRT.LoadParamFromXML(dir))
