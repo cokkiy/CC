@@ -1,5 +1,5 @@
 ﻿#include "codesource.h"
-#include "codesourceplugin.h"
+#include "codeSourceplugin.h"
 
 #include <QtPlugin>
 
@@ -83,7 +83,7 @@ QString codeSourcePlugin::domXml() const
 }
 QString codeSourcePlugin::includeFile() const
 {
-    return QLatin1String("codesource.h");
+    return QLatin1String("codeSource.h");
 }
 #if QT_VERSION < 0x050000
 Q_EXPORT_PLUGIN2(codesourceplugin, codeSourcePlugin)

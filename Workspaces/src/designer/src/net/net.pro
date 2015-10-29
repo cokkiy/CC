@@ -76,7 +76,8 @@ SOURCES += \
     GC.cpp \
     getMemorySize.cpp \
     getRSS.cpp \
-    HistoryBufferManager.cpp
+    HistoryBufferManager.cpp \
+    SimpleLogger.cpp
 
 HEADERS += \
         net_global.h \
@@ -130,7 +131,8 @@ HEADERS += \
     showtype/coderesultstring.h \
     GC.h \
     GCWrapper.h \
-    HistoryBufferManager.h
+    HistoryBufferManager.h \
+    SimpleLogger.h
 
 
 unix {

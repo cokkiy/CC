@@ -42,7 +42,7 @@ int NetInstance::load(QString dir)
     //std::string temp = dir.toStdString();
     if(g_cfg.LoadConfig(dir) == false)
     {
-        cout<<"加载信息处理配置信息失败，请检查配置重启软件！"<<endl;
+        qWarning()<<QObject::tr("Loading config file error.");
         return -1;
     }
 
@@ -72,7 +72,7 @@ int NetInstance::load(QString dir)
     }
 
     //启动记录器
-    if (!simpleLogger.init((dir + "../private/Data").toStdString()))
+    if (!simpleLogger.init(QString("%1../private/Data").arg(dir).toStdString()))
     {
         qDebug() << QObject::tr("Create data record file error.");
     }

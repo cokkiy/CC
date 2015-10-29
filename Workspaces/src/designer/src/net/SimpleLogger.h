@@ -4,7 +4,6 @@
 #include <list>
 #include <mutex>
 #include <condition_variable>
-#include <io.h>
 #include <thread>
 #include "selfshare/src/historyparam/historyparam.h"
 

@@ -1,8 +1,25 @@
-﻿#include "..\..\..\..\include\net\netDepends"
-#include "SimpleLogger.h"
+﻿#include "SimpleLogger.h"
+#include <qsystemdetection.h>
 #include <time.h>
 #include <thread>
 #include <fcntl.h>
+
+#ifdef Q_OS_WIN
+#include <io.h>
+#endif
+
+#ifdef Q_OS_LINUX
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#define _write write
+#define _close close
+#define _open open
+#define _O_BINARY O_TRUNC
+#define _O_CREAT O_CREAT
+#define _O_WRONLY O_WRONLY
+#define _S_IWRITE S_IWRITE
+#endif
 
 
 //构造函数,申请资源
@@ -76,23 +93,23 @@ void SimpleLogger::stop()
         }
         _close(file);    //关闭文件
 
-    time_t cur;
-    time(&cur);
-    char* filename = new char[path.length() + 32];
-     //open parsed packet count file
-    memset(filename, 0, path.length() + 32);
-    sprintf(filename, "%s/packet-count-%d.txt", path.c_str(), cur);
-    FILE* file4packetCount = fopen(filename, "w");
-    delete filename;
+//    time_t cur;
+//    time(&cur);
+//    char* filename = new char[path.length() + 32];
+//     //open parsed packet count file
+//    memset(filename, 0, path.length() + 32);
+//    sprintf(filename, "%s/packet-count-%d.txt", path.c_str(), cur);
+//    FILE* file4packetCount = fopen(filename, "w");
+//    delete filename;
 
-    //关闭计数文件
-    if (file4packetCount != NULL)
-    {
-        //write count to file
-        fprintf(file4packetCount, "Received Frame:%d, After Parsed:%d packet.", receivedDataCount, parsedPacketCount);
-        fclose(file4packetCount);
-        file4packetCount = NULL;
-    }    
+//    //关闭计数文件
+//    if (file4packetCount != NULL)
+//    {
+//        //write count to file
+//        fprintf(file4packetCount, "Received Frame:%d, After Parsed:%d packet.", receivedDataCount, parsedPacketCount);
+//        fclose(file4packetCount);
+//        file4packetCount = NULL;
+//    }
 }
 
 //记录处理后的包个数
@@ -152,7 +169,7 @@ void SimpleLogger::put2buf(char* src, unsigned int size)
         hasItemCV.notify_one();
         //create new buf
         buf = new char[bufSize];
-        index = 0;
+        index = size; // index+=size;
         curIndex = 0;
     }
     mutexForBuf.unlock();
