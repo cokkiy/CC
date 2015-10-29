@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <chrono>
 #include <thread>
+#include <QDir>
 
 extern Config g_cfg;
 
@@ -72,6 +73,12 @@ int NetInstance::load(QString dir)
     }
 
     //启动记录器
+    QString path = QString("%1../private/Data").arg(dir);
+    QDir dataDir;
+    if (!dataDir.exists(path))
+    {
+        dataDir.mkdir(path);
+    }
     if (!simpleLogger.init(QString("%1../private/Data").arg(dir).toStdString()))
     {
         qDebug() << QObject::tr("Create data record file error.");
