@@ -13,58 +13,23 @@
 class Rectangle : public QWidget
 {
     Q_OBJECT
-    //Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-    //Q_PROPERTY(QColor border READ border WRITE setBorder NOTIFY borderChanged)
-    Q_PROPERTY(qint32 x READ x WRITE setX )
-    Q_PROPERTY(qint32 y READ y WRITE setY )
-    Q_PROPERTY(qint32 rectWidth READ rectWidth WRITE setRectWidth NOTIFY rectWidthChanged)
-    Q_PROPERTY(qint32 rectHeight READ rectHeight WRITE setRectHeight NOTIFY rectHeightChanged)
-    Q_PROPERTY(QBrush backgroundBrush READ bgBrush WRITE setBgBrush NOTIFY bgBrushChanged RESET unsetBgBrush)
-    Q_PROPERTY(Qt::PenStyle borderStyle READ borderStyle WRITE setBorderStyle NOTIFY borderStyleChanged RESET unsetBorderStyle)
-    Q_PROPERTY(QBrush borderBrush READ borderBrush WRITE setBorderBrush NOTIFY borderBrushChanged RESET unsetBorderBrush)
+    Q_PROPERTY(QBrush backgroundColor READ bgBrush WRITE setBgBrush NOTIFY bgBrushChanged RESET unsetBgBrush)
+    Q_PROPERTY(QBrush borderColor READ borderColor WRITE setBorderBrush NOTIFY borderBrushChanged RESET unsetBorderBrush)
     Q_PROPERTY(qint32 borderWidth READ borderWidth WRITE setBorderWidth NOTIFY borderWidthChanged RESET unsetBorderWidth)
+    Q_PROPERTY(Qt::PenStyle borderStyle READ borderStyle WRITE setBorderStyle NOTIFY borderStyleChanged RESET unsetBorderStyle)
     Q_PROPERTY(qint32 radius READ radius WRITE setRadius NOTIFY radiusChanged RESET unsetRadius)
     Q_PROPERTY(qint32 rotate READ rotate WRITE setRotate NOTIFY rotateChanged RESET unsetRotate)
+    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 
 public:
     Rectangle(QWidget *parent = 0);
-
-    //x,y
-    void setX(quint32 x)
-    {
-        this->move(x,y());
-    }
-
-
-    void setY(qint32 y)
-    {
-        this->move(x(),y);
-    }
-
-
-    //rect width and height
-    void setRectWidth(qint32 width)
-    {
-        m_width=width;
-        emit rectWidthChanged(width);
-    }
-
-    qint32 rectWidth()
-    {
-        return m_width;
-    }
-
-    void setRectHeight(qint32 height)
-    {
-        m_height=height;
-        emit rectHeightChanged(height);
-    }
-
-    qint32 rectHeight()
-    {
-        return m_height;
-    }
 
     //rect backgroud brush
     void setBgBrush(const QBrush & brush)
@@ -85,7 +50,7 @@ public:
         emit borderBrushChanged(brush);
     }
 
-    QBrush borderBrush() const
+    QBrush borderColor() const
     {
         return m_borderBrush;
     }
@@ -160,8 +125,6 @@ signals:
 public slots:
 
 private:
-    //QColor m_color;
-    //QColor m_border;
     quint32 m_borderWidth;
     quint32 m_radius;
     QBrush m_bgBrush;

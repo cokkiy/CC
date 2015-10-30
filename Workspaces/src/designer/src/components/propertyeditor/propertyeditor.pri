@@ -26,7 +26,8 @@ FORMS += $$PWD/paletteeditor.ui \
     $$PWD/q2wmapobj/q2wmapstaticelementdlg.ui \
     $$PWD/q2wmapobj/q2wmappolygondialog.ui \
     $$PWD/q2wmapobj/q2wmaplabeldlg.ui \
-    $$PWD/q2wmapobj/q2wmapcircledlg.ui
+    $$PWD/q2wmapobj/q2wmapcircledlg.ui \
+    $$PWD/configshowtype/configshowtypedialog.ui
 
 HEADERS += $$PWD/propertyeditor.h \
     $$PWD/designerpropertymanager.h \
@@ -56,7 +57,8 @@ HEADERS += $$PWD/propertyeditor.h \
     $$PWD/q2wmapobj/q2wmappolygondialog.h \
     $$PWD/q2wmapobj/q2wmaplabeldlg.h \
     $$PWD/q2wmapobj/q2wmapcircledlg.h \
-    $$PWD/q2wmapobj/q2wmapelementdlg.h
+    $$PWD/q2wmapobj/q2wmapelementdlg.h \
+    $$PWD/configshowtype/configshowtypedialog.h
 
 SOURCES += $$PWD/propertyeditor.cpp \
     $$PWD/designerpropertymanager.cpp \
@@ -86,7 +88,8 @@ SOURCES += $$PWD/propertyeditor.cpp \
     $$PWD/q2wmapobj/q2wmappolygondialog.cpp \
     $$PWD/q2wmapobj/q2wmaplabeldlg.cpp \
     $$PWD/q2wmapobj/q2wmapcircledlg.cpp \
-    $$PWD/q2wmapobj/q2wmapelementdlg.cpp
+    $$PWD/q2wmapobj/q2wmapelementdlg.cpp \
+    $$PWD/configshowtype/configshowtypedialog.cpp
 
 HEADERS += \
     $$PWD/propertyeditor_global.h \

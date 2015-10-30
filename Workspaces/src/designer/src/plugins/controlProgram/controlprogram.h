@@ -20,19 +20,25 @@ class controlProgram : public QTableWidget
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
     //coulmn = 1 状态列 三种状态的字体颜色
-    Q_PROPERTY(QFont undofont READ getUndoFont WRITE setUndoFont)
+    Q_PROPERTY(QFont undoFont READ getUndoFont WRITE setUndoFont)
     Q_PROPERTY(QColor undoColor READ getUndoColor WRITE setUndoColor)
-    Q_PROPERTY(QFont doingfont READ getDoingFont WRITE setDoingFont)
+    Q_PROPERTY(QFont doingFont READ getDoingFont WRITE setDoingFont)
     Q_PROPERTY(QColor doingColor READ getDoingColor WRITE setDoingColor)
-    Q_PROPERTY(QFont donefont READ getDoneFont WRITE setDoneFont)
+    Q_PROPERTY(QFont doneFont READ getDoneFont WRITE setDoneFont)
     Q_PROPERTY(QColor doneColor READ getDoneColor WRITE setDoneColor)
 
     //grid
-    Q_PROPERTY(QColor gridlineColor READ gridlineColor WRITE
+    Q_PROPERTY(QColor lineColor READ lineColor WRITE
                setGridlineColor NOTIFY gridlineColorChanged)//网格线条颜色
 
     //图元坐标
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     controlProgram(QWidget *parent = 0);
@@ -71,7 +77,7 @@ public:
     QColor backgroundColor() const{return m_backgroundColor;}
     void setBackgroundColor(const QColor &newcolor);
 
-    QColor gridlineColor() const{return m_gridlineColor;}
+    QColor lineColor() const{return m_gridlineColor;}
     void setGridlineColor(const QColor &newcolor);
 
 private:    

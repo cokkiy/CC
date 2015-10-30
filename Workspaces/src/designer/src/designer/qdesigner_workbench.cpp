@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -221,7 +221,7 @@ QDesignerWorkbench::QDesignerWorkbench()  :
 
     //m_windowMenu = addMenu(m_globalMenuBar, tr("&Window"), m_actionManager->windowActions()->actions());
 
-    m_funMenu = addMenu(m_globalMenuBar, tr("功能(&O)"), m_actionManager->functionActions()->actions());
+    m_funMenu = addMenu(m_globalMenuBar, QString::fromLocal8Bit("功能(&O)"), m_actionManager->functionActions()->actions());
 
     m_helpMenu = addMenu(m_globalMenuBar, tr("&Help"), m_actionManager->helpActions()->actions());
 
@@ -334,6 +334,9 @@ AppMode QDesignerWorkbench::appmode() const
 
 void QDesignerWorkbench::setAppMode(const AppMode m)
 {
+    //不允许重复设置应用模式,andrew,20151029
+    if(m_appMode==m)
+        return;
     m_appMode = m;
     if(!m_editMenu)
         return;

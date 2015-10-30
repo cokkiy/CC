@@ -1,4 +1,4 @@
-#include "table.h"
+﻿#include "table.h"
 #include <QDebug>
 QTable::QTable(QWidget *parent) :
     QWidget(parent)
@@ -10,15 +10,15 @@ QTable::QTable(QWidget *parent) :
     zebraLineColor.setRgb(255,255,255,127);
 
     //网格线属性
-    gridLineColor.setRgb(0,0,0);
-    gridLineWidth = 1;
-	gridLineStyle = Qt::SolidLine;
+    lineColor.setRgb(0,0,0);
+    lineWidth = 1;
+	lineStyle = Qt::SolidLine;
 
     //插件框架属性
     QColor Color;
     Color.setAlpha(255);
     Color.setRgb(0);
-    backgroundBrush.setColor(Color);
+    backgroundColor.setColor(Color);
     borderColor.setRgb(0,0,0);
     borderWidth = 1;
     borderStyle = Qt::SolidLine;
@@ -78,7 +78,7 @@ void QTable::showPluginBackgroud()
 {
     setPluginRect();
     QPainter painter(this);
-    painter.fillRect(pluginRect,backgroundBrush);
+    painter.fillRect(pluginRect,backgroundColor);
 }
 //显示表格文本
 void QTable::showTableText(float wr,float hr)
@@ -116,7 +116,7 @@ void QTable::showTableText(float wr,float hr)
 void QTable::showTable(float wr,float hr)
 {
     QPainter painter(this);
-    QPen pen = setCustomPen(gridLineStyle,gridLineColor,gridLineWidth);
+    QPen pen = setCustomPen(lineStyle,lineColor,lineWidth);
     painter.setPen(pen);
     int width = 0;
     int height = 0;
@@ -207,7 +207,7 @@ void QTable::setBorderStyle(const Qt::PenStyle style)
 //插件背景色
 void QTable::setBackgroundBrush(const QBrush Brush)
 {
-    backgroundBrush = Brush;
+    backgroundColor = Brush;
     update();
     updateGeometry();
 }
@@ -268,21 +268,21 @@ void QTable::setZebraLineColor(const QColor Color)
 //网格线颜色
 void QTable::setGridLineColor(const QColor Color)
 {
-	gridLineColor = Color;
+	lineColor = Color;
 	update();
     updateGeometry();
 }
 //网格线宽度
 void QTable::setGridLineWidth(const qint32 w)
 {
-	gridLineWidth = w;
+	lineWidth = w;
 	update();
     updateGeometry();
 }
 //网格线样式
 void QTable::setGridLineStyle(const Qt::PenStyle style)
 {
-	gridLineStyle = style;
+	lineStyle = style;
 	update();
     updateGeometry();
 }

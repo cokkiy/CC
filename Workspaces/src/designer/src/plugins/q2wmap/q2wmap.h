@@ -1,4 +1,4 @@
-#ifndef Q2WMAP_H
+﻿#ifndef Q2WMAP_H
 #define Q2WMAP_H
 
 #include <QWidget>
@@ -10,32 +10,45 @@ class Q2wmap : public QWidget
 {
     Q_OBJECT
 
+    //目标配置
+    Q_PROPERTY(QString objectConfig READ getobj WRITE setobj RESET rstobj)
+
+    //静态元素配置
+    Q_PROPERTY(QString staticConfig READ getstatic WRITE setstatic RESET rststatic)
+
+    //地图路径
+    Q_PROPERTY(QPixmap backgroundImage READ getPixmap WRITE setPixmap)
+
+    //地图经度下限
+    Q_PROPERTY(double leftL READ getLLowLimit WRITE setLLowLimit)
+
+    //地图经度上限
+    Q_PROPERTY(double rightL READ getLUpLimit WRITE setLUpLimit)
+
+    //地图纬度下限
+    Q_PROPERTY(double lowB READ getBLowLimit WRITE setBLowLimit)
+
+    //地图纬度上限
+    Q_PROPERTY(double upB READ getBUpLimit WRITE setBUpLimit)
+
+    //视窗起始点经度
+    Q_PROPERTY(double viewOriginL READ getViewOriginL WRITE setViewOriginL)
+
+    //视窗起始点纬度
+    Q_PROPERTY(double viewOriginB READ getViewOriginB WRITE setViewOriginB)
+
+    //坐标轴颜色
+    Q_PROPERTY(QColor axisColor READ getAColor WRITE setAColor)
+
     //图元矩形
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
 
-    //目标配置
-    Q_PROPERTY(QString q2wmapobj READ getobj WRITE setobj RESET rstobj)
-
-    //静态元素配置
-    Q_PROPERTY(QString q2wmapstatic READ getstatic WRITE setstatic RESET rststatic)
-
-    //坐标轴颜色
-    Q_PROPERTY(QColor AColor READ getAColor WRITE setAColor)
-
-    //地图经度下限
-    Q_PROPERTY(double LLowLimit READ getLLowLimit WRITE setLLowLimit)
-
-    //地图经度上限
-    Q_PROPERTY(double LUpLimit READ getLUpLimit WRITE setLUpLimit)
-
-    //地图纬度下限
-    Q_PROPERTY(double BLowLimit READ getBLowLimit WRITE setBLowLimit)
-
-    //地图纬度上限
-    Q_PROPERTY(double BUpLimit READ getBUpLimit WRITE setBUpLimit)
-
-    //地图路径
-    Q_PROPERTY(QPixmap pixmap READ getPixmap WRITE setPixmap)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     Q2wmap(QWidget *parent = 0);
@@ -78,6 +91,12 @@ public:
     //获取/设置地图纬度上限
     double getBUpLimit()  const;
     void setBUpLimit(const double wu);
+
+    //获取/设置视窗起始点经纬度
+    double getViewOriginL() const;
+    void setViewOriginL(const double l);
+    double getViewOriginB() const;
+    void setViewOriginB(const double b);
 
     //右键菜单事件
     void contextMenuEvent(QContextMenuEvent*);

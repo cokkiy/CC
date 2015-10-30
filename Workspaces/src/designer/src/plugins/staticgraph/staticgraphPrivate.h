@@ -1,4 +1,4 @@
-#ifndef STATICGRAPHPRIVATE_H
+﻿#ifndef STATICGRAPHPRIVATE_H
 #define STATICGRAPHPRIVATE_H
 
 #include <Net/NetComponents>
@@ -33,75 +33,53 @@ public:
     QString m_Scaleplace_y_plot;
     //原点的位置：左下、左上、右下、右上、上中、下中、正中
     QString m_OriginPlace_plot;
-    //刻度标签的位置：内侧、外侧
-    QString m_Scalelabelplace_x_plot;
-    QString m_Scalelabelplace_y_plot;
     //是否显示x轴
     bool m_XAxisdisplay_plot;
     //是否显示y轴
     bool m_YAxisdisplay_plot;
-
     //实时曲线名称
     QString m_GraphName_plot ;
     //实时曲线宽度
     qint32  m_GraphWidth_plot ;
     //实时曲线颜色
     QString m_strgraphColor_plot;
-    //实时曲线缓冲区大小
-    double  m_GraphBuffer_plot;
-
     //理论曲线名称
     QString m_LGraphName_plot ;
     //理论曲线宽度
     qint32  m_LGraphWidth_plot ;
     //理论曲线颜色
     QString m_strLgraphColor_plot;
-    //理论曲线缓冲区大小
-    double  m_LGraphBuffer_plot;
-
     //实时曲线x参数
     QString m_xParam_plot;
     //实时曲线y参数
     QString m_yParam_plot;
-
     //理论曲线弹道文件
     QString m_Lgraphfile_plot;//理论曲线文件(路径)
-
     qint32 m_XAxiswideth_plot;
     QString m_chooseXAxisColor_plot ;
-//    qint32 m_YAxiswideth_plot ;
-//    QString m_chooseYAxisColor_plot ;
     QString m_chooseXAxisLabelColor_plot ;
-
     bool m_chooseXAxislabeldisplay_plot ;
     QString m_chooseYAxisLabelColor_plot ;
     bool m_chooseYAxislabeldisplay_plot ;
     QString m_chooseXAxisScaleLabelColor_plot;
-
     qint32 m_numOfXAxisScale_plot ;//设置刻度数
     qint32 m_numOfYAxisScale_plot ;
-
     qint32 m_XAxisScaleRuler_plot ;
     qint32 m_XAxisScaleprecision_plot ;
     bool m_chooseXAxisScalelabeldisplay_plot ;
     QString m_chooseYAxisScaleLabelColor_plot;
-
     qint32 m_YAxisScaleRuler_plot ;
     qint32 m_YAxisScaleprecision_plot ;
     bool m_chooseYAxisScalelabeldisplay_plot ;
     bool m_chooseXAxisScaleTickdisplay_plot ;
     bool m_chooseYAxisScaleTickdisplay_plot ;
-
     QString m_XAxislabelFont_plot;
-//    QString m_YAxislabelFont_plot;
     QString m_XAxisScalelabelFont_plot;
     QString m_YAxisScalelabelFont_plot;
-
     QString m_XAxisScalelabeloffset_x_plot ;
     QString m_XAxisScalelabeloffset_y_plot ;
     QString m_YAxisScalelabeloffset_x_plot ;
     QString m_YAxisScalelabeloffset_y_plot ;
-
     //理论曲线图层
     QCPGraph* m_pLgraph;
     //实时曲线图层
@@ -109,6 +87,9 @@ public:
     //实时曲线(最后收到的点)---闪烁点
     QCPGraph* m_pgraphLast;
     //
+    QCPAxis* m_pXAxis;
+    QCPAxis* m_pYAxis;
+
 
 
 
@@ -199,6 +180,8 @@ public:
     void setrightMargin(const qint32 rm);
     void settopMargin(const qint32 tm);
     void setbottomMargin(const qint32 bm);
+    qint32 m_riginplacenum;
+
 
 
 

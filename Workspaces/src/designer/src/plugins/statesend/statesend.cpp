@@ -167,9 +167,9 @@ void StateSend::loadData()
         QTableWidgetItem* beginItem = new QTableWidgetItem("开始");
         QTableWidgetItem* finishItem = new QTableWidgetItem("完成");
         QTableWidgetItem* notBeginItem = new QTableWidgetItem("未进行");
-        beginItem->setBackground(QBrush(beforeClickedColor()));
-        finishItem->setBackground(QBrush(beforeClickedColor()));
-        notBeginItem->setBackground(QBrush(beforeClickedColor()));
+        beginItem->setBackground(QBrush(normalColor()));
+        finishItem->setBackground(QBrush(normalColor()));
+        notBeginItem->setBackground(QBrush(normalColor()));
         setItem(i, 2, beginItem);
         setItem(i, 3, finishItem);
         setItem(i, 4, notBeginItem);
@@ -195,7 +195,7 @@ void StateSend::sendState(int row, int column)
     if (column >= 2 && column <= 4) {
 //        clickedItem[row] = column - 1;
         intialColor(row);
-        item(row, column)->setBackground(QBrush(clickedColor()));
+        item(row, column)->setBackground(QBrush(pressedColor()));
 
         for(int i = 0; i < 2; i++) {
             QUdpSocket udpSocket;
@@ -287,9 +287,9 @@ void StateSend::paintEvent(QPaintEvent *event)
 
 void StateSend::intialColor(int row)
 {
-    item(row, 2)->setBackground(QBrush(beforeClickedColor()));
-    item(row, 3)->setBackground(QBrush(beforeClickedColor()));
-    item(row, 4)->setBackground(QBrush(beforeClickedColor()));
+    item(row, 2)->setBackground(QBrush(normalColor()));
+    item(row, 3)->setBackground(QBrush(normalColor()));
+    item(row, 4)->setBackground(QBrush(normalColor()));
 }
 
 

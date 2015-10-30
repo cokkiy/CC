@@ -14,7 +14,6 @@ codeSource::codeSource(QWidget *parent) :
 
     setBlankNum(1);// blank number
     setTextColor(Qt::black); //设置文本颜色
-    m_txt = center;//初始字体位置为居中对齐
     m_bgcolor.setRgb(210,210,255);//背景颜色
 
     m_dc = NetComponents::getDataCenter();
@@ -53,9 +52,9 @@ void codeSource::setData(const QString newdata)
     update();
 }
 
-void codeSource::settxtalignment(const textAlignment newtxt)
+void codeSource::settxtalignment(const Qt::Alignment newtxt)
 {
-    m_txt = newtxt;
+    m_alignMent = newtxt;
     emit txtalignmentChanged();
     update();
 }
@@ -108,17 +107,7 @@ void codeSource::handleData()
     setText(disData);
 
     //设置对齐方式
-    switch (m_txt) {
-    case left:
-        setAlignment(Qt::AlignLeft);
-        break;
-    case center:
-        setAlignment(Qt::AlignCenter);
-        break;
-    case right:
-        setAlignment(Qt::AlignRight);
-        break;
-    }
+    setAlignment(m_alignMent);
 }
 
 //定时器事件

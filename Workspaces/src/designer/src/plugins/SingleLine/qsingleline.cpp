@@ -16,7 +16,7 @@ QSingleLine::QSingleLine(QWidget *parent) :
     lineColor.setRgb(0,0,0);
     lineWidth = 2;    //直线初始化宽度
     lineLength = 500;//直线初始化长度
-    linePenStyle = Qt::SolidLine;
+    lineStyle = Qt::SolidLine;
     unsetRotate();//角度
     connect(this,SIGNAL(rotateChanged(qint32)),this,SLOT(update()));//角度改变时更新
 }
@@ -28,7 +28,7 @@ void QSingleLine::paintEvent(QPaintEvent *)
 {
 
     QPainter painter(this);
-    QPen pen = SetCustomPen(linePenStyle,lineColor,lineWidth);
+    QPen pen = SetCustomPen(lineStyle,lineColor,lineWidth);
     painter.setPen(pen);
     painter.translate(width()/2,(height())/2);
     painter.rotate(m_rotate);
@@ -47,7 +47,7 @@ void QSingleLine::SetLineColor(const QColor Color)
 void QSingleLine::SetLinePenStyle(const Qt::PenStyle style)
 {
 
-    linePenStyle = style;
+    lineStyle = style;
     update();
     updateGeometry();
 }

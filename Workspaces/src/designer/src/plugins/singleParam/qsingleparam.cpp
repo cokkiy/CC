@@ -1,4 +1,4 @@
-#include "qsingleparam.h"
+﻿#include "qsingleparam.h"
 #include <QRect>
 QSingleParam::QSingleParam(QWidget *parent) :
     QWidget(parent)
@@ -14,7 +14,7 @@ QSingleParam::QSingleParam(QWidget *parent) :
     QColor Color;
     Color.setAlpha(255);
     Color.setRgb(0);
-    backgroundBrush.setColor(Color);
+    backgroundColor.setColor(Color);
     borderColor.setRgb(0,0,0);
     borderWidth = 1;
     borderStyle = Qt::SolidLine;
@@ -46,7 +46,7 @@ void QSingleParam::showPluginFrame()
     QPainter painter(this);
     QPen pen = setCustomPen(borderStyle,borderColor,borderWidth);
     painter.setPen(pen);
-    painter.fillRect(pluginRect,backgroundBrush);
+    painter.fillRect(pluginRect,backgroundColor);
     painter.drawRect(pluginRect);
 }
 //解析显示字符串，字符串中包括字体、颜色、文本
@@ -139,7 +139,7 @@ void QSingleParam::setBorderStyle(const Qt::PenStyle style)
 
 void QSingleParam::setBackgroundBrush(const QBrush brush)
 {
-    backgroundBrush = brush;
+    backgroundColor = brush;
     update();
     updateGeometry();
 }

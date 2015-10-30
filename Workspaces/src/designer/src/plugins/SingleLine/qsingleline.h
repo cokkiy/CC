@@ -9,19 +9,26 @@ class QSingleLine : public QWidget
     Q_OBJECT
 
     Q_PROPERTY(QColor lineColor READ GetLineColor WRITE SetLineColor)
-    Q_PROPERTY(Qt::PenStyle linePenStyle READ GetLinePenStyle WRITE SetLinePenStyle)
+    Q_PROPERTY(Qt::PenStyle lineStyle READ GetLinePenStyle WRITE SetLinePenStyle)
     Q_PROPERTY(uint lineWidth READ GetLineWidth WRITE SetLineWidth)
     Q_PROPERTY(uint lineLength READ GetLineLength WRITE SetLineLength)
     Q_PROPERTY(qint32 rotate READ rotate WRITE setRotate NOTIFY rotateChanged RESET unsetRotate)
-    Q_PROPERTY(qint32 x READ x WRITE setX )
-    Q_PROPERTY(qint32 y READ y WRITE setY )
+    //图元背景矩形坐标
+    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
+
 protected:
      void paintEvent(QPaintEvent *event);
 public:
      QColor GetLineColor() const {return lineColor;}
      void SetLineColor(const QColor Color);
 
-     Qt::PenStyle GetLinePenStyle() const {return linePenStyle;}
+     Qt::PenStyle GetLinePenStyle() const {return lineStyle;}
      void SetLinePenStyle(const Qt::PenStyle style);
 
      qint16 GetLineWidth() const {return lineWidth;}
@@ -52,7 +59,7 @@ signals:
 private:
      //直线属性
     QColor lineColor;//直线颜色
-    Qt::PenStyle linePenStyle;//直线画笔样式
+    Qt::PenStyle lineStyle;//直线画笔样式
     uint lineWidth;//直线宽度
     uint lineLength ;//直线长度
     qint32 m_rotate;//直线旋转角度

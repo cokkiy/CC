@@ -139,7 +139,9 @@ void SimpleLogger::logReceivedPacketCount()
 bool SimpleLogger::init(string path, bool isPrimaryChannel)
 {
     time_t cur;
+    _tzset();
     time(&cur);
+    struct tm today;
     char* filename = new char[path.length() + 64];
     if (isPrimaryChannel)
     {

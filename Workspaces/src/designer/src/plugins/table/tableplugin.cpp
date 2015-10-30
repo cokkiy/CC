@@ -61,7 +61,25 @@ bool TablePlugin::isContainer() const
 
 QString TablePlugin::domXml() const
 {
-    return QLatin1String("<widget class=\"QTable\" name=\"qTable\">\n</widget>\n");
+    QString xmls = "<ui version =\"1.0\" displayname = \"";
+    xmls += tr("QTable");
+    xmls += "\">\n";
+    xmls += "<widget class=\"";
+    xmls += name();
+    xmls += "\" name=\"";
+    xmls += name();
+    xmls += "\">\n";
+    xmls += "   <property name=\"geometry\">\n";
+    xmls += "       <rect>\n";
+    xmls += "       <x>0</x>\n";
+    xmls += "       <y>0</y>\n";
+    xmls += "       <width>300</width>\n";
+    xmls += "       <height>200</height>\n";
+    xmls += "       </rect>\n";
+    xmls += "   </property>\n";
+    xmls += "</widget>\n";
+    xmls += "</ui>\n";
+    return xmls;
 }
 
 QString TablePlugin::includeFile() const

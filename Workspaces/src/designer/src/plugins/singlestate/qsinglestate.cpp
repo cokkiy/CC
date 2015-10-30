@@ -17,9 +17,9 @@ QSingleState::QSingleState(QWidget *parent) :
     QWidget(parent)
 {
      //插件框架属性
-    edgeColor.setRgb(0,0,0);      //设置初始化边框颜色为黑色
-    edgeLinewidth = 1;     //设置初始化边框宽度
-    edgePenStyle = Qt::SolidLine;     //设置初始化边框画笔为不画线
+    borderColor.setRgb(0,0,0);      //设置初始化边框颜色为黑色
+    borderWidth = 1;     //设置初始化边框宽度
+    borderStyle = Qt::SolidLine;     //设置初始化边框画笔为不画线
     pluginRect.setRect(0,0,0,0);
     m_bgcolor.setColor(Qt::red);   //初始背景为红色
     m_width=150;
@@ -72,7 +72,7 @@ void QSingleState::paintEvent(QPaintEvent *)
     QStylePainter painter(this);
     QPen pen(borderBrush(),1,Qt::NoPen);
     painter.setPen(pen);
-    painter.setBrush(backgroundcolor());//设置背景矩形内部颜色
+    painter.setBrush(backgroundColor());//设置背景矩形内部颜色
 
     QRect Rect = this->geometry();
     qint16 w = Rect.width();
@@ -125,21 +125,21 @@ void QSingleState::SetStates(const QString states)
 
 void QSingleState::SetEdgeColor(const QColor Color)
 {
-    edgeColor = Color;
+    borderColor = Color;
     update();
     updateGeometry();
 }
 
 void QSingleState::SetEdgePenStyle(const Qt::PenStyle style)
 {
-    edgePenStyle = style;
+    borderStyle = style;
     update();
     updateGeometry();
 }
 
 void QSingleState::SetEdgeLinewidth(const uint width)
 {
-    edgeLinewidth = width;
+    borderWidth = width;
     update();
     updateGeometry();
 }
@@ -147,7 +147,7 @@ void QSingleState::SetEdgeLinewidth(const uint width)
 void QSingleState::ShowPluginFrame()
 {
     QPainter painter(this);
-    QPen pen = SetCustomPen(edgePenStyle,edgeColor,edgeLinewidth);
+    QPen pen = SetCustomPen(borderStyle,borderColor,borderWidth);
     painter.setPen(pen);
     painter.drawRect(pluginRect);
 }

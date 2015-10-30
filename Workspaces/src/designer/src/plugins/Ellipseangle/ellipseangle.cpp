@@ -90,7 +90,7 @@ void Ellipseangle::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
     QPainter painter(this);
 
-    QPen pen(borderBrush(),borderWidth(),borderStyle());
+    QPen pen(borderColor(),borderWidth(),borderStyle());
     painter.setPen(pen);
 
     painter.setBrush(bgBrush());

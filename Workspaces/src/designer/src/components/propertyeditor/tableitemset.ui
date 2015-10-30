@@ -352,7 +352,7 @@
     <rect>
      <x>88</x>
      <y>11</y>
-     <width>231</width>
+     <width>181</width>
      <height>27</height>
     </rect>
    </property>
@@ -368,6 +368,19 @@
    </property>
    <property name="text">
     <string>&gt;&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="SelectShowType">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>11</y>
+     <width>51</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>选择</string>
    </property>
   </widget>
  </widget>

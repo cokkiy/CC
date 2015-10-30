@@ -10,6 +10,18 @@
     <height>335</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>637</width>
+    <height>335</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>637</width>
+    <height>335</height>
+   </size>
+  </property>
   <property name="font">
    <font>
     <family>微软雅黑</family>
@@ -35,20 +47,20 @@
   <widget class="QPushButton" name="pushButtonPolygon">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>320</x>
      <y>10</y>
      <width>141</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>添加不规则区域</string>
+    <string>添加定制图形</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtonLabel">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>170</x>
      <y>10</y>
      <width>141</width>
      <height>31</height>

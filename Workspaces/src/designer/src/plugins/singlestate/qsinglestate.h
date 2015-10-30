@@ -8,24 +8,26 @@
 class QSingleState : public QWidget
 {
     Q_OBJECT
-//数据属性
-    Q_PROPERTY(QString states READ GetStates WRITE SetStates)
+
+    //数据属性
     Q_PROPERTY(QString data READ getData WRITE setData)
-
-//背景属性
-    Q_PROPERTY(QBrush backgroundcolor READ backgroundcolor WRITE
+    //状态设置
+    Q_PROPERTY(QString stateConfig READ GetStates WRITE SetStates)
+    //背景属性
+    Q_PROPERTY(QBrush backgroundColor READ backgroundColor WRITE
                setbackgroundcolor NOTIFY backgroundcolorChanged)
-
-//边框属性
-    Q_PROPERTY(QColor edgeColor READ GetEdgeColor WRITE SetEdgeColor) 
-    Q_PROPERTY(uint edgeLinewidth READ GetEdgeLinewidth WRITE SetEdgeLinewidth)
-    Q_PROPERTY(qint32 rectWidth READ rectWidth WRITE setRectWidth NOTIFY rectWidthChanged)
-    Q_PROPERTY(qint32 rectHeight READ rectHeight WRITE setRectHeight NOTIFY rectHeightChanged)
-    Q_PROPERTY(Qt::PenStyle edgePenStyle READ GetEdgePenStyle WRITE SetEdgePenStyle)
-
-  //位置属性
-    Q_PROPERTY(qint32 x READ x WRITE setX )
-    Q_PROPERTY(qint32 y READ y WRITE setY )
+    //边框属性
+    Q_PROPERTY(QColor borderColor READ GetEdgeColor WRITE SetEdgeColor)
+    Q_PROPERTY(uint borderWidth READ GetEdgeLinewidth WRITE SetEdgeLinewidth)
+    Q_PROPERTY(Qt::PenStyle borderStyle READ GetEdgePenStyle WRITE SetEdgePenStyle)
+    //2、设置控件边框，控件定位的必要变量坐标
+    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
      void paintEvent(QPaintEvent *event);//重写绘图函数
      void resizeEvent(QResizeEvent * event);//重画事件
@@ -64,19 +66,19 @@ public:
      //框架属性
      QColor GetEdgeColor() const
      {
-         return edgeColor;
+         return borderColor;
      }
      void SetEdgeColor(const QColor Color);
 
     Qt::PenStyle GetEdgePenStyle() const
     {
-        return edgePenStyle;
+        return borderStyle;
     }
     void SetEdgePenStyle(const Qt::PenStyle style);
 
     qint16 GetEdgeLinewidth() const
     {
-        return edgeLinewidth;
+        return borderWidth;
     }
     void SetEdgeLinewidth(const uint width);
 
@@ -86,7 +88,7 @@ public:
         m_bgcolor=bgcolor;
         emit backgroundcolorChanged(bgcolor);
     }
-    QBrush backgroundcolor() const
+    QBrush backgroundColor() const
     {
         return m_bgcolor;
     }
@@ -132,9 +134,9 @@ private:
     int m_timer_id;
     qint32 m_width,m_height;
     QPen edgePen;     //边框画笔
-    QColor edgeColor;     //插件边框颜色
-    Qt::PenStyle edgePenStyle;     //插件边框画笔样式
-    uint edgeLinewidth;      //插件边框宽度
+    QColor borderColor;     //插件边框颜色
+    Qt::PenStyle borderStyle;     //插件边框画笔样式
+    uint borderWidth;      //插件边框宽度
 
 
     QPixmap m_pixmap;

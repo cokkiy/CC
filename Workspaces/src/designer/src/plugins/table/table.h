@@ -1,4 +1,4 @@
-#ifndef TABLE_H
+﻿#ifndef TABLE_H
 #define TABLE_H
 #include <Net/NetComponents>
 #include "../../components/propertyeditor/simpletable/tablecell.h"
@@ -10,21 +10,26 @@ class QTable : public QWidget
 {
     Q_OBJECT
     //文本属性
-    Q_PROPERTY(QString table READ textString WRITE setTextString RESET resetTable)
-	//斑马线显示
+    Q_PROPERTY(QString tableConfig READ textString WRITE setTextString RESET resetTable)
+    Q_PROPERTY(QBrush backgroundColor READ getBackgroundBrush WRITE setBackgroundBrush )
+    //斑马线显示
 	Q_PROPERTY(QColor zebraLineColor READ getZebraLineColor WRITE setZebraLineColor )
-
-    //网格线属性
-    Q_PROPERTY(QColor gridLineColor READ getGridLineColor WRITE setGridLineColor)
-    Q_PROPERTY(qint32 gridLineWidth READ getGridLineWidth WRITE setGridLineWidth)
-    Q_PROPERTY(Qt::PenStyle gridLineStyle READ getGridLineStyle WRITE setGridLineStyle)
-
     //插件框架属性
-    Q_PROPERTY(QBrush backgroundBrush READ getBackgroundBrush WRITE setBackgroundBrush )
     Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
     Q_PROPERTY(qint32 borderWidth READ getBorderWidth WRITE setBorderWidth)
     Q_PROPERTY(Qt::PenStyle borderStyle READ getBorderStyle WRITE setBorderStyle)
+    //网格线属性
+    Q_PROPERTY(QColor lineColor READ getGridLineColor WRITE setGridLineColor)
+    Q_PROPERTY(qint32 lineWidth READ getGridLineWidth WRITE setGridLineWidth)
+    Q_PROPERTY(Qt::PenStyle lineStyle READ getGridLineStyle WRITE setGridLineStyle)
+
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 protected:
 	//绘制事件
 	void paintEvent(QPaintEvent *event);
@@ -42,17 +47,17 @@ public:
 
 	//网格线属性
 	//网格线颜色
-	QColor getGridLineColor() const {return gridLineColor;}
+    QColor getGridLineColor() const {return lineColor;}
 	void setGridLineColor(const QColor Color);
 	//网格线宽度
-	qint32 getGridLineWidth() const {return gridLineWidth;}
+    qint32 getGridLineWidth() const {return lineWidth;}
 	void setGridLineWidth(const qint32 w);
 	//网格线样式
-    Qt::PenStyle getGridLineStyle() const {return gridLineStyle;}
+    Qt::PenStyle getGridLineStyle() const {return lineStyle;}
 	void setGridLineStyle(const Qt::PenStyle style);
     //插件框架属性
 	//插件背景色
-    QBrush getBackgroundBrush() const {return backgroundBrush;}
+    QBrush getBackgroundBrush() const {return backgroundColor;}
     void setBackgroundBrush(const QBrush Brush);
 	//插件边框颜色
 	QColor getBorderColor() const {return borderColor;}
@@ -74,12 +79,12 @@ private:
 
     //网格线属性
     QColor gridLineBrush;//网格线画笔
-    QColor gridLineColor;//网格线颜色
-    qint32 gridLineWidth;//网格线宽度
-	Qt::PenStyle gridLineStyle;//网格线样式
+    QColor lineColor;//网格线颜色
+    qint32 lineWidth;//网格线宽度
+    Qt::PenStyle lineStyle;//网格线样式
 
     //表格框架属性
-    QBrush backgroundBrush;//插件背景颜色
+    QBrush backgroundColor;//插件背景颜色
     QColor borderColor;//插件边框颜色
     qint32 borderWidth;//插件边框宽度
     Qt::PenStyle borderStyle;//插件边框样式

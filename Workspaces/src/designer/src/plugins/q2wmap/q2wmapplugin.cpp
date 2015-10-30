@@ -36,7 +36,7 @@ QString Q2wmapPlugin::name() const
 
 QString Q2wmapPlugin::group() const
 {
-    return QLatin1String("map");
+    return tr("map");
 }
 
 QIcon Q2wmapPlugin::icon() const
@@ -61,7 +61,25 @@ bool Q2wmapPlugin::isContainer() const
 
 QString Q2wmapPlugin::domXml() const
 {
-    return QLatin1String("<widget class=\"Q2wmap\" name=\"Q2wmap\">\n</widget>\n");
+    QString xmls = "<ui version =\"1.0\" displayname = \"";
+    xmls += tr("Q2wmap");
+    xmls += "\">\n";
+    xmls += "<widget class=\"";
+    xmls += name();
+    xmls += "\" name=\"";
+    xmls += name();
+    xmls += "\">\n";
+    xmls += "   <property name=\"geometry\">\n";
+    xmls += "       <rect>\n";
+    xmls += "       <x>0</x>\n";
+    xmls += "       <y>0</y>\n";
+    xmls += "       <width>300</width>\n";
+    xmls += "       <height>200</height>\n";
+    xmls += "       </rect>\n";
+    xmls += "   </property>\n";
+    xmls += "</widget>\n";
+    xmls += "</ui>\n";
+    return xmls;
 }
 
 QString Q2wmapPlugin::includeFile() const

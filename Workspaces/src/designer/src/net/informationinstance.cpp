@@ -8,6 +8,7 @@
 Config g_cfg;
 //外部变量,C3I/PDXP包处理对象
 extern CParamInfoRT g_paramInfoRT;
+extern QParamStyleConfig g_paramStyleConfig;
 
 InformationInstance::InformationInstance(QObject *parent) :
     InformationInterface(parent)
@@ -140,4 +141,11 @@ AbstractParam* InformationInstance::getParam(QString data)
     }
     return NULL;
 }
+
+//样式链表
+list<QParamStyle>* InformationInstance::getParamStyleList()
+{
+    return g_paramStyleConfig.getParamStyleList();
+}
+
 

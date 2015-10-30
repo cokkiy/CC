@@ -1,4 +1,4 @@
-#include "staticgraph.h"
+﻿#include "staticgraph.h"
 #include "staticgraphPrivate.h"
 
 

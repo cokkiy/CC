@@ -61,8 +61,9 @@ qint32 DataCenterInstance::getHistoryDatas(qint32 count...)
     qint32 res;
 
     //保存公式解释器的时标，用于获取数据完后重置
-    int last_data = m_LFormula.getDate();
-    int last_time = m_LFormula.getTime();
+//    int last_data = m_LFormula.getDate();
+//    int last_time = m_LFormula.getTime();
+    size_t last_pos = m_LFormula.getPos();
 
     //循环取得所有参数，填进输出QVector
     for(qint32 i=0;i<count;i++)
@@ -85,13 +86,15 @@ qint32 DataCenterInstance::getHistoryDatas(qint32 count...)
             return -1;
         }
 
-        last_data = rr_LFormula.getDate();
-        last_time = rr_LFormula.getTime();
+//        last_data = rr_LFormula.getDate();
+//        last_time = rr_LFormula.getTime();
+        last_pos = rr_LFormula.getPos();
     }
 
     //重置公式解释器的时标。如果不这样做，每次compute调用得到的数据会不断增加
-    m_LFormula.setDate(last_data);
-    m_LFormula.setTime(last_time);
+//    m_LFormula.setDate(last_data);
+//    m_LFormula.setTime(last_time);
+    m_LFormula.setPos(last_pos);
 
     //结束参数列表的调用，其实没有什么用处...
     va_end(arg_ptr);

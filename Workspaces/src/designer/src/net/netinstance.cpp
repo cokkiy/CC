@@ -27,7 +27,7 @@ CParamInfoRT g_paramInfoRT;
 //全局变量,主备信道切换表
 ChannelSelectConfig channelSelectConfig;
 
-QParamStyleConfig Paramstyleconfig;
+QParamStyleConfig g_paramStyleConfig;
 //全局变量,数据记录
 SimpleLogger primaryChannelLogger;
 SimpleLogger backupChannelLogger;
@@ -61,7 +61,7 @@ int NetInstance::load(QString dir)
         return -1;
     }
 
-    if (!Paramstyleconfig.LoadParamFromXML(dir))
+    if (!g_paramStyleConfig.LoadParamFromXML(dir))
     {
         qWarning() << QObject::tr("Atleast one config file loading failure.Please check prior log.");
     }

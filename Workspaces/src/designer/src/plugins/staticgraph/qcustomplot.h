@@ -1044,14 +1044,6 @@ public:
   QPen pen() const { return mPen; }//画笔
   QPen subGridPen() const { return mSubGridPen; }//子网格画笔
   QPen zeroLinePen() const { return mZeroLinePen; }//零线画笔
-  qint32 getGridnumofXAxis() const   //zjb add :传入固定的刻度数
-  {
-      return m_GridnumofXAxis;
-  }
-  qint32 getGridnumofYAxis() const   //zjb add :传入固定的刻度数
-  {
-      return m_GridnumofYAxis;
-  }
 
 
   // setters:
@@ -1061,8 +1053,6 @@ public:
   void setPen(const QPen &pen);//设置画笔
   void setSubGridPen(const QPen &pen);//设置子网格画笔
   void setZeroLinePen(const QPen &pen);//设置零线画笔
-  void setGridnumofXAxis(qint32 numofTickx);//zjb add :传入固定的刻度数 m_GridnumofXAxis
-  void setGridnumofYAxis(qint32 numofTicky);
 
 protected:
   // property members: 属性成员
@@ -1071,8 +1061,6 @@ protected:
   QPen mPen, mSubGridPen, mZeroLinePen;//画笔
   // non-property members:
   QCPAxis *mParentAxis;//轴的指针
-  //zjb add
-  qint32 m_GridnumofXAxis,m_GridnumofYAxis;//zjb add :传入固定的刻度数
 
   // reimplemented virtual methods:重写虚方法
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const;//应用缺省的抗锯齿
@@ -1080,7 +1068,6 @@ protected:
 
   // non-virtual methods: 非虚方法
   void drawGridLines(QCPPainter *painter) const;//画网格线
-  void drawGridLines(QCPPainter *painter,qint32 numofTickx_plot,qint32 numofTicky_plot) const;//画网格线  zjb add 传入固定的刻度数
   void drawSubGridLines(QCPPainter *painter) const;//画子网格线
 
   friend class QCPAxis;//友元类坐标轴类
@@ -1238,9 +1225,9 @@ public:
   {
       return m_YAxisTickLabeloffset_y;
   }
-  bool getCenterOrigin() const
+  qint32 getoriginplace() const  //zjb add
   {
-      return m_originatCenter;
+      return m_originplace;
   }
   double tickLabelRotation() const;//刻度标签颜色旋转
   LabelSide tickLabelSide() const;//刻度标签在哪边
@@ -1302,11 +1289,11 @@ public:
   //在这里从界面设置获取刻度标签的位移量（单位为象素），再在主类中调用私有类指针将位移量传输到私有类中
   // !!!!!这个特别重要！！！！
   //QCPAxisPainterPrivate *mAxisPainter;//画轴的父类指针
-  void setXAxisTickLabeloffset_x(double X_x,qint32 numxofall_x);
-  void setXAxisTickLabeloffset_y(double X_y,qint32 numxofall_y);
-  void setYAxisTickLabeloffset_x(double Y_x,qint32 numyofall_x);
-  void setYAxisTickLabeloffset_y(double Y_y,qint32 numyofall_y);  
-  bool setCenterOrigin(bool m_setoriginatCenter);
+  void setXAxisTickLabeloffset_x(double X_x,qint32 numxofall_x);//zjb add
+  void setXAxisTickLabeloffset_y(double X_y,qint32 numxofall_y);//zjb add
+  void setYAxisTickLabeloffset_x(double Y_x,qint32 numyofall_x);//zjb add
+  void setYAxisTickLabeloffset_y(double Y_y,qint32 numyofall_y);//zjb add
+  void setoriginplace(qint32 m_setoriginplace);//zjb add
 
   void setTickLabelRotation(double degrees);//设置刻度标签旋转
   void setTickLabelSide(LabelSide side);//设置刻度标签在哪边
@@ -1361,6 +1348,9 @@ public:
   QList<QCPGraph*> graphs() const;//画的曲线的指针列表
   QList<QCPAbstractItem*> items() const;//项目的指针列表
 
+//  //哪一边的轴的类型
+//  static AxisType marginSideToAxisType(QCP::MarginSide side);
+  //zjb add: 增加输入一个参数，判断原点是矩形区正中的情况
   //哪一边的轴的类型
   static AxisType marginSideToAxisType(QCP::MarginSide side);
   //轴的方向
@@ -1401,15 +1391,15 @@ protected:
   LabelType mTickLabelType;//刻度标签类型
   QFont mTickLabelFont, mSelectedTickLabelFont;//刻度标签字体，选择的刻度标签字体
   QColor mTickLabelColor, mSelectedTickLabelColor;//刻度标签颜色，选择的刻度标签颜色
-  double m_XAxisTickLabeloffset_x;//存放设置的刻度标签位移量
-  double m_XAxisTickLabeloffset_y;
-  double m_YAxisTickLabeloffset_x;
-  double m_YAxisTickLabeloffset_y;
-  bool   m_originatCenter;
-  qint32 m_numxofall_x;//存放获得设置刻度标签数字的有效位数，以对刻度文本偏移的自动设置提供帮助
-  qint32 m_numxofall_y;
-  qint32 m_numyofall_x;
-  qint32 m_numyofall_y;
+  double m_XAxisTickLabeloffset_x;//zjb add:存放设置的刻度标签位移量
+  double m_XAxisTickLabeloffset_y;//zjb add
+  double m_YAxisTickLabeloffset_x;//zjb add
+  double m_YAxisTickLabeloffset_y;//zjb add
+  qint32 m_originplace;  //zjb add
+  qint32 m_numxofall_x;  //zjb add:存放获得设置刻度标签数字的有效位数，以对刻度文本偏移的自动设置提供帮助
+  qint32 m_numxofall_y;  //zjb add
+  qint32 m_numyofall_x;  //zjb add
+  qint32 m_numyofall_y;  //zjb add
   QString mDateTimeFormat;//日期时间格式
   Qt::TimeSpec mDateTimeSpec;//日期时间规格
   int mNumberPrecision;//数字精度
@@ -1487,6 +1477,7 @@ public:
   virtual ~QCPAxisPainterPrivate();
 
   virtual void draw(QCPPainter *painter);
+
   virtual int size() const;//尺寸
   void clearCache();//清缓冲
 
@@ -1520,12 +1511,13 @@ public:
   QVector<double> tickPositions;//刻度坐标容器
   QVector<QString> tickLabels;//刻度标签容器
 
-  double m_XAxisTickLabeloffset_x;
-  double m_XAxisTickLabeloffset_y;
-  double m_YAxisTickLabeloffset_x;
-  double m_YAxisTickLabeloffset_y;
+  double m_XAxisTickLabeloffset_x;//zjb add
+  double m_XAxisTickLabeloffset_y;//zjb add
+  double m_YAxisTickLabeloffset_x;//zjb add
+  double m_YAxisTickLabeloffset_y;//zjb add
 
-  bool m_originatCenter ;
+  qint32 m_originplace ;
+
 
 protected:
   struct CachedLabel//隐藏的标签

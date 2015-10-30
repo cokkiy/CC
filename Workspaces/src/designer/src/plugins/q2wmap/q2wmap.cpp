@@ -222,6 +222,31 @@ void Q2wmap::setBUpLimit(const double wu)
     d->setBUpLimit(wu);
 }
 
+//获取/设置视窗起始点经纬度
+double Q2wmap::getViewOriginL() const
+{
+    Q_D(const Q2wmap);
+    return d->getViewOriginL();
+}
+
+void Q2wmap::setViewOriginL(const double l)
+{
+    Q_D(Q2wmap);
+    d->setViewOriginL(l);
+}
+
+double Q2wmap::getViewOriginB() const
+{
+    Q_D(const Q2wmap);
+    return d->getViewOriginB();
+}
+
+void Q2wmap::setViewOriginB(const double b)
+{
+    Q_D(Q2wmap);
+    d->setViewOriginB(b);
+}
+
 //获取图片
 QPixmap Q2wmap::getPixmap()const
 {

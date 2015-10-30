@@ -36,7 +36,7 @@ QString QSingleStatePlugin::name() const
 
 QString QSingleStatePlugin::group() const
 {
-    return QLatin1String("dynamic");
+    return tr("dynamic");
 }
 
 QIcon QSingleStatePlugin::icon() const

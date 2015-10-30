@@ -21,24 +21,25 @@ class Cstatictxt : public QLabel//
     Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY txtAlignmentChanged)
 
     //3、设置字体颜色,自己定义的属性
-    Q_PROPERTY(QColor txtcolor READ txtcolor WRITE
+    Q_PROPERTY(QColor textColor READ textColor WRITE
                settxtcolor NOTIFY txtcolorChanged)
 
     //背景属性
     //4、设置背景:背景矩形内部填充颜色,自己定义的属性
-    Q_PROPERTY(QBrush backgroundcolor READ backgroundcolor WRITE
+    Q_PROPERTY(QBrush backgroundColor READ backgroundColor WRITE
                setbackgroundcolor NOTIFY backgroundcolorChanged)
-    //4、设置背景:背景矩形宽与高,自己定义的属性
-    Q_PROPERTY(qint32 rectWidth READ rectWidth WRITE setRectWidth NOTIFY rectWidthChanged)
-    Q_PROPERTY(qint32 rectHeight READ rectHeight WRITE setRectHeight NOTIFY rectHeightChanged)
-
-
 
     //7、设置旋转角度,自己定义的属性
     Q_PROPERTY(qint32 rotate READ rotate WRITE setrotate NOTIFY rotateChanged RESET unsetrotate)
 
     //6、设置控件边框，控件定位的必要变量坐标
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     Cstatictxt(QWidget *parent = 0);
@@ -51,7 +52,7 @@ public:
         m_bgcolor=bgcolor;
         emit backgroundcolorChanged(bgcolor);
     }
-    QBrush backgroundcolor() const
+    QBrush backgroundColor() const
     {
         return m_bgcolor;
     }
@@ -86,7 +87,7 @@ public:
         m_txcolor=txcolor;
         emit txtcolorChanged(txcolor);
     }
-    QColor txtcolor() const
+    QColor textColor() const
     {
         return m_txcolor;
     }

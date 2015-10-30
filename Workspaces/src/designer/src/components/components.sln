@@ -1,7 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Qt5DesignerComponentsBase", "D:/CodeStores/Workspaces/src/designer/src/components/lib\Qt5DesignerComponentsBase.vcxproj", "{89A47A45-E001-34DA-9C7B-1411C3BD4D32}"
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Qt5DesignerComponentsBase", "lib\Qt5DesignerComponentsBase.vcxproj", "{89A47A45-E001-34DA-9C7B-1411C3BD4D32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,8 +15,10 @@ Global
 		{89A47A45-E001-34DA-9C7B-1411C3BD4D32}.Release|x64.ActiveCfg = Release|x64
 		{89A47A45-E001-34DA-9C7B-1411C3BD4D32}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		Qt5Version = Qt5.5.0-msvc2015
 	EndGlobalSection
 EndGlobal

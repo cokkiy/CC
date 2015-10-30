@@ -1007,7 +1007,17 @@ void PropertyEditor::setObject(QObject *object)
                 continue;
             //隐藏某些类的配置属性,andrew,20150303
             const QString groupNamet = m_propertySheet->propertyGroup(i);
-            if(groupNamet=="QWidget")
+            if(groupNamet=="QWidget"
+                    ||groupNamet=="QFrame"
+                    ||groupNamet=="QTextEdit"
+                    ||groupNamet=="QAbstractScrollArea"
+                    ||groupNamet=="QAbstractItemView"
+                    ||groupNamet=="QTableView"
+                    ||groupNamet=="QTableWidget"
+                    ||groupNamet=="Header"
+                    ||groupNamet=="QPushButton"
+                    ||groupNamet=="QAbstractButton"
+                    ||groupNamet=="QLabel")
                 continue;
             const QString propertyName = m_propertySheet->propertyName(i);
             if (m_propertySheet->indexOf(propertyName) != i)

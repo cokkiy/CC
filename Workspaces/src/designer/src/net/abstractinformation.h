@@ -1,9 +1,11 @@
 ﻿#ifndef ABSTRACTINFORMATION_H
 #define ABSTRACTINFORMATION_H
 #include "net_global.h"
+#include "C3I/paramstyle/paramstyleconfig.h"
 #include <QObject>
 #include "abstractparam.h"
 #include <QVector>
+
 //存放某表所有参数的队列
 typedef QVector<AbstractParam > SingleTableParamVector;
 //存放包含(表号，参数号，参数实例)的映射
@@ -54,6 +56,9 @@ public:
       @return AbstractParam*  某参数指针,NULL表示为空
     */
     virtual AbstractParam* getParam(QString data) = 0;
+
+    //样式链表
+    virtual list<QParamStyle>* getParamStyleList() = 0;
 };
 
 #endif // ABSTRACTINFORMATION_H

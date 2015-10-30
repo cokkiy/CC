@@ -73,6 +73,11 @@ enum ParseType
     HistoryData,
     CurData
 };
+enum GetHistoryDataType
+{
+    Time,
+    Pos
+};
 
 struct OperatorData 
 {
@@ -176,6 +181,10 @@ public:
     */
     void setDate(int date);
     void setTime(int time);
+    //获取历史数据的位置
+    size_t getPos();
+    //设置历史数据的位置
+    void setPos(size_t pos);
 private:
     /*!
       更新公式中包含参数的数据
@@ -221,6 +230,8 @@ private:
     int m_savTime;
 
     int m_savDate;
+
+    size_t m_curPos;
 private:
     //所有参数配置信息
     Config* m_config;
@@ -242,7 +253,7 @@ private:
     /*!
       更新公式中包含参数的数据
     */
-    bool updateAllHistroyParam();
+    bool updateAllHistroyParam(GetHistoryDataType type = Pos);
     //no use
     int getParamCount();
 private:	

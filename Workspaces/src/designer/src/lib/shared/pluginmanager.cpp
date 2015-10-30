@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -305,19 +305,20 @@ static qdesigner_internal::TextPropertyValidationMode typeStringToType(const QSt
         return qdesigner_internal::ValidationURL;
     if (v ==  QStringLiteral("graphobj"))
         return qdesigner_internal::ValidationGraphObj;
-    if (v ==  QStringLiteral("q2wmapobj"))
+    if (v ==  QStringLiteral("objectConfig"))
         return qdesigner_internal::Validation2wmapObj;
-    if (v ==  QStringLiteral("q2wmapstatic"))
+    if (v ==  QStringLiteral("staticConfig"))
         return qdesigner_internal::Validation2wmapStatic;
-    if (v.endsWith(QStringLiteral("data")))
+    if (v.endsWith(QStringLiteral("data"))
+            ||v.endsWith(QStringLiteral("Data")))
         return qdesigner_internal::ValidationData;
     if (v.endsWith(QStringLiteral("dataes")))
         return qdesigner_internal::ValidationDataes;
     if (v  == QStringLiteral("file"))
         return qdesigner_internal::ValidationFile;
-    if (v.endsWith( QStringLiteral("states")))
+    if (v.endsWith( QStringLiteral("stateConfig")))
         return qdesigner_internal::ValidationStates;
-    if (v.endsWith(QStringLiteral("table")))
+    if (v.endsWith(QStringLiteral("tableConfig")))
         return qdesigner_internal::ValidationTable;
     *ok = false;
     return qdesigner_internal::ValidationRichText;

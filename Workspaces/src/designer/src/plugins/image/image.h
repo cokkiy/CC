@@ -21,10 +21,16 @@ class image : public QWidget
     Q_OBJECT
 
     //1.读取图片
-    Q_PROPERTY(QPixmap pixmap READ pixmap WRITE setPixmap)
+    Q_PROPERTY(QPixmap backgroundImage READ backgroundImage WRITE setPixmap)
 
     //2、设置控件边框，控件定位的必要变量坐标
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     image(QWidget *parent = 0);
@@ -34,7 +40,7 @@ public:
     {
         m_pixmap = newPixmap;
     }
-    QPixmap pixmap() const
+    QPixmap backgroundImage() const
     {
         return m_pixmap;
     }

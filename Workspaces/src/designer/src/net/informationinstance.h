@@ -1,6 +1,6 @@
 ﻿#ifndef INFORMATIONINSTANCE_H
 #define INFORMATIONINSTANCE_H
-
+#include "C3I/paramstyle/paramstyleconfig.h"
 #include "abstractinformation.h"
 
 class CParamInfoRT;
@@ -55,12 +55,10 @@ public:
     */
     virtual AbstractParam* getParam(QString data);
 
-
-   
+    //样式链表
+    virtual list<QParamStyle>* getParamStyleList();
 private:
-
     TabMap  m_tabMap;
-
     ParamMap m_paramMap;
 };
 

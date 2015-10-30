@@ -23,8 +23,6 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
         m_Xmin = 0 ;
         m_Ymax = 80 ;
         m_Ymin = 0 ;
-        m_Xoffset = 0;
-        m_Yoffset = 0;
         m_XAxisLabel = QString("X");
         m_YAxisLabel = QString("Y");
         m_XAxisdisplay = true;
@@ -32,15 +30,9 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
         m_Scaleplace_x = QString(tr("上"));//X的刻度位置（上中下）
         m_Scaleplace_y = QString(tr("右")); //Y的刻度位置（左中右）
         m_OriginPlace = QString(tr("左下")); //原点的位置：（左下、左上、右下、右上、上中、下中、正中）
-        m_Scalelabelplace_x =QString(tr("外侧"));//刻度标签的位置：内侧、外侧
-        m_Scalelabelplace_y =QString(tr("外侧"));//刻度标签的位置：内侧、外侧
-
         m_GraphName  = QString(tr("X-Y曲线"));
         m_GraphWidth = 3;
-        m_GraphBuffer = 3000;
         m_LGraphWidth = 3;
-        m_LGraphBuffer = 3000;
-
         //曲线颜色
         m_strgraphColor = "#ff0000";  //红色
         //理论曲线颜色
@@ -49,41 +41,29 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
 //        m_strgraphColor = "#0000ff";  //蓝色
 //        //理论曲线颜色
 //        m_strLgraphColor = "#555555"; //灰色
-
         m_xParam = QString("[10001,2]");
         m_yParam = QString("[10001,2]");
-
         m_Lgraphfile = QString("");//理论曲线文件(路径)
-
         m_XAxiswideth = 2;
 //        m_YAxiswideth = 2;
-
-        m_chooseXAxisColor ="#FFFFFF"; //白色        
-
+        m_chooseXAxisColor ="#ffaa00"; //金色,白色--"#ffffff"
         m_chooseXAxislabeldisplay = true;
         m_chooseYAxislabeldisplay = true;
         m_chooseXAxisScalelabeldisplay = true;
         m_chooseYAxisScalelabeldisplay = true;
         m_chooseXAxisScaleTickdisplay = true;
         m_chooseYAxisScaleTickdisplay = true;
-
         //取到设置的字体
         m_XAxislabelFont = "Sans Serif,28,-1,5,50,0,0,0,0,0";
-
         m_XAxisScalelabelFont = "Sans Serif,10,-1,5,50,0,0,0,0,0";
         m_YAxisScalelabelFont = "Sans Serif,10,-1,5,50,0,0,0,0,0";
-
         m_numOfXAxisScale = 4;
         m_numOfYAxisScale = 4;
-
         //刻度小线段长度的设置
         m_XAxisScaleRuler =10;
         m_YAxisScaleRuler =10;
-
-
         m_XAxisScaleprecision = 2;
         m_YAxisScaleprecision = 2;
-
         m_XAxisScalelabeloffset_x = "-15";
         m_XAxisScalelabeloffset_y = "0";
         m_YAxisScalelabeloffset_x = "0";
@@ -105,10 +85,6 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
         m_Ymax = jobj["Ymax"].toDouble();
         //y轴最小值
         m_Ymin = jobj["Xmin"].toDouble();
-        //x轴标签文本偏移
-        m_Xoffset =jobj["Xoffset"].toInt();
-        //y轴标签文本偏移
-        m_Yoffset =jobj["Yoffset"].toInt();
         //x轴标签
         m_XAxisLabel =jobj["XAxisLabel"].toString();
         //y轴标签
@@ -119,58 +95,39 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
         m_Scaleplace_y =jobj["Scaleplace_y"].toString();
         //原点的位置：左下、左上、右下、右上、上中、下中、正中
         m_OriginPlace =jobj["OriginPlace"].toString();
-        //刻度标签的位置：内侧、外侧
-        m_Scalelabelplace_x = jobj["Scalelabelplace_x"].toString();
-        m_Scalelabelplace_y = jobj["Scalelabelplace_y"].toString();
         //是否显示x轴
         m_XAxisdisplay =jobj["XAxisdisplay"].toBool();
         //是否显示y轴
         m_YAxisdisplay =jobj["YAxisdisplay"].toBool();
-
         //实时曲线名称
         m_GraphName = jobj["GraphName"].toString();
         //实时曲线宽度
         m_GraphWidth =jobj["GraphWidth"].toInt();
-        //实时曲线缓冲区大小
-        m_GraphBuffer = jobj["GraphBuffer"].toDouble();
         //理论曲线颜色
         m_strgraphColor =jobj["strgraphColor"].toString();
-
         //理论曲线名称
 //        m_LGraphName = jobj["GraphName"].toString();
         //理论曲线宽度
         m_LGraphWidth = jobj["LGraphWidth"].toInt();
-        //理论曲线缓冲区大小
-        m_LGraphBuffer = jobj["LGraphBuffer"].toDouble();
         //理论曲线颜色
         m_strLgraphColor = jobj["strLgraphColor"].toString();
-
         //实时曲线x参数
         m_xParam = jobj["xParam"].toString();
         //实时曲线y参数
         m_yParam = jobj["yParam"].toString();
-
         //理论曲线路径
         m_Lgraphfile = jobj["Lgraphfile"].toString();
-
-
         m_XAxiswideth = jobj["XAxiswideth"].toInt();
-
-
         m_chooseXAxisColor = jobj["chooseXAxisColor"].toString();
-
         m_chooseXAxislabeldisplay = jobj["chooseXAxislabeldisplay"].toBool();
         m_chooseYAxislabeldisplay = jobj["chooseYAxislabeldisplay"].toBool();
         m_chooseXAxisScalelabeldisplay = jobj["chooseXAxisScalelabeldisplay"].toBool();
         m_chooseYAxisScalelabeldisplay = jobj["chooseYAxisScalelabeldisplay"].toBool();
         m_chooseXAxisScaleTickdisplay = jobj["chooseXAxisScaleTickdisplay"].toBool();
         m_chooseYAxisScaleTickdisplay = jobj["chooseYAxisScaleTickdisplay"].toBool();
-
         m_XAxislabelFont= jobj["XAxislabelFont"].toString();
-
         m_XAxisScalelabelFont= jobj["XAxisScalelabelFont"].toString();
         m_YAxisScalelabelFont= jobj["YAxisScalelabelFont"].toString();
-
         m_numOfXAxisScale = jobj["numOfXAxisScale"].toInt();
         m_XAxisScaleRuler = jobj["XAxisScaleRuler"].toInt();
         m_numOfYAxisScale = jobj["numOfYAxisScale"].toInt();
@@ -207,8 +164,6 @@ void GraphObjDlg::setControls()
     ui->lineEdit_Xmin_tab->setText(QString::number(m_Xmin));
     ui->lineEdit_Ymax_tab->setText(QString::number(m_Ymax));
     ui->lineEdit_Ymin_tab->setText(QString::number(m_Ymin));
-    ui->lineEdit_Xoffset_tab->setText(QString::number(m_Xoffset));
-    ui->lineEdit_Yoffset_tab->setText(QString::number(m_Yoffset));
     ui->lineEdit_XAxisLabel_tab->setText(m_XAxisLabel);
     ui->lineEdit_YAxisLabel_tab->setText(m_YAxisLabel);
     ui->checkBox_chooseAxisdisplay_x->setChecked(m_XAxisdisplay);
@@ -217,44 +172,28 @@ void GraphObjDlg::setControls()
     ui->comboBox_Scaleplace_y->setCurrentText(m_Scaleplace_y);
     //原点的位置：左下、左上、右下、右上、上中、下中、正中
     ui->comboBox_OriginPlace->setCurrentText(m_OriginPlace);
-    //刻度标签的位置：内侧、外侧
-    ui->comboBox_Scalelabelplace_x->setCurrentText(m_Scalelabelplace_x);
-    ui->comboBox_Scalelabelplace_y->setCurrentText(m_Scalelabelplace_y);
-
     ui->lineEdit_GraphName_tab->setText(m_GraphName);
     ui->lineEdit_GraphWidth_tab->setText(QString::number(m_GraphWidth));
-    ui->lineEdit_GraphBuffer_tab->setText(QString::number(m_GraphBuffer));
-    ui->label_chooseGraphColor->setStyleSheet(QString("background-color: %1").arg(m_strgraphColor));
-
+    ui->pushButton_chooseGraphColor_tab->setStyleSheet(QString("background-color: %1").arg(m_strgraphColor));
     ui->lineEdit_LGraphWidth_tab->setText(QString::number(m_LGraphWidth));
-    ui->lineEdit_LGraphBuffer_tab->setText(QString::number(m_LGraphBuffer));
-    ui->label_chooseLGraphColor->setStyleSheet(QString("background-color: %1").arg(m_strLgraphColor));
-
+    ui->pushButton_chooseLGraphColor_tab->setStyleSheet(QString("background-color: %1").arg(m_strLgraphColor));
     ui->lineEdit_inputXparam_tab->setText(m_xParam);
     ui->lineEdit_inputYparam_tab->setText(m_yParam);
     ui->lineEdit_chooseGraphbasemap_tab->setText(m_Lgraphfile);
-
-
     ui->lineEdit_XAxiswideth_tab->setText(QString::number(m_XAxiswideth));
-
     ui->lineEdit_numOfXAxisScale_tab->setText(QString::number(m_numOfXAxisScale));
     ui->lineEdit_XAxisScaleRuler_tab->setText(QString::number(m_XAxisScaleRuler));
     ui->lineEdit_numOfYAxisScale_tab->setText(QString::number(m_numOfYAxisScale));
     ui->lineEdit_YAxisScaleRuler_tab->setText(QString::number(m_YAxisScaleRuler));
-
     ui->lineEdit_XAxisScaleprecision_tab->setText(QString::number(m_XAxisScaleprecision));
     ui->lineEdit_YAxisScaleprecision_tab->setText(QString::number(m_YAxisScaleprecision));
-
-    ui->label_chooseXAxisColor_tab->setStyleSheet(QString("background-color: %1").arg(m_chooseXAxisColor));
-
+    ui->pushButton_chooseXAxisColor_tab->setStyleSheet(QString("background-color: %1").arg(m_chooseXAxisColor));
     ui->checkBox_chooseXAxislabeldisplay_tab->setChecked(m_chooseXAxislabeldisplay);
     ui->checkBox_chooseYAxislabeldisplay_tab->setChecked(m_chooseYAxislabeldisplay);
     ui->checkBox_chooseXAxisScalelabeldisplay_tab->setChecked(m_chooseXAxisScalelabeldisplay);
     ui->checkBox_chooseYAxisScalelabeldisplay_tab->setChecked(m_chooseYAxisScalelabeldisplay);
     ui->checkBox_chooseXAxisScaleTickdisplay_tab->setChecked(m_chooseXAxisScaleTickdisplay);
     ui->checkBox_chooseYAxisScaleTickdisplay_tab->setChecked(m_chooseYAxisScaleTickdisplay);
-
-
     //准备好向界面的填充文字---字的大小
     //XAxislabelFont
     QString m_XAxislabelFontstr = m_XAxislabelFont;
@@ -335,19 +274,6 @@ void GraphObjDlg::on_lineEdit_Ymin_tab_textChanged(const QString &arg1)
 
 }
 
-//X轴轴偏移量
-void GraphObjDlg::on_lineEdit_Xoffset_tab_textChanged(const QString &arg1)
-{
-    m_Xoffset = arg1.toInt();
-}
-
-//Y轴轴偏移量
-void GraphObjDlg::on_lineEdit_Yoffset_tab_textChanged(const QString &arg1)
-{
-
-    m_Yoffset = arg1.toInt();
-}
-
 
 //X轴轴标签
 void GraphObjDlg::on_lineEdit_XAxisLabel_tab_textChanged(const QString &arg1)
@@ -421,14 +347,6 @@ void GraphObjDlg::on_lineEdit_GraphWidth_tab_textChanged(const QString &arg1)
     m_GraphWidth = arg1.toInt();
 }
 
-//实时曲线缓冲区大小
-void GraphObjDlg::on_lineEdit_GraphBuffer_tab_textChanged(const QString &arg1)
-{
-
-    m_GraphBuffer = arg1.toDouble();
-
-}
-
 
 //选择实时曲线颜色
 void GraphObjDlg::on_pushButton_chooseGraphColor_tab_clicked()
@@ -451,7 +369,7 @@ void GraphObjDlg::on_pushButton_chooseGraphColor_tab_clicked()
     //最爽的还是样式表
     //background-color: rgb(255, 0, 0);
     //ui->label_chooseGraphColor->setStyleSheet("background-color: rgb(255, 0, 0)");
-    ui->label_chooseGraphColor->setStyleSheet(QString("background-color: %1").arg(tempgraphcolor.name()));
+    ui->pushButton_chooseGraphColor_tab->setStyleSheet(QString("background-color: %1").arg(tempgraphcolor.name()));
 
 }
 
@@ -469,12 +387,6 @@ void GraphObjDlg::on_lineEdit_LGraphWidth_tab_textChanged(const QString &arg1)
     m_LGraphWidth = arg1.toInt();
 }
 
-//理论曲线缓冲区大小
-void GraphObjDlg::on_lineEdit_LGraphBuffer_tab_textChanged(const QString &arg1)
-{
-    m_LGraphBuffer = arg1.toDouble();
-
-}
 
 //选择理论曲线颜色
 void GraphObjDlg::on_pushButton_chooseLGraphColor_tab_clicked()
@@ -497,7 +409,7 @@ void GraphObjDlg::on_pushButton_chooseLGraphColor_tab_clicked()
     //最爽的还是样式表
     //background-color: rgb(255, 0, 0);
     //ui->label_chooseGraphColor->setStyleSheet("background-color: rgb(255, 0, 0)");
-    ui->label_chooseLGraphColor->setStyleSheet(QString("background-color: %1").arg(tempLgraphcolor.name()));
+    ui->pushButton_chooseLGraphColor_tab->setStyleSheet(QString("background-color: %1").arg(tempLgraphcolor.name()));
 
 
 }
@@ -574,7 +486,7 @@ void GraphObjDlg::on_pushButton_chooseXAxisColor_tab_clicked()
     m_chooseXAxisColor= tempXAxiscolor.name();
     //将按钮颜色设置为取到的颜色
     //最爽的还是样式表
-     ui->label_chooseXAxisColor_tab->setStyleSheet(QString("background-color: %1").arg(tempXAxiscolor.name()));
+     ui->pushButton_chooseXAxisColor_tab->setStyleSheet(QString("background-color: %1").arg(tempXAxiscolor.name()));
 
 }
 
@@ -821,14 +733,4 @@ void GraphObjDlg::on_comboBox_OriginPlace_currentTextChanged(const QString &arg1
 
 }
 
-//刻度标签的位置：内侧、外侧
-void GraphObjDlg::on_comboBox_Scalelabelplace_x_currentTextChanged(const QString &arg1)
-{
-    m_Scalelabelplace_x = arg1;
-}
-
-void GraphObjDlg::on_comboBox_Scalelabelplace_y_currentTextChanged(const QString &arg1)
-{
-    m_Scalelabelplace_y = arg1;
-}
 

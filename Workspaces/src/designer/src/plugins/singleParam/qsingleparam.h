@@ -1,4 +1,4 @@
-#ifndef QSINGLEPARAM_H
+﻿#ifndef QSINGLEPARAM_H
 #define QSINGLEPARAM_H
 #include <Net/NetComponents>
 #include <QWidget>
@@ -13,12 +13,19 @@ class QSingleParam : public QWidget
     Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor )
     //插件框架属性
-    Q_PROPERTY(QBrush backgroundBrush READ getBackgroundBrush WRITE setBackgroundBrush )
+    Q_PROPERTY(QBrush backgroundColor READ getBackgroundBrush WRITE setBackgroundBrush )
 
     Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
     Q_PROPERTY(qint32 borderWidth READ getBorderWidth WRITE setBorderWidth)
     Q_PROPERTY(Qt::PenStyle borderStyle READ getBorderStyle WRITE setBorderStyle)
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
+
 protected:
      void paintEvent(QPaintEvent *event);
 public:
@@ -39,7 +46,7 @@ public:
      QColor getTextColor() const {return textColor;}
      void setTextColor(const QColor Color);
 
-     QBrush getBackgroundBrush() const {return backgroundBrush;}
+     QBrush getBackgroundBrush() const {return backgroundColor;}
      void setBackgroundBrush(const QBrush Brush);
 
     //插件框架属性
@@ -62,7 +69,7 @@ private:
     Qt::Alignment alignment;//文本对齐方式
     QColor textColor;//文本颜色
     //插件框架属性
-    QBrush backgroundBrush;//插件背景颜色
+    QBrush backgroundColor;//插件背景颜色
     QColor borderBrush;//边框画笔
     QColor borderColor;//插件边框颜色
     qint32 borderWidth;//插件边框宽度

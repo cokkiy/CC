@@ -1,5 +1,6 @@
 ﻿#include "tableitemset.h"
 #include "ui_tableitemset.h"
+#include "../configshowtype/configshowtypedialog.h"
 #include <QColorDialog>
 #include <QFontDialog>
 
@@ -149,4 +150,10 @@ void tableitemset::on_moreButton_clicked()
         ui->moreButton->setText(tr(">>"));
         setGeometry(rect.x(),rect.y(),uiRect.width()/2,uiRect.height());
     }
+}
+
+void tableitemset::on_SelectShowType_clicked()
+{
+    QConfigShowTypeDialog dlg;
+    dlg.exec();
 }

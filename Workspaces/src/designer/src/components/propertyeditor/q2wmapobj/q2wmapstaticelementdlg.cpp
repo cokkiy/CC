@@ -153,14 +153,14 @@ void Q2wmapStaticElementDlg::on_pushButtonCircle_clicked()
     ui->tabWidget->setCurrentWidget(t);
 }
 
-//点击按钮-添加不规则区域
+//点击按钮-添加定制图形
 void Q2wmapStaticElementDlg::on_pushButtonPolygon_clicked()
 {
     QJsonObject obj;
 
     Q2wmapPolygonDialog * t = new Q2wmapPolygonDialog(obj);
 
-    QString str = "新不规则区域";
+    QString str = "新定制图形";
 
     //添加tab
     ui->tabWidget->addTab(t, str);
@@ -258,7 +258,24 @@ void Q2wmapStaticElementDlg::on_pushButtonOK_clicked()
         }
         else if(t->m_strType == "Polygon")
         {
+            Q2wmapPolygonDialog * tp = (Q2wmapPolygonDialog*)t;
 
+            //下面在json中插入各个要保存的属性
+
+            //元素类型
+            stateObject.insert("Type", tp->m_strType);
+
+            //元素名称
+            stateObject.insert("Name", tp->m_strName);
+
+            //元素线条颜色
+            stateObject.insert("Color", tp->m_strColor);
+
+            //元素线条粗细
+            stateObject.insert("Width", tp->m_iWidth);
+
+            //组成多边形的点
+            stateObject.insert("Poly", tp->m_strPoly);
         }
 
         //将每一行Json字符串添加到Json数组

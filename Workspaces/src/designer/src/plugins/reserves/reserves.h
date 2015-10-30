@@ -17,30 +17,30 @@
 class reserves : public QWidget
 {
     Q_OBJECT
-    //1.参数
+    //参数
     Q_PROPERTY(QString data READ getData WRITE setData NOTIFY dataChanged)
-
-    //2.矩形中的文本属性
-    //    Q_PROPERTY(QString text READ text WRITE setText) //1、读写文本
-    Q_PROPERTY(QFont font READ font WRITE setFont)//2、设置文本字体
-    Q_PROPERTY(QColor textcolor READ textcolor WRITE settextcolor NOTIFY textcolorChanged)//3.文本颜色
-
-    //3、设置背景:背景矩形颜色
+    //设置背景:背景矩形颜色
     Q_PROPERTY(QBrush backgroundColor  READ backgroundColor  WRITE setBackgroundColor  NOTIFY backgroundColorChanged)
-
-    //4、设置填充颜色
+    //设置填充颜色
     Q_PROPERTY(QBrush fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
+    //矩形中的文本属性
+    Q_PROPERTY(QFont font READ font WRITE setFont)//2、设置文本字体
+    Q_PROPERTY(QColor textColor READ textColor WRITE settextcolor NOTIFY textcolorChanged)//3.文本颜色
+    //判断百分比方式，显示或不显示
+    Q_PROPERTY(PercentShow showText READ showPercent WRITE setPercentShow NOTIFY percentShowChanged)
+    //判断图元显示样式，横向或纵向
+    Q_PROPERTY(RectStyle direction READ direction WRITE setRectStyle NOTIFY rectStyleChanged)
 
-    //5.判断百分比方式，显示或不显示
-    Q_PROPERTY(PercentShow percentShow READ percentShow WRITE setPercentShow NOTIFY percentShowChanged)
-
-    //6.判断图元显示样式，横向或纵向
-    Q_PROPERTY(RectStyle rectStyle READ rectStyle WRITE setRectStyle NOTIFY rectStyleChanged)
-
-    //7.图元背景矩形坐标
+    //图元背景矩形坐标
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
-    //8.定义枚举类型
+    //定义枚举类型
     Q_ENUMS(PercentShow)
     Q_ENUMS(RectStyle)
 
@@ -58,7 +58,7 @@ public:
         m_percentShow = percentShow;
         emit percentShowChanged(percentShow);
     }
-    reserves::PercentShow percentShow() const
+    reserves::PercentShow showPercent() const
     { return m_percentShow; }
 
     //判断图元显示样式
@@ -67,7 +67,7 @@ public:
         m_rectStyle = rectStyle;
         emit rectStyleChanged(rectStyle);
     }
-    reserves::RectStyle rectStyle() const
+    reserves::RectStyle direction() const
     { return m_rectStyle; }
 
     //获取/设置  参数
@@ -89,7 +89,7 @@ public:
         emit textcolorChanged(txcolor);
     }
 
-    QColor textcolor() const
+    QColor textColor() const
     {
         return m_txcolor;
     }

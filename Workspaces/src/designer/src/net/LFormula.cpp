@@ -98,7 +98,8 @@ void OperatorData::GetCodeValue(double& ret_d)
 }
 LFormula::LFormula(Config*cf)
     :m_bUse(true),m_config(cf),m_formula(""),
-      m_savTime(0),m_savDate(0),m_primaryParam(NULL)
+      m_savTime(0),m_savDate(0),m_primaryParam(NULL),
+      m_curPos(0)
 {
 
 }
@@ -237,25 +238,45 @@ bool LFormula::insertOneHistroyParam(unsigned int& time)
     }
 }
 
-bool LFormula::updateAllHistroyParam()
+bool LFormula::updateAllHistroyParam(GetHistoryDataType type)
 {
     m_tHistoryMap.clear();
     FormulaZXParamMap::iterator it = m_zxparamMap.begin();
+    size_t pos = 0;
     int time = 0;
     int date = 0;
     bool bUpdate = false;
     while(it!=m_zxparamMap.end())
     {
         unsigned int pn = it->first;
-        time = m_savTime;
-        date = m_savDate;
-        list<HistoryParam> buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),date,time);
-        m_tHistoryMap[pn] = buf;
+        switch(type)
+        {
+        case Time:
+        {
+            time = m_savTime;
+            date = m_savDate;
+            const list<HistoryParam>& buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),date,time);
+            m_tHistoryMap[pn] = buf;
+        }
+            break;
+        case Pos:
+        default:
+        {
+            pos = m_curPos;
+            const list<HistoryParam>& buf = m_config->m_zxHistoryParamBuf.GetBuffer(TABNO(pn),PARAMNO(pn),pos);
+            m_tHistoryMap[pn] = buf;
+        }
+            break;
+        }
         bUpdate = true;
         it++;
     }
     if(bUpdate)
     {
+        if(pos>m_curPos)
+        {
+            m_curPos = pos;
+        }
         if(time>m_savTime)
         {
             m_savTime = time;
@@ -1646,6 +1667,16 @@ int LFormula::getTime()
 void LFormula::setDate(int date)
 {
     m_savDate = date;
+}
+
+size_t LFormula::getPos()
+{
+    return m_curPos;
+}
+
+void LFormula::setPos(size_t pos)
+{
+    m_curPos = pos;
 }
 
 void LFormula::setTime(int time)

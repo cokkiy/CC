@@ -8,19 +8,22 @@ class StateSend : public QTableWidget
 {
     Q_OBJECT
     Q_PROPERTY(QString dataes READ getDataes WRITE setDataes NOTIFY dataesChanged)
-    Q_PROPERTY(QColor beforeClickedColor READ beforeClickedColor WRITE setBeforeClickedColor)
-    Q_PROPERTY(QColor clickedColor READ clickedColor WRITE setClickedColor)
-
+    Q_PROPERTY(QColor normalColor READ normalColor WRITE setBeforeClickedColor)
+    Q_PROPERTY(QColor pressedColor READ pressedColor WRITE setClickedColor)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
     //设置给指定主机发送数据包的IP地址
     Q_PROPERTY(QString destAddress READ destAddress WRITE setDestAddress)
     //设置UDP数据包的传输端口
     Q_PROPERTY(uint port READ port WRITE setPort)
-
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
-
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     StateSend(QWidget *parent = 0);
@@ -28,10 +31,10 @@ public:
     QString getDataes() const { return m_data; }
     void setDataes(const QString &data);
 
-    QColor beforeClickedColor() const { return m_beforeClickedColor; }
+    QColor normalColor() const { return m_beforeClickedColor; }
     void setBeforeClickedColor(const QColor &color);
 
-    QColor clickedColor() const { return m_clickedColor; }
+    QColor pressedColor() const { return m_clickedColor; }
     void setClickedColor(const QColor &color);
 
     QColor textColor() const { return m_textColor; }

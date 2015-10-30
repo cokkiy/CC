@@ -50,8 +50,6 @@ void GraphObj::on_pushButton_AddNewObj_clicked()
         obj.insert("Xmin",tt->m_Xmin);//第2
         obj.insert("Ymax",tt->m_Ymax);//第3
         obj.insert("Ymin",tt->m_Ymin);//第4
-        obj.insert("Xoffset",tt->m_Xoffset);//第5
-        obj.insert("Yoffset",tt->m_Yoffset);//第6
         obj.insert("XAxisLabel",tt->m_XAxisLabel);//第7
         obj.insert("YAxisLabel",tt->m_YAxisLabel);//第8
         obj.insert("XAxisdisplay",tt->m_XAxisdisplay);//第9
@@ -59,46 +57,31 @@ void GraphObj::on_pushButton_AddNewObj_clicked()
         obj.insert("Scaleplace_x",tt->m_Scaleplace_x);//第11
         obj.insert("Scaleplace_y",tt->m_Scaleplace_y);//第12
         obj.insert("OriginPlace",tt->m_OriginPlace);//第12
-        obj.insert("Scalelabelplace_x",tt->m_Scalelabelplace_x);//第12
-        obj.insert("Scalelabelplace_y",tt->m_Scalelabelplace_y);//第12
-
         obj.insert("GraphName",tt->m_GraphName);//第13
         obj.insert("GraphWidth",tt->m_GraphWidth);//第14
-        obj.insert("GraphBuffer",tt->m_GraphBuffer);//第15
         obj.insert("strgraphColor",tt->m_strgraphColor);//第16
-
         obj.insert("LGraphWidth",tt->m_LGraphWidth);//第17
-        obj.insert("LGraphBuffer",tt->m_LGraphBuffer);//第18
         obj.insert("strLgraphColor",tt->m_strLgraphColor);//第19
-
         obj.insert("xParam",tt->m_xParam);//第20
         obj.insert("yParam",tt->m_yParam);//第21
         obj.insert("Lgraphfile",tt->m_Lgraphfile);//第22
-
         obj.insert("XAxiswideth",tt->m_XAxiswideth);//第23
-
         obj.insert("chooseXAxisColor",tt->m_chooseXAxisColor);//第25
-
         obj.insert("chooseXAxislabeldisplay",tt->m_chooseXAxislabeldisplay);//第31
         obj.insert("chooseYAxislabeldisplay",tt->m_chooseYAxislabeldisplay);//第32
         obj.insert("chooseXAxisScalelabeldisplay",tt->m_chooseXAxisScalelabeldisplay);//第33
         obj.insert("chooseYAxisScalelabeldisplay",tt->m_chooseYAxisScalelabeldisplay);//第34
         obj.insert("chooseXAxisScaleTickdisplay",tt->m_chooseXAxisScaleTickdisplay);//第35
         obj.insert("chooseYAxisScaleTickdisplay",tt->m_chooseYAxisScaleTickdisplay);//第36
-
         obj.insert("XAxislabelFont",tt->m_XAxislabelFont);//第37
-
         obj.insert("XAxisScalelabelFont",tt->m_XAxisScalelabelFont);//第39
         obj.insert("YAxisScalelabelFont",tt->m_YAxisScalelabelFont);//第40
-
         obj.insert("numOfXAxisScale",tt->m_numOfXAxisScale);//第41
         obj.insert("XAxisScaleRuler",tt->m_XAxisScaleRuler);//第42
         obj.insert("numOfYAxisScale",tt->m_numOfYAxisScale);//第43
         obj.insert("YAxisScaleRuler",tt->m_YAxisScaleRuler);//第44
-
         obj.insert("XAxisScaleprecision",tt->m_XAxisScaleprecision);//第45
         obj.insert("YAxisScaleprecision",tt->m_YAxisScaleprecision);//第46
-
         obj.insert("XAxisScalelabeloffset_x",tt->m_XAxisScalelabeloffset_x);//第47
         obj.insert("XAxisScalelabeloffset_y",tt->m_XAxisScalelabeloffset_y);//第48
         obj.insert("YAxisScalelabeloffset_x",tt->m_YAxisScalelabeloffset_x);//第47
@@ -306,37 +289,23 @@ void GraphObj::on_pushButton_SaveQuit_clicked()
         stateObject.insert("Xmin",t->m_Xmin);//第2
         stateObject.insert("Ymax",t->m_Ymax);//第3
         stateObject.insert("Ymin",t->m_Ymin);//第4
-        stateObject.insert("Xoffset",t->m_Xoffset);//第5
-        stateObject.insert("Yoffset",t->m_Yoffset);//第6
         stateObject.insert("XAxisLabel",t->m_XAxisLabel);//第7
         stateObject.insert("YAxisLabel",t->m_YAxisLabel);//第8
-
         stateObject.insert("XAxisdisplay",t->m_XAxisdisplay);//第9
         stateObject.insert("YAxisdisplay",t->m_YAxisdisplay);//第10
-
         stateObject.insert("Scaleplace_x",t->m_Scaleplace_x);//第11
         stateObject.insert("Scaleplace_y",t->m_Scaleplace_y);//第12
         stateObject.insert("OriginPlace",t->m_OriginPlace);//第12
-        stateObject.insert("Scalelabelplace_x",t->m_Scalelabelplace_x);//第12
-        stateObject.insert("Scalelabelplace_y",t->m_Scalelabelplace_y);//第12
-
         stateObject.insert("GraphName",t->m_GraphName);//第13
         stateObject.insert("GraphWidth",t->m_GraphWidth);//第14
-        stateObject.insert("GraphBuffer",t->m_GraphBuffer);//第15
         stateObject.insert("strgraphColor",t->m_strgraphColor);//第16
-
         stateObject.insert("LGraphWidth",t->m_LGraphWidth);//第17
-        stateObject.insert("LGraphBuffer",t->m_LGraphBuffer);//第18
         stateObject.insert("strLgraphColor",t->m_strLgraphColor);//第19
-
         stateObject.insert("xParam",t->m_xParam);//第20
         stateObject.insert("yParam",t->m_yParam);//第21
         stateObject.insert("Lgraphfile",t->m_Lgraphfile);//第22
-
         stateObject.insert("XAxiswideth",t->m_XAxiswideth);//第23
-
         stateObject.insert("chooseXAxisColor",t->m_chooseXAxisColor);//第25
-
         stateObject.insert("chooseXAxislabeldisplay",t->m_chooseXAxislabeldisplay);//第31
         stateObject.insert("chooseYAxislabeldisplay",t->m_chooseYAxislabeldisplay);//第32
         stateObject.insert("chooseXAxisScalelabeldisplay",t->m_chooseXAxisScalelabeldisplay);//第33
@@ -345,22 +314,14 @@ void GraphObj::on_pushButton_SaveQuit_clicked()
         stateObject.insert("chooseYAxisScaleTickdisplay",t->m_chooseYAxisScaleTickdisplay);//第36
 
         stateObject.insert("XAxislabelFont",t->m_XAxislabelFont);//第37
-
         stateObject.insert("XAxisScalelabelFont",t->m_XAxisScalelabelFont);//第39
         stateObject.insert("YAxisScalelabelFont",t->m_YAxisScalelabelFont);//第40
-
-
         stateObject.insert("numOfXAxisScale",t->m_numOfXAxisScale);//第41
         stateObject.insert("numOfYAxisScale",t->m_numOfYAxisScale);//第42
-
         stateObject.insert("YAxisScaleRuler",t->m_YAxisScaleRuler);//第43
         stateObject.insert("XAxisScaleRuler",t->m_XAxisScaleRuler);//第44
-
-
-
         stateObject.insert("XAxisScaleprecision",t->m_XAxisScaleprecision);//第45
         stateObject.insert("YAxisScaleprecision",t->m_YAxisScaleprecision);//第46
-
         stateObject.insert("XAxisScalelabeloffset_x",t->m_XAxisScalelabeloffset_x);//第47
         stateObject.insert("XAxisScalelabeloffset_y",t->m_XAxisScalelabeloffset_y);//第48
         stateObject.insert("YAxisScalelabeloffset_x",t->m_YAxisScalelabeloffset_x);//第47

@@ -2,7 +2,7 @@
 #include <math.h>
 #include <string.h>
 #include "../C3I/paramstyle/paramstyleconfig.h"
-extern QParamStyleConfig Paramstyleconfig;
+extern QParamStyleConfig g_paramStyleConfig;
 #if defined(_WIN32)
 #define  uint unsigned int
 #endif
@@ -130,7 +130,7 @@ string QNumericalValueResultString::getStyleResultString(const double fParamValu
 {
     double value = fParamValue;
     QString resultStr = QObject::tr("");
-    list<QParamStyle>* paramStyleList = Paramstyleconfig.getParamStyleList();
+    list<QParamStyle>* paramStyleList = g_paramStyleConfig.getParamStyleList();
     list<QParamStyle>::iterator paramStyleIt = paramStyleList->begin();
 	//遍历所有样式
     for(;paramStyleIt != paramStyleList->end();paramStyleIt++)
@@ -150,7 +150,7 @@ string QNumericalValueResultString::getStyleResultString(const double fParamValu
 				//判断数值区间，获取样式索引名
                 if(((max == min) && (min == value))||((value <= max) && (value > min)))
                 {
-                    list<QParamIndex>* paramIndexList = Paramstyleconfig.getParamIndexList();
+                    list<QParamIndex>* paramIndexList = g_paramStyleConfig.getParamIndexList();
                     list<QParamIndex>::iterator paramIndexIt = paramIndexList->begin();
 					//通过索引名获取结果文本、字体、字符串
                     for(;paramIndexIt != paramIndexList->end();paramIndexIt++)
@@ -175,6 +175,11 @@ string QNumericalValueResultString::getStyleResultString(const double fParamValu
                             return resultStr.toStdString();
                         }
                     }
+                    resultStr = QObject::tr("{{,,,}{}{");
+                    int pos = indexStr.indexOf(QObject::tr("."));
+                    resultStr = resultStr + indexStr.right(indexStr.length() - pos - 1);
+                    resultStr = resultStr + QObject::tr("}}");
+                    return resultStr.toStdString();
                 }
             }
         }

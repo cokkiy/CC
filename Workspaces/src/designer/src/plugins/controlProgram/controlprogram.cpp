@@ -241,9 +241,9 @@ void controlProgram::stylesheetUpdate()
 {
     if(hasStyleSheetUpdate == false)//用于限制样式表的绘制，在颜色确定改变时工作
     {
-        QString m_gridlineColor = QString("rgb(%1, %2, %3)").arg(QString::number(gridlineColor().red()),
-                                                                 QString::number(gridlineColor().green()),
-                                                                 QString::number(gridlineColor().blue()));
+        QString m_gridlineColor = QString("rgb(%1, %2, %3)").arg(QString::number(lineColor().red()),
+                                                                 QString::number(lineColor().green()),
+                                                                 QString::number(lineColor().blue()));
         this->setStyleSheet( QString("QTableWidget{gridline-color: %1}").arg(m_gridlineColor));
 
         hasStyleSheetUpdate =true;

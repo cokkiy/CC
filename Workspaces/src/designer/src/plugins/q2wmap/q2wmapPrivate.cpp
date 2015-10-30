@@ -1,4 +1,4 @@
-#include "q2wmapPrivate.h"
+﻿#include "q2wmapPrivate.h"
 #include "qwidget.h"
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -26,6 +26,10 @@ Q2wmapPrivate::Q2wmapPrivate(QWidget*wgt)
     //图元的宽度
     m_width = m_parent->width();
 
+    //默认视窗起始点经纬度
+    m_ViewOriginL = 100.0;
+    m_ViewOriginB = 40.0;
+
     //默认显示经纬度网格
     m_bShowGrid = true;
 
@@ -46,6 +50,8 @@ Q2wmapPrivate::Q2wmapPrivate(QWidget*wgt)
 
     //关联定时器100ms的周期信号，这样可以使用全局的周期信号
     connect(m_ti, SIGNAL(timeout_100()), this, SLOT(timeEvent_100ms()));
+
+    m_bFirstOpen = true;
 }
 
 //读取理论曲线文件，并生成理论曲线
@@ -79,25 +85,47 @@ bool Q2wmapObject::ReadLLCv()
             //读一行
             qint64 ReadLen = f.readLine(buf, sizeof(buf));
 
+            //读完退出
+            if(ReadLen == -1)
+            {
+                break;
+            }
+
             //声明经纬度
             double L,B;
 
-            //为了使用sscanf，还需要两个char数组
-            char  s1[100] = {0};
-            char  s2[100] = {0};
+            QString str = buf;
 
-            //从读到的数据中分离L,B
-            sscanf(buf, "%s%s", s1,s2);
+            QStringList listlb;
 
-            //再变成QString，真麻烦
-            QString ss1 = s1;
-            QString ss2 = s2;
+            //兼容这些分隔符号：逗号(,) 制表符(\t) 空格( )
+            if(str.indexOf(",") != -1)
+            {
+                listlb = str.split(",", QString::SkipEmptyParts);
+            }
+            else if(str.indexOf("\t") != -1)
+            {
+                listlb = str.split("\t", QString::SkipEmptyParts);
+            }
+            else
+            {
+                listlb = str.split(" ", QString::SkipEmptyParts);
+            }
 
-            //总算得到了经纬度的浮点数格式，还得防止读到的东西有问题，导致转换失败
+            //至少需要L和B
+            if(listlb.size()<2)
+            {
+                continue;
+            }
+
+            QString strL = listlb[0];
+            QString strB = listlb[1];
+
+            //得到了经纬度的文本格式，还得防止读到的东西有问题，导致转换成浮点数时失败
             bool rr_ok1, rr_ok2;
 
-            L = ss1.toDouble(&rr_ok1);
-            B = ss2.toDouble(&rr_ok2);
+            L = strL.toDouble(&rr_ok1);
+            B = strB.toDouble(&rr_ok2);
 
             //如转换失败就不添加点了
             if( (rr_ok1 == true) && (rr_ok2 == true) )
@@ -109,13 +137,6 @@ bool Q2wmapObject::ReadLLCv()
             else
             {
                 qWarning()<<"Rika's Warning! Q2wmapObject::ReadLLCv() : Convert double from QString failed!";
-            }
-
-            //读完了
-            if(ReadLen == -1)
-            {
-                //跳出循环
-                break;
             }
         }
 
@@ -133,6 +154,54 @@ bool Q2wmapObject::ReadLLCv()
     }
 
     //工作结束，返回true
+    return true;
+}
+
+//从定制图形点文本中取得点的集合
+bool Q2wmapStatic::GetPointFormPolystr(QVector<QPointF>& vctPt)
+{
+    QString str = m_strPoly;
+
+    QStringList listStr = str.split("\n", QString::SkipEmptyParts);
+
+    QString strS;
+
+    foreach(strS, listStr)
+    {
+        QStringList listlb = strS.split(",", QString::SkipEmptyParts);
+
+        if(listlb.size()<2)
+        {
+            QMessageBox::information(0,"提示","格式有错误！");
+            vctPt.clear();
+            return false;
+        }
+
+        QPointF pt;
+        bool okx,oky;
+
+        //转换成数值
+        pt.setX(listlb[0].toDouble(&okx));
+        pt.setY(listlb[1].toDouble(&oky));
+
+        //转换失败
+        if(okx==false || oky==false)
+        {
+            QMessageBox::information(0,"提示","格式有错误！");
+            vctPt.clear();
+            return false;
+        }
+
+        //转换成功后装进数组
+        vctPt.push_back(pt);
+    }
+
+    if(vctPt.size() == 0)
+    {
+       QMessageBox::information(0,"提示","没有有效数据！");
+       return false;
+    }
+
     return true;
 }
 
@@ -357,9 +426,6 @@ void Q2wmapPrivate::setStatic(const QString str)
                 //半径(Km)
                 sj.m_dbRadius = name["Radius"].toDouble();
 
-                //清空数据
-                sj.m_pStaticGraph->clearData();
-
                 //添加圆心点
                 sj.m_pStaticGraph->addData(sj.m_dbPosL, sj.m_dbPosB);
 
@@ -377,16 +443,29 @@ void Q2wmapPrivate::setStatic(const QString str)
                 //字体
                 sj.m_strFont = name["Font"].toString();
 
-                //清空数据
-                sj.m_pStaticGraph->clearData();
-
                 //添加标定点
                 sj.m_pStaticGraph->addData(sj.m_dbPosL, sj.m_dbPosB);
 
-            }else if( sj.m_strType == "Polygon")//不规则区域
+            }else if( sj.m_strType == "Polygon")//定制图形
             {
                 //添加静态元素的图层
                 sj.m_pStaticGraph = m_plot->addGraph();
+
+                //组成定制图形的点
+                sj.m_strPoly = name["Poly"].toString();
+
+                QVector<QPointF> vctPt;
+
+                if(sj.GetPointFormPolystr(vctPt))
+                {
+                    QPointF pt;
+
+                    //点全加入到数据
+                    foreach(pt, vctPt)
+                    {
+                        sj.m_pStaticGraph->addData(pt.x(), pt.y());
+                    }
+                }
             }
             else
             {
@@ -432,6 +511,21 @@ void Q2wmapPrivate::setBUpLimit(const double wu)
 void Q2wmapPrivate::setShowGrid(const bool bShowGrid)
 {
     m_bShowGrid = bShowGrid;
+    update();
+}
+
+//设置视窗起始点经纬度
+void Q2wmapPrivate::setViewOriginL(const double l)
+{
+    m_ViewOriginL = l;
+    MoveToPointOfMapLB(m_ViewOriginL, m_ViewOriginB);
+    update();
+}
+
+void Q2wmapPrivate::setViewOriginB(const double b)
+{
+    m_ViewOriginB = b;
+    MoveToPointOfMapLB(m_ViewOriginL, m_ViewOriginB);
     update();
 }
 
@@ -536,28 +630,6 @@ void Q2wmapPrivate::setPlot()
     //曲线及图表可以被选择 QCP::iSelectPlottables
     //m_plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom| QCP::iSelectPlottables);
 
-
-    //绘制理论曲线
-    Q2wmapObject t_Obj;
-
-    foreach(t_Obj, m_vctObj)
-    {
-        //理论曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
-        t_Obj.m_pLcurve->setLineStyle(QCPGraph::lsNone);
-
-        t_Obj.m_pLcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, t_Obj.m_cLcurveColor, t_Obj.m_iLcurveWidth));
-
-        QPen LPen;
-
-        LPen.setColor(t_Obj.m_cLcurveColor);
-
-        LPen.setWidth(t_Obj.m_iLcurveWidth);
-
-        LPen.setStyle(Qt::SolidLine);
-
-        t_Obj.m_pLcurve->setPen(LPen);
-    }
-
     //绘制静态元素
     Q2wmapStatic t_Sta;
 
@@ -602,7 +674,53 @@ void Q2wmapPrivate::setPlot()
 
           //设置风格
           t_Sta.m_pStaticGraph->setScatterStyle(styleLabel);
+
+      }else if(t_Sta.m_strType == "Polygon")//定制图形
+      {
+          //新建一个Style
+          QCPScatterStyle styleLabel(QCPScatterStyle(QCPScatterStyle::ssDot, t_Sta.m_Color, t_Sta.m_iWidth));
+//          QCPScatterStyle styleLabel(QCPScatterStyle(QCPScatterStyle::ssNone, t_Sta.m_Color, t_Sta.m_iWidth));
+
+//          //取画笔并修改粗细
+//          QPen penPolygon = styleLabel.pen();
+
+//          penPolygon.setWidth(t_Sta.m_iWidth);
+
+//          //应用修改
+//          styleLabel.setPen(penPolygon);
+          t_Sta.m_pStaticGraph->setLineStyle(QCPGraph::lsLine);
+
+          QPen op= t_Sta.m_pStaticGraph->pen();
+          QPen np = op;
+          np.setWidth(t_Sta.m_iWidth);
+          np.setColor(t_Sta.m_Color);
+          t_Sta.m_pStaticGraph->setPen(np);
+
+
+          //设置风格
+          t_Sta.m_pStaticGraph->setScatterStyle(styleLabel);
       }
+    }
+
+    //绘制理论曲线
+    Q2wmapObject t_Obj;
+
+    foreach(t_Obj, m_vctObj)
+    {
+        //理论曲线设置绘图方式：以点为圆心，按指定的颜色和粗细绘制
+        t_Obj.m_pLcurve->setLineStyle(QCPGraph::lsNone);
+
+        t_Obj.m_pLcurve->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, t_Obj.m_cLcurveColor, t_Obj.m_iLcurveWidth));
+
+        QPen LPen;
+
+        LPen.setColor(t_Obj.m_cLcurveColor);
+
+        LPen.setWidth(t_Obj.m_iLcurveWidth);
+
+        LPen.setStyle(Qt::SolidLine);
+
+        t_Obj.m_pLcurve->setPen(LPen);
     }
 
     //绘制实时曲线及当前点
@@ -717,28 +835,11 @@ void Q2wmapPrivate::setPlot()
     m_plot->yAxis->setTickLabelSide(QCPAxis::lsInside);
     m_plot->yAxis2->setTickLabelSide(QCPAxis::lsInside);
 
-    static bool bMoveFirst = false;
-
-    //没收到数据时，视窗自动移动到主目标的理论弹道的第一个点处(仅首次需要移动)
-    if(!bMoveFirst)
+    //首次打开图元时将视窗移动到指定位置
+    if(m_bFirstOpen)
     {
-        Q2wmapObject t_o2;
-        foreach(t_o2, m_vctObj)
-        {
-            if(t_o2.m_bMainObj == true)//主目标
-            {
-                if(t_o2.m_Cx.size() == 0)//没收到数据
-                {
-                    if(t_o2.m_Lx.size()>0 && t_o2.m_Ly.size()>0)//理论弹道至少有1个点
-                    {
-                        double L = t_o2.m_Lx[0];
-                        double B = t_o2.m_Ly[0];
-                        MoveToPointOfMapLB(L,B);
-                        bMoveFirst = true;
-                    }
-                }
-            }
-        }
+        MoveToPointOfMapLB(m_ViewOriginL, m_ViewOriginB);
+        m_bFirstOpen = false;
     }
 }
 

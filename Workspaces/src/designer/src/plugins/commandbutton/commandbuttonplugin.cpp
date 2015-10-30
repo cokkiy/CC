@@ -36,7 +36,7 @@ QString CommandButtonPlugin::name() const
 
 QString CommandButtonPlugin::group() const
 {
-    return QLatin1String("button");
+    return tr("command");
 }
 
 QIcon CommandButtonPlugin::icon() const

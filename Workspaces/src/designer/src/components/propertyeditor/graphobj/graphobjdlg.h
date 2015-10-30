@@ -36,49 +36,32 @@ public:
     QString m_Scaleplace_x;
     QString m_Scaleplace_y;
     QString m_OriginPlace;
-    QString m_Scalelabelplace_x;
-    QString m_Scalelabelplace_y;
-
     QString m_GraphName;
     qint32  m_GraphWidth;
     double  m_GraphBuffer;
     QString m_strgraphColor;
-
     qint32  m_LGraphWidth;
     double  m_LGraphBuffer;
     QString m_strLgraphColor;
-
-
     QString m_xParam;
     QString m_yParam;
     QString m_Lgraphfile;//理论曲线文件(路径)
-
-
-
     qint32 m_XAxiswideth;
-
     QString m_chooseXAxisColor;
-
-
     bool m_chooseXAxislabeldisplay;
     bool m_chooseYAxislabeldisplay;
     bool m_chooseXAxisScalelabeldisplay;
     bool m_chooseYAxisScalelabeldisplay;
     bool m_chooseXAxisScaleTickdisplay;
     bool m_chooseYAxisScaleTickdisplay;
-
     qint32 m_numOfXAxisScale;//刻度数的设置
     qint32 m_numOfYAxisScale;
-
     qint32 m_XAxisScaleRuler;//刻度小线段长度的设置
     qint32 m_YAxisScaleRuler;//刻度小线段长度的设置
-
     qint32 m_XAxisScaleprecision;
     qint32 m_YAxisScaleprecision;
 
-
     QString m_XAxislabelFont;
-
     QString m_XAxisScalelabelFont;
     QString m_YAxisScalelabelFont;
 
@@ -86,7 +69,6 @@ public:
     QString m_XAxisScalelabeloffset_y;
     QString m_YAxisScalelabeloffset_x;
     QString m_YAxisScalelabeloffset_y;
-    
 
 
     //设置控件
@@ -113,10 +95,6 @@ private slots:
 
     void on_lineEdit_Ymin_tab_textChanged(const QString &arg1);//输入Y轴最小值
 
-    void on_lineEdit_Xoffset_tab_textChanged(const QString &arg1);//X轴文本偏移
-
-    void on_lineEdit_Yoffset_tab_textChanged(const QString &arg1);//Y轴文本偏移
-
     void on_lineEdit_XAxisLabel_tab_textChanged(const QString &arg1);//X轴轴标签
 
     void on_lineEdit_YAxisLabel_tab_textChanged(const QString &arg1);//Y轴轴标签
@@ -129,16 +107,10 @@ private slots:
 
     void on_comboBox_Scaleplace_y_currentTextChanged(const QString &arg1);//y的刻度位置（左中右）
 
-    void on_comboBox_Scalelabelplace_x_currentTextChanged(const QString &arg1);//x的刻度标签位置（内侧、外侧）
-    void on_comboBox_Scalelabelplace_y_currentTextChanged(const QString &arg1);//x的刻度标签位置（内侧、外侧）
-
-
-
     void on_lineEdit_GraphName_tab_textChanged(const QString &arg1);//曲线名称
 
     void on_lineEdit_GraphWidth_tab_textChanged(const QString &arg1);//实时曲线宽度
 
-    void on_lineEdit_GraphBuffer_tab_textChanged(const QString &arg1);//实时曲线缓冲区
 
     void on_pushButton_chooseGraphColor_tab_clicked();//实时曲线颜色
 
@@ -146,8 +118,6 @@ private slots:
 
 
     void on_lineEdit_LGraphWidth_tab_textChanged(const QString &arg1);//理论曲线宽度
-
-    void on_lineEdit_LGraphBuffer_tab_textChanged(const QString &arg1);//理论曲线缓冲区
 
     void on_pushButton_chooseLGraphColor_tab_clicked();//理论曲线颜色
 

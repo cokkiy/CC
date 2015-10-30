@@ -158,18 +158,19 @@ QDesignerPropertyEditor::StringPropertyParameters QDesignerPropertyEditor::textP
     }
 
     // q2wmapobj: 设置目标选择界面,rika,20150928
-    if (propertyName.endsWith(QStringLiteral("q2wmapobj"))) {
+    if (propertyName.endsWith(QStringLiteral("objectConfig"))) {
         return StringPropertyParameters(Validation2wmapObj, true);
     }
 
     // q2wmapstatic: 静态配置界面,rika,20151022
-    if (propertyName == (QStringLiteral("q2wmapstatic"))) {
+    if (propertyName == (QStringLiteral("staticConfig"))) {
         return StringPropertyParameters(Validation2wmapStatic, true);
     }
 
 
     // data: 设置单参数数据的配置类别,andrew,20140421
-    if (propertyName.endsWith(QStringLiteral("data"))) {
+    if (propertyName.endsWith(QStringLiteral("data"))
+            ||propertyName.endsWith(QStringLiteral("Data"))) {
         return StringPropertyParameters(ValidationData, true);
     }
 
@@ -185,11 +186,11 @@ QDesignerPropertyEditor::StringPropertyParameters QDesignerPropertyEditor::textP
 
 
     //states: 设置多参数数据的配置类别,wp,20150831
-    if (propertyName.endsWith(QStringLiteral("states"))) {
+    if (propertyName.endsWith(QStringLiteral("statesConfig"))) {
         return StringPropertyParameters(ValidationStates, true);
     }
 
-    if (propertyName.endsWith(QStringLiteral("table"))) {
+    if (propertyName.endsWith(QStringLiteral("tableConfig"))) {
         return StringPropertyParameters(ValidationTable, true);
     }
     // Fuzzy matching

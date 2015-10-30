@@ -16,37 +16,37 @@ class CommandButton : public QWidget
     Q_OBJECT
 
     //仅可设置send_data和receive_data, 其中将命令发送至send_data, 从receive_data接收数据
-    Q_PROPERTY(QString send_data READ getSendData WRITE setSendData)
-    Q_PROPERTY(QString receive_data READ getReceiveData WRITE setReceiveData)
-
+    Q_PROPERTY(QString sendData READ getSendData WRITE setSendData)
+    Q_PROPERTY(QString receiveData READ getReceiveData WRITE setReceiveData)
     //设置命令按钮的发送模式，分为“单条指令”、“下一口令”、“列表发令”三种
-    Q_PROPERTY(CommandChoice commandtype READ command WRITE setCommand NOTIFY commandChanged)
-
+    Q_PROPERTY(CommandChoice type READ command WRITE setCommand NOTIFY commandChanged)
     //设置发送的命令列表, 在命令类型为“单条指令”时发出CommandList的第一条命令
     //在命令类型为“列表发令”时可选择CommandList中的命令进行发送
-    Q_PROPERTY(QStringList commandList READ commandList WRITE setCommandList NOTIFY commandListChanged)
-
+    Q_PROPERTY(QStringList dataList READ commandList WRITE setCommandList NOTIFY commandListChanged)
     //设置给指定主机发送数据包的IP地址
     Q_PROPERTY(QString destAddress READ destAddress WRITE setDestAddress)
     //设置本机IP地址
     Q_PROPERTY(QString localAddress READ localAddress WRITE setLocalAddress)
     //设置UDP数据包的传输端口
     Q_PROPERTY(uint port READ port WRITE setPort)
-
+    //设置按钮显示文本，字体及字体颜色
+    Q_PROPERTY(QString text READ text WRITE setText)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     //读取图片，用于更换不同状态下显示的背景图片
     Q_PROPERTY(QUrl normalImage READ normalImage WRITE setNormalImage)
     Q_PROPERTY(QUrl hoverImage READ hoverImage WRITE setHoverImage)
     Q_PROPERTY(QUrl pressedImage READ pressedImage WRITE setPressedImage)
     Q_PROPERTY(QUrl disabledImage READ disabledImage WRITE setDisabledImage)
     Q_PROPERTY(QUrl focusImage READ focusImage WRITE setFocusImage)
-
-    //设置按钮显示文本，字体及字体颜色
-    Q_PROPERTY(QString text READ text WRITE setText)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
-
     //设置按钮的位置信息
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
     Q_ENUMS(CommandChoice)
 

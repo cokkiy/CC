@@ -28,6 +28,8 @@ private slots:
 
     void on_moreButton_clicked();
 
+    void on_SelectShowType_clicked();
+
 private:
     //ui界面
     Ui::tableitemset *ui;

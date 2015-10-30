@@ -15,15 +15,21 @@ class circleangle : public QWidget
     Q_OBJECT
 
     //画刷背景
-    Q_PROPERTY(QBrush backgroundBrush READ bgBrush WRITE setBgBrush NOTIFY bgBrushChanged RESET unsetBgBrush)
-    //画笔风格
-    Q_PROPERTY(Qt::PenStyle borderStyle READ borderStyle WRITE setBorderStyle NOTIFY borderStyleChanged RESET unsetBorderStyle)
+    Q_PROPERTY(QBrush backgroundColor READ bgBrush WRITE setBgBrush NOTIFY bgBrushChanged RESET unsetBgBrush)
     //画刷边框
-    Q_PROPERTY(QBrush borderBrush READ borderBrush WRITE setBorderBrush NOTIFY borderBrushChanged RESET unsetBorderBrush)
+    Q_PROPERTY(QBrush borderColor READ borderColor WRITE setBorderBrush NOTIFY borderBrushChanged RESET unsetBorderBrush)
     //边框宽度
     Q_PROPERTY(qint32 borderWidth READ borderWidth WRITE setBorderWidth NOTIFY borderWidthChanged RESET unsetBorderWidth)
+    //画笔风格
+    Q_PROPERTY(Qt::PenStyle borderStyle READ borderStyle WRITE setBorderStyle NOTIFY borderStyleChanged RESET unsetBorderStyle)
     //图元背景矩形坐标(x,y)width and height
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     circleangle(QWidget *parent = 0);
@@ -47,7 +53,7 @@ public:
         emit borderBrushChanged(brush);
     }
 
-    QBrush borderBrush() const
+    QBrush borderColor() const
     {
         return m_borderBrush;
     }

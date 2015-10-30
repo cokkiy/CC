@@ -13,11 +13,10 @@ class codeSource : public QTextEdit
     Q_PROPERTY(QString data READ getData WRITE setData)
 
     //2.矩形中的文本属性
-    Q_PROPERTY(QFont font READ font WRITE setFont)//1、设置文本字体
+    Q_PROPERTY(QFont font READ font WRITE setFont)//1、设置文本字体    
+    Q_PROPERTY(Qt::Alignment alignment READ txtalignment
+               WRITE settxtalignment )//3.文本对齐方式
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)//2.文本颜色
-    Q_PROPERTY(textAlignment txtalignment READ txtalignment
-               WRITE settxtalignment NOTIFY txtalignmentChanged)//3.文本对齐方式
-
     //3.背景颜色
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE
                setBackgroundColor NOTIFY backgroundColorChanged)
@@ -26,19 +25,19 @@ class codeSource : public QTextEdit
 
     //5.图元背景矩形坐标(x,y)width and height
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
-
-    //6.定义枚举类型
-    Q_ENUMS(textAlignment)
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
 
 public:
     codeSource(QWidget *parent = 0);
     virtual~codeSource();
 
-    //定义枚举成员
-    enum textAlignment { left, center, right };
-
-    textAlignment txtalignment() const{return m_txt;}
-    void settxtalignment(const textAlignment newtxt);
+    Qt::Alignment txtalignment() const{return m_alignMent;}
+    void settxtalignment(const Qt::Alignment newtxt);
 
     QColor backgroundColor() const{return m_bgcolor;}
     void setBackgroundColor(const QColor newbgcolor);
@@ -59,7 +58,7 @@ private:
     QString disData;
     int blankNum;
     QColor m_bgcolor;
-    textAlignment m_txt;
+    Qt::Alignment m_alignMent;
     // //定时器 用于更新图形绘制
     TimerInterface* m_timer;
     DataCenterInterface* m_dc;//

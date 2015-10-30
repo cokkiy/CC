@@ -192,7 +192,7 @@ void Q2wmapObj::on_pushButton_SaveQuit_clicked()
         stateArray.append(stateObject);
     }
 
-    if(iMainObjCount != 1)
+    if(stateArray.size()>0 && iMainObjCount != 1)
     {
         QMessageBox::warning(this,                          //warning是警告样式，更多样式参考文档。this是父窗口指针
                              tr("提示信息"),              //MSGBOX的标题

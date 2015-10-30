@@ -128,7 +128,7 @@ void Cstatictxt::paintEvent(QPaintEvent *event)
     painter2.setPen(pen);
 
     //设置背景矩形内部颜色
-    painter2.setBrush(backgroundcolor());
+    painter2.setBrush(backgroundColor());
 
     //取控件的中心点旋转
     painter2.setRenderHint(QPainter::Antialiasing);
@@ -146,7 +146,7 @@ void Cstatictxt::paintEvent(QPaintEvent *event)
 
     //画内部静态文本,使用第2支画笔pen2
     //设置字体颜色
-    QPen pen2(txtcolor());
+    QPen pen2(textColor());
     painter2.setPen(pen2);
     //设置字体
     painter2.setFont(font());

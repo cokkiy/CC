@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>593</width>
+    <height>199</height>
    </rect>
   </property>
   <property name="font">
@@ -19,53 +19,127 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLineEdit" name="lineEditAreaName">
+  <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>60</y>
-     <width>161</width>
-     <height>20</height>
+     <x>40</x>
+     <y>100</y>
+     <width>71</width>
+     <height>21</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>边线粗细</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>140</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>边线颜色</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_SelectColor">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>140</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>40</x>
      <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>区域名称</string>
+    <string>图形名称</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>20</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>类型：定制图形</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditName">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>59</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditWidth">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>100</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>60</y>
+     <width>241</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="sizeAdjustPolicy">
+    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+   </property>
+   <property name="lineWrapMode">
+    <enum>QTextEdit::NoWrap</enum>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>110</y>
-     <width>71</width>
+     <x>330</x>
+     <y>25</y>
+     <width>231</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>边线颜色</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>160</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>边线颜色</string>
+    <string>输入定制点，格式：经度,纬度</string>
    </property>
   </widget>
  </widget>

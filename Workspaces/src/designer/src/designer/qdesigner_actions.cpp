@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -538,7 +538,7 @@ QActionGroup *QDesignerActions::createFunctionActions()
     QActionGroup *functionActions = createActionGroup(this);
 
     //添加导出数据菜单项
-    QAction *outDataAction = new QAction(tr("导出数据"), this);
+    QAction *outDataAction = new QAction(QString::fromLocal8Bit("导出数据"), this);
 
     //关联菜单动作到导出数据功能
     connect(outDataAction, SIGNAL(triggered()), this, SLOT(outData()));

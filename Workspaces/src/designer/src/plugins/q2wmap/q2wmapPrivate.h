@@ -1,4 +1,4 @@
-#ifndef Q2WMAPPRIVATE_H
+﻿#ifndef Q2WMAPPRIVATE_H
 #define Q2WMAPPRIVATE_H
 #include <Net/NetComponents>
 #include "qcustomplot.h"
@@ -75,7 +75,7 @@ public:
     {
     }
 
-    //元素类型 Circle=圆形区域 Label=标签 Polygon=不规则区域
+    //元素类型 Circle=圆形区域 Label=标签 Polygon=定制图形
     QString m_strType;
 
     //元素名称
@@ -99,8 +99,14 @@ public:
     //字体(仅标签使用)
     QString m_strFont;
 
+    //定制图形点(仅定制图形使用)
+    QString m_strPoly;
+
     //绘制的图形
     QCPGraph* m_pStaticGraph;
+
+    //从定制图形点文本中取得点的集合
+    bool GetPointFormPolystr(QVector<QPointF>& vctPt);
 };
 
 
@@ -190,6 +196,14 @@ public:
     double getBUpLimit() const{ return m_BUpLimit; }
     void setBUpLimit(const double wu);
 
+    //视窗起始点经纬度
+    double m_ViewOriginL;
+    double m_ViewOriginB;
+    double getViewOriginL() const { return m_ViewOriginL; }
+    void setViewOriginL(const double l);
+    double getViewOriginB() const { return m_ViewOriginB; }
+    void setViewOriginB(const double b);
+
     //地图路径
     QPixmap m_pixmap;
     QPixmap getPixmap()const{return m_pixmap;}
@@ -246,6 +260,9 @@ private:
 
     //定时器类
     TimerInterface* m_ti;
+
+    //是否首次打开
+    bool m_bFirstOpen;
 
     //视窗的经度下限
     double m_ViewLLow;

@@ -128,7 +128,7 @@ void reserves::paintEvent(QPaintEvent *event)
     //判断百分比方式，显示或不显示
     if(m_percentShow==Yes)//显示
     {
-        QPen pen3(textcolor());
+        QPen pen3(textColor());
         painter3.setPen(pen3);
 
         //读写文本
