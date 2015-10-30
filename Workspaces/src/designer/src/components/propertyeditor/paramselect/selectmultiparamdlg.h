@@ -14,7 +14,7 @@ class QSelectMultiParamDlg_UI;
 #define  Q_SelectMultiParamDlg_EXPORT
 #endif
 #else
-#define Q_SelectMultiParamDlg_EXPORT
+#define Q_SelectMultiParamDlg_EXPORT Q_DECL_EXPORT
 #endif
 
 class Q_SelectMultiParamDlg_EXPORT QSelectMultiParamDlg : public QDialog

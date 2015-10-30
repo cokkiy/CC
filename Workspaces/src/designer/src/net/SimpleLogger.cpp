@@ -6,7 +6,6 @@
 
 #ifdef Q_OS_WIN
 #include <io.h>
-#define S_IROTH _S_IREAD  
 #endif
 
 #ifdef Q_OS_LINUX
@@ -16,10 +15,11 @@
 #define _write write
 #define _close close
 #define _open open
+#define _tzset tzset
 #define _O_BINARY O_TRUNC
 #define _O_CREAT O_CREAT
 #define _O_WRONLY O_WRONLY
-#define _S_IWRITE S_IWRITE
+#define _S_IWRITE S_IWUSR|S_IRUSR|S_IRGRP|S_IROTH
 #endif
 
 
@@ -155,7 +155,7 @@ bool SimpleLogger::init(string path, bool isPrimaryChannel)
         sprintf(filename, "%s/received-%d%02d%02d-%02d%02d%02d-backup-channel.dat\0", path.c_str(),
             now->tm_year + 1900, now->tm_mon + 1, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     }
-    file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE | S_IROTH);
+    file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE );
 
     //save path
     this->path = path;
