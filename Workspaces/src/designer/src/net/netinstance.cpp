@@ -87,12 +87,12 @@ int NetInstance::load(QString dir)
     {
         dataDir.mkdir(path);
     }
-    if (!primaryChannelLogger.init(QString("%1../private/Data").arg(dir).toStdString(), true))
+    if (!primaryChannelLogger.init(path.toStdString(), true))
     {
         qDebug() << QObject::tr("Create primary channel data record file error.");
     }
 
-    if (!backupChannelLogger.init(QString("%1../private/Data").arg(dir).toStdString(), false))
+    if (!backupChannelLogger.init(path.toStdString(), false))
     {
         qDebug() << QObject::tr("Create backup channel data record file error.");
     }

@@ -6,6 +6,7 @@
 
 #ifdef Q_OS_WIN
 #include <io.h>
+#define S_IROTH _S_IREAD  
 #endif
 
 #ifdef Q_OS_LINUX
@@ -30,18 +31,18 @@ SimpleLogger::SimpleLogger() :file(-1)
 }
 
 //析构函数,释放资源
- SimpleLogger::~SimpleLogger()
- {
-     //stop first
-     stop();
+SimpleLogger::~SimpleLogger()
+{
+    //stop first
+    stop();
 
-     if (buf != nullptr)
-     {
-         delete[] buf;
-         buf = nullptr;
-     }
+    if (buf != nullptr)
+    {
+        delete[] buf;
+        buf = nullptr;
+    }
 
- }
+}
 
 
 /*!
@@ -52,11 +53,11 @@ SimpleLogger::SimpleLogger() :file(-1)
 作者：cokkiy（张立民)
 创建时间：2015/10/08 21:59:26
 */
- void SimpleLogger::log(char* buf, unsigned int size)
- {
-     //put to buffer
-     put2buf(buf, size);
- }
+void SimpleLogger::log(char* buf, unsigned int size)
+{
+    //put to buffer
+    put2buf(buf, size);
+}
 
 /*!
 开始记录数据
@@ -65,7 +66,7 @@ SimpleLogger::SimpleLogger() :file(-1)
 创建时间：2015/10/08 21:59:12
 */
 void SimpleLogger::start()
-{    
+{
     if (file != -1)
     {
         writer = new std::thread(&SimpleLogger::write2file, this);
@@ -84,13 +85,14 @@ void SimpleLogger::stop()
     }
 
     if (index < bufSize)
+    {
+        //还有数据没有写入
+        if (file != -1)
         {
-            //还有数据没有写入
-            if (file != -1)
-            {
-                _write(file, buf, index);            
-            }
+            _write(file, buf, index);
         }
+    }
+    if (file != -1)
         _close(file);    //关闭文件
 
 //    time_t cur;
@@ -138,21 +140,22 @@ void SimpleLogger::logReceivedPacketCount()
 */
 bool SimpleLogger::init(string path, bool isPrimaryChannel)
 {
-    time_t cur;
     _tzset();
+    time_t cur;
     time(&cur);
-    struct tm today;
-    char* filename = new char[path.length() + 64];
+    struct tm* now = localtime(&cur);    
+    char filename[2048];
     if (isPrimaryChannel)
     {
-        sprintf(filename, "%s/net-received-%d-primary-channel.dat", path.c_str(), cur);
+        sprintf(filename, "%s/received-%d%02d%02d-%02d%02d%02d-primary-channel.dat\0", path.c_str(),
+            now->tm_year+1900, now->tm_mon+1, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     }
     else
     {
-        sprintf(filename, "%s/net-received-%d-backup-channel.dat", path.c_str(), cur);
+        sprintf(filename, "%s/received-%d%02d%02d-%02d%02d%02d-backup-channel.dat\0", path.c_str(),
+            now->tm_year + 1900, now->tm_mon + 1, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     }
-    file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE);
-    delete filename;
+    file = _open(filename, _O_BINARY | _O_CREAT | _O_WRONLY, _S_IWRITE | S_IROTH);
 
     //save path
     this->path = path;
@@ -217,5 +220,5 @@ void SimpleLogger::write2file()
             bufList.pop_front();
         }
     }
-   
+
 }
