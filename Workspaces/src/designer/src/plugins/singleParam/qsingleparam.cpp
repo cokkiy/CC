@@ -1,4 +1,4 @@
-﻿#include "qsingleparam.h"
+#include "qsingleparam.h"
 #include <QRect>
 QSingleParam::QSingleParam(QWidget *parent) :
     QWidget(parent)
@@ -192,6 +192,11 @@ void QSingleParam::setPluginRect()
 }
 
 void QSingleParam::resetData()
+{
+    return;
+}
+
+void QSingleParam::resetShowType()
 {
     return;
 }

@@ -193,6 +193,10 @@ QDesignerPropertyEditor::StringPropertyParameters QDesignerPropertyEditor::textP
     if (propertyName.endsWith(QStringLiteral("tableConfig"))) {
         return StringPropertyParameters(ValidationTable, true);
     }
+
+    if (propertyName.endsWith(QStringLiteral("showType"))) {
+        return StringPropertyParameters(ValidationShowType, true);
+    }
     // Fuzzy matching
     if (propertyName.endsWith(QStringLiteral("Name")))
         return StringPropertyParameters(ValidationSingleLine, true);

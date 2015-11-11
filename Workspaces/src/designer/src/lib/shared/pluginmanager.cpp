@@ -320,6 +320,8 @@ static qdesigner_internal::TextPropertyValidationMode typeStringToType(const QSt
         return qdesigner_internal::ValidationStates;
     if (v.endsWith(QStringLiteral("tableConfig")))
         return qdesigner_internal::ValidationTable;
+    if (v.endsWith(QStringLiteral("showType")))
+        return qdesigner_internal::ValidationShowType;
     *ok = false;
     return qdesigner_internal::ValidationRichText;
 }

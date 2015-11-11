@@ -1045,16 +1045,6 @@
          </property>
         </item>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_originpointplace_tab">
-        <property name="geometry">
-         <rect>
-          <x>739</x>
-          <y>29</y>
-          <width>81</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_GraphConfig_tab">

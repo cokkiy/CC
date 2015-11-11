@@ -7641,7 +7641,7 @@ QCPAbstractPlottable::QCPAbstractPlottable(QCPAxis *keyAxis, QCPAxis *valueAxis)
 */
 void QCPAbstractPlottable::setName(const QString &name)
 {
-  mName = name;
+  //mName = name;
 }
 
 /*!
@@ -7825,6 +7825,39 @@ void QCPAbstractPlottable::rescaleAxes(bool onlyEnlarge) const
 
   See \ref rescaleAxes for detailed behaviour.
 */
+//void QCPAbstractPlottable::rescaleKeyAxis(bool onlyEnlarge) const
+//{
+//  QCPAxis *keyAxis = mKeyAxis.data();
+//  if (!keyAxis) { qDebug() << Q_FUNC_INFO << "invalid key axis"; return; }
+
+//  SignDomain signDomain = sdBoth;
+//  if (keyAxis->scaleType() == QCPAxis::stLogarithmic)
+//    signDomain = (keyAxis->range().upper < 0 ? sdNegative : sdPositive);
+
+//  bool foundRange;
+//  QCPRange newRange = getKeyRange(foundRange, signDomain);
+//  if (foundRange)
+//  {
+//    if (onlyEnlarge)
+//      newRange.expand(keyAxis->range());
+//    if (!QCPRange::validRange(newRange)) // likely due to range being zero (plottable has only constant data in this axis dimension), shift current range to at least center the plottable
+//    {
+//      double center = (newRange.lower+newRange.upper)*0.5; // upper and lower should be equal anyway, but just to make sure, incase validRange returned false for other reason
+//      if (keyAxis->scaleType() == QCPAxis::stLinear)
+//      {
+//        newRange.lower = center-keyAxis->range().size()/2.0;
+//        newRange.upper = center+keyAxis->range().size()/2.0;
+//      } else // scaleType() == stLogarithmic
+//      {
+//        newRange.lower = center/qSqrt(keyAxis->range().upper/keyAxis->range().lower);
+//        newRange.upper = center*qSqrt(keyAxis->range().upper/keyAxis->range().lower);
+//      }
+//    }
+//    keyAxis->setRange(newRange);
+//  }
+//}
+
+//zjb add: could change here!
 void QCPAbstractPlottable::rescaleKeyAxis(bool onlyEnlarge) const
 {
   QCPAxis *keyAxis = mKeyAxis.data();
@@ -7845,8 +7878,11 @@ void QCPAbstractPlottable::rescaleKeyAxis(bool onlyEnlarge) const
       double center = (newRange.lower+newRange.upper)*0.5; // upper and lower should be equal anyway, but just to make sure, incase validRange returned false for other reason
       if (keyAxis->scaleType() == QCPAxis::stLinear)
       {
-        newRange.lower = center-keyAxis->range().size()/2.0;
-        newRange.upper = center+keyAxis->range().size()/2.0;
+        //zjb add: could change here!
+          newRange.lower = center-keyAxis->range().size()/2.0;
+          newRange.upper = center+keyAxis->range().size()/2.0;
+//        newRange.lower = center-keyAxis->range().size()/2.0;
+//        newRange.upper = center+keyAxis->range().size()/2.0;
       } else // scaleType() == stLogarithmic
       {
         newRange.lower = center/qSqrt(keyAxis->range().upper/keyAxis->range().lower);
@@ -7856,7 +7892,6 @@ void QCPAbstractPlottable::rescaleKeyAxis(bool onlyEnlarge) const
     keyAxis->setRange(newRange);
   }
 }
-
 /*!
   Rescales the value axis of the plottable so the whole plottable is visible.
 
@@ -12660,10 +12695,12 @@ QList<QCPAxis*> QCPAxisRect::axes() const
 QCPAxis *QCPAxisRect::addAxis(QCPAxis::AxisType type, QCPAxis *axis)
 {
   QCPAxis *newAxis = axis;
-  if (!newAxis)
+  if (!newAxis)//axis不为0时，新建一根轴（按照type类型）
   {
     newAxis = new QCPAxis(this, type);
-  } else // user provided existing axis instance, do some sanity checks
+  }
+  // user provided existing axis instance, do some sanity checks
+  else //axis为0时，即QCPAxis *newAxis = 0;
   {
     if (newAxis->axisType() != type)
     {

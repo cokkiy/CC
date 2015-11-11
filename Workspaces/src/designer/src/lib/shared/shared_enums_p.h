@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -91,6 +91,8 @@ namespace qdesigner_internal {
         ValidationStates,
         //Table
         ValidationTable,
+        //showType
+        ValidationShowType,
         };
 
     // Container types

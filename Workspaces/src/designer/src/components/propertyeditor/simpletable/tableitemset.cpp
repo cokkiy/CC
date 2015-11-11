@@ -51,10 +51,10 @@ tableitemset::tableitemset(QTableCell TableCell,QWidget *parent) :
 
     ui->ShowTypeEdit->setText(TableCell.getShowType());
     QDesktopWidget* pDesk = QApplication::desktop();
-
     uiRect = geometry();
+    setFixedHeight(uiRect.height());
     bMoreOperate = false;
-    setGeometry((pDesk->width() - uiRect.width())/2,(pDesk->height() - uiRect.height())/2,uiRect.width()/2,uiRect.height());
+    setGeometry((pDesk->width() - uiRect.width()/2)/2,(pDesk->height() - uiRect.height())/2,uiRect.width()/2,uiRect.height());
 }
 
 tableitemset::~tableitemset()
@@ -154,6 +154,7 @@ void tableitemset::on_moreButton_clicked()
 
 void tableitemset::on_SelectShowType_clicked()
 {
-    QConfigShowTypeDialog dlg;
-    dlg.exec();
+    QConfigShowTypeDialog dlg(this,ui->ShowTypeEdit->text());
+    if(dlg.exec() == QDialog::Accepted)
+        ui->ShowTypeEdit->setText(dlg.getShowTypeStr());
 }

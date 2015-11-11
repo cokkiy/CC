@@ -41,7 +41,7 @@ QString staticgraph1Plugin::group() const
 */
 QString staticgraphPlugin::name() const
 {
-    return tr("staticgraph");
+    return QLatin1String("staticgraph");
 }
 
 
@@ -88,8 +88,8 @@ QString staticgraphPlugin::domXml() const
     xmls += "\">\n";
     xmls += "   <property name=\"geometry\">\n";
     xmls += "       <rect>\n";
-    xmls += "       <x>0</x>\n";
-    xmls += "       <y>0</y>\n";
+    xmls += "       <x>150</x>\n";
+    xmls += "       <y>130</y>\n";
     xmls += "       <width>600</width>\n";
     xmls += "       <height>600</height>\n";
     xmls += "       </rect>\n";

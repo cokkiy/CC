@@ -23,11 +23,65 @@ GraphObj::~GraphObj()
 {
     delete ui;
 }
+//左移曲线
+void GraphObj::on_pushButton_leftmove_clicked()
+{
+    //先做判断，至少已拥有2条及2条以上曲线
+     qint32 numOfgraph = ui->tabWidget->count();//获取曲线总数
+     if(numOfgraph>=2)
+     {
+         //第1步
+         //先把当前曲线及前1条曲线的索引号存起来
+         qint32 currentindex;
+         currentindex= ui->tabWidget->currentIndex();//当前曲线索引号
+         if(currentindex>=1)
+         {
+             //第2步
+             //取到current窗口
+             GraphObjDlg * t_current = (GraphObjDlg*)(ui->tabWidget->widget(currentindex));
+             //标注添加曲线的tab名称
+             QString strtabName;//标注添加曲线的tab名称---不带索引
+             strtabName = (t_current->m_GraphName);
+             //获取插入曲线的位置，在当前曲线相邻曲线的左侧
+             qint32 insertgraphindexplace = currentindex-1;
+             //添加tab
+             ui->tabWidget->insertTab(insertgraphindexplace,t_current, strtabName);//插入曲线的tab标签名字
+             //设置为当前tab
+             ui->tabWidget->setCurrentWidget(t_current);
+         }
+
+     }
+
+}
 
 
+//右移曲线
+void GraphObj::on_pushButton_rightmove_clicked()
+{
+    //先做判断，至少已拥有2条及2条以上曲线
+    qint32 numOfgraph = ui->tabWidget->count();//获取曲线总数
+    if(numOfgraph>=2)
+    {
+        //第1步
+        //先把当前曲线及前1条曲线的索引号存起来
+        qint32 currentindex;
+        currentindex= ui->tabWidget->currentIndex();//当前曲线索引号
+        //第2步
+        //取到current窗口
+        GraphObjDlg * t_current = (GraphObjDlg*)(ui->tabWidget->widget(currentindex));
+        //标注添加曲线的tab名称
+        QString strtabName;//标注添加曲线的tab名称---不带索引
+        strtabName = (t_current->m_GraphName);
+        //获取插入曲线的位置，在当前曲线相邻曲线的右侧
+        qint32 insertgraphindexplace = currentindex+1;
+        //添加tab
+        ui->tabWidget->insertTab(insertgraphindexplace,t_current, strtabName);//插入曲线的tab标签名字
+        //设置为当前tab
+        ui->tabWidget->setCurrentWidget(t_current);
 
+    }
 
-
+}
 
 //添加新曲线
 void GraphObj::on_pushButton_AddNewObj_clicked()
@@ -86,13 +140,10 @@ void GraphObj::on_pushButton_AddNewObj_clicked()
         obj.insert("XAxisScalelabeloffset_y",tt->m_XAxisScalelabeloffset_y);//第48
         obj.insert("YAxisScalelabeloffset_x",tt->m_YAxisScalelabeloffset_x);//第47
         obj.insert("YAxisScalelabeloffset_y",tt->m_YAxisScalelabeloffset_y);//第48
-
     }
-
 
     //使用配好的Json对象，进行新的页面的创建
     GraphObjDlg * t = new GraphObjDlg(obj, this);
-
 
     //标注添加曲线的tab名称
     QString strtabName;//标注添加曲线的tab名称---不带索引
@@ -108,19 +159,12 @@ void GraphObj::on_pushButton_AddNewObj_clicked()
     //设置为当前tab
     ui->tabWidget->setCurrentWidget(t);
 
-
-
     //获取曲线总数，填充到曲线统计文本框
     qint32 numOftab=ui->tabWidget->count();
     QString numOftabstr = QString::number(numOftab);
     ui->lineEdit_numofgraph->setText(numOftabstr);
 
     update();
-
-
-
-
-
 }
 
 //删除当前曲线
@@ -225,46 +269,7 @@ void GraphObj::InitControl(QString str)
 }
 
 
-////左移曲线
-//void GraphDialog::on_pushButton_leftmovegraph_target_clicked()
-//{
 
-//    //思路：把当前2个窗口存起来，然后用setTabOrder()进行交换
-//    //第一步
-//    //先把当前曲线及前1条曲线的索引号存起来
-//    qint32 graphindex;
-//    graphindex= ui->tabWidget->currentIndex()-1;
-//    //第二步
-//    //取到左边窗口和右边窗口
-//    QWidget *widget_right = ui->tabWidget->currentWidget();//right widget
-//    ui->tabWidget->setCurrentIndex(graphindex);
-//    QWidget *widget_left = ui->tabWidget->currentWidget();//left widget
-
-//    ui->tabWidget->setTabOrder(widget_right,widget_left);
-
-//    numOfgraph = ui->tabWidget->count();//获取曲线总数
-
-//}
-
-
-////右移曲线
-//void GraphDialog::on_pushButton_rightmovegraph_target_clicked()
-//{
-//    //第一步
-//    //先把当前曲线及后1条曲线的索引号存起来
-//    qint32 graphindex;
-//    graphindex= ui->tabWidget->currentIndex()+1;
-//    //第二步
-//    //取到左边窗口和右边窗口
-//    QWidget *widget_left = ui->tabWidget->currentWidget();//left widget
-//    ui->tabWidget->setCurrentIndex(graphindex);
-//    QWidget *widget_right = ui->tabWidget->currentWidget();//right widget
-
-//    ui->tabWidget->setTabOrder(widget_right,widget_left);
-
-//    numOfgraph = ui->tabWidget->count();//获取曲线总数
-
-//}
 
 
 

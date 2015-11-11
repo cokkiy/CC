@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -268,6 +268,7 @@ namespace qdesigner_internal {
         case ValidationFile:
         case ValidationStates:
         case ValidationTable:
+        case ValidationShowType:
         case Validation2wmapObj:
         case Validation2wmapStatic:
             m_lineEdit->setReadOnly(true);
@@ -397,7 +398,8 @@ namespace qdesigner_internal {
         return validationMode == ValidationMultiLine || validationMode == ValidationStyleSheet
              || validationMode == ValidationRichText || validationMode == ValidationData
              || validationMode == ValidationDataes || validationMode == ValidationFile
-             || validationMode == ValidationStates|| validationMode == ValidationTable;
+             || validationMode == ValidationStates|| validationMode == ValidationTable
+             || validationMode == ValidationShowType;
     }
 
     // Replace newline characters literal "\n"  for inline editing in mode ValidationMultiLine

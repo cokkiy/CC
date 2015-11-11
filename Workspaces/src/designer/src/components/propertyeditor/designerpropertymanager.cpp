@@ -52,7 +52,7 @@
 #include "paramselect/selectparamdialog.h"
 #include "paramselect/selectmultiparamdlg.h"
 #include "simpletable/tablepropertysetDlg.h"
-
+#include "configshowtype/configshowtypedialog.h"
 
 #include <formwindowbase_p.h>
 #include <textpropertyeditor_p.h>
@@ -384,8 +384,8 @@ void TextEditor::setTextPropertyValidationMode(TextPropertyValidationMode vm)
     m_button->setVisible(vm == ValidationStyleSheet || vm == ValidationRichText
                          || vm == ValidationMultiLine || vm == ValidationURL
                          || vm == ValidationData || vm == ValidationDataes
-                         || vm == ValidationFile|| vm == ValidationStates
-                         || vm == ValidationTable
+                         || vm == ValidationFile || vm == ValidationStates
+                         || vm == ValidationTable|| vm == ValidationShowType
                          ||vm == Validation2wmapObj||vm == Validation2wmapStatic
                          ||vm == ValidationGraphObj);
 }
@@ -535,6 +535,7 @@ void TextEditor::buttonClicked()
         newText = dlg.transArrayJson();//将构建的Json字符串赋值给传输字符串
     }
         break;
+
     case ValidationTable:
         {
             QTablePropertySetDlg dlg(this , oldText);
@@ -543,6 +544,17 @@ void TextEditor::buttonClicked()
             newText = dlg.getTableProperty().toJsonStr(1.0,1.0);
         }
             break;
+
+    case ValidationShowType:
+        {
+            QConfigShowTypeDialog dlg(this , oldText);
+            if (dlg.exec()!= QDialog::Accepted )
+                return;
+            newText = dlg.getShowTypeStr();
+        }
+            break;
+        //
+
         default:
             return;
     }

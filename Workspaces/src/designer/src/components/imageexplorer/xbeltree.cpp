@@ -426,16 +426,16 @@ void XbelTree::createActions()
     connect(removeFolderAction,SIGNAL(triggered()),this,SLOT(removeFolder()));
     createPageAction = new QAction(tr("createPage"),this);
     connect(createPageAction,SIGNAL(triggered()),this,SLOT(createPage()));
-    createPageAction->setStatusTip("createPage");
+    createPageAction->setStatusTip(tr("createPage"));
     removePageAction = new QAction(tr("removePage"),this);
     connect(removePageAction,SIGNAL(triggered()),this,SLOT(removePage()));
-    moveUpAction = new QAction("moveUp",this);
+    moveUpAction = new QAction(tr("moveUp"),this);
     connect(moveUpAction,SIGNAL(triggered()),this,SLOT(moveUp()));
-    moveDownAction = new QAction("moveDown",this);
+    moveDownAction = new QAction(tr("moveDown"),this);
     connect(moveDownAction,SIGNAL(triggered()),this,SLOT(moveDown()));
-    moveTopAction = new QAction("moveTop",this);
+    moveTopAction = new QAction(tr("moveTop"),this);
     connect(moveTopAction,SIGNAL(triggered()),this,SLOT(moveTop()));
-    moveBottomAction = new QAction("moveBottom",this);
+    moveBottomAction = new QAction(tr("moveBottom"),this);
     connect(moveBottomAction,SIGNAL(triggered()),this,SLOT(moveBottom()));
 }
 

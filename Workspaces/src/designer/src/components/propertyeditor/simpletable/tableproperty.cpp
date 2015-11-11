@@ -194,32 +194,32 @@ QString QTableProperty::toJsonStr(float wr,float hr)
                 TableCell = m_TableVector.at(j);
                 int width = TableCell.getWidth()*wr;
                 TableCell = m_TableVector.at(i*m_iColNum + j);
-                stateObject[QObject::tr("Param")] = TableCell.getParamStr();
-                stateObject[QObject::tr("Formula")] = TableCell.getFormulaStr();
-                stateObject[QObject::tr("ShowType")] = TableCell.getShowType();
-                stateObject[QObject::tr("Text")] = TableCell.getText();
-                stateObject[QObject::tr("TextType")] = TableCell.getTextType();
-                stateObject[QObject::tr("TextColor")] = (int)TableCell.getTextColor().rgb();
-                stateObject[QObject::tr("Font")] = TableCell.getTextFont().toString();
-                stateObject[QObject::tr("TextVAlignment")] = (int)TableCell.getTextVAlignment();
-                stateObject[QObject::tr("TextHAlignment")] = (int)TableCell.getTextHAlignment();
-                stateObject[QObject::tr("BGColor")] = (int)TableCell.getBackgroundColor().rgba();
-                stateObject[QObject::tr("height")] = height;
-                stateObject[QObject::tr("width")] = width;
-                stateObject[QObject::tr("TopEdgeVisible")] = (int)TableCell.getTopEdgeVisible();
-                stateObject[QObject::tr("LeftEdgeVisible")] = (int)TableCell.getLeftEdgeVisible();
-                stateObject[QObject::tr("LeftMargin")] = TableCell.getLeftMargin();
-                stateObject[QObject::tr("RightMargin")] = TableCell.getRightMargin();
-                stateObject[QObject::tr("TopMargin")] = TableCell.getTopMargin();
-                stateObject[QObject::tr("BottomMargin")] = TableCell.getBottomMargin();
+                stateObject[QLatin1String("Param")] = TableCell.getParamStr();
+                stateObject[QLatin1String("Formula")] = TableCell.getFormulaStr();
+                stateObject[QLatin1String("ShowType")] = TableCell.getShowType();
+                stateObject[QLatin1String("Text")] = TableCell.getText();
+                stateObject[QLatin1String("TextType")] = TableCell.getTextType();
+                stateObject[QLatin1String("TextColor")] = (int)TableCell.getTextColor().rgb();
+                stateObject[QLatin1String("Font")] = TableCell.getTextFont().toString();
+                stateObject[QLatin1String("TextVAlignment")] = (int)TableCell.getTextVAlignment();
+                stateObject[QLatin1String("TextHAlignment")] = (int)TableCell.getTextHAlignment();
+                stateObject[QLatin1String("BGColor")] = (int)TableCell.getBackgroundColor().rgba();
+                stateObject[QLatin1String("height")] = height;
+                stateObject[QLatin1String("width")] = width;
+                stateObject[QLatin1String("TopEdgeVisible")] = (int)TableCell.getTopEdgeVisible();
+                stateObject[QLatin1String("LeftEdgeVisible")] = (int)TableCell.getLeftEdgeVisible();
+                stateObject[QLatin1String("LeftMargin")] = TableCell.getLeftMargin();
+                stateObject[QLatin1String("RightMargin")] = TableCell.getRightMargin();
+                stateObject[QLatin1String("TopMargin")] = TableCell.getTopMargin();
+                stateObject[QLatin1String("BottomMargin")] = TableCell.getBottomMargin();
                 stateArray.append(stateObject);//将每一行Json字符串添加到Json数组
         }
     }
     QJsonDocument doc2(stateArray);
     QByteArray byte_array = doc2.toJson(QJsonDocument::Compact);
 	//在单元格属性json字符串前插入行列数字符串
-    jsonStr = QString(QObject::tr("%1,%2")).arg(m_iRowNum).arg(m_iColNum);
-    jsonStr += QObject::tr(byte_array);//将构建的Json数组赋值给接口接收字符串
+    jsonStr = QString(("%1,%2")).arg(m_iRowNum).arg(m_iColNum);
+    jsonStr += QString(byte_array);//将构建的Json数组赋值给接口接收字符串
     return jsonStr;
 }
 //解析传入的字符串，该字符串包括表格的行列数和所有单元格的属性
@@ -282,29 +282,29 @@ bool QTableProperty::initTableVector(const QString jsonStr)
                 {
                     QJsonObject name = value.toObject();
                     QTableCell TableCell;
-                    TableCell.setParamStr(name.value(QObject::tr("Param")).toString());
-                    TableCell.setFormulaStr((name.value(QObject::tr("Formula")).toString()));
-                    TableCell.setText((name.value(QObject::tr("Text")).toString()));
-                    TableCell.setShowType(name.value(QObject::tr("ShowType")).toString());
-                    TableCell.setTextType(name.value(QObject::tr("TextType")).toInt());
+                    TableCell.setParamStr(name.value(QLatin1String("Param")).toString());
+                    TableCell.setFormulaStr((name.value(QLatin1String("Formula")).toString()));
+                    TableCell.setText((name.value(QLatin1String("Text")).toString()));
+                    TableCell.setShowType(name.value(QLatin1String("ShowType")).toString());
+                    TableCell.setTextType(name.value(QLatin1String("TextType")).toInt());
                     QColor color;
-                    color.setRgb(name.value(QObject::tr("TextColor")).toInt());
+                    color.setRgb(name.value(QLatin1String("TextColor")).toInt());
                     TableCell.setTextColor(color);
                     QFont font;
-                    font.fromString(name.value(QObject::tr("Font")).toString());
+                    font.fromString(name.value(QLatin1String("Font")).toString());
                     TableCell.setTextFont(font);
-                    TableCell.setTextHAlignment((Qt::Alignment)name.value(QObject::tr("TextHAlignment")).toInt());
-                    TableCell.setTextVAlignment((Qt::Alignment)name.value(QObject::tr("TextVAlignment")).toInt());
-                    color.setRgba(name.value(QObject::tr("BGColor")).toInt());
+                    TableCell.setTextHAlignment((Qt::Alignment)name.value(QLatin1String("TextHAlignment")).toInt());
+                    TableCell.setTextVAlignment((Qt::Alignment)name.value(QLatin1String("TextVAlignment")).toInt());
+                    color.setRgba(name.value(QLatin1String("BGColor")).toInt());
                     TableCell.setBackgroundColor(color);
-                    TableCell.setHeight(name.value(QObject::tr("height")).toInt());
-                    TableCell.setWidth(name.value(QObject::tr("width")).toInt());
-                    TableCell.setTopEdgeVisible(name.value(QObject::tr("TopEdgeVisible")).toInt());
-                    TableCell.setLeftEdgeVisible(name.value(QObject::tr("LeftEdgeVisible")).toInt());
-                    TableCell.setLeftMargin(name.value(QObject::tr("LeftMargin")).toInt());
-                    TableCell.setRightMargin(name.value(QObject::tr("RightMargin")).toInt());
-                    TableCell.setTopMargin(name.value(QObject::tr("TopMargin")).toInt());
-                    TableCell.setBottomMargin(name.value(QObject::tr("BottomMargin")).toInt());
+                    TableCell.setHeight(name.value(QLatin1String("height")).toInt());
+                    TableCell.setWidth(name.value(QLatin1String("width")).toInt());
+                    TableCell.setTopEdgeVisible(name.value(QLatin1String("TopEdgeVisible")).toInt());
+                    TableCell.setLeftEdgeVisible(name.value(QLatin1String("LeftEdgeVisible")).toInt());
+                    TableCell.setLeftMargin(name.value(QLatin1String("LeftMargin")).toInt());
+                    TableCell.setRightMargin(name.value(QLatin1String("RightMargin")).toInt());
+                    TableCell.setTopMargin(name.value(QLatin1String("TopMargin")).toInt());
+                    TableCell.setBottomMargin(name.value(QLatin1String("BottomMargin")).toInt());
                     m_TableVector.push_back(TableCell);
                 }
             }

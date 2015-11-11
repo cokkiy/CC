@@ -35,10 +35,10 @@ private slots:
     //删除选中曲线
     void on_pushButton_DelCurrentObj_clicked();
 
-//    //左移曲线
-//    void on_pushButton_leftmove_clicked();
-//    //右移曲线
-//    void on_pushButton_rightmove_clicked();
+    //左移曲线
+    void on_pushButton_leftmove_clicked();
+    //右移曲线
+    void on_pushButton_rightmove_clicked();
 
     //保存退出
     void on_pushButton_SaveQuit_clicked();

@@ -1,4 +1,4 @@
-﻿#ifndef QSINGLEPARAM_H
+#ifndef QSINGLEPARAM_H
 #define QSINGLEPARAM_H
 #include <Net/NetComponents>
 #include <QWidget>
@@ -8,7 +8,7 @@ class QSingleParam : public QWidget
     Q_OBJECT
     //文本属性
     Q_PROPERTY(QString data READ textString WRITE setTextString RESET resetData)
-    Q_PROPERTY(QString showType READ getShowType WRITE setShowType)
+    Q_PROPERTY(QString showType READ getShowType WRITE setShowType RESET resetShowType)
     Q_PROPERTY(QFont font READ getFont WRITE setFont)
     Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor )
@@ -36,6 +36,7 @@ public:
 
      QString getShowType() const {return showType;}
      void setShowType(const QString string);
+     void resetShowType();
 
      QFont getFont() const {return font;}
      void setFont(const QFont Font);

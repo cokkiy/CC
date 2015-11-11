@@ -57,7 +57,7 @@ void staticgraph::timerEvent(QTimerEvent *event)
     Q_D(staticgraph);
 
 
-    d->getData_Test();//获取自己设计的测试数据
+//    d->getData_Test();//获取自己设计的测试数据
 
     d->getData();//获取从外部net模块接收的数据
 
@@ -69,8 +69,10 @@ void staticgraph::paintEvent(QPaintEvent *event)
 {
     Q_D(staticgraph);//创建私有类指针d,d为staticgraphPrivate类对象的指针
 
+    d->setPlotOfInitialization();
+    //设置画图更新的配置参数----根据多曲线配置对话框所作的坐标轴参数静态配置
+    d->setPlotOfAxis();
     d->setPlot();//工作代码
-
     d->update();      //更新绘图
 }
 

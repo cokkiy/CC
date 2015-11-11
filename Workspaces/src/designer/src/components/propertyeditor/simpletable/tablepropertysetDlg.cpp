@@ -25,6 +25,7 @@ QTablePropertySetDlg::QTablePropertySetDlg(QWidget *parent,QString tableproperty
     m_iColNum = m_TableProperty.getColNum();
     MainMenu = new QMenu(this);
     ui->setupUi(this);
+    this->setFixedSize(geometry().width(),geometry().height());
     initMenu();
     setWindowTitle(tr("表格属性设置"));
     setTableWidgetProperty();

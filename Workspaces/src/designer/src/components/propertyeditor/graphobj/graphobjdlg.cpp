@@ -19,9 +19,9 @@ GraphObjDlg::GraphObjDlg(QJsonObject jobj, QWidget *parent) :
     {
 
         //给曲线赋默认值
-        m_Xmax = 80 ;
+        m_Xmax = 1000 ;
         m_Xmin = 0 ;
-        m_Ymax = 80 ;
+        m_Ymax = 1000 ;
         m_Ymin = 0 ;
         m_XAxisLabel = QString("X");
         m_YAxisLabel = QString("Y");

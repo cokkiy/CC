@@ -11,15 +11,15 @@ class staticgraphPrivate;//提前在此声明，加快编译速度，相当于�
 class staticgraph : public QWidget
 {
     Q_OBJECT
-
-
+    //数据属性
     //多曲线配置对话框
     Q_PROPERTY(QString graphobj READ textString WRITE setTextString RESET rsttext)
 
-    //共性部分
-
-    //图元矩形
-    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
+    //图元曲线属性
+    //显示网格
+    Q_PROPERTY(bool showGrid READ getShowGrid WRITE setShowGrid)
+    //显示图例
+    Q_PROPERTY(bool showLegend READ getShowLegend WRITE setShowLegend)
 
     //背景属性
     //背景色
@@ -27,19 +27,19 @@ class staticgraph : public QWidget
     //背景图片
     Q_PROPERTY(QPixmap backgroundImage READ backgroundImage WRITE setbackgroundImage)
 
-    //显示网格
-    Q_PROPERTY(bool showGrid READ getShowGrid WRITE setShowGrid)
-
-    //显示图例
-    Q_PROPERTY(bool showLegend READ getShowLegend WRITE setShowLegend)
-
     //页边距属性
     Q_PROPERTY(qint32 leftMargin READ getleftMargin WRITE setleftMargin)
     Q_PROPERTY(qint32 topMargin READ gettopMargin WRITE settopMargin)
     Q_PROPERTY(qint32 rightMargin READ getrightMargin WRITE setrightMargin)
     Q_PROPERTY(qint32 bottomMargin READ getbottomMargin WRITE setbottomMargin)
-   //个性部分
-
+    //设置图元大小策略的属性
+    Q_PROPERTY(QSizePolicy sizePolicy READ sizePolicy WRITE setSizePolicy)
+    Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
+    Q_PROPERTY(QSize maximumSize READ maximumSize WRITE setMaximumSize)
+    Q_PROPERTY(QSize sizeIncrement READ sizeIncrement WRITE setSizeIncrement)
+    Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize)
+    //区域属性
+    Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry)
 
 public:
     //构造函数
