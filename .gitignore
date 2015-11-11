@@ -214,7 +214,8 @@ ModelManifest.xml
 #qt files
 qttools.pro.user
 qttools.pro.user.*
-
+*.qph
+*.qm
 #exclude path
 /.vs
 /.svn
@@ -231,4 +232,5 @@ qttools.pro.user.*
 /ipch
 /mkspecs
 /tests
-
+**/GeneratedFiles
+**/Icons
