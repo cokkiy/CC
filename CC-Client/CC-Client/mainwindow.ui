@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>微软雅黑</family>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>中控控制台</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="cc-client.qrc">
+    <normaloff>:/Icons/ncom003.ico</normaloff>:/Icons/ncom003.ico</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="opaqueResize">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="font">
+                <font>
+                 <family>微软雅黑</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>过滤：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="filterLineEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>输入过滤条件</string>
+               </property>
+               <property name="statusTip">
+                <string>输入过滤条件</string>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="filterToolButton">
+               <property name="toolTip">
+                <string>编辑过滤条件</string>
+               </property>
+               <property name="statusTip">
+                <string>编辑过滤条件</string>
+               </property>
+               <property name="text">
+                <string>▼</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>18</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>显示方式：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="displayModeComboBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>选择显示方式</string>
+               </property>
+               <property name="statusTip">
+                <string>选择显示方式</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Small Icons</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Larger Icons</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>List</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Detail</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>13</width>
+                 <height>18</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>排序：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="sortComboBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>选择排序方式</string>
+               </property>
+               <property name="statusTip">
+                <string>选择排序方式</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>IP</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IP DESC</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>State</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>State DESC</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Name</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Name DESC</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QListView" name="listView">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="textElideMode">
+              <enum>Qt::ElideNone</enum>
+             </property>
+             <property name="viewMode">
+              <enum>QListView::ListMode</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableView" name="tableView">
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+              <bool>true</bool>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1024</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuControl">
+    <property name="title">
+     <string>控制(&amp;C)</string>
+    </property>
+    <addaction name="actionAllPower_On"/>
+    <addaction name="actionStartAllApp"/>
+    <addaction name="separator"/>
+    <addaction name="actionExitAllZXApp"/>
+    <addaction name="actionAll_Shutdown"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuMonitor">
+    <property name="title">
+     <string>监视(&amp;M)</string>
+    </property>
+    <addaction name="actionCPU"/>
+    <addaction name="actionMemory"/>
+    <addaction name="separator"/>
+    <addaction name="actionAppCPU"/>
+    <addaction name="actionAppMemory"/>
+    <addaction name="separator"/>
+    <addaction name="actionAppThreadCount"/>
+    <addaction name="actionProcCount"/>
+   </widget>
+   <addaction name="menuControl"/>
+   <addaction name="menuMonitor"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAllPower_On">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_108.png</normaloff>:/Icons/52design.com_jingying_108.png</iconset>
+   </property>
+   <property name="text">
+    <string>全部开机...</string>
+   </property>
+   <property name="toolTip">
+    <string>打开指定计算机</string>
+   </property>
+  </action>
+  <action name="actionAll_Power_On">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
+   </property>
+   <property name="text">
+    <string>全部开机</string>
+   </property>
+   <property name="toolTip">
+    <string>开启全部计算机</string>
+   </property>
+  </action>
+  <action name="actionShutdown">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_098.png</normaloff>:/Icons/52design.com_jingying_098.png</iconset>
+   </property>
+   <property name="text">
+    <string>关机...</string>
+   </property>
+   <property name="toolTip">
+    <string>关闭指定计算机</string>
+   </property>
+  </action>
+  <action name="actionAll_Shutdown">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/App12.jpg</normaloff>:/Icons/App12.jpg</iconset>
+   </property>
+   <property name="text">
+    <string>全部关机</string>
+   </property>
+   <property name="toolTip">
+    <string>关闭全部计算机</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset>
+     <normalon>:/Icons/52design.com_3d_08.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>退出</string>
+   </property>
+   <property name="toolTip">
+    <string>退出程序</string>
+   </property>
+  </action>
+  <action name="actionStartAllApp">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
+   </property>
+   <property name="text">
+    <string>启动指显...</string>
+   </property>
+   <property name="toolTip">
+    <string>启动全部工作站指显软件</string>
+   </property>
+   <property name="statusTip">
+    <string>启动全部工作站指显软件</string>
+   </property>
+  </action>
+  <action name="actionExitAllZXApp">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_alth_171.png</normaloff>:/Icons/52design.com_alth_171.png</iconset>
+   </property>
+   <property name="text">
+    <string>退出指显</string>
+   </property>
+   <property name="toolTip">
+    <string>退出全部工作站指显软件</string>
+   </property>
+   <property name="statusTip">
+    <string>退出全部工作站指显软件</string>
+   </property>
+  </action>
+  <action name="actionCPU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>CPU占用率</string>
+   </property>
+  </action>
+  <action name="actionMemory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>内存占用率</string>
+   </property>
+  </action>
+  <action name="actionAppCPU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>指显CPU占用率</string>
+   </property>
+  </action>
+  <action name="actionAppMemory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>指显内存占用率</string>
+   </property>
+  </action>
+  <action name="actionProcCount">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>进程数量</string>
+   </property>
+  </action>
+  <action name="actionAppThreadCount">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>指显线程数量</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="cc-client.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
