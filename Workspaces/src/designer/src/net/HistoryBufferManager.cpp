@@ -100,6 +100,14 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
     list<HistoryParam> retBuf;
     HistoryParams::reverse_iterator it;
     GCWrapper& wrapper = m_historyParamBuffer[INDEX(tabNo, paramNo)];
+
+    while (wrapper.clearing)
+    {
+        //等待直到清除数据结束
+        //该处不会死锁是基于清屏不会连续进行这一假设的
+    }
+    wrapper.reading = true;
+
     HistoryParams* pbuf = wrapper.getBuffer();
     int t_date, t_time = 0;
     //从最后一个vector开始取数据
@@ -151,6 +159,7 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
         date = t_date;
         time = t_time;
     }
+    wrapper.reading = false; //读取结束
     return retBuf;
 }
 
@@ -166,8 +175,13 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
 std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, unsigned short paramNo, size_t & index)
 {
     list<HistoryParam> retBuf; 
-    GCWrapper& wrapper = m_historyParamBuffer[INDEX(tabNo, paramNo)];
-    
+    GCWrapper& wrapper = m_historyParamBuffer[INDEX(tabNo, paramNo)];    
+    while (wrapper.clearing)
+    {
+        //等待直到清除数据结束
+        //该处不会死锁是基于清屏不会连续进行这一假设的
+    }
+    wrapper.reading = true;
     //根据GC修正index
     size_t realIndex = index - ((size_t)wrapper.collectedCount)* wrapper.vectorSize;
     if (realIndex < 0)
@@ -209,7 +223,7 @@ std::list<HistoryParam> HistoryBufferManager::getParams(unsigned short tabNo, un
         }
         indexInVector = 0; //取完第一个vector的数据后,从头开始取
     }
-    
+    wrapper.reading = false; //读取结束
     return retBuf;
 }
 
@@ -252,4 +266,49 @@ void HistoryBufferManager::releaseAll()
     }
     //清空缓冲区队列
     m_historyParamBuffer.clear();
+}
+
+/*!
+清除beginTabNo和endTabNo之间的全部数据
+@param unsigned short beginTabNo 开始表号
+@param unsigned short endTabNo 结束表号
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/11 15:54:30
+*/
+void HistoryBufferManager::clear(unsigned short beginTabNo, unsigned short endTabNo)
+{
+    unsigned int begin = ((unsigned int)beginTabNo) << 16;
+    unsigned int end = ((unsigned int)endTabNo) << 16;
+    for (auto& paramMapItem : m_historyParamBuffer)
+    {
+        if (paramMapItem.first >= begin&&paramMapItem.first <= end)
+        {
+            GCWrapper& wrapper = paramMapItem.second;
+            HistoryBufferManager::HistoryParams* org = wrapper.pParamsBuf;
+            lockForWriteBuf.lock(); //防止写入异常
+            wrapper.pParamsBuf = new HistoryBufferManager::HistoryParams();
+            wrapper.curVectorIndex = 0;
+            wrapper.collectedCount = 0; //清屏后需要重置读计数
+            lockForWriteBuf.unlock();    
+            //读可能连续读,但清屏不会是连续的,所以可以安全的置为true后等待读结束
+            wrapper.clearing = true; 
+            while (wrapper.reading)
+            {
+                //等待直到读取结束
+            }            
+            for (auto& item : *org)
+            {
+                if (item != nullptr)
+                {
+                    item->clear();
+                    delete item;
+                    item = nullptr;
+                }
+            }
+            org->clear();
+            delete org;
+            wrapper.clearing = false;
+        }
+    }    
 }

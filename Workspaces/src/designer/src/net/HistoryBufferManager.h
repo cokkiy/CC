@@ -20,9 +20,7 @@ private:
     // History Param wrapper for GC
     class GCWrapper
     {
-    private:
-        //存储数据的list
-        HistoryParams* pParamsBuf = nullptr;
+    private:        
         // visited time since last gc collection
         unsigned int visited = 0;
         // writed count since last gc collection
@@ -44,7 +42,12 @@ private:
         std::vector<HistoryParam>* currentVector;
         //当前Verctor写入计数
         unsigned short curVectorIndex;
-
+        //存储数据的list
+        HistoryParams* pParamsBuf = nullptr;
+        //正在读取数据
+        bool reading = false;
+        //正在清除数据
+        bool clearing = false;
     public:
         /*!
         默认构造函数,创建GCWrapper实例
@@ -191,5 +194,15 @@ public:
     创建时间：2015/10/24 12:28:09
     */
      static void releaseAll();
+
+     /*!
+     清除beginTabNo和endTabNo之间的全部数据
+     @param unsigned short beginTabNo 开始表号
+     @param unsigned short endTabNo 结束表号
+     @return void
+     作者：cokkiy（张立民)
+     创建时间：2015/11/11 15:54:30
+     */
+     static void clear(unsigned short beginTabNo, unsigned short endTabNo);
 };
 

@@ -116,6 +116,7 @@ void GC::collect(HistoryBufferManager::HistoryParamMap* pParamMap)
                     wrapper.noWrite = true;
                     HistoryBufferManager::HistoryParams* org = wrapper.pParamsBuf;
                     wrapper.pParamsBuf = new HistoryBufferManager::HistoryParams();
+                    wrapper.curVectorIndex = 0;
                     for (auto& item : *org)
                     {
                         if (item != nullptr)
