@@ -31,7 +31,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/09 21:07:00
     */
-    void show(int posX, int posY);
+    void show(int posX, int posY);    
 
     /*绘制圆形底图*/
     virtual void paintEvent(QPaintEvent *) override;
@@ -119,6 +119,9 @@ private:
     QList<QToolButton*> buttons;
     //按钮大小
     int buttonSize = 54;
+
+    //修正位置
+    void AmendPosition(int &posX, int &posY);    
 
 private slots:
     //关闭菜单

@@ -4,9 +4,36 @@
 #include <QPen>
 #include <QParallelAnimationGroup>
 #include <QtMath>
+#include <QScreen>
 
 //初始化为空指针
 FloatingMenu* FloatingMenu::instance = nullptr;
+
+//修正显示位置
+void FloatingMenu::AmendPosition(int &posX, int &posY)
+{
+    QPoint point = mapToGlobal(QPoint(posX, posY));
+    QSize screenSize = QGuiApplication::primaryScreen()->availableSize();
+    if (point.x() - size() / 2 < 0)
+    {
+        //左边
+        posX += size() / 2 - point.x();
+    }
+    else if (point.x() + size() / 2 > screenSize.width())
+    {
+        //右边
+        posX = screenSize.width() - size() / 2;
+    }
+    if (point.y() - size() / 2 < 0)
+    {
+        //上边
+        posY += size() / 2 - point.y();
+    }
+    else if (point.y() + size() / 2 > screenSize.height())
+    {
+        posY = screenSize.height() - size() / 2;
+    }
+}
 
 //关闭菜单
 void FloatingMenu::closeMe()
@@ -66,6 +93,10 @@ void FloatingMenu::show(int posX, int posY)
         delete instance;
     }
     instance = this;
+
+    //修正坐标,不要超出屏幕边距
+    AmendPosition(posX, posY);
+
     //动画组
     QAnimationGroup* animationGroup = new QParallelAnimationGroup();
     //设置所有按钮动画属性
