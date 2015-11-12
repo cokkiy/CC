@@ -20,6 +20,10 @@ public:
         List,/*列表*/
         Details,/*详细信息*/
     };
+
+    //行数
+    const int totalColumnCount = 11;
+
     /*!
     创建\see StationTableModel对象实例
     @param QObject * parent 父对象

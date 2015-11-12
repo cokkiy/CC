@@ -18,7 +18,31 @@ int StationList::count() const
 作者：cokkiy（张立民)
 创建时间：2015/11/04 12:07:09
 */
-StationInfo& StationList::at(int row)
+StationInfo* StationList::at(int row)
+{
+    return currentStations[row];
+}
+
+/*!
+获取\see row位置的工作站
+@param int row 指定位置
+@return StationInfo \see row位置的工作站信息
+作者：cokkiy（张立民)
+创建时间：2015/11/04 12:07:09
+*/
+StationInfo* StationList::operator[](int row)
+{
+    return currentStations[row];
+}
+
+/*!
+获取\see row位置的工作站引用
+@param int row 指定位置
+@return StationInfo \see row位置的工作站引用
+作者：cokkiy（张立民)
+创建时间：2015/11/04 12:07:09
+*/
+StationInfo& StationList::ref(int row)
 {
     return *currentStations[row];
 }
@@ -30,9 +54,32 @@ StationInfo& StationList::at(int row)
 作者：cokkiy（张立民)
 创建时间：2015/11/10 21:55:38
 */
-StationInfo StationList::at(int row) const
+StationInfo* StationList::at(int row) const
 {
-    return *currentStations[row];
+    return currentStations[row];
+}
+
+/*!
+获取指定工作站在列表中的位置
+@param StationInfo * pStation 工作站
+@return int
+作者：cokkiy（张立民)
+创建时间：2015/11/12 10:50:06
+*/
+int StationList::indexOf(const StationInfo* pStation) const
+{
+    int index = -1;
+    bool isExists = false;
+    for (auto p : currentStations)
+    {
+        index++; // first is 0
+        if (pStation == p)
+        {
+            isExists = true;
+            break;
+        }
+    }
+    return isExists ? index : -1;
 }
 
 /*!

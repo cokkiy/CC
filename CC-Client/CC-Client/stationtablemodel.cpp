@@ -16,7 +16,8 @@ StationTableModel::StationTableModel(const StationList* pStations, QObject *pare
     int count = pStations->count();
     for (int i = 0; i < count; i++)
     {
-        pStations->at(i).subscribePropertyChanged(this, SLOT(stationPropertyChanged(const QString&, const QObject*)));
+        connect(pStations->at(i), SIGNAL(propertyChanged(const QString&, const QObject*)), this, SLOT(stationPropertyChanged(const QString&, const QObject*)));
+        //pStations->at(i).subscribePropertyChanged(this, SLOT(stationPropertyChanged(const QString&, const QObject*)));
     }
 }
 
@@ -32,7 +33,7 @@ int StationTableModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) c
 //返回列数
 int StationTableModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return 11;// Name,IP,State,MAC
+    return totalColumnCount;
 }
 //view 获取数据方法
 QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
@@ -48,8 +49,8 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         if (displayMode==List)
         {
             QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存：%4\tCPU：%5");
-            StationInfo s = pStations->at(index.row());
-            return str.arg(s.name).arg(s.IP).arg(s.state2String()).arg(s.Memory()).arg(s.CPU());
+            StationInfo* s = pStations->at(index.row());
+            return str.arg(s->name).arg(s->IP).arg(s->state2String()).arg(s->Memory()).arg(s->CPU());
         }
         else if(displayMode==Details)
         {
@@ -57,7 +58,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         }
         else
         {
-            return pStations->at(index.row()).name;
+            return pStations->at(index.row())->name;
         }        
     }
 
@@ -77,12 +78,12 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
     {
         QString tip = QStringLiteral("%1\r\nIP：%2\r\n状态：%3");
         auto s = pStations->at(index.row());
-        return tip.arg(s.name).arg(s.IP).arg(s.state2String());
+        return tip.arg(s->name).arg(s->IP).arg(s->state2String());
     }
     if (role == Qt::ForegroundRole)
     {
         QVariant v;
-        switch (pStations->at(index.row()).state())
+        switch (pStations->at(index.row())->state())
         {
         case StationInfo::State::Normal:
         {
@@ -194,7 +195,7 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
     {
         //大图标
         QIcon icon;
-        switch (pStations->at(index.row()).state())
+        switch (pStations->at(index.row())->state())
         {
         case StationInfo::State::Unkonown:
             icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
@@ -229,7 +230,7 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
     {
         //小图标
         QIcon icon;
-        switch (pStations->at(index.row()).state())
+        switch (pStations->at(index.row())->state())
         {
         case StationInfo::State::Unkonown:
             icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(), QIcon::Normal, QIcon::On);
@@ -268,28 +269,28 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
     switch (index.column())
     {
     case 0:
-        return pStations->at(index.row()).name;
+        return pStations->at(index.row())->name;
         break;
     case 1:
-        return pStations->at(index.row()).IP;
+        return pStations->at(index.row())->IP;
     case 2:
-        return pStations->at(index.row()).state2String();
+        return pStations->at(index.row())->state2String();
     case 3:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).CPU(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->at(index.row())->CPU(), 0, 'f', 0);
     case 4:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).Memory(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->at(index.row())->Memory(), 0, 'f', 0);
     case 5:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).ZXCPU(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->at(index.row())->ZXCPU(), 0, 'f', 0);
     case 6:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).ZXMemory(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->at(index.row())->ZXMemory(), 0, 'f', 0);
     case 7:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).TotalMemory());
+        return QStringLiteral("%1").arg(pStations->at(index.row())->TotalMemory());
     case 8:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).ProcCount());
+        return QStringLiteral("%1").arg(pStations->at(index.row())->ProcCount());
     case 9:
-        return QStringLiteral("%1").arg(pStations->at(index.row()).ZXThreadCount());
+        return QStringLiteral("%1").arg(pStations->at(index.row())->ZXThreadCount());
     case 10:
-        return pStations->at(index.row()).mac;
+        return pStations->at(index.row())->mac;
     default:
         break;
     }    
@@ -299,5 +300,9 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
 //工作站状态发生变化
 void StationTableModel::stationPropertyChanged(const QString& propertyName, const QObject* station)
 {
-
+    int row = pStations->indexOf((StationInfo*)station);
+    if (row != -1)
+    {
+        dataChanged(index(row, 0), index(row, totalColumnCount));
+    }
 }

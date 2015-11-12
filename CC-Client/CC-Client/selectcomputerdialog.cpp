@@ -1,4 +1,4 @@
-#include "selectcomputerdialog.h"
+﻿#include "selectcomputerdialog.h"
 #include "ui_selectcomputerdialog.h"
 
 selectComputerDialog::selectComputerDialog(QWidget *parent) :

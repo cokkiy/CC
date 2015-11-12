@@ -7,19 +7,19 @@
  @class: StationInfo 指显工作站信息类,定义了指显工作站
  @see IP, @see MAC @see Name
  **************************************/
-class StationInfo :QObject
+class StationInfo : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(State state READ state WRITE setState)
-    Q_PROPERTY(float CPU READ CPU WRITE setCPU)
-    Q_PROPERTY(float Memory READ Memory WRITE setMemory)
-    Q_PROPERTY(float ZXCPU READ ZXCPU WRITE setZXCPU)
-    Q_PROPERTY(int ProcCount READ ProcCount WRITE setProcCount)
-    Q_PROPERTY(int ZXThreadCount READ ZXThreadCount WRITE setZXThreadCount)
-    Q_PROPERTY(size_t TotalMemory READ TotalMemory WRITE setTotalMemory)
-    Q_PROPERTY(float ZXMemory READ ZXMemory WRITE setZXMemory)
-    Q_PROPERTY(bool ZXIsRunning READ ZXIsRunning WRITE setZXIsRunning)
-    Q_PROPERTY(QString hint READ hint WRITE setHint)
+        Q_PROPERTY(State state READ state WRITE setState)
+        Q_PROPERTY(float CPU READ CPU WRITE setCPU)
+        Q_PROPERTY(float Memory READ Memory WRITE setMemory)
+        Q_PROPERTY(float ZXCPU READ ZXCPU WRITE setZXCPU)
+        Q_PROPERTY(int ProcCount READ ProcCount WRITE setProcCount)
+        Q_PROPERTY(int ZXThreadCount READ ZXThreadCount WRITE setZXThreadCount)
+        Q_PROPERTY(size_t TotalMemory READ TotalMemory WRITE setTotalMemory)
+        Q_PROPERTY(float ZXMemory READ ZXMemory WRITE setZXMemory)
+        Q_PROPERTY(bool ZXIsRunning READ ZXIsRunning WRITE setZXIsRunning)
+        Q_PROPERTY(QString hint READ hint WRITE setHint)
 
 public:
     //工作站状态

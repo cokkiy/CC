@@ -244,7 +244,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
     {
         //根据状态选择
         auto station = pStationList->at(selectedIndexs.first().row());
-        if (station.state() == StationInfo::Unkonown)
+        if (station->state() == StationInfo::Unkonown)
         {
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
             menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
@@ -252,7 +252,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
             menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动指显"));
             menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"));
         }
-        else if(station.state() == StationInfo::Powering)
+        else if(station->state() == StationInfo::Powering)
         {
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
             menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
@@ -262,7 +262,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
         {
             menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
             menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
-            if (station.ZXIsRunning())
+            if (station->ZXIsRunning())
             {
                 menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"), manager, SLOT(restartApp()));
                 menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出指显"), manager, SLOT(exitApp()));
