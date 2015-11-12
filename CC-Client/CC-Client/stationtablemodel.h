@@ -15,7 +15,7 @@ public:
     /*显示模式*/
     enum DisplayMode
     {
-        SmallIcons=0,/*小图标*/
+        SmallIcons = 0,/*小图标*/
         LargerIcons,/*大图标*/
         List,/*列表*/
         Details,/*详细信息*/
@@ -38,7 +38,7 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     //view获取数据的方法
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    
+
     //排序方法
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
     //view获取行标题和列标题
@@ -60,9 +60,13 @@ private:
     //获取列值
     QVariant getColumnValue(const QModelIndex &index) const;
     //显示模式
-     DisplayMode displayMode = SmallIcons;
-     //图标索引
-     int icon_index = 0;
+    DisplayMode displayMode = SmallIcons;
+    //图标索引
+    int icon_index = 0;
+
+    private slots:
+    //工作站状态发生变化
+    void stationPropertyChanged(const QString& propertyName, const QObject* station);
 };
 
 #endif // STATIONTABLEMODEL_H

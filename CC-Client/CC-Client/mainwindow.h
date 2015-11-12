@@ -77,6 +77,8 @@ private:
     StationTableModel *pTableModel = nullptr;
     //table header
     QHeaderView* tableHeader;
+    //更新定时器
+    QTimer* updateTimer;
 
 private slots:
     //点击标题栏排序

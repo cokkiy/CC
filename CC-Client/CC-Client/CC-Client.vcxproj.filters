@@ -143,6 +143,9 @@
     <ClCompile Include="Release\moc_stationmanager.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="Debug\moc_StationInfo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.h">
@@ -167,6 +170,9 @@
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="stationmanager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StationInfo.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -314,9 +320,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xelement.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StationInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StationList.h">

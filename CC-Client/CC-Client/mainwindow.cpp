@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //创建更新定时器
+    updateTimer = new QTimer();
+    //connect(updateTimer, SIGNAL(timeout()), this, SLOT(update()));
     //隐藏tableView,只显示listView
     ui->tableView->setVisible(false);
     tableHeader = ui->tableView->horizontalHeader();
@@ -44,6 +47,7 @@ MainWindow::~MainWindow()
         delete pStationList;
     if (pTableModel != nullptr)
         delete pTableModel;
+    delete updateTimer;
 }
 
 void MainWindow::on_actionPower_On_triggered()
@@ -67,10 +71,12 @@ void MainWindow::configLoaded(StationList* pStations)
     ui->tableView->setModel(pTableModel);
     ui->listView->setModel(pTableModel);
     //绑定鼠标进入事件,显示悬浮式菜单
-    //connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(showFloatingMenu(const QModelIndex &)));
+    connect(ui->tableView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showFloatingMenu(const QPoint &)));
     connect(ui->listView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showFloatingMenu(const QPoint &)));
     //默认小图标模式
     smallIcomMode();
+    //启动更新定时器
+    //updateTimer->start(1000);
 }
 //工作站信息加载失败
 void MainWindow::configLoadFailed(const QString& fileName)
@@ -81,7 +87,6 @@ void MainWindow::configLoadFailed(const QString& fileName)
 //点击标题栏排序
 void MainWindow::sortByColumn(int cloumnIndex)
 {
-
 }
 
 //显示悬浮式菜单
@@ -239,7 +244,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
     {
         //根据状态选择
         auto station = pStationList->at(selectedIndexs.first().row());
-        if (station.state == StationInfo::Unkonown)
+        if (station.state() == StationInfo::Unkonown)
         {
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
             menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
@@ -247,11 +252,17 @@ void MainWindow::addButtons(FloatingMenu* menu)
             menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动指显"));
             menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"));
         }
+        else if(station.state() == StationInfo::Powering)
+        {
+            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
+            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"));
+        }
         else
         {
             menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
             menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
-            if (station.zxIsRunning)
+            if (station.ZXIsRunning())
             {
                 menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"), manager, SLOT(restartApp()));
                 menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出指显"), manager, SLOT(exitApp()));
