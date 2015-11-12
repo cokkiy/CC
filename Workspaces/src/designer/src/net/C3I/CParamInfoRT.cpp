@@ -111,6 +111,32 @@ char* CParamInfoRT::SetParamValue(AbstractParam* pParam,
 	}
 	return pp;
 }
+
+/*!
+T0清屏,置beginTabNo和endTableNo之间的所有参数时间为0xFFFFFFFF
+@param unsigned short beginTabNo 开始表号
+@param unsigned short endTableNo 结束表号
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/12 10:13:58
+*/
+void CParamInfoRT::clear(unsigned short beginTabNo, unsigned short endTableNo)
+{
+    for (int i = beginTabNo; i <= endTableNo; i++)
+    {
+        auto iter = m_pMapParamTable->find(i);
+        if (iter != m_pMapParamTable->end())
+        {
+            for (auto& param : iter->second)
+            {
+                //设置日期时间为0xFFFFF
+                param.second.SetParamDate(0xFFFF);
+                param.second.SetParamTime(0xFFFF);
+            }
+        }
+    }
+}
+
 //处理11：String类型。
 //10:String按格式处理
 //字符串数据由"字符串长度"、"字符串有效数据区"和"字符串结束尾"三部分构成。"字符串

@@ -37,6 +37,16 @@ public:
 	//、字段号的参数地址中。
     char* SetParamValue(AbstractParam* pParam, char* pRevMem,
         unsigned int ulParamTime,unsigned int ulParamDate);
+
+    /*!
+    T0清屏,置beginTabNo和endTableNo之间的所有参数时间为0xFFFFFFFF
+    @param unsigned short beginTabNo 开始表号
+    @param unsigned short endTableNo 结束表号
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/12 10:13:58
+    */
+    void clear(unsigned short beginTabNo, unsigned short endTableNo);
 protected:	
 	//处理11：String类型。
 	//10:String按格式处理
