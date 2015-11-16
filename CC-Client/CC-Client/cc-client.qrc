@@ -127,5 +127,8 @@
         <file>Icons/powerOn-1.png</file>
         <file>Icons/powerOn-2.png</file>
         <file>Icons/powerOn-3.png</file>
+        <file>Icons/PowerOnFailure.png</file>
+        <file>Icons/PP15.jpg</file>
+        <file>Icons/52design.com_jdxt_045.png</file>
     </qresource>
 </RCC>

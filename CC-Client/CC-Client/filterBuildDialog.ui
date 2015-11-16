@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>597</width>
+    <width>617</width>
     <height>250</height>
    </rect>
   </property>
@@ -218,6 +218,46 @@
             <item>
              <property name="text">
               <string>Error</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Powering</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>AppStarting</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Shutdowning</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Rebooting</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PowerOnFailure</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RebootFailure</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>AppStartFailure</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ShutdownFailure</string>
              </property>
             </item>
            </widget>

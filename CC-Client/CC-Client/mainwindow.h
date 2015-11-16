@@ -51,7 +51,17 @@ public:
     void on_displayModeComboBox_currentIndexChanged(QString index);
     //点击过滤按钮
     void on_filterToolButton_clicked();
-
+    //查看CPU占用率
+    void on_actionViewCPU_triggered(bool checked);
+    //查看内存占用率
+    void on_actionViewMemory_triggered(bool checked);
+    //查看详细信息
+    void on_actionViewDetail_triggered(bool checked);
+    //查看消息
+    void on_actionViewMessage_triggered(bool checked);
+    //消息列表右键菜单
+    void on_msgListWidget_customContextMenuRequested(const QPoint &);
+    
 private:
     Ui::MainWindow *ui;
 
@@ -77,19 +87,30 @@ private:
     StationTableModel *pTableModel = nullptr;
     //table header
     QHeaderView* tableHeader;
-    //更新定时器
-    QTimer* updateTimer;
 
 private slots:
     //点击标题栏排序
     void sortByColumn(int cloumnIndex);
     //显示悬浮式菜单
-    void showFloatingMenu(const QModelIndex & index);
     void showFloatingMenu(const QPoint & pos);
-
+    // 操作菜单即将显示
+    void operationMenuToShow();
+    //工作站状态发生变化
+    void stationStateChanged(const QObject*);
+    //清空消息记录
+    void clearMessage();
+    //拷贝选择的消息
+    void copyMessage();
+    //拷贝全部消息
+    void copyAllMessage();
 private:
     //添加按钮到右键菜单
     void addButtons(FloatingMenu* menu);
+    //获取当前选择的工作站索引
+    QModelIndexList getSelectedIndexs();    
+    //是否只选择了一个工作站
+    bool selectedJustOne(QModelIndexList selectedIndexs);
+
 };
 
 //Class for config loading thread

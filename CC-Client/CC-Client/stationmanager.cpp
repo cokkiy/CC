@@ -44,7 +44,7 @@ void StationManager::powerOn()
 {
     for (auto index : stationIndexs)
     {
-        StationInfo* s = pStations->at(index.row());
+        StationInfo* s = pStations->atCurrent(index.row());
         s->setState(StationInfo::Powering);
     }
 }

@@ -60,6 +60,10 @@
       <Extensions>ts</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
+    <Filter Include="Slice Files">
+      <UniqueIdentifier>{e5a25725-6770-4dd6-ad10-5f2258986be2}</UniqueIdentifier>
+      <Extensions>ice</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

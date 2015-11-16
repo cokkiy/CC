@@ -13,12 +13,11 @@ StationTableModel::StationTableModel(const StationList* pStations, QObject *pare
     : QAbstractTableModel(parent)
 {
     this->pStations = pStations;
-    int count = pStations->count();
-    for (int i = 0; i < count; i++)
-    {
-        connect(pStations->at(i), SIGNAL(propertyChanged(const QString&, const QObject*)), this, SLOT(stationPropertyChanged(const QString&, const QObject*)));
-        //pStations->at(i).subscribePropertyChanged(this, SLOT(stationPropertyChanged(const QString&, const QObject*)));
-    }
+    const_cast<StationList*>(pStations)->subscribeAllStationsPropertyChangedEvent(this, SLOT(stationPropertyChanged(const QString&, const QObject* )));
+    powerOnIcons[0].addFile(":/Icons/powerOn-0.png");
+    powerOnIcons[1].addFile(":/Icons/powerOn-1.png");
+    powerOnIcons[2].addFile(":/Icons/powerOn-2.png");
+    powerOnIcons[3].addFile(":/Icons/powerOn-3.png");
 }
 
 StationTableModel::~StationTableModel()
@@ -28,7 +27,7 @@ StationTableModel::~StationTableModel()
 //返回行数
 int StationTableModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return pStations->count();
+    return pStations->currentCount();
 }
 //返回列数
 int StationTableModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
@@ -41,7 +40,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= pStations->count())
+    if (index.row() >= pStations->currentCount())
         return QVariant();
 
     if (role == Qt::DisplayRole)
@@ -49,7 +48,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         if (displayMode==List)
         {
             QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存：%4\tCPU：%5");
-            StationInfo* s = pStations->at(index.row());
+            StationInfo* s = pStations->atCurrent(index.row());
             return str.arg(s->name).arg(s->IP).arg(s->state2String()).arg(s->Memory()).arg(s->CPU());
         }
         else if(displayMode==Details)
@@ -58,7 +57,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         }
         else
         {
-            return pStations->at(index.row())->name;
+            return pStations->atCurrent(index.row())->name;
         }        
     }
 
@@ -77,13 +76,13 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
     if (role == Qt::ToolTipRole)
     {
         QString tip = QStringLiteral("%1\r\nIP：%2\r\n状态：%3");
-        auto s = pStations->at(index.row());
+        auto s = pStations->atCurrent(index.row());
         return tip.arg(s->name).arg(s->IP).arg(s->state2String());
     }
     if (role == Qt::ForegroundRole)
     {
         QVariant v;
-        switch (pStations->at(index.row())->state())
+        switch (pStations->atCurrent(index.row())->state())
         {
         case StationInfo::State::Normal:
         {
@@ -195,7 +194,7 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
     {
         //大图标
         QIcon icon;
-        switch (pStations->at(index.row())->state())
+        switch (pStations->atCurrent(index.row())->state())
         {
         case StationInfo::State::Unkonown:
             icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
@@ -210,15 +209,14 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
             icon.addFile(QStringLiteral(":/Icons/ncom006.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
             break;
         case  StationInfo::Powering:
-            icon.addFile(QStringLiteral(":/Icons/powerOn-%1.png").arg(icon_index), QSize(64,64), QIcon::Normal, QIcon::On);
-            const_cast<int&>(icon_index)++;
-            if (icon_index > 3)
-            {
-                const_cast<int&>(icon_index) = 0;
-            }
+            //icon.addFile(QStringLiteral(":/Icons/powerOn-%1.png").arg(pStations->atCurrent(index.row())->ExecuteCounting() % 4), QSize(64,64), QIcon::Normal, QIcon::On);
+            return powerOnIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 4];
             break;
         case  StationInfo::AppStarting:
             icon.addFile(QStringLiteral(":/Icons/App1.jpg"), QSize(64, 64), QIcon::Normal, QIcon::On);
+            break;
+        case StationInfo::PowerOnFailure:
+            icon.addFile(QStringLiteral(":/Icons/PowerOnFailure.png"), QSize(64, 64), QIcon::Normal, QIcon::On);
             break;
         default:
             icon.addFile(QStringLiteral(":/Icons/ncom001.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
@@ -230,7 +228,7 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
     {
         //小图标
         QIcon icon;
-        switch (pStations->at(index.row())->state())
+        switch (pStations->atCurrent(index.row())->state())
         {
         case StationInfo::State::Unkonown:
             icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(), QIcon::Normal, QIcon::On);
@@ -245,15 +243,14 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
             icon.addFile(QStringLiteral(":/Icons/ncom006.ico"), QSize(), QIcon::Normal, QIcon::On);
             break;
         case  StationInfo::Powering:
-            icon.addFile(QStringLiteral(":/Icons/powerOn-%1.png").arg(icon_index), QSize(), QIcon::Normal, QIcon::On);
-            const_cast<int&>(icon_index)++;
-            if (icon_index > 3)
-            {
-                const_cast<int&>(icon_index) = 0;
-            }
+            //icon.addFile(QStringLiteral(":/Icons/powerOn-%1.png").arg(pStations->atCurrent(index.row())->ExecuteCounting() % 4), QSize(), QIcon::Normal, QIcon::On);
+            return powerOnIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 4];
             break;
         case  StationInfo::AppStarting:
             icon.addFile(QStringLiteral(":/Icons/App1.jpg"), QSize(), QIcon::Normal, QIcon::On);
+            break;
+        case StationInfo::PowerOnFailure:
+            icon.addFile(QStringLiteral(":/Icons/PowerOnFailure.png"), QSize(), QIcon::Normal, QIcon::On);
             break;
         default:
             icon.addFile(QStringLiteral(":/Icons/ncom001.ico"), QSize(), QIcon::Normal, QIcon::On);
@@ -269,28 +266,28 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
     switch (index.column())
     {
     case 0:
-        return pStations->at(index.row())->name;
+        return pStations->atCurrent(index.row())->name;
         break;
     case 1:
-        return pStations->at(index.row())->IP;
+        return pStations->atCurrent(index.row())->IP;
     case 2:
-        return pStations->at(index.row())->state2String();
+        return pStations->atCurrent(index.row())->state2String();
     case 3:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->CPU(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->CPU(), 0, 'f', 0);
     case 4:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->Memory(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory(), 0, 'f', 0);
     case 5:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->ZXCPU(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppCPU(), 0, 'f', 0);
     case 6:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->ZXMemory(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppMemory(), 0, 'f', 0);
     case 7:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->TotalMemory());
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->TotalMemory());
     case 8:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->ProcCount());
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->ProcCount());
     case 9:
-        return QStringLiteral("%1").arg(pStations->at(index.row())->ZXThreadCount());
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppThreadCount());
     case 10:
-        return pStations->at(index.row())->mac;
+        return pStations->atCurrent(index.row())->mac;
     default:
         break;
     }    

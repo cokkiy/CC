@@ -29,6 +29,9 @@
    <iconset resource="cc-client.qrc">
     <normaloff>:/Icons/ncom003.ico</normaloff>:/Icons/ncom003.ico</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
@@ -288,7 +291,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QFrame" name="frame_2">
+      <widget class="QFrame" name="rightFrame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -301,12 +304,69 @@
          <height>0</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(170, 255, 127);</string>
+       </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QSplitter" name="splitter_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <widget class="QwtPlot" name="qwtPlotCPU"/>
+          <widget class="QwtPlot" name="qwtPlotMemory"/>
+          <widget class="QFrame" name="detailFrame">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>线程数：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="threadCountlineEdit"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>进程数：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="procCountlineEdit"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QListWidget" name="msgListWidget">
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -328,6 +388,9 @@
     <addaction name="actionAllPower_On"/>
     <addaction name="actionStartAllApp"/>
     <addaction name="separator"/>
+    <addaction name="actionRebootAll"/>
+    <addaction name="actionRestartAll"/>
+    <addaction name="separator"/>
     <addaction name="actionExitAllZXApp"/>
     <addaction name="actionAll_Shutdown"/>
     <addaction name="separator"/>
@@ -346,8 +409,55 @@
     <addaction name="actionAppThreadCount"/>
     <addaction name="actionProcCount"/>
    </widget>
+   <widget class="QMenu" name="menuOperation">
+    <property name="title">
+     <string>操作</string>
+    </property>
+    <addaction name="actionPowerOn"/>
+    <addaction name="actionPoweroff"/>
+    <addaction name="actionReboot"/>
+    <addaction name="separator"/>
+    <addaction name="actionStartApp"/>
+    <addaction name="actionRestartApp"/>
+    <addaction name="actionExitApp"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>查看</string>
+    </property>
+    <addaction name="actionViewCPU"/>
+    <addaction name="actionViewMemory"/>
+    <addaction name="actionViewDetail"/>
+    <addaction name="actionViewMessage"/>
+   </widget>
+   <widget class="QMenu" name="menuOption">
+    <property name="title">
+     <string>选项</string>
+    </property>
+    <widget class="QMenu" name="menuCPUOption">
+     <property name="title">
+      <string>CPU</string>
+     </property>
+     <addaction name="actionLineCPU"/>
+     <addaction name="actionPieCPU"/>
+     <addaction name="actionRectCPU"/>
+    </widget>
+    <widget class="QMenu" name="menuViewMemoryOption">
+     <property name="title">
+      <string>内存</string>
+     </property>
+     <addaction name="actionViewLineMemory"/>
+     <addaction name="actionPieMemory"/>
+     <addaction name="actionRectMemory"/>
+    </widget>
+    <addaction name="menuCPUOption"/>
+    <addaction name="menuViewMemoryOption"/>
+   </widget>
    <addaction name="menuControl"/>
+   <addaction name="menuOperation"/>
    <addaction name="menuMonitor"/>
+   <addaction name="menuView"/>
+   <addaction name="menuOption"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAllPower_On">
@@ -408,7 +518,10 @@
     <string>退出</string>
    </property>
    <property name="toolTip">
-    <string>退出程序</string>
+    <string>退出控制台</string>
+   </property>
+   <property name="statusTip">
+    <string>退出控制台</string>
    </property>
   </action>
   <action name="actionStartAllApp">
@@ -417,13 +530,13 @@
      <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
    </property>
    <property name="text">
-    <string>启动指显...</string>
+    <string>全部启动程序...</string>
    </property>
    <property name="toolTip">
-    <string>启动全部工作站指显软件</string>
+    <string>启动全部工作站应用软件</string>
    </property>
    <property name="statusTip">
-    <string>启动全部工作站指显软件</string>
+    <string>启动全部工作站应用软件</string>
    </property>
   </action>
   <action name="actionExitAllZXApp">
@@ -432,13 +545,13 @@
      <normaloff>:/Icons/52design.com_alth_171.png</normaloff>:/Icons/52design.com_alth_171.png</iconset>
    </property>
    <property name="text">
-    <string>退出指显</string>
+    <string>全部退出程序</string>
    </property>
    <property name="toolTip">
-    <string>退出全部工作站指显软件</string>
+    <string>退出全部工作站应用程序</string>
    </property>
    <property name="statusTip">
-    <string>退出全部工作站指显软件</string>
+    <string>退出全部工作站应用程序</string>
    </property>
   </action>
   <action name="actionCPU">
@@ -501,8 +614,242 @@
     <string>指显线程数量</string>
    </property>
   </action>
+  <action name="actionPowerOn">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_108.png</normaloff>:/Icons/52design.com_jingying_108.png</iconset>
+   </property>
+   <property name="text">
+    <string>开机</string>
+   </property>
+   <property name="toolTip">
+    <string>打开选定的计算机</string>
+   </property>
+   <property name="statusTip">
+    <string>打开选定的计算机</string>
+   </property>
+  </action>
+  <action name="actionPoweroff">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_098.png</normaloff>:/Icons/52design.com_jingying_098.png</iconset>
+   </property>
+   <property name="text">
+    <string>关机</string>
+   </property>
+   <property name="toolTip">
+    <string>关闭选定的计算机</string>
+   </property>
+   <property name="statusTip">
+    <string>关闭选定的计算机</string>
+   </property>
+  </action>
+  <action name="actionReboot">
+   <property name="text">
+    <string>重启</string>
+   </property>
+   <property name="statusTip">
+    <string>重新启动选定的计算机</string>
+   </property>
+   <property name="whatsThis">
+    <string>重新启动选定的计算机</string>
+   </property>
+  </action>
+  <action name="actionStartApp">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
+   </property>
+   <property name="text">
+    <string>启动程序</string>
+   </property>
+   <property name="statusTip">
+    <string>启动选定工作站的程序</string>
+   </property>
+   <property name="whatsThis">
+    <string>启动选定工作站的程序</string>
+   </property>
+  </action>
+  <action name="actionExitApp">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_alth_171.png</normaloff>:/Icons/52design.com_alth_171.png</iconset>
+   </property>
+   <property name="text">
+    <string>退出程序</string>
+   </property>
+   <property name="statusTip">
+    <string>退出选定工作站的应用程序</string>
+   </property>
+   <property name="whatsThis">
+    <string>退出选定工作站的应用程序</string>
+   </property>
+  </action>
+  <action name="actionRestartApp">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/2009724113238761.png</normaloff>:/Icons/2009724113238761.png</iconset>
+   </property>
+   <property name="text">
+    <string>重启程序</string>
+   </property>
+   <property name="statusTip">
+    <string>重新启动选定工作站的应用程序</string>
+   </property>
+   <property name="whatsThis">
+    <string>重新启动选定工作站的应用程序</string>
+   </property>
+  </action>
+  <action name="actionViewCPU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>CPU占用率</string>
+   </property>
+   <property name="statusTip">
+    <string>查看CPU占用率</string>
+   </property>
+  </action>
+  <action name="actionViewMemory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>内存占用率</string>
+   </property>
+   <property name="toolTip">
+    <string>内存占用率</string>
+   </property>
+   <property name="statusTip">
+    <string>查看内存占用率</string>
+   </property>
+  </action>
+  <action name="actionViewDetail">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>程序信息</string>
+   </property>
+   <property name="statusTip">
+    <string>查看程序进程线程信息</string>
+   </property>
+  </action>
+  <action name="actionViewMessage">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>消息</string>
+   </property>
+   <property name="toolTip">
+    <string>查看消息</string>
+   </property>
+   <property name="statusTip">
+    <string>查看消息</string>
+   </property>
+  </action>
+  <action name="actionLineCPU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>线性图</string>
+   </property>
+  </action>
+  <action name="actionPieCPU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>饼图</string>
+   </property>
+  </action>
+  <action name="actionRectCPU">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>柱状图</string>
+   </property>
+  </action>
+  <action name="actionLineMemory">
+   <property name="text">
+    <string>lineMemory</string>
+   </property>
+  </action>
+  <action name="actionViewLineMemory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>线性图</string>
+   </property>
+  </action>
+  <action name="actionPieMemory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>饼图</string>
+   </property>
+  </action>
+  <action name="actionRectMemory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>柱状图</string>
+   </property>
+  </action>
+  <action name="actionRebootAll">
+   <property name="text">
+    <string>全部重启系统</string>
+   </property>
+   <property name="statusTip">
+    <string>重新启动全部工作站</string>
+   </property>
+  </action>
+  <action name="actionRestartAll">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/2009724113238761.png</normaloff>:/Icons/2009724113238761.png</iconset>
+   </property>
+   <property name="text">
+    <string>全部重启应用</string>
+   </property>
+   <property name="statusTip">
+    <string>重新启动全部工作站应用程序</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="cc-client.qrc"/>
  </resources>

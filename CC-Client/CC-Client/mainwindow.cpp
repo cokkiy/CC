@@ -13,15 +13,16 @@
 #include "floatingmenu.h"
 #include <QItemSelectionModel>
 #include "stationmanager.h"
+#include "monitor.h"
+#include <QClipboard>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //创建更新定时器
-    updateTimer = new QTimer();
-    //connect(updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+    //绑定菜单显示事件
+    connect(ui->menuOperation, SIGNAL(aboutToShow()), this, SLOT(operationMenuToShow()));
     //隐藏tableView,只显示listView
     ui->tableView->setVisible(false);
     tableHeader = ui->tableView->horizontalHeader();
@@ -47,7 +48,6 @@ MainWindow::~MainWindow()
         delete pStationList;
     if (pTableModel != nullptr)
         delete pTableModel;
-    delete updateTimer;
 }
 
 void MainWindow::on_actionPower_On_triggered()
@@ -68,6 +68,8 @@ void MainWindow::configLoaded(StationList* pStations)
     ui->statusBar->showMessage(QString::fromLocal8Bit("工作站信息加载完毕。"),5000);
     //设置模型和视图
     pTableModel = new StationTableModel(pStations);
+    //订阅状态变化
+    pStations->subscribeAllStationsStateChangedEvent(this, SLOT(stationStateChanged(const QObject*)));
     ui->tableView->setModel(pTableModel);
     ui->listView->setModel(pTableModel);
     //绑定鼠标进入事件,显示悬浮式菜单
@@ -75,8 +77,10 @@ void MainWindow::configLoaded(StationList* pStations)
     connect(ui->listView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showFloatingMenu(const QPoint &)));
     //默认小图标模式
     smallIcomMode();
-    //启动更新定时器
-    //updateTimer->start(1000);
+    //启动状态监视
+    Monitor* monitor = new Monitor();
+    monitor->setStationList(pStations);
+    monitor->start(QThread::NormalPriority);
 }
 //工作站信息加载失败
 void MainWindow::configLoadFailed(const QString& fileName)
@@ -87,15 +91,6 @@ void MainWindow::configLoadFailed(const QString& fileName)
 //点击标题栏排序
 void MainWindow::sortByColumn(int cloumnIndex)
 {
-}
-
-//显示悬浮式菜单
-void MainWindow::showFloatingMenu(const QModelIndex & index)
-{
-    //悬浮式菜单    
-//     FloatingMenu* menu = new FloatingMenu(this);
-//     //menu->setGeometry(this->cursor().pos().x(), this->cursor().pos().y(), 180, 40);
-//     menu->show(this->cursor().pos().x(), this->cursor().pos().y());
 }
 
 //显示悬浮式菜单
@@ -116,6 +111,103 @@ void MainWindow::showFloatingMenu(const QPoint & pos)
     menu->setBorder(border);
     //显示菜单
     menu->show(this->cursor().pos().x(), this->cursor().pos().y());
+}
+
+// 操作菜单即将显示,根据选择情况控制菜单可用性
+void MainWindow::operationMenuToShow()
+{
+    QModelIndexList selectedIndexs = getSelectedIndexs();
+    if (selectedIndexs.isEmpty())
+    {
+        //没有选择
+        for (auto action : ui->menuOperation->actions())
+        {
+            action->setEnabled(false);
+        }
+    }
+    else if(selectedJustOne(selectedIndexs))
+    {
+        //只选择了一个
+        for (auto action : ui->menuOperation->actions())
+        {
+            //先禁用全部
+            action->setEnabled(false);
+        }
+        auto station = pStationList->atCurrent(selectedIndexs.first().row());
+        if (station->state()==StationInfo::Unkonown)
+        {
+            ui->actionPowerOn->setEnabled(true);
+        }
+        else if(station->StationIsRunning())
+        {
+            ui->actionReboot->setEnabled(true);
+            ui->actionShutdown->setEnabled(true);
+            if (station->AppIsRunning())
+            {
+                ui->actionRestartApp->setEnabled(true);
+                ui->actionExitApp->setEnabled(true);
+            }
+            else
+            {
+                ui->actionStartApp->setEnabled(true);
+            }
+        } 
+        else if(!station->inExecutingState())
+        {
+            ui->actionPowerOn->setEnabled(true);
+        }
+    }
+    else
+    {
+        //选择了多个
+        for (auto action : ui->menuOperation->actions())
+        {
+            action->setEnabled(true);
+        }
+    }
+}
+
+//工作站状态发生变化
+void MainWindow::stationStateChanged(const QObject* pObject)
+{
+    StationInfo* pStation = (StationInfo*)pObject;
+    switch (pStation->state())
+    {
+    case StationInfo::Unkonown:
+        break;
+    case  StationInfo::Powering:
+        ui->msgListWidget->addItem(QStringLiteral("向%1（%2)发送开机命令...").arg(pStation->IP).arg(pStation->name));
+        break;
+    case StationInfo::PowerOnFailure:
+        break;
+    default:
+        break;
+    }
+    ui->msgListWidget->setCurrentItem(ui->msgListWidget->item(ui->msgListWidget->count() - 1));
+}
+//清空消息记录
+void MainWindow::clearMessage()
+{
+    ui->msgListWidget->clear();
+}
+//拷贝选择的消息
+void MainWindow::copyMessage()
+{
+    if (ui->msgListWidget->currentItem() != NULL)
+    {
+        auto item = ui->msgListWidget->currentIndex();
+        QGuiApplication::clipboard()->setText(item.data().toString());
+    }
+}
+//拷贝全部消息
+void MainWindow::copyAllMessage()
+{
+    QString msg;
+    for (int i = 0; i < ui->msgListWidget->count(); i++)
+    {
+        msg += QStringLiteral("%1\r\n").arg(ui->msgListWidget->item(i)->data(0).toString());
+    }
+    QGuiApplication::clipboard()->setText(msg);
 }
 
 /*!
@@ -212,9 +304,130 @@ void MainWindow::on_filterToolButton_clicked()
         ui->filterLineEdit->setText(operations.toString());
     }
 }
+//查看CPU占用率
+void MainWindow::on_actionViewCPU_triggered(bool checked)
+{
+    if (checked)
+    {
+        ui->qwtPlotCPU->setVisible(true);
+    }
+    else
+    {
+        ui->qwtPlotCPU->setVisible(false);
+    }
+}
+
+void MainWindow::on_actionViewMemory_triggered(bool checked)
+{
+    if (checked)
+    {
+        ui->qwtPlotMemory->setVisible(true);
+    }
+    else
+    {
+        ui->qwtPlotMemory->setVisible(false);
+    }
+}
+
+void MainWindow::on_actionViewDetail_triggered(bool checked)
+{
+    if (checked)
+    {
+        ui->detailFrame->setVisible(true);
+    }
+    else
+    {
+        ui->detailFrame->setVisible(false);
+    }    
+}
+
+//是否显示消息
+void MainWindow::on_actionViewMessage_triggered(bool checked)
+{
+    if (checked)
+    {
+        ui->msgListWidget->setVisible(true);
+    }
+    else
+    {
+        ui->msgListWidget->setVisible(false);
+    }
+}
+//消息列表右键菜单
+void MainWindow::on_msgListWidget_customContextMenuRequested(const QPoint & point)
+{
+    FloatingMenu* menu = new FloatingMenu(this);
+    menu->setSize(150);
+    if (ui->msgListWidget->count() > 0)
+    {
+        menu->addButton(":/Icons/52design.com_3d_08.png", QStringLiteral("清空"), this, SLOT(clearMessage()));
+        menu->addButton(":/Icons/PP15.jpg", QStringLiteral("复制"), this, SLOT(copyMessage()));
+        menu->addButton(":/Icons/52design.com_jdxt_045.png", QStringLiteral("全部复制"), this, SLOT(copyAllMessage()));
+    }
+    else
+    {
+        menu->addButton(":/Icons/52design.com_3d_08.png", QStringLiteral("清空"));
+        menu->addButton(":/Icons/PP15.jpg", QStringLiteral("复制"));
+        menu->addButton(":/Icons/52design.com_jdxt_045.png", QStringLiteral("全部复制"));
+    }
+
+    menu->show(this->cursor().pos().x(), this->cursor().pos().y());
+}
 
 //添加按钮到右键菜单
 void MainWindow::addButtons(FloatingMenu* menu)
+{
+    QModelIndexList selectedIndexs = getSelectedIndexs();
+    //创建工作站管理类
+    StationManager* manager=new StationManager(pStationList, selectedIndexs);
+    if (!selectedJustOne(selectedIndexs))
+    {
+        //选择了多个
+        menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+        menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
+        menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
+        menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
+        menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager,SLOT(restartApp()));
+        menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出程序"), manager, SLOT(exitApp()));
+    }
+    else
+    {
+        //只选择了一个,则根据状态显示菜单
+        auto station = pStationList->atCurrent(selectedIndexs.first().row());
+        if (station->state() == StationInfo::Unkonown)
+        {
+            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
+            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"));
+            menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"));
+            menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"));
+        }
+        else if(station->state() == StationInfo::Powering)
+        {
+            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
+            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"));
+        }
+        else
+        {
+            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
+            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
+            if (station->AppIsRunning())
+            {
+                menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
+                menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出程序"), manager, SLOT(exitApp()));
+                menu->addButton(":/Icons/52design.com_3d_08.png", QStringLiteral("强制退出"), manager, SLOT(forceExitApp()));
+            }
+            else
+            {
+                menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
+            }
+        }
+    }
+}
+
+//获取当前选择的工作站索引
+QModelIndexList MainWindow::getSelectedIndexs()
 {
     QModelIndexList selectedIndexs;
     if (ui->listView->isVisible())
@@ -229,49 +442,23 @@ void MainWindow::addButtons(FloatingMenu* menu)
         QItemSelectionModel* selection = ui->tableView->selectionModel();
         selectedIndexs = selection->selectedIndexes();
     }
-    //创建工作站管理类
-    StationManager* manager=new StationManager(pStationList, selectedIndexs);
-    if (selectedIndexs.count() > 1)
+
+    return selectedIndexs;
+}
+
+//是否只选择了一个工作站
+bool MainWindow::selectedJustOne(QModelIndexList selectedIndexs)
+{
+    if (ui->listView->isVisible())
+        return selectedIndexs.count() == 1;
+    //如果是表格,则做进一步判断   
+    if (selectedIndexs.isEmpty())
+        return false;
+    int row = selectedIndexs.first().row();
+    for (auto index : selectedIndexs)
     {
-        menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
-        menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
-        menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
-        menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动指显"), manager, SLOT(startApp()));
-        menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"), manager,SLOT(restartApp()));
-        menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出指显"), manager, SLOT(exitApp()));
+        if (row != index.row())
+            return false;
     }
-    else
-    {
-        //根据状态选择
-        auto station = pStationList->at(selectedIndexs.first().row());
-        if (station->state() == StationInfo::Unkonown)
-        {
-            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
-            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
-            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"));
-            menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动指显"));
-            menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"));
-        }
-        else if(station->state() == StationInfo::Powering)
-        {
-            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
-            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
-            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"));
-        }
-        else
-        {
-            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
-            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
-            if (station->ZXIsRunning())
-            {
-                menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启指显"), manager, SLOT(restartApp()));
-                menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出指显"), manager, SLOT(exitApp()));
-                menu->addButton(":/Icons/52design.com_3d_08.png", QStringLiteral("强制退出"), manager, SLOT(forceExitApp()));
-            }
-            else
-            {
-                menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动指显"), manager, SLOT(startApp()));
-            }
-        }
-    }
+    return true;
 }

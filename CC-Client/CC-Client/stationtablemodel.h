@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include "StationList.h"
 #include <QVariant>
+#include <QIcon>
 /**************************************************************************
 * StationTableModel: Model of Station Table, 实现M/V模式的Model
 **************************************************************************/
@@ -65,8 +66,8 @@ private:
     QVariant getColumnValue(const QModelIndex &index) const;
     //显示模式
     DisplayMode displayMode = SmallIcons;
-    //图标索引
-    int icon_index = 0;
+    //加电时显示的图标
+    QIcon powerOnIcons[4];
 
     private slots:
     //工作站状态发生变化

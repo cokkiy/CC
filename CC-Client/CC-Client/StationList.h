@@ -36,57 +36,86 @@ public:
     ~StationList() = default;
 
     /*!
-    获取当前工作站数量
+    获取当前工作站数量(已过滤后的)
     @return int 工作站数量
     作者：cokkiy（张立民)
     创建时间：2015/11/04 12:06:18
     */
-    int count() const;
+    int currentCount() const;
 
     /*!
-    获取\see row位置的工作站
+    获取全部工作站数量
+    @return int 全部工作站数量
+    作者：cokkiy（张立民)
+    创建时间：2015/11/12 17:13:55
+    */
+    int total();
+
+    /*!
+    获取当前工作站列表（过滤后的)中\see row位置的工作站
     @param int row 指定位置
     @return StationInfo \see row位置的工作站信息
     作者：cokkiy（张立民)
     创建时间：2015/11/04 12:07:09
     */
-    StationInfo* at(int row); 
-
+    StationInfo* atCurrent(int row); 
+    
     /*!
-    获取\see row位置的工作站
-    @param int row 指定位置
-    @return StationInfo \see row位置的工作站信息
-    作者：cokkiy（张立民)
-    创建时间：2015/11/04 12:07:09
-    */
-    StationInfo* operator[](int row);
-
-    /*!
-    获取\see row位置的工作站引用
+    获取当前工作站列表（过滤后的)\see row位置的工作站引用
     @param int row 指定位置
     @return StationInfo \see row位置的工作站引用
     作者：cokkiy（张立民)
     创建时间：2015/11/04 12:07:09
     */
-    StationInfo& ref(int row);
+    StationInfo& refCurrent(int row);
 
     /*!
-    获取\see row位置的工作站(const)
+    获取当前工作站列表（过滤后的)\see row位置的工作站(const)
     @param int row 指定位置
     @return StationInfo \see row位置的工作站信息
     作者：cokkiy（张立民)
     创建时间：2015/11/10 21:55:38
     */
-    StationInfo* at(int row) const;
+    StationInfo* atCurrent(int row) const;
+
 
     /*!
-    获取指定工作站在列表中的位置
+    获取指定工作站在当前工作站列表（过滤后的)中的位置
     @param StationInfo * pStation 工作站
     @return int
     作者：cokkiy（张立民)
     创建时间：2015/11/12 10:50:06
     */
     int indexOf(const StationInfo* pStation) const;
+
+    /*!
+    查找指定IP的工作站信息
+    @param QString ip 工作站IP
+    @return StationInfo* 指定IP的工作站指针
+    作者：cokkiy（张立民)
+    创建时间：2015/11/12 17:41:43
+    */
+    StationInfo* find(QString ip);
+
+    /*!
+    订阅全部工作站属性变化通知事件
+    @param const QObject * receiver 事件接收函数所在对象的指针
+    @param const char * member 事件接收函数名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/12 17:44:28
+    */
+    void subscribeAllStationsPropertyChangedEvent(const QObject* receiver, const char* member);
+  
+    /*!
+    订阅全部工作站状态变化通知事件
+    @param const QObject * receiver 事件接收函数所在对象的指针
+    @param const char * member 事件接收函数名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/13 10:57:28
+    */
+    void subscribeAllStationsStateChangedEvent(const QObject* receiver, const char* member);
 
     /*!
     根据@param filterString过滤工作站
