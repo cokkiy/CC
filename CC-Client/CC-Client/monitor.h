@@ -5,6 +5,8 @@
 #include <QTimer>
 #include "StationList.h"
 #include <map>
+
+
 /*!
  * \class Monitor
  *
@@ -41,6 +43,7 @@ private:
     void stationStateChanged(const QObject* station);
     //定时器事件,提供执行计数工作
     virtual void timerEvent(QTimerEvent *) override;    
+
 };
 
 #endif // MONITOR_H

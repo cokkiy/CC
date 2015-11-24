@@ -31,6 +31,7 @@ void FloatingMenu::AmendPosition(int &posX, int &posY)
     }
     else if (point.y() + size() / 2 > screenSize.height())
     {
+        //下边
         posY = screenSize.height() - size() / 2;
     }
 }

@@ -179,6 +179,7 @@ void MainWindow::stationStateChanged(const QObject* pObject)
         ui->msgListWidget->addItem(QStringLiteral("向%1（%2)发送开机命令...").arg(pStation->IP).arg(pStation->name));
         break;
     case StationInfo::PowerOnFailure:
+        ui->msgListWidget->addItem(QStringLiteral("%1(%2)开机失败.").arg(pStation->IP).arg(pStation->name));
         break;
     default:
         break;
@@ -298,6 +299,7 @@ void MainWindow::smallIcomMode()
 void MainWindow::on_filterToolButton_clicked()
 {
     FilterBuildDialog buildDlg;
+    buildDlg.setGeometry(this->cursor().pos().x(), this->cursor().pos().y()+20, buildDlg.width(), buildDlg.height());
     if (buildDlg.exec() == QDialog::Accepted)
     {
         FilterOperations operations = buildDlg.getFilter();

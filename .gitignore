@@ -233,4 +233,9 @@ qttools.pro.user.*
 /mkspecs
 /tests
 **/GeneratedFiles
+**/generated/*.cs
+**/generated/*.cpp
+**/generated/*.h
 **/Icons
+*.amplxeproj
+*.d

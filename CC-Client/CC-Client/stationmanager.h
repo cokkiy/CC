@@ -47,6 +47,7 @@ public:
     创建时间：2015/11/10 15:53:48
     */
     void reboot();
+
     /*!
     关闭选择的计算机
     @return void
@@ -103,6 +104,7 @@ public:
     创建时间：2015/11/10 15:55:34
     */
     void startApp();
+
     /*!
     启动所有工作站指显程序
     @return void
@@ -116,7 +118,8 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/10 15:56:02
     */
-    void forceExitApp();
+    void forceExitApp();  
+
 private:
     //全部工作站列表
     StationList* pStations;

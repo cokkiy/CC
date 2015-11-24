@@ -3,6 +3,10 @@
  等动作
  *****************************************************************************/
 #include "stationmanager.h"
+#include "IController.h"
+#include <Ice/Ice.h>
+using namespace std;
+using namespace CC;
 
 /*!
 创建一个工作站管理类的实例
@@ -46,6 +50,7 @@ void StationManager::powerOn()
     {
         StationInfo* s = pStations->atCurrent(index.row());
         s->setState(StationInfo::Powering);
+        reboot();
     }
 }
 /*!
@@ -56,8 +61,16 @@ void StationManager::powerOn()
 */
 void StationManager::reboot()
 {
-
+//     auto controller = CCApplication::getController();
+//     if (controller)
+//     {
+//         controller->reboot(false);
+//     }
 }
+
+
+
+
 /*!
 关闭选择的计算机
 @return void
@@ -136,8 +149,15 @@ void StationManager::exitAllApp()
 */
 void StationManager::startApp()
 {
-
+//     auto controller = CCApplication::getController();
+//     if (controller)
+//     {
+//         controller->startApp("vscode");
+//     }
 }
+
+
+
 /*!
 启动所有工作站指显程序
 @return void
@@ -158,4 +178,6 @@ void StationManager::forceExitApp()
 {
 
 }
+
+
 

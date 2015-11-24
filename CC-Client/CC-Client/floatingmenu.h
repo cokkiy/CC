@@ -12,7 +12,7 @@ namespace Ui { class FloatingMenu; };
 class FloatingMenu : public QDialog
 {
     Q_OBJECT
-        Q_PROPERTY(int size READ size WRITE setSize) /*size property*/
+    Q_PROPERTY(int size READ size WRITE setSize) /*size property*/
 public:
     FloatingMenu(QWidget *parent = 0);
     ~FloatingMenu();

@@ -1,9 +1,10 @@
 ﻿#include "monitor.h"
 #include <QTimerEvent>
 
+
 Monitor::Monitor(QObject *parent)
     : QThread(parent)
-{
+{    
 }
 
 Monitor::~Monitor()
@@ -15,6 +16,7 @@ Monitor::~Monitor()
 //执行监视工作站状态任务
 void Monitor::run()
 {
+    //启动工作站执行动作心跳计数线程    
     while (true)
     {
         //等待1秒
@@ -70,3 +72,4 @@ void Monitor::timerEvent(QTimerEvent * event)
         }
     }
 }
+
