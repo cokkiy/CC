@@ -330,6 +330,7 @@
     <None Include="cc-client_zh.ts">
       <Filter>Translation Files</Filter>
     </None>
+    <None Include="Config.Server" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_mainwindow.h">

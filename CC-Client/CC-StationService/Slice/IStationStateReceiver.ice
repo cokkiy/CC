@@ -7,7 +7,8 @@ module CC
 {
 
 	// string list, can't defines sequence<string> direct in struct
-	["cpp:type:std::list<std::string>"]
+	//["cpp:type:std::list<std::string>"]
+	["clr:generic:List"]	
 	sequence<string> stringList;
 
 	///定义了Network Interface information结构

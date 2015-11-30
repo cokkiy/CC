@@ -11,6 +11,7 @@
 #include "StationList.h"
 #include "stationtablemodel.h"
 #include "floatingmenu.h"
+#include <Ice\Ice.h>
 
 namespace Ui {
     class MainWindow;
@@ -87,6 +88,14 @@ private:
     StationTableModel *pTableModel = nullptr;
     //table header
     QHeaderView* tableHeader;
+
+    // Create an ice communicator 
+    // Ice communicator for receiving station state
+    Ice::CommunicatorPtr communicator;
+    // Adapter for communicator 
+    Ice::ObjectAdapterPtr adapter;
+    //ICE框架初始化是否成功
+    bool iceInitSuccess = false;
 
 private slots:
     //点击标题栏排序

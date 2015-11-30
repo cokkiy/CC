@@ -19,6 +19,8 @@ StationInfo::StationInfo(const StationInfo& ref)
     this->m_ExecuteCounting = ref.m_ExecuteCounting;
     this->m_hint = ref.m_hint;
     this->m_StationIsRunning = ref.m_StationIsRunning;
+    this->stationId = ref.stationId;
+    this->lastTick = ref.lastTick;
 }
 
 /*!
@@ -87,6 +89,56 @@ bool StationInfo::inExecutingState()
 {
     return state() == AppStarting || state() == Powering
         || state() == Shutdowning || state() == Rebooting;
+}
+
+/*!
+设置工作站标识
+@param const std::string & stationId 工作站唯一标识
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/24 10:41:20
+*/
+void StationInfo::setStationId(const std::string& stationId)
+{
+    this->stationId = QString(stationId.c_str());
+}
+
+/*!
+设置工作站操作系统名称
+@param const std::string & osName 工作站操作系统名称
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/24 10:41:20
+*/
+void StationInfo::setOSName(const std::string& osName)
+{
+    this->osName = QString(osName.c_str());
+    emit propertyChanged("osName", this);
+}
+
+/*!
+设置工作站操作系统版本
+@param const std::string & osVersion 工作站操作系统版本
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/24 10:41:20
+*/
+void StationInfo::setOSVersion(const std::string& osVersion)
+{
+    this->osVersion = QString(osVersion.c_str());
+    emit propertyChanged("osVersion", this);
+}
+
+/*!
+设置最后收到状态时间
+@param const time_t & time 收到状态的时间
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/25 12:17:13
+*/
+void StationInfo::setLastTick(const time_t& time /*= time(NULL)*/)
+{
+    this->lastTick = time;
 }
 
 /*!

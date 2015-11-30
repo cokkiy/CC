@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CC;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CC_StationService
@@ -17,6 +19,16 @@ namespace CC_StationService
     {
         //ice communicator
         private Ice.Communicator ic = null;
+        /// <summary>
+        /// 系统监视
+        /// </summary>
+        private SystemWatcher watcher = null;
+
+        /// <summary>
+        /// 日志记录器
+        /// </summary>
+        Ice.Logger logger = PlatformMethodFactory.GetLogger();
+
 
         public StationMonitorService()
         {
@@ -25,24 +37,56 @@ namespace CC_StationService
 
         protected override void OnStart(string[] args)
         {
-            Ice.Communicator ic = null;
             try
             {
-                ic = Ice.Util.initialize(ref args);
-                Ice.ObjectAdapter adapter = ic.createObjectAdapterWithEndpoints("CCStationAdapter", "default -h 192.168.0.203 -p 10000");
-                Ice.Object obj = new ControllerImp();
-                adapter.add(obj, ic.stringToIdentity("StationController"));
-                adapter.activate();
-                ic.waitForShutdown();
+                //初始化ICE 通信对象
+                Ice.InitializationData initData = new Ice.InitializationData();
+                initData.properties = Ice.Util.createProperties();
+                initData.properties.load("Config.Client");
+                initData.logger = logger;
+                ic = Ice.Util.initialize(initData);
+
+                //启动监视线程
+                //初始化监视应用程序列表为空
+                watcher = new SystemWatcher(ic);
+                watcher.StartWatching();
+                logger.print("开始系统资源监视...");
+
+                //启动控制通道
+                Ice.ObjectAdapter controlAdapter = ic.createObjectAdapter("Controller");
+                Ice.Object obj = new ControllerImp(watcher);
+                controlAdapter.add(obj, ic.stringToIdentity("StationController"));
+                controlAdapter.activate();
+                logger.print("开始监听控制消息...");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine(e);
+                logger.error(ex.ToString());
             }
+        }
+
+        
+        protected override void OnPause()
+        {
+            //停止监视系统
+            watcher.StopWatching();
+            base.OnPause();
+            logger.print("服务已暂停.");
+        }
+
+        protected override void OnContinue()
+        {
+            base.OnContinue();
+            //开始监视
+            watcher.StartWatching();
+            logger.print("服务继续...");
         }
 
         protected override void OnStop()
         {
+            //停止监视系统
+            watcher.StopWatching();
+            //释放通信资源
             if (ic != null)
             {
                 //clean up
@@ -55,6 +99,8 @@ namespace CC_StationService
                     Console.WriteLine(e);
                 }
             }
+
+            logger.print("服务已停止.");
         }
     }
 }

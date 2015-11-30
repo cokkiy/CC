@@ -15,6 +15,7 @@
 #include "stationmanager.h"
 #include "monitor.h"
 #include <QClipboard>
+#include "StationStateReceiver.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -81,6 +82,12 @@ void MainWindow::configLoaded(StationList* pStations)
     Monitor* monitor = new Monitor();
     monitor->setStationList(pStations);
     monitor->start(QThread::NormalPriority);
+    if (iceInitSuccess)
+    {
+        Ice::ObjectPtr servant = new StationStateReceiver(pStations);        
+        adapter->add(servant, communicator->stringToIdentity("stateReceiver"));
+        adapter->activate();
+    }
 }
 //工作站信息加载失败
 void MainWindow::configLoadFailed(const QString& fileName)
@@ -223,7 +230,31 @@ void MainWindow::show()
     ui->statusBar->showMessage(QString::fromLocal8Bit("开始加载工作站信息..."), 0);
     QString dir = QApplication::applicationDirPath();
     QString fileName = dir + QString::fromLocal8Bit("/../config/指显工作站信息.xml");
-    emit load(fileName, pStationList); //开始加载配置文件
+    //初始化ICE框架,创建监听通道
+    try
+    {
+        int argc = 0;
+        Ice::InitializationData initData;
+        initData.properties = Ice::createProperties();
+        //加载配置文件
+        initData.properties->load("Config.Server");
+        //log = new LogI;
+        //initData.logger = log;
+        communicator = Ice::initialize(argc, 0, initData);
+        adapter = communicator->createObjectAdapter("StateReceiver");
+        //初始化成功
+        iceInitSuccess = true;
+    }
+    catch (const IceUtil::Exception& ex)
+    {
+        iceInitSuccess = false;
+        ostringstream ostr;
+        ostr << ex;
+        QString s = ostr.str().c_str();
+        QMessageBox::information(NULL, QStringLiteral("警告"), QStringLiteral("创建工作站状态监视通道失败：%1").arg(s));
+    }
+
+    emit load(fileName, pStationList); //开始加载工作站配置文件
 }
 
 //关闭程序前提示确认
@@ -234,7 +265,14 @@ void MainWindow::closeEvent(QCloseEvent * event)
         QString::fromLocal8Bit("确定要退出集中监控程序吗?"),
         QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
     {
-        event->accept();
+        try
+        {
+            communicator->destroy();
+        }
+        catch (const IceUtil::Exception&)
+        {
+        }
+        event->accept();        
     }
     else
     {

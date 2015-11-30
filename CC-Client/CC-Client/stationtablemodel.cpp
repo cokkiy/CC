@@ -297,7 +297,7 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
 //工作站状态发生变化
 void StationTableModel::stationPropertyChanged(const QString& propertyName, const QObject* station)
 {
-    int row = pStations->indexOf((StationInfo*)station);
+    int row = pStations->indexAtCurrent((StationInfo*)station);
     if (row != -1)
     {
         dataChanged(index(row, 0), index(row, totalColumnCount));

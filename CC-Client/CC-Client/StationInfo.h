@@ -3,6 +3,8 @@
 #include <QMetaType>
 #include <QObject>
 #include <QVariant>
+#include <QDateTime>
+#include <time.h>
 /**************************************
  @class: StationInfo 指显工作站信息类,定义了指显工作站
  @see IP, @see MAC @see Name
@@ -294,6 +296,26 @@ public:
      **/
     QString IP;
 
+    /*
+     工作站标识,区别不同的工作站
+     **/
+    QString stationId;
+
+    /*
+    工作站操作系统名称
+    **/
+    QString osName;
+
+    /*
+    工作站操作系统版本
+    **/
+    QString osVersion;
+    
+    /*
+    最后一次收到工作站状态时间 
+     **/
+    time_t lastTick;
+
 public:
     /*!
     订阅属性变化事件
@@ -321,6 +343,41 @@ public:
     创建时间：2015/11/12 21:27:35
     */
     bool inExecutingState();
+
+    /*!
+    设置工作站标识
+    @param const std::string & stationId 工作站唯一标识
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/24 10:41:20
+    */
+    void setStationId(const std::string& stationId);
+    /*!
+    设置工作站操作系统名称
+    @param const std::string & osName 工作站操作系统名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/24 10:41:20
+    */
+    void setOSName(const std::string& osName);
+    /*!
+    设置工作站操作系统版本
+    @param const std::string & osVersion 工作站操作系统版本
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/24 10:41:20
+    */
+    void setOSVersion(const std::string& osVersion);
+
+
+    /*!
+    设置最后收到状态时间
+    @param const time_t & time 收到状态的时间
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/25 12:17:13
+    */
+    void setLastTick(const time_t& time = time(NULL));
 signals:
     /*!
     属性发生变化

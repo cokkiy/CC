@@ -1,5 +1,7 @@
 ﻿#include "monitor.h"
 #include <QTimerEvent>
+#include <QDateTime>
+#include <time.h>
 
 
 Monitor::Monitor(QObject *parent)
@@ -20,7 +22,32 @@ void Monitor::run()
     while (true)
     {
         //等待1秒
-        QThread::sleep(1);
+        QThread::sleep(2);
+        //获取当前时间
+        time_t now = time(NULL);
+        for (auto& station : *pStations)
+        {
+            if (station.StationIsRunning())
+            {
+                if (now - station.lastTick >= 10)
+                {
+                    //10秒内没有收到状态,则转为未知状态
+                    station.setState(StationInfo::Unkonown);
+                }
+                else if (now - station.lastTick >= 5)
+                {
+                    //如果大于5秒仍然没有收到新的状态,则报错
+                    station.setState(StationInfo::Error);
+                    station.setHint(QStringLiteral("5秒内没有收到该工作站状态,请检查"));
+                }
+                else if (now - station.lastTick >= 2)
+                {
+                    //如果大于2秒仍然没有收到新的状态,则报警
+                    station.setState(StationInfo::Warning);
+                    station.setHint(QStringLiteral("2秒内没有收到该工作站状态,请检查"));
+                }
+            }
+        }
     }
 }
 

@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QTranslator>
 #include <QLibraryInfo>
+#include <Ice/Ice.h>
+
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +16,7 @@ int main(int argc, char *argv[])
 
     QTranslator myappTranslator;
     myappTranslator.load("cc-client_" + QLocale::system().name());
-    a.installTranslator(&myappTranslator);
+    a.installTranslator(&myappTranslator);       
 
     MainWindow w;
     w.show();

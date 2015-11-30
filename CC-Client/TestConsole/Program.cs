@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Diagnostics;
+using System.Threading;
 
 namespace TestConsole
 {
@@ -12,12 +11,33 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine(System.GC.GetTotalMemory(false));
-            long result = sysconf((int)SysConfName._SC_PHYS_PAGES) * (long)sysconf((int)SysConfName._SC_PAGESIZE);
 
-            Console.WriteLine(result);
+            //             PerformanceCounter pCounter = new PerformanceCounter("Process", "% Processor Time", "4085/designer");
+            //             for (int i = 0; i < 10; i++)
+            //             {
+            //                 Console.WriteLine(pCounter.NextValue()/System.Environment.ProcessorCount);
+            //                 Thread.Sleep(500);
+            //             }
+            // 
+            // 
+            //             Process[] processes = Process.GetProcessesByName("designer");
+            //             foreach (var process in processes)
+            //             {
+            // 
+            //                 Console.WriteLine("{0}/{1}:Thread Count:{2} Memory:{3} StartTime:{4} CPU:{5}",
+            //                     process.Id, process.ProcessName, process.Threads.Count,
+            //                     process.WorkingSet64, process.StartTime, process.TotalProcessorTime);
+            //             }
+
+            if (!EventLog.SourceExists("CCService"))
+            {
+                EventLog.CreateEventSource("CCService", "Application");
+            }
+
             Console.ReadKey();
         }
+
+       
 
         [DllImport("libc")]
         extern static long sysconf(int __name);

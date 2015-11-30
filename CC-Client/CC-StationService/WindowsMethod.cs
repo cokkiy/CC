@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Text;
@@ -9,14 +10,20 @@ namespace CC_StationService
 {
     class WindowsMethod : IPlatformMethod
     {
+        //总内存
+        private static long totalMemory = 0;
+
         public long GetTotalMemory()
         {
+            if (totalMemory != 0)
+                return totalMemory;
             ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_ComputerSystem");
             var searcher = new ManagementObjectSearcher(query);
             var collection = searcher.Get();
             foreach (var item in collection)
             {
-                return (long)item["TotalPhysicalMemory"];
+                totalMemory = (long)item["TotalPhysicalMemory"];
+                return totalMemory;
             }
             return 0;
         }
@@ -30,5 +37,26 @@ namespace CC_StationService
         {
             System.Diagnostics.Process.Start("shutdown -s -f");
         }
+
+        /// <summary>
+        /// 获取内存使用情况
+        /// </summary>
+        /// <returns></returns>
+        public MemoryInfo GetMemoryInfo()
+        {
+            PerformanceCounter memoryCounter = new PerformanceCounter("Memory", "Available Bytes");
+            MemoryInfo info = new MemoryInfo();
+            if (totalMemory == 0)
+            {
+                info.Total = GetTotalMemory();
+            }
+            info.Total = totalMemory;
+            info.Free = memoryCounter.RawValue;
+            info.Cached = 0;
+            info.Buffers = 0;
+            memoryCounter.Close();
+            return info;
+        }
+
     }
 }

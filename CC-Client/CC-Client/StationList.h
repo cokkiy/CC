@@ -36,7 +36,7 @@ public:
     ~StationList() = default;
 
     /*!
-    获取当前工作站数量(已过滤后的)
+    获取当前显示工作站数量(已过滤后的)
     @return int 工作站数量
     作者：cokkiy（张立民)
     创建时间：2015/11/04 12:06:18
@@ -52,7 +52,7 @@ public:
     int total();
 
     /*!
-    获取当前工作站列表（过滤后的)中\see row位置的工作站
+    获取当前工作站显示列表（过滤后的)中\see row位置的工作站
     @param int row 指定位置
     @return StationInfo \see row位置的工作站信息
     作者：cokkiy（张立民)
@@ -61,7 +61,7 @@ public:
     StationInfo* atCurrent(int row); 
     
     /*!
-    获取当前工作站列表（过滤后的)\see row位置的工作站引用
+    获取当前工作站显示列表（过滤后的)\see row位置的工作站引用
     @param int row 指定位置
     @return StationInfo \see row位置的工作站引用
     作者：cokkiy（张立民)
@@ -70,7 +70,7 @@ public:
     StationInfo& refCurrent(int row);
 
     /*!
-    获取当前工作站列表（过滤后的)\see row位置的工作站(const)
+    获取当前工作站显示列表（过滤后的)\see row位置的工作站(const)
     @param int row 指定位置
     @return StationInfo \see row位置的工作站信息
     作者：cokkiy（张立民)
@@ -80,22 +80,63 @@ public:
 
 
     /*!
-    获取指定工作站在当前工作站列表（过滤后的)中的位置
+    获取指定工作站在当前显示列表中的位置
     @param StationInfo * pStation 工作站
     @return int
     作者：cokkiy（张立民)
     创建时间：2015/11/12 10:50:06
     */
-    int indexOf(const StationInfo* pStation) const;
+    int indexAtCurrent(const StationInfo* pStation) const;
 
     /*!
     查找指定IP的工作站信息
     @param QString ip 工作站IP
-    @return StationInfo* 指定IP的工作站指针
+    @return StationInfo* 指定IP的工作站指针,如果不存在,返回NULL
     作者：cokkiy（张立民)
     创建时间：2015/11/12 17:41:43
     */
     StationInfo* find(QString ip);
+
+    /*!
+    根据工作站唯一标识(\see stationId)查找工作站信息
+    @param const std::string & stationId 工作站唯一标识
+    @return StationInfo* 指定标识的工作站指针,如果不存在,返回NULL
+    作者：cokkiy（张立民)
+    创建时间：2015/11/24 11:19:48
+    */
+    StationInfo* findById(const std::string& stationId);
+
+
+    /*!
+    查找指定mac->IP对应的工作站信息
+    @param std::pair<const std::string, std::list<std::string>> 工作站的mac->list<ip>
+    @return StationInfo* 指定信息的工作站指针,如果不存在,返回NULL
+    作者：cokkiy（张立民)
+    创建时间：2015/11/24 10:22:10
+    */
+    StationInfo* find(const std::pair<const std::string, std::list<std::string>> &);
+
+    /*!
+    获取全部工作站列表的开始位置
+    @return std::list<StationInfo>::iterator 全部工作站列表的开始位置
+    作者：cokkiy（张立民)
+    创建时间：2015/11/25 12:31:08
+    */
+    std::list<StationInfo>::iterator begin()
+    {
+        return allStations.begin();
+    }
+
+    /*!
+    获取全部工作站列表的结束位置
+    @return std::list<StationInfo>::iterator 全部工作站列表的结束位置
+    作者：cokkiy（张立民)
+    创建时间：2015/11/25 12:31:45
+    */
+    std::list<StationInfo>::iterator end()
+    {
+        return allStations.end();
+    }
 
     /*!
     订阅全部工作站属性变化通知事件

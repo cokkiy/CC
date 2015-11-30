@@ -1,0 +1,41 @@
+﻿#
+# The client reads this property to create the reference to the
+# "StateReceiver" object in the server.
+# Multicast address between 233.0.0.0 to 239.255.255.255
+StateReceiver.Proxy=stateReceiver:udp -h 239.100.1.1 -p 10000 --sourceAddress 192.168.0.203 --interface 192.168.0.203 --ttl 255
+
+#
+# The Controller endpoint, cc-client can sent control message 
+# to workstation by this point
+#
+Controller.Endpoints=tcp -h 0.0.0.0 -p 10000
+
+#
+# Alternative IPv6 configuration
+#
+#Ice.IPv6=1
+#StateReceiver.Proxy=discover:udp -h "ff15::1:1" -p 10000
+
+
+#
+# Warn about connection exceptions
+#
+Ice.Warn.Connections=1
+
+#
+# Network Tracing
+#
+# 0 = no network tracing
+# 1 = trace connection establishment and closure
+# 2 = like 1, but more detailed
+# 3 = like 2, but also trace data transfer
+#
+Ice.Trace.Network=3
+
+#
+# Protocol Tracing
+#
+# 0 = no protocol tracing
+# 1 = trace protocol messages
+#
+Ice.Trace.Protocol=1
