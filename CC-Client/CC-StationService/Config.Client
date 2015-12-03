@@ -30,7 +30,7 @@ Ice.Warn.Connections=1
 # 2 = like 1, but more detailed
 # 3 = like 2, but also trace data transfer
 #
-Ice.Trace.Network=3
+Ice.Trace.Network=0
 
 #
 # Protocol Tracing
@@ -38,4 +38,12 @@ Ice.Trace.Network=3
 # 0 = no protocol tracing
 # 1 = trace protocol messages
 #
-Ice.Trace.Protocol=1
+#Ice.Trace.Protocol=1
+
+# Control Server
+#Close connection on idle forceful
+Ice.ACM.Close=4 
+# No heat beat ping
+Ice.ACM.Heartbeat=0
+# time out 30
+Ice.ACM.Timeout=30

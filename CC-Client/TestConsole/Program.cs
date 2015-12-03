@@ -29,10 +29,7 @@ namespace TestConsole
             //                     process.WorkingSet64, process.StartTime, process.TotalProcessorTime);
             //             }
 
-            if (!EventLog.SourceExists("CCService"))
-            {
-                EventLog.CreateEventSource("CCService", "Application");
-            }
+            Console.WriteLine(System.Environment.MachineName);
 
             Console.ReadKey();
         }

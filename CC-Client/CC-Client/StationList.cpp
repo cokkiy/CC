@@ -1,5 +1,7 @@
 ﻿#include "StationList.h"
-
+#include <QTextStream>
+#include <QFile>
+#include <QTextCodec>
 /*!
 获取当前显示工作站数量
 @return int 工作站数量
@@ -92,7 +94,8 @@ StationInfo* StationList::find(QString ip)
 {
     for (auto& s : allStations)
     {
-        if (s.IP.compare(ip) == 0)
+        QStringList ipList = s.IP().split(",", QString::SkipEmptyParts);
+        if (ipList.indexOf(ip) != -1)
         {
             return &s;
         }
@@ -111,16 +114,13 @@ StationInfo* StationList::find(const std::pair<const std::string, std::list<std:
 {
     for (auto& station : allStations)
     {
-        if (station.mac.compare(QString::fromStdString(ni.first), Qt::CaseInsensitive) == 0)
+        for (auto& tempNI : station.NetworkIntefaces)
         {
-            for (auto& ip : ni.second)
+            if (tempNI.hasMacAndIPConfig(ni))
             {
-                if (station.IP.compare(QString::fromStdString(ip)) == 0)
-                {
-                    return &station;
-                }
+                return &station;
             }
-        }
+        }        
     }
 
     return NULL;
@@ -156,6 +156,32 @@ void StationList::subscribeAllStationsStateChangedEvent(const QObject* receiver,
     {
         station.subscribeStateChanged(receiver, member);
     }
+}
+
+/*!
+订阅工作站被添加事件
+@param const QObject * receiver 事件接收函数所在对象的指针
+@param const char * member 事件接收函数名称
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/02 18:01:41
+*/
+void StationList::subscribeStationAddedEvent(const QObject* receiver, const char* member)
+{
+    connect(this, SIGNAL(stationAdded(StationInfo*)), receiver, member);
+}
+
+/*!
+订阅工作站列表变化事件
+@param const QObject * receiver 事件接收函数所在对象的指针
+@param const char * member 事件接收函数名称
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/03 9:14:33
+*/
+void StationList::subscribeListChangedEvent(const QObject* receiver, const char* member)
+{
+    connect(this, SIGNAL(stationListChanged()), receiver, member);
 }
 
 /*!
@@ -213,6 +239,31 @@ void StationList::filterANDsort()
 }
 
 /*!
+把工作站列表保存到文件中
+@param QString fileName 文件名
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/02 21:32:36
+*/
+void StationList::saveToFile(QString fileName)
+{
+    QFile file(fileName);
+    if (file.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream config(&file);
+        config.setCodec(QTextCodec::codecForName("UTF-8"));
+        config << QStringLiteral("<?xml version=\"1.0\" encoding=\"UTF - 8\" standalone=\"yes\"?>") << endl;
+        config << QStringLiteral("<指显工作站信息>") << endl;
+        for (auto&s : allStations)
+        {
+            config << s.toXmlString() << endl;
+        }
+        config << QStringLiteral("</指显工作站信息>") << endl;
+        file.close();
+    }
+}
+
+/*!
 根据工作站唯一标识(\see stationId)查找工作站信息
 @param const std::string & stationId 工作站唯一标识
 @return StationInfo* 指定标识的工作站指针,如果不存在,返回NULL
@@ -243,4 +294,6 @@ void StationList::push(const StationInfo& station)
     this->allStations.push_back(station);
     //currentStations 是allStations的投影,内部存储的是同一个对象
     this->currentStations.push_back(&allStations.back());
+    emit stationAdded(&allStations.back());
+    emit stationListChanged();
 }

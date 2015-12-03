@@ -46,18 +46,19 @@ namespace CC_StationService
                 initData.logger = logger;
                 ic = Ice.Util.initialize(initData);
 
-                //启动监视线程
-                //初始化监视应用程序列表为空
-                watcher = new SystemWatcher(ic);
-                watcher.StartWatching();
-                logger.print("开始系统资源监视...");
-
-                //启动控制通道
+                //创建控制适配器和对象
                 Ice.ObjectAdapter controlAdapter = ic.createObjectAdapter("Controller");
                 Ice.Object obj = new ControllerImp(watcher);
-                controlAdapter.add(obj, ic.stringToIdentity("StationController"));
+                IControllerPrx controlPrx = IControllerPrxHelper.uncheckedCast(controlAdapter.add(obj, ic.stringToIdentity("StationController")));
+                //启动控制通道
                 controlAdapter.activate();
                 logger.print("开始监听控制消息...");
+
+                //启动监视线程
+                //初始化监视应用程序列表为空
+                watcher = new SystemWatcher(ic, controlPrx);
+                watcher.StartWatching();
+                logger.print("开始系统资源监视...");               
             }
             catch (Exception ex)
             {

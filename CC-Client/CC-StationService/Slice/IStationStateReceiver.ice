@@ -2,9 +2,12 @@
 
 [["cpp:include:list"]]
 [["cpp:include:string"]]
+
 //Center Control
 module CC
 {
+	// 预定义控制接口
+	interface IController;
 
 	// string list, can't defines sequence<string> direct in struct
 	//["cpp:type:std::list<std::string>"]
@@ -31,7 +34,7 @@ module CC
 		///计算机名称
 		string computerName;
 		///网卡信息,包括MAC地址和对应的IP地址,一个MAC地址可以有多个IP地址
-		NIInfo NI;
+		NIInfo NetworkInterfaces;
 		///操作系统名称
 		string osName;
 		///操作系统版本
@@ -77,7 +80,7 @@ module CC
 		///收集系统状态
 		idempotent void receiveSystemState(StationSystemState systemState);
 		///收集工作站运行动态
-		idempotent void  receiveStationRunningState(StationRunningState stationRunningState);
+		idempotent void  receiveStationRunningState(StationRunningState stationRunningState, IController* controller);
 		///收集程序运行状态
 		idempotent void receiveAppRunningState(AppRunningState appRunningState);
 	};

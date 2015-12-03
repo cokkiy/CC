@@ -14,6 +14,8 @@ StationTableModel::StationTableModel(const StationList* pStations, QObject *pare
 {
     this->pStations = pStations;
     const_cast<StationList*>(pStations)->subscribeAllStationsPropertyChangedEvent(this, SLOT(stationPropertyChanged(const QString&, const QObject* )));
+    connect(pStations, SIGNAL(stationListChanged()), this, SLOT(stationListChanged()));
+    connect(pStations, SIGNAL(stationAdded(StationInfo* )), this, SLOT(stationAdded(StationInfo* )));
     powerOnIcons[0].addFile(":/Icons/powerOn-0.png");
     powerOnIcons[1].addFile(":/Icons/powerOn-1.png");
     powerOnIcons[2].addFile(":/Icons/powerOn-2.png");
@@ -49,7 +51,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         {
             QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存：%4\tCPU：%5");
             StationInfo* s = pStations->atCurrent(index.row());
-            return str.arg(s->name).arg(s->IP).arg(s->state2String()).arg(s->Memory()).arg(s->CPU());
+            return str.arg(s->name).arg(s->IP()).arg(s->state2String()).arg(s->Memory()).arg(s->CPU());
         }
         else if(displayMode==Details)
         {
@@ -63,7 +65,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
 
     if (role == Qt::TextAlignmentRole)
     {
-        if (displayMode == LargerIcons)
+        if (displayMode == LargerIcons || displayMode == SmallIcons)
         {
             return Qt::AlignHCenter;
         }
@@ -77,7 +79,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
     {
         QString tip = QStringLiteral("%1\r\nIP：%2\r\n状态：%3");
         auto s = pStations->atCurrent(index.row());
-        return tip.arg(s->name).arg(s->IP).arg(s->state2String());
+        return tip.arg(s->name).arg(s->IP()).arg(s->state2String());
     }
     if (role == Qt::ForegroundRole)
     {
@@ -269,7 +271,7 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
         return pStations->atCurrent(index.row())->name;
         break;
     case 1:
-        return pStations->atCurrent(index.row())->IP;
+        return pStations->atCurrent(index.row())->IP();
     case 2:
         return pStations->atCurrent(index.row())->state2String();
     case 3:
@@ -287,7 +289,7 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
     case 9:
         return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppThreadCount());
     case 10:
-        return pStations->atCurrent(index.row())->mac;
+        return pStations->atCurrent(index.row())->MAC();
     default:
         break;
     }    
@@ -302,4 +304,15 @@ void StationTableModel::stationPropertyChanged(const QString& propertyName, cons
     {
         dataChanged(index(row, 0), index(row, totalColumnCount));
     }
+}
+
+void StationTableModel::stationListChanged()
+{
+    this->beginResetModel();
+    this->endResetModel();
+}
+//工作站被添加
+void StationTableModel::stationAdded(StationInfo* addedStation)
+{
+    addedStation->subscribePropertyChanged(this, SLOT(stationPropertyChanged(const QString&, const QObject*)));
 }

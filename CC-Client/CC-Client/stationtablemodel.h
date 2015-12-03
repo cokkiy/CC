@@ -72,6 +72,10 @@ private:
     private slots:
     //工作站状态发生变化
     void stationPropertyChanged(const QString& propertyName, const QObject* station);
+    //工作站列表发生变化
+    void stationListChanged();
+    //工作站被添加
+    void stationAdded(StationInfo* addedStation);
 };
 
 #endif // STATIONTABLEMODEL_H

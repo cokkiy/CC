@@ -26,6 +26,7 @@ bool XDocument::Load(QIODevice * device)
     Q_ASSERT(device->isOpen()&&device->isReadable()&&device->isTextModeEnabled());
 
     QTextStream stream(device);
+    stream.setCodec(QTextCodec::codecForName("UTF-8"));
 
     QString all=stream.readAll();
 
@@ -97,7 +98,7 @@ bool XDocument::finishToken(int tokenType, stack<XAttribute>& unhandledAttribute
         XElement element=unhandledElements.top();
         if(element.Name.compare(curToken,Qt::CaseInsensitive)!=0)
         {
-            qCritical()<<"xml文档格式不正确，有未闭合的标签："<<element.Name<<endl;
+            qCritical()<<"xml file format error, unclosed tag: "<<element.Name<<endl;
 
             return false;
         }
@@ -354,7 +355,7 @@ bool XDocument::parse(const QString& content)
             else
             {
                 //否则，格式不正确
-                qFatal("xml 文档格式不正确，有不可识别的字符（\\）");
+                qWarning()<<QStringLiteral("xml file format error，unrecognized char（\\）");
                 return false;
 
             }

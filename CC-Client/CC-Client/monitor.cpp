@@ -62,6 +62,7 @@ void Monitor::setStationList(StationList* pStations)
 {
     this->pStations = pStations;
     this->pStations->subscribeAllStationsStateChangedEvent(this, SLOT(stationStateChanged(const QObject* )));
+    this->pStations->subscribeStationAddedEvent(this, SLOT(stationAdded(StationInfo*)));
 }
 
 //工作站状态发生变化
@@ -98,5 +99,11 @@ void Monitor::timerEvent(QTimerEvent * event)
             pStation->setExecuteCounting(pStation->ExecuteCounting() + 1);
         }
     }
+}
+
+//响应工作站被添加事件
+void Monitor::stationAdded(StationInfo* addedStation)
+{
+    addedStation->subscribeStateChanged(this, SLOT(stationStateChanged(const QObject*)));
 }
 

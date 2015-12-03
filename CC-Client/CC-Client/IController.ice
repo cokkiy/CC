@@ -25,9 +25,9 @@ module CC
 		StationSystemState getSystemState(); 
 
 		///设置要监视的进程（名称)列表
-		void setWatchingApp(stringList procNames);
+		idempotent void setWatchingApp(stringList procNames);
 
 		///设置状态收集间隔（毫秒)
-		void setStateGatheringInterval(int interval);
+		idempotent void setStateGatheringInterval(int interval);
 	};
 };

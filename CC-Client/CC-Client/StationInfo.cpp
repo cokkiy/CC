@@ -1,12 +1,182 @@
 ﻿#include "StationInfo.h"
 #include <QObject>
 
+bool StationInfo::StationIsRunning()
+{
+    return m_StationIsRunning;
+}
+
+void StationInfo::setStationIsRunning(bool value)
+{
+    if (m_StationIsRunning != value)
+    {
+        m_StationIsRunning = value;
+        emit propertyChanged("StationIsRunning", this);
+    }
+}
+
+int StationInfo::ExecuteCounting()
+{
+    return m_ExecuteCounting;
+}
+
+void StationInfo::setExecuteCounting(int value)
+{
+    if (m_ExecuteCounting != value)
+    {
+        m_ExecuteCounting = value;
+        m_hint = QStringLiteral("命令已发送%1秒...").arg(m_ExecuteCounting);
+        emit propertyChanged("ExecuteCounting", this);
+    }
+}
+
+bool StationInfo::AppIsRunning()
+{
+    return m_AppIsRunning;
+}
+
+void StationInfo::setAppIsRunning(bool value)
+{
+    if (m_AppIsRunning != value)
+    {
+        m_AppIsRunning = value;
+        emit propertyChanged("AppIsRunning", this);
+    }
+}
+
+QString StationInfo::hint()
+{
+    return m_hint;
+}
+
+void StationInfo::setHint(QString value)
+{
+    if (m_hint != value)
+    {
+        m_hint = value;
+        emit propertyChanged("hint", this);
+    }
+}
+
+float StationInfo::AppMemory()
+{
+    return m_ZXMemory;
+}
+
+void StationInfo::setAppMemory(float value)
+{
+    if (m_ZXMemory != value)
+    {
+        m_ZXMemory = value;
+        emit propertyChanged("AppMemory", this);
+    }
+}
+
+size_t StationInfo::TotalMemory()
+{
+    return m_TotalMemory;
+}
+
+void StationInfo::setTotalMemory(size_t value)
+{
+    if (m_TotalMemory != value)
+    {
+        m_TotalMemory = value;
+        emit propertyChanged("TotalMemory", this);
+    }
+}
+
+int StationInfo::AppThreadCount()
+{
+    return m_zxThreadCount;
+}
+
+void StationInfo::setAppThreadCount(int value)
+{
+    if (m_zxThreadCount != value)
+    {
+        m_zxThreadCount = value;
+        emit propertyChanged("AppThreadCount", this);
+    }
+}
+
+int StationInfo::ProcCount()
+{
+    return m_ProcCount;
+}
+
+void StationInfo::setProcCount(int value)
+{
+    if (m_ProcCount != value)
+    {
+        m_ProcCount = value;
+        emit propertyChanged("ProcCount", this);
+    }
+}
+
+float StationInfo::AppCPU()
+{
+    return m_zxCPU;
+}
+
+void StationInfo::setAppCPU(float value)
+{
+    if (m_zxCPU != value)
+    {
+        m_zxCPU = value;
+        emit propertyChanged("AppCPU", this);
+    }
+}
+
+float StationInfo::Memory()
+{
+    return m_Memory;
+}
+
+void StationInfo::setMemory(float value)
+{
+    if (m_Memory != value)
+    {
+        m_Memory = value;
+        emit propertyChanged("Memory", this);
+    }
+}
+
+StationInfo::State StationInfo::state()
+{
+    return m_state;
+}
+
+void StationInfo::setState(State value)
+{
+    if (m_state != value)
+    {
+        m_state = value;
+        m_hint = QStringLiteral(""); //状态变化时清除原来提示信息
+        emit propertyChanged("state", this);
+        emit stateChanged(this);
+    }
+}
+
+float StationInfo::CPU()
+{
+    return m_CPU;
+}
+
+void StationInfo::setCPU(float value)
+{
+    if (m_CPU != value)
+    {
+        m_CPU = value;
+        emit propertyChanged("CPU", this);
+    }
+}
+
 /*复制构造函数*/
 StationInfo::StationInfo(const StationInfo& ref)
 {
     this->name = ref.name;
-    this->IP = ref.IP;
-    this->mac = ref.mac;
+    this->NetworkIntefaces.insert(this->NetworkIntefaces.begin(), ref.NetworkIntefaces.begin(), ref.NetworkIntefaces.end());
     this->m_state = ref.m_state;
     this->m_CPU = ref.m_CPU;
     this->m_Memory = ref.m_Memory;
@@ -139,6 +309,114 @@ void StationInfo::setOSVersion(const std::string& osVersion)
 void StationInfo::setLastTick(const time_t& time /*= time(NULL)*/)
 {
     this->lastTick = time;
+}
+
+/*!
+返回描述工作站的字符串
+@return QString 描述工作站的字符串
+作者：cokkiy（张立民)
+创建时间：2015/12/01 16:35:23
+*/
+QString StationInfo::toString()
+{
+    QString allIP = QStringLiteral("");
+    for (auto& ni : NetworkIntefaces)
+    {
+        allIP += ni.getAllIPString() + ",";
+    }
+    allIP = allIP.left(allIP.length() - 1);
+    return QStringLiteral("%1 IP(%2)").arg(name).arg(allIP);
+}
+
+/*!
+获取表示所有IP地址的字符串,多个IP用逗号分隔
+@return QString 表示所有IP地址的字符串,多个IP用逗号分隔
+作者：cokkiy（张立民)
+创建时间：2015/12/01 16:50:44
+*/
+QString StationInfo::IP()
+{
+    QString allIP = QStringLiteral("");
+    for (auto& ni : NetworkIntefaces)
+    {
+        allIP = allIP.append(ni.getAllIPString()).append(",");
+    }
+    return allIP.left(allIP.length() - 1);
+}
+
+/*!
+获取表示所有MAC地址的字符串,多个MAC地址用逗号分隔
+@return QString 表示所有MAC地址的字符串,多个MAC地址用逗号分隔
+作者：cokkiy（张立民)
+创建时间：2015/12/01 17:09:46
+*/
+QString StationInfo::MAC()
+{
+    QString result;
+    for (auto& ni : NetworkIntefaces)
+    {
+        result = result.append(ni.getMAC()).append(",");
+    }
+    return result.left(result.length() - 1);
+}
+
+/*!
+返回工作站所有配置信息的XML字符串
+@return QString 工作站所有配置信息的XML字符串
+作者：cokkiy（张立民)
+创建时间：2015/12/02 22:49:13
+*/
+QString StationInfo::toXmlString()
+{
+    QString xml = QStringLiteral("  <指显工作站>\r\n")
+        + QStringLiteral("    <名称>%1</名称>\r\n").arg(name);
+    for (auto&ni : NetworkIntefaces)
+    {
+        xml += QStringLiteral("    <网卡>")
+            + QStringLiteral("      <MAC>%1</MAC>").arg(ni.getMAC());
+        for (auto&ip : ni.getIPList())
+        {
+            xml += QStringLiteral("      <IP>%1</IP>").arg(QString::fromStdString(ip));
+        }
+        xml += QStringLiteral("    </网卡>");
+    }
+    xml += QStringLiteral("  </指显工作站>\r\n");
+    return xml;
+}
+
+void StationInfo::clearMonitorProc()
+{
+    this->monitorProcessList.clear();
+}
+
+void StationInfo::addMonitorProc(QString procName)
+{
+    this->monitorProcessList.push_back(procName);
+}
+
+QStringList StationInfo::getStartAppNames()
+{
+    return startAppList;
+}
+
+void StationInfo::addStartApp(QString name)
+{
+    startAppList.push_back(name);
+}
+
+void StationInfo::addStartApps(QStringList names)
+{
+    startAppList.append(names);
+}
+
+void StationInfo::clearStartApp()
+{
+    startAppList.clear();
+}
+
+QStringList StationInfo::getMonitorProcNames()
+{
+    return monitorProcessList;
 }
 
 /*!

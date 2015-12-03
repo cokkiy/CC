@@ -17,17 +17,15 @@ using namespace CC;
 作者：cokkiy（张立民)
 创建时间：2015/11/10 15:43:35
 */
-StationManager::StationManager(StationList* stations, const QModelIndexList& indexs /*= QModelIndexList()*/, QObject *parent /*= NULL*/)
+StationManager::StationManager(StationList* stations, Ice::CommunicatorPtr  communicator,
+    const QModelIndexList& indexs /*= QModelIndexList()*/, QObject *parent /*= NULL*/)
     :QObject(parent)
 {
     this->pStations = stations;
     this->stationIndexs = indexs;
+    this->communicator = communicator;
 }
 
-StationManager::~StationManager()
-{
-
-}
 /*!
 全部开机
 @return void
@@ -179,5 +177,28 @@ void StationManager::forceExitApp()
 
 }
 
+
+/*!
+设置监视间隔
+@param int interval 监视间隔（毫秒)
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/01 11:42:42
+*/
+void StationManager::setInterval(int interval)
+{
+//     int port = communicator->getProperties()->getPropertyAsInt("Controller.Port");
+//     for (auto& station : *pStations)
+//     {
+//         QString proxyString = QStringLiteral("control:tcp -h %1 -p %2").arg(station.IP).arg(port);
+//         auto proxy = communicator->stringToProxy(proxyString.toStdString());
+//         IControllerPrx prx = IControllerPrx::uncheckedCast(proxy);
+//         prx->begin_setStateGatheringInterval(interval,
+//             [](const ::Ice::AsyncResultPtr& result)
+//         {
+//             bool c = result.get()->isCompleted();
+//         });
+//     }
+}
 
 

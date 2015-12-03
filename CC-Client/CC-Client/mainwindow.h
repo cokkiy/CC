@@ -12,6 +12,7 @@
 #include "stationtablemodel.h"
 #include "floatingmenu.h"
 #include <Ice\Ice.h>
+#include "StationStateReceiver.h"
 
 namespace Ui {
     class MainWindow;
@@ -62,18 +63,20 @@ public:
     void on_actionViewMessage_triggered(bool checked);
     //消息列表右键菜单
     void on_msgListWidget_customContextMenuRequested(const QPoint &);
-    
+    //设置监视间隔
+    void on_actionSetInterval_triggered();
+    //自动更新工作站列表
+    void on_actionAllowAutoRefreshList_triggered(bool checked);
+    //新加工作站
+    void on_actionNewStation_triggered();
 private:
     Ui::MainWindow *ui;
 
     // 工作站信息加载完毕
-    void configLoaded(StationList* pStations);
+    void configLoaded(StationList* pStations, bool success);
 
     //小图标模式（默认模式)
     void smallIcomMode();
-
-    //工作站信息加载失败
-    void configLoadFailed(const QString& fileName);
 
     //加载配置文件线程
     QThread ldconf_thread;
@@ -89,6 +92,11 @@ private:
     //table header
     QHeaderView* tableHeader;
 
+    //工作站文件目录
+    QString filePath;
+    //工作站文件名称
+    QString fileName;
+
     // Create an ice communicator 
     // Ice communicator for receiving station state
     Ice::CommunicatorPtr communicator;
@@ -96,6 +104,8 @@ private:
     Ice::ObjectAdapterPtr adapter;
     //ICE框架初始化是否成功
     bool iceInitSuccess = false;
+    //工作站信息接收指针
+    StationStateReceiver* StationStateReceiverPtr = nullptr;
 
 private slots:
     //点击标题栏排序
@@ -106,12 +116,16 @@ private slots:
     void operationMenuToShow();
     //工作站状态发生变化
     void stationStateChanged(const QObject*);
+    //工作站被添加事件处理函数
+    void onStationAdded(StationInfo* addedStation);
     //清空消息记录
     void clearMessage();
     //拷贝选择的消息
     void copyMessage();
     //拷贝全部消息
     void copyAllMessage();
+    //工作站列表发生变化
+    void onStationListChanged();
 private:
     //添加按钮到右键菜单
     void addButtons(FloatingMenu* menu);
@@ -136,27 +150,41 @@ public:
         XDocument doc;
         if (doc.Load(filename))
         {
-            auto elements = doc.getChild().getChildrenByName(QString::fromLocal8Bit("指显工作站"));
+            auto elements = doc.getChild().getChildrenByName(QStringLiteral("指显工作站"));
             for (XElement el : elements)
             {
                 StationInfo station;
-                station.name = el.getChildValue(QString::fromLocal8Bit("名称"));
-                station.IP = el.getChildValue(QString::fromLocal8Bit("IP"));
-                station.mac = el.getChildValue(QString::fromLocal8Bit("MAC"));
+                station.name = el.getChildValue(QStringLiteral("名称"));
+                for (XElement& niElemet : el.getChildrenByName(QStringLiteral("网卡")))
+                {
+                    QString mac = niElemet.getChildValue(QStringLiteral("MAC"));
+                    QStringList ipList;
+                    for (XElement& ipElement : niElemet.getChildrenByName(QStringLiteral("IP")))
+                    {
+                        ipList.push_back(ipElement.Value);
+                    }
+                    NetworkInterface ni(mac, ipList);
+                    station.NetworkIntefaces.push_back(ni);
+                }
                 pStations->push(station);
             }
-            emit loaded(pStations);
+            emit loaded(pStations, true);
         }
         else
         {
-            emit fail(filename);
+            emit loaded(pStations, false);
         }
     }
 signals:
-    // the config file is loaded
-    void loaded(StationList* pStations);
-    // load file error
-    void fail(const QString filename);
+    /*!
+    列表加载完毕信号,当工作站加载完毕时被触发
+    @param StationList * pStations 工作站列表
+    @param bool success 是否成功加载
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 9:20:23
+    */
+    void loaded(StationList* pStations,bool success);
 };
 
 #endif // MAINWINDOW_H

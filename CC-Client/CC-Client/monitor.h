@@ -42,7 +42,9 @@ private:
     //工作站状态发生变化
     void stationStateChanged(const QObject* station);
     //定时器事件,提供执行计数工作
-    virtual void timerEvent(QTimerEvent *) override;    
+    virtual void timerEvent(QTimerEvent *) override;   
+    //工作站被添加
+    void stationAdded(StationInfo* addedStation);
 
 };
 

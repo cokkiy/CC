@@ -4,6 +4,7 @@
 #include <QObject>
 #include "StationList.h"
 #include <QAbstractItemModel>
+#include <Ice/Ice.h>
 /************************************************************************
  @class StationManager:工作站管理类,管理工作站启动,关闭,重启,运行程序
  等动作
@@ -16,14 +17,16 @@ public:
     /*!
     创建一个工作站管理类的实例
     @param StationList * stations 工作站列表
+    @param Ice::Communicator communicator ICE通信对象
     @param const QModelIndexList & indexs 选择的工作站索引
     @param QObject * parent 
     @return 
     作者：cokkiy（张立民)
     创建时间：2015/11/10 15:43:35
     */
-    StationManager(StationList* stations, const QModelIndexList& indexs = QModelIndexList(), QObject *parent = NULL);
-    ~StationManager();
+    StationManager(StationList* stations, Ice::CommunicatorPtr communicator,
+        const QModelIndexList& indexs = QModelIndexList(), QObject *parent = NULL);
+    ~StationManager() = default;
 
     public slots:
     /*!
@@ -120,11 +123,23 @@ public:
     */
     void forceExitApp();  
 
+    /*!
+    设置监视间隔
+    @param int interval 监视间隔（毫秒)
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 11:42:42
+    */
+    void setInterval(int interval);
 private:
     //全部工作站列表
     StationList* pStations;
     //选择的工作站索引
     QModelIndexList stationIndexs;
+
+    //ICE通信对象
+    Ice::CommunicatorPtr  communicator;
+
 };
 
 #endif // STATIONMANAGER_H

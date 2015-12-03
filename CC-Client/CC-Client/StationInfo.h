@@ -3,8 +3,9 @@
 #include <QMetaType>
 #include <QObject>
 #include <QVariant>
-#include <QDateTime>
 #include <time.h>
+#include <list>
+#include "NetworkInterface.h"
 /**************************************
  @class: StationInfo 指显工作站信息类,定义了指显工作站
  @see IP, @see MAC @see Name
@@ -28,19 +29,9 @@ private:
     bool m_StationIsRunning=false;
 public:
     //获取工作站是否在运行
-    bool StationIsRunning()
-    {
-        return m_StationIsRunning;
-    }
+    bool StationIsRunning();
     //设置工作站是否在运行
-    void setStationIsRunning(bool value)
-    {
-        if (m_StationIsRunning != value)
-        {
-            m_StationIsRunning = value;
-            emit propertyChanged("StationIsRunning", this);
-        }
-    }
+    void setStationIsRunning(bool value);
 
 
 public:
@@ -70,207 +61,94 @@ private:
     int m_ExecuteCounting = 0;
 public:
     //获取执行计数
-    int ExecuteCounting()
-    {
-        return m_ExecuteCounting;
-    }
+    int ExecuteCounting();
     //设置执行计数
-    void setExecuteCounting(int value)
-    {
-        if (m_ExecuteCounting != value)
-        {
-            m_ExecuteCounting = value;
-            m_hint = QStringLiteral("命令已发送%1秒...").arg(m_ExecuteCounting);
-            emit propertyChanged("ExecuteCounting", this);
-        }
-    }
+    void setExecuteCounting(int value);
 
 private:
     bool m_AppIsRunning = false;
 public:
     //获取指显软件是否在运行
-    bool AppIsRunning()
-    {
-        return m_AppIsRunning;
-    }
+    bool AppIsRunning();
     //设置指显软件是否在运行
-    void setAppIsRunning(bool value)
-    {
-        if (m_AppIsRunning != value)
-        {
-            m_AppIsRunning = value;
-            emit propertyChanged("AppIsRunning", this);
-        }
-    }
+    void setAppIsRunning(bool value);
 
 private:
     QString m_hint;
 public:
     //获取提示信息
-    QString hint()
-    {
-        return m_hint;
-    }
+    QString hint();
     //设置提示信息
-    void setHint(QString value)
-    {
-        if (m_hint != value)
-        {
-            m_hint = value;
-            emit propertyChanged("hint", this);
-        }
-    }
+    void setHint(QString value);
 
 
 private:
     float m_ZXMemory = 0;
 public:
     //获取指显软件所占内存百分比
-    float AppMemory()
-    {
-        return m_ZXMemory;
-    }
+    float AppMemory();
     //设置指显软件所占百分比
-    void setAppMemory(float value)
-    {
-        if (m_ZXMemory != value)
-        {
-            m_ZXMemory = value;
-            emit propertyChanged("AppMemory", this);
-        }
-    }
+    void setAppMemory(float value);
 
 
 private:
     size_t m_TotalMemory = 0;
 public:
     //获取总内存
-    size_t TotalMemory()
-    {
-        return m_TotalMemory;
-    }
+    size_t TotalMemory();
     //设置总内存
-    void setTotalMemory(size_t value)
-    {
-        if (m_TotalMemory != value)
-        {
-            m_TotalMemory = value;
-            emit propertyChanged("TotalMemory", this);
-        }
-    }
+    void setTotalMemory(size_t value);
 
 
 private:
     int m_zxThreadCount = 0;
 public:
     //获取指显软件线程数量
-    int AppThreadCount()
-    {
-        return m_zxThreadCount;
-    }
+    int AppThreadCount();
     //设置指显软件数量
-    void setAppThreadCount(int value)
-    {
-        if (m_zxThreadCount != value)
-        {
-            m_zxThreadCount = value;
-            emit propertyChanged("AppThreadCount", this);
-        }
-    }
+    void setAppThreadCount(int value);
 
 
 private:
     int m_ProcCount = 0;
 public:
     //获取进程数量
-    int ProcCount()
-    {
-        return m_ProcCount;
-    }
+    int ProcCount();
     //设置进程数量
-    void setProcCount(int value)
-    {
-        if (m_ProcCount != value)
-        {
-            m_ProcCount = value;
-            emit propertyChanged("ProcCount", this);
-        }
-    }
+    void setProcCount(int value);
 
 
 private:
     float m_zxCPU = 0;
 public:
     //获取应用CPU占用率
-    float AppCPU()
-    {
-        return m_zxCPU;
-    }
+    float AppCPU();
     //设置应用CPU占用率
-    void setAppCPU(float value)
-    {
-        if (m_zxCPU != value)
-        {
-            m_zxCPU = value;
-            emit propertyChanged("AppCPU", this);
-        }
-    }
+    void setAppCPU(float value);
 
 private:
     float m_Memory = 0;
 public:
     //获取系统内存总占用率
-    float Memory()
-    {
-        return m_Memory;
-    }
+    float Memory();
     //设置系统内存总占用率
-    void setMemory(float value)
-    {
-        if (m_Memory != value)
-        {
-            m_Memory = value;
-            emit propertyChanged("Memory", this);
-        }
-    }
+    void setMemory(float value);
 
 private:
     State m_state = Unkonown;
 public:
     //获取工作站状态
-    State state()
-    {
-        return m_state;
-    }
+    State state();
     //设置工作站状态
-    void setState(State value)
-    {
-        if (m_state != value)
-        {
-            m_state = value;
-            m_hint = QStringLiteral(""); //状态变化时清除原来提示信息
-            emit propertyChanged("state", this);
-            emit stateChanged(this);
-        }
-    }
+    void setState(State value);
 
 private:
-    float m_CPU;
+    float m_CPU = 0;
 public:
     //获取总CPU占用率
-    float CPU()
-    {
-        return m_CPU;
-    }
+    float CPU();
     //设置总CPU占用率
-    void setCPU(float value)
-    {
-        if (m_CPU != value)
-        {
-            m_CPU = value;
-            emit propertyChanged("CPU", this);
-        }
-    }
+    void setCPU(float value);
 
     /*默认构造函数*/
     StationInfo() = default;
@@ -287,14 +165,12 @@ public:
     工作站名称
     **/
     QString name;
+
     /*
-    工作站MAC地址
+    工作站网卡信息
     **/
-    QString mac;
-    /*
-     工作站IP地址
-     **/
-    QString IP;
+    std::list<NetworkInterface> NetworkIntefaces;
+    
 
     /*
      工作站标识,区别不同的工作站
@@ -316,7 +192,70 @@ public:
      **/
     time_t lastTick;
 
+private:
+        /*
+        需要启动程序名称列表
+        **/
+        QStringList startAppList;
+
+        /*
+        需要监视进程列表
+        **/
+        QStringList monitorProcessList;
+
 public:
+    /*!
+    获取需要启动程序名称列表
+    @return QStringList 需要启动程序名称列表
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 22:25:20
+    */
+    QStringList getStartAppNames();
+
+    /*!
+    添加启动程序
+    @param QString name 启动程序名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 16:47:03
+    */
+    void addStartApp(QString name);
+
+    /*!
+    添加一系列启动程序
+    @param QStringList names 启动程序名称列表
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 16:47:31
+    */
+    void addStartApps(QStringList names);
+
+    void clearStartApp();
+
+    /*!
+    获取需要监视进程列表
+    @return QStringList 需要监视进程列表
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 22:26:23
+    */
+    QStringList getMonitorProcNames();
+
+    /*!
+    清空监视进程列表
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 16:48:20
+    */
+    void clearMonitorProc();
+    /*!
+    添加一个监视进程名称
+    @param QString procName 
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 16:48:48
+    */
+    void addMonitorProc(QString procName);
+
     /*!
     订阅属性变化事件
     @param const QObject * receiver 接收者
@@ -378,6 +317,39 @@ public:
     创建时间：2015/11/25 12:17:13
     */
     void setLastTick(const time_t& time = time(NULL));
+
+    /*!
+    返回描述工作站的字符串
+    @return QString 描述工作站的字符串
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 16:35:23
+    */
+    QString toString();
+
+
+    /*!
+    获取表示所有IP地址的字符串,多个IP用逗号分隔
+    @return QString 表示所有IP地址的字符串,多个IP用逗号分隔
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 16:50:44
+    */
+    QString IP();
+    /*!
+    获取表示所有MAC地址的字符串,多个MAC地址用逗号分隔
+    @return QString 表示所有MAC地址的字符串,多个MAC地址用逗号分隔
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 17:09:46
+    */
+    QString MAC();
+
+    /*!
+    返回工作站所有配置信息的XML字符串
+    @return QString 工作站所有配置信息的XML字符串
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 22:49:13
+    */
+    QString toXmlString();
+    
 signals:
     /*!
     属性发生变化
@@ -389,7 +361,7 @@ signals:
     */
     void propertyChanged(const QString& propertyName, const QObject* owner);
     /*状态发生变化时事件*/
-    void stateChanged(const QObject* owner);
+    void stateChanged(const QObject* owner);    
 };
 
 //注册到metatype中

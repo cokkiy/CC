@@ -13,17 +13,23 @@ class StationStateReceiver : public CC::IStationStateReceiver
 private:
     // 工作站列表
     StationList* pStations;
+    //是否自动更新工作站列表
+    bool autoRefreshStationList;
+private:
+    //查找并更新工作站信息
+    StationInfo* findAndSetStationSystemState(const ::CC::StationSystemStatePtr& pStationSystemState);
 public:
     /*!
     创建一个工作站信息接收对象
     @param StationList* pStations 工作站列表
+    @param bool autoRefreshStationList 是否自动更新工作站列表
     @return 工作站信息接收对象
     作者：cokkiy（张立民)
     创建时间：2015/11/23 21:16:50
     */
-    StationStateReceiver(StationList* pStations);
+    StationStateReceiver(StationList* pStations, bool autoRefreshStationList = true);
     /*释放资源*/
-    ~StationStateReceiver();
+    ~StationStateReceiver() = default;
 
     /*!
     接收工作站系统状态
@@ -43,7 +49,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/24 9:39:14
     */
-    virtual void receiveStationRunningState(const ::CC::StationRunningStatePtr&, const ::Ice::Current& = ::Ice::Current()) override;
+    virtual void receiveStationRunningState(const ::CC::StationRunningStatePtr&, const ::CC::IControllerPrx&, const ::Ice::Current& = ::Ice::Current()) override;
 
     /*!
     接收工作站应用程序状态
@@ -64,5 +70,13 @@ public:
     */
     void setStations(StationList* pStations);
 
+    /*!
+    设置是否自动更新工作站列表
+    @param bool autoRefresh 是否自动更新工作站列表
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 18:02:53
+    */
+    void setAutoRefreshStationList(bool autoRefresh);
 };
 

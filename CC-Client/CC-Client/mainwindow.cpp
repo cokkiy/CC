@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "filterbuilddialog.h"
 #include <QMessageBox>
-#include <selectcomputerdialog.h>
 #include <QApplication>
 #include <QDir>
 #include "xdocument.h"
@@ -16,6 +15,8 @@
 #include "monitor.h"
 #include <QClipboard>
 #include "StationStateReceiver.h"
+#include "setintervaldialog.h"
+#include "editstationdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,15 +31,17 @@ MainWindow::MainWindow(QWidget *parent) :
     tableHeader->setSortIndicator(1, Qt::AscendingOrder); //默认, IP 正序
     //绑定点击排序
     connect(tableHeader, SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
+    //工作站文件名
+    filePath= QDir::homePath() + QStringLiteral("/.CC-Client/");
+    fileName = filePath + QStringLiteral("指显工作站信息.xml");
     //初始化工作站信息列表 
-    pStationList = new StationList();
+    pStationList = new StationList();    
     // 初始化加载线程
     ConfigLoader* loader = new ConfigLoader();
     loader->moveToThread(&ldconf_thread);
     connect(&ldconf_thread, &QThread::finished, loader, &QObject::deleteLater);
     connect(this, &MainWindow::load, loader, &ConfigLoader::load);
     connect(loader, &ConfigLoader::loaded, this, &MainWindow::configLoaded);
-    connect(loader, &ConfigLoader::fail, this, &MainWindow::configLoadFailed);
     ldconf_thread.start();
 }
 
@@ -54,8 +57,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionPower_On_triggered()
 {
     //打开指定计算机电源
-    selectComputerDialog dlg(this);
-    dlg.exec();
+
 }
 
 void MainWindow::on_actionAll_Power_On_triggered()
@@ -64,13 +66,22 @@ void MainWindow::on_actionAll_Power_On_triggered()
 }
 
 //工作站信息加载完毕
-void MainWindow::configLoaded(StationList* pStations)
+void MainWindow::configLoaded(StationList* pStations, bool success)
 {
-    ui->statusBar->showMessage(QString::fromLocal8Bit("工作站信息加载完毕。"),5000);
+    if (success)
+    {
+        ui->statusBar->showMessage(QString::fromLocal8Bit("工作站信息加载完毕。"), 5000);
+    }
+    else
+    {
+        ui->statusBar->showMessage(QStringLiteral("无法加载工作站信息，%1无法打开。").arg(fileName), 3000);
+    }
     //设置模型和视图
     pTableModel = new StationTableModel(pStations);
     //订阅状态变化
     pStations->subscribeAllStationsStateChangedEvent(this, SLOT(stationStateChanged(const QObject*)));
+    pStations->subscribeStationAddedEvent(this, SLOT(onStationAdded(StationInfo*)));
+    pStations->subscribeListChangedEvent(this, SLOT(onStationListChanged()));
     ui->tableView->setModel(pTableModel);
     ui->listView->setModel(pTableModel);
     //绑定鼠标进入事件,显示悬浮式菜单
@@ -84,15 +95,10 @@ void MainWindow::configLoaded(StationList* pStations)
     monitor->start(QThread::NormalPriority);
     if (iceInitSuccess)
     {
-        Ice::ObjectPtr servant = new StationStateReceiver(pStations);        
-        adapter->add(servant, communicator->stringToIdentity("stateReceiver"));
+        StationStateReceiverPtr = new StationStateReceiver(pStations);
+        adapter->add(StationStateReceiverPtr, communicator->stringToIdentity("stateReceiver"));
         adapter->activate();
     }
-}
-//工作站信息加载失败
-void MainWindow::configLoadFailed(const QString& fileName)
-{
-    ui->statusBar->showMessage(QString::fromLocal8Bit("无法加载工作站信息，%1无法打开。").arg(fileName), 3000);
 }
 
 //点击标题栏排序
@@ -172,6 +178,8 @@ void MainWindow::operationMenuToShow()
             action->setEnabled(true);
         }
     }
+    //新增按钮总是起作用
+    ui->actionNewStation->setEnabled(true);
 }
 
 //工作站状态发生变化
@@ -183,16 +191,23 @@ void MainWindow::stationStateChanged(const QObject* pObject)
     case StationInfo::Unkonown:
         break;
     case  StationInfo::Powering:
-        ui->msgListWidget->addItem(QStringLiteral("向%1（%2)发送开机命令...").arg(pStation->IP).arg(pStation->name));
+        ui->msgListWidget->addItem(QStringLiteral("向%1发送开机命令...").arg(pStation->toString()));
         break;
     case StationInfo::PowerOnFailure:
-        ui->msgListWidget->addItem(QStringLiteral("%1(%2)开机失败.").arg(pStation->IP).arg(pStation->name));
+        ui->msgListWidget->addItem(QStringLiteral("%1开机失败.").arg(pStation->toString()));
         break;
     default:
         break;
     }
     ui->msgListWidget->setCurrentItem(ui->msgListWidget->item(ui->msgListWidget->count() - 1));
 }
+
+//工作站被添加处理函数
+void MainWindow::onStationAdded(StationInfo* addedStation)
+{
+    addedStation->subscribeStateChanged(this, SLOT(stationStateChanged(const QObject*)));
+}
+
 //清空消息记录
 void MainWindow::clearMessage()
 {
@@ -218,6 +233,17 @@ void MainWindow::copyAllMessage()
     QGuiApplication::clipboard()->setText(msg);
 }
 
+//工作站列表发生变化
+void MainWindow::onStationListChanged()
+{
+    QDir dir(filePath);
+    if (!dir.exists())
+    {
+        dir.mkdir(filePath);
+    }
+    pStationList->saveToFile(fileName);
+}
+
 /*!
 重载show函数,实现加载配置信息并显示窗口
 @return void
@@ -227,9 +253,8 @@ void MainWindow::copyAllMessage()
 void MainWindow::show()
 {
     QMainWindow::show();
-    ui->statusBar->showMessage(QString::fromLocal8Bit("开始加载工作站信息..."), 0);
-    QString dir = QApplication::applicationDirPath();
-    QString fileName = dir + QString::fromLocal8Bit("/../config/指显工作站信息.xml");
+    ui->statusBar->showMessage(QStringLiteral("开始加载工作站信息..."), 0);
+    QString dir = QApplication::applicationDirPath();    
     //初始化ICE框架,创建监听通道
     try
     {
@@ -238,8 +263,6 @@ void MainWindow::show()
         initData.properties = Ice::createProperties();
         //加载配置文件
         initData.properties->load("Config.Server");
-        //log = new LogI;
-        //initData.logger = log;
         communicator = Ice::initialize(argc, 0, initData);
         adapter = communicator->createObjectAdapter("StateReceiver");
         //初始化成功
@@ -414,12 +437,54 @@ void MainWindow::on_msgListWidget_customContextMenuRequested(const QPoint & poin
     menu->show(this->cursor().pos().x(), this->cursor().pos().y());
 }
 
+// 设置监视间隔
+void MainWindow::on_actionSetInterval_triggered()
+{
+    if (iceInitSuccess)
+    {
+        SetIntervalDialog* dlg = new SetIntervalDialog();
+        dlg->setGeometry(this->cursor().pos().x(), this->cursor().pos().y(), dlg->width(), dlg->height());
+        if (dlg->exec() == QDialog::Accepted)
+        {
+            int interval = dlg->Interval();
+            //设置监视间隔
+            StationManager* manager = new StationManager(pStationList, communicator);
+            manager->setInterval(interval);
+        }
+        delete dlg;
+    }
+    else
+    {
+        QMessageBox::information(this, QStringLiteral("警告"), QStringLiteral("初始化通信框架失败,无法设置监视间隔."));
+    }
+}
+
+//自动更新工作站列表
+void MainWindow::on_actionAllowAutoRefreshList_triggered(bool checked)
+{
+    if (StationStateReceiverPtr != nullptr)
+    {
+        StationStateReceiverPtr->setAutoRefreshStationList(checked);
+    }
+}
+
+//新加工作站
+void MainWindow::on_actionNewStation_triggered()
+{
+    StationInfo* pStation = new StationInfo;
+    EditStationDialog dlg(pStation, EditStationDialog::New);
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        pStationList->push(*pStation);
+    }
+}
+
 //添加按钮到右键菜单
 void MainWindow::addButtons(FloatingMenu* menu)
 {
     QModelIndexList selectedIndexs = getSelectedIndexs();
     //创建工作站管理类
-    StationManager* manager=new StationManager(pStationList, selectedIndexs);
+    StationManager* manager = new StationManager(pStationList, communicator, selectedIndexs);
     if (!selectedJustOne(selectedIndexs))
     {
         //选择了多个

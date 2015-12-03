@@ -6,13 +6,14 @@
 /***************************************************************************
  @class StationList：工作站列表类,定义了对工作站进行排序,过滤等操作
  ***************************************************************************/
-class StationList 
+class StationList : public QObject
 {
+    Q_OBJECT
 public:
     //排序方式
     enum SortBy
     {
-        IP=0, /*按IP正排序*/
+        IP = 0, /*按IP正排序*/
         IP_DESC,/*按IP逆排序*/
         State,/*按状态正排序,正常的在前面*/
         State_DESC,/*按状态逆排序,正常的在后面*/
@@ -58,8 +59,8 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/04 12:07:09
     */
-    StationInfo* atCurrent(int row); 
-    
+    StationInfo* atCurrent(int row);
+
     /*!
     获取当前工作站显示列表（过滤后的)\see row位置的工作站引用
     @param int row 指定位置
@@ -147,7 +148,7 @@ public:
     创建时间：2015/11/12 17:44:28
     */
     void subscribeAllStationsPropertyChangedEvent(const QObject* receiver, const char* member);
-  
+
     /*!
     订阅全部工作站状态变化通知事件
     @param const QObject * receiver 事件接收函数所在对象的指针
@@ -159,9 +160,28 @@ public:
     void subscribeAllStationsStateChangedEvent(const QObject* receiver, const char* member);
 
     /*!
+    订阅工作站被添加事件
+    @param const QObject * receiver 事件接收函数所在对象的指针
+    @param const char * member 事件接收函数名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 18:01:41
+    */
+    void subscribeStationAddedEvent(const QObject* receiver, const char* member);
+
+    /*!
+    订阅工作站列表变化事件
+    @param const QObject * receiver 事件接收函数所在对象的指针
+    @param const char * member 事件接收函数名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 9:14:33
+    */
+    void subscribeListChangedEvent(const QObject* receiver, const char* member);
+    /*!
     根据@param filterString过滤工作站
     @param const FilterOperations&  过滤条件
-    @return void 
+    @return void
     作者：cokkiy（张立民)
     创建时间：2015/11/04 12:29:36
     */
@@ -184,6 +204,15 @@ public:
     创建时间：2015/11/04 12:32:52
     */
     void push(const StationInfo& station);
+
+    /*!
+    保存工作站列表到文件中
+    @param QString fileName 文件名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 22:00:51
+    */
+    void saveToFile(QString fileName);
 private:
     //全部工作站列表
     std::list<StationInfo> allStations;
@@ -195,6 +224,24 @@ private:
     SortBy sortby;
 
     //过滤并排序
-    void filterANDsort();    
+    void filterANDsort();
+
+signals:    
+    /*!
+    工作站列表变化信号：当工作站列表发生变化时被触发
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/01 16:26:43
+    */
+    void stationListChanged();
+    /*!
+    工作站被添加信号：当工作站被添加进去时被触发
+    @param StationInfo * addedStation 添加进去的工作站
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/02 17:58:20
+    */
+    void stationAdded(StationInfo* addedStation);
+    
 };
 

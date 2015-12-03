@@ -420,6 +420,10 @@
     <addaction name="actionStartApp"/>
     <addaction name="actionRestartApp"/>
     <addaction name="actionExitApp"/>
+    <addaction name="separator"/>
+    <addaction name="actionRemove"/>
+    <addaction name="actionEdit"/>
+    <addaction name="actionNewStation"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -452,6 +456,8 @@
     </widget>
     <addaction name="menuCPUOption"/>
     <addaction name="menuViewMemoryOption"/>
+    <addaction name="actionAllowAutoRefreshList"/>
+    <addaction name="actionSetInterval"/>
    </widget>
    <addaction name="menuControl"/>
    <addaction name="menuOperation"/>
@@ -839,6 +845,86 @@
    </property>
    <property name="statusTip">
     <string>重新启动全部工作站应用程序</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_3d_08.png</normaloff>:/Icons/52design.com_3d_08.png</iconset>
+   </property>
+   <property name="text">
+    <string>删除工作站</string>
+   </property>
+   <property name="toolTip">
+    <string>删除选定的工作站</string>
+   </property>
+   <property name="statusTip">
+    <string>从列表中删除选定的工作站</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/TOOLS.ico</normaloff>:/Icons/TOOLS.ico</iconset>
+   </property>
+   <property name="text">
+    <string>编辑工作站</string>
+   </property>
+   <property name="toolTip">
+    <string>编辑工作站信息</string>
+   </property>
+   <property name="statusTip">
+    <string>编辑选定工作站信息</string>
+   </property>
+  </action>
+  <action name="actionAllowAutoRefreshList">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>自动更新工作站列表</string>
+   </property>
+   <property name="iconText">
+    <string>允许自动更新工作站列表</string>
+   </property>
+   <property name="toolTip">
+    <string>允许自动更新工作站列表</string>
+   </property>
+   <property name="statusTip">
+    <string>允许自动更新工作站列表</string>
+   </property>
+  </action>
+  <action name="actionSetInterval">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_alth_023.png</normaloff>:/Icons/52design.com_alth_023.png</iconset>
+   </property>
+   <property name="text">
+    <string>设置监视间隔...</string>
+   </property>
+   <property name="toolTip">
+    <string>设置工作站监视间隔</string>
+   </property>
+   <property name="statusTip">
+    <string>设置工作站监视间隔</string>
+   </property>
+  </action>
+  <action name="actionNewStation">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/people_officee_o.ico</normaloff>:/Icons/people_officee_o.ico</iconset>
+   </property>
+   <property name="text">
+    <string>新建工作站</string>
+   </property>
+   <property name="toolTip">
+    <string>新建一个工作站配置项</string>
+   </property>
+   <property name="statusTip">
+    <string>新建一个工作站配置项</string>
    </property>
   </action>
  </widget>
