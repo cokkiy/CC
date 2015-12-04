@@ -1,7 +1,6 @@
 ﻿#pragma once
-
-// 引用系统状态
 #include "IStationStateReceiver.ice"
+
 //Center Control
 module CC
 {
@@ -21,8 +20,8 @@ module CC
 		///关闭系统
 		void shutdown();
 
-		///获取工作站系统状态
-		StationSystemState getSystemState(); 
+		///请求发送工作站基本信息
+		idempotent StationSystemState  getSystemState(); 
 
 		///设置要监视的进程（名称)列表
 		idempotent void setWatchingApp(stringList procNames);

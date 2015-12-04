@@ -41,7 +41,16 @@ public:
     void on_OKPushButton_clicked();
     //取消
     void on_CancelPushButton_clicked();
-
+    //添加启动程序
+    void on_addStartAppPushButton_clicked();
+    //删除启动程序
+    void on_removeStartAppPushButton_clicked();
+    //添加监视进程
+    void on_addMonitorProcPushButton_clicked();
+    //删除监视进程
+    void on_removeMonitorProcPushButton_clicked();
+    //查看当前运行进程
+    void on_viewProcPushButton_clicked();
 private:
     //初始化UI
     void initUI();

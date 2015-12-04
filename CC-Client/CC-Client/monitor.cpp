@@ -4,9 +4,10 @@
 #include <time.h>
 
 
-Monitor::Monitor(QObject *parent)
+Monitor::Monitor(int interval, QObject *parent)
     : QThread(parent)
-{    
+{
+    this->interval = interval; //默认1秒
 }
 
 Monitor::~Monitor()
@@ -22,29 +23,26 @@ void Monitor::run()
     while (true)
     {
         //等待1秒
-        QThread::sleep(2);
+        QThread::sleep(interval);
+
+        if(stop)
+            break;
+
         //获取当前时间
         time_t now = time(NULL);
         for (auto& station : *pStations)
         {
-            if (station.StationIsRunning())
+            if (station.IsRunning())
             {
-                if (now - station.lastTick >= 10)
+                if (now - station.lastTick >= 5 * interval)
                 {
-                    //10秒内没有收到状态,则转为未知状态
-                    station.setState(StationInfo::Unkonown);
+                    //如果大于5 * interval秒仍然没有收到新的状态,则设置为离线
+                    station.setState(StationInfo::Unknown);
                 }
-                else if (now - station.lastTick >= 5)
-                {
-                    //如果大于5秒仍然没有收到新的状态,则报错
-                    station.setState(StationInfo::Error);
-                    station.setHint(QStringLiteral("5秒内没有收到该工作站状态,请检查"));
-                }
-                else if (now - station.lastTick >= 2)
+                else if (now - station.lastTick >= 2 * interval)
                 {
                     //如果大于2秒仍然没有收到新的状态,则报警
-                    station.setState(StationInfo::Warning);
-                    station.setHint(QStringLiteral("2秒内没有收到该工作站状态,请检查"));
+                    station.setState(StationInfo::NoHeartbeat, QStringLiteral("%1秒内没有收到该工作站状态,请检查").arg(2 * interval));
                 }
             }
         }
@@ -63,6 +61,24 @@ void Monitor::setStationList(StationList* pStations)
     this->pStations = pStations;
     this->pStations->subscribeAllStationsStateChangedEvent(this, SLOT(stationStateChanged(const QObject* )));
     this->pStations->subscribeStationAddedEvent(this, SLOT(stationAdded(StationInfo*)));
+}
+
+/*!
+设置检测间隔
+@param int interval 检测间隔
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/04 11:02:24
+*/
+void Monitor::setInterval(int interval)
+{
+    this->interval = interval;
+}
+
+//停止监听
+void Monitor::Stop()
+{
+    this->stop = true;
 }
 
 //工作站状态发生变化

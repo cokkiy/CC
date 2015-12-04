@@ -160,6 +160,16 @@ public:
     void subscribeAllStationsStateChangedEvent(const QObject* receiver, const char* member);
 
     /*!
+    订阅全部工作站用户编辑导致的属性变化通知事件
+    @param const QObject * receiver 事件接收函数所在对象的指针
+    @param const char * member 事件接收函数名称
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/13 10:57:28
+    */
+    void subscribeAllStationsChangedEvent(const QObject* receiver, const char* member);
+
+    /*!
     订阅工作站被添加事件
     @param const QObject * receiver 事件接收函数所在对象的指针
     @param const char * member 事件接收函数名称
@@ -213,6 +223,15 @@ public:
     创建时间：2015/12/02 22:00:51
     */
     void saveToFile(QString fileName);
+
+    /*!
+    从列表中删除指定的工作站
+    @param StationInfo * s 工作站指针
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 15:44:09
+    */
+    void remove(StationInfo* s);
 private:
     //全部工作站列表
     std::list<StationInfo> allStations;
@@ -242,6 +261,6 @@ signals:
     创建时间：2015/12/02 17:58:20
     */
     void stationAdded(StationInfo* addedStation);
-    
+   
 };
 

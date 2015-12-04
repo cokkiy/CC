@@ -159,6 +159,22 @@ void StationList::subscribeAllStationsStateChangedEvent(const QObject* receiver,
 }
 
 /*!
+订阅全部工作站用户编辑导致的属性变化通知事件
+@param const QObject * receiver 事件接收函数所在对象的指针
+@param const char * member 事件接收函数名称
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/13 10:57:28
+*/
+void StationList::subscribeAllStationsChangedEvent(const QObject* receiver, const char* member)
+{
+    for (auto& station : allStations)
+    {
+        station.subscribeStationChanged(receiver, member);
+    }
+}
+
+/*!
 订阅工作站被添加事件
 @param const QObject * receiver 事件接收函数所在对象的指针
 @param const char * member 事件接收函数名称
@@ -239,6 +255,31 @@ void StationList::filterANDsort()
 }
 
 /*!
+从列表中删除指定的工作站
+@param StationInfo * s 工作站指针
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/03 15:44:09
+*/
+void StationList::remove(StationInfo* station)
+{
+    // First remove from current list
+    for (auto iter = currentStations.begin(); iter != currentStations.end(); iter++)
+    {
+        if (*iter == station)
+        {
+            currentStations.erase(iter);
+            break;
+        }
+    }
+    // remove from all list
+    allStations.remove(*station);
+
+    //发生消息
+    emit stationListChanged();
+}
+
+/*!
 把工作站列表保存到文件中
 @param QString fileName 文件名
 @return void
@@ -252,13 +293,13 @@ void StationList::saveToFile(QString fileName)
     {
         QTextStream config(&file);
         config.setCodec(QTextCodec::codecForName("UTF-8"));
-        config << QStringLiteral("<?xml version=\"1.0\" encoding=\"UTF - 8\" standalone=\"yes\"?>") << endl;
-        config << QStringLiteral("<指显工作站信息>") << endl;
+        config << QStringLiteral("<?xml version=\"1.0\" encoding=\"UTF - 8\" standalone=\"yes\"?>") << "\r\n";
+        config << QStringLiteral("<指显工作站信息>") << "\r\n";
         for (auto&s : allStations)
         {
-            config << s.toXmlString() << endl;
+            config << s.toXmlString() << "\r\n";
         }
-        config << QStringLiteral("</指显工作站信息>") << endl;
+        config << QStringLiteral("</指显工作站信息>") << "\r\n";
         file.close();
     }
 }

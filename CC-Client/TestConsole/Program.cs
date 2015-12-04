@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using System.Linq;
 
 namespace TestConsole
 {
@@ -11,30 +14,35 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-
-            //             PerformanceCounter pCounter = new PerformanceCounter("Process", "% Processor Time", "4085/designer");
-            //             for (int i = 0; i < 10; i++)
-            //             {
-            //                 Console.WriteLine(pCounter.NextValue()/System.Environment.ProcessorCount);
-            //                 Thread.Sleep(500);
-            //             }
-            // 
-            // 
-            //             Process[] processes = Process.GetProcessesByName("designer");
-            //             foreach (var process in processes)
-            //             {
-            // 
-            //                 Console.WriteLine("{0}/{1}:Thread Count:{2} Memory:{3} StartTime:{4} CPU:{5}",
-            //                     process.Id, process.ProcessName, process.Threads.Count,
-            //                     process.WorkingSet64, process.StartTime, process.TotalProcessorTime);
-            //             }
-
-            Console.WriteLine(System.Environment.MachineName);
+           var list = getAllNIInfo();
 
             Console.ReadKey();
         }
 
-       
+        private static Dictionary<string, List<string>> getAllNIInfo()
+        {
+
+            Dictionary<string, List<string>> niInfo = new Dictionary<string, List<string>>();
+            NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (var ni in nis)
+            {
+                if (ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                {
+                    string mac = string.Join("-", ni.GetPhysicalAddress().GetAddressBytes()
+                        .Select((byte b) => { return b.ToString("X2"); }));
+                    IPInterfaceProperties ipProperties = ni.GetIPProperties();
+                    List<string> ipList = new List<string>(); ;
+                    foreach (var item in ipProperties.UnicastAddresses)
+                    {
+                        if(item.Address.AddressFamily== System.Net.Sockets.AddressFamily.InterNetwork)
+                            ipList.Add(item.Address.ToString());
+                    }
+                    niInfo.Add(mac, ipList);
+                }
+            }
+
+            return niInfo;
+        }
 
         [DllImport("libc")]
         extern static long sysconf(int __name);

@@ -457,7 +457,9 @@
     <addaction name="menuCPUOption"/>
     <addaction name="menuViewMemoryOption"/>
     <addaction name="actionAllowAutoRefreshList"/>
+    <addaction name="separator"/>
     <addaction name="actionSetInterval"/>
+    <addaction name="actionSetDefaultAppAndProc"/>
    </widget>
    <addaction name="menuControl"/>
    <addaction name="menuOperation"/>
@@ -925,6 +927,21 @@
    </property>
    <property name="statusTip">
     <string>新建一个工作站配置项</string>
+   </property>
+  </action>
+  <action name="actionSetDefaultAppAndProc">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/cc-client.ico</normaloff>:/Icons/cc-client.ico</iconset>
+   </property>
+   <property name="text">
+    <string>设置默认程序和进程...</string>
+   </property>
+   <property name="toolTip">
+    <string>设置新建工作站默认启动程序和监视进程</string>
+   </property>
+   <property name="statusTip">
+    <string>设置新建工作站默认启动程序和监视进程</string>
    </property>
   </action>
  </widget>

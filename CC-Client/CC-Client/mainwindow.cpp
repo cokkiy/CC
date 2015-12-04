@@ -17,6 +17,8 @@
 #include "StationStateReceiver.h"
 #include "setintervaldialog.h"
 #include "editstationdialog.h"
+#include "defaultappprocdialog.h"
+#include "option.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,10 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //绑定点击排序
     connect(tableHeader, SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
     //工作站文件名
-    filePath= QDir::homePath() + QStringLiteral("/.CC-Client/");
+    filePath = QDir::homePath() + QStringLiteral("/.CC-Client/");
     fileName = filePath + QStringLiteral("指显工作站信息.xml");
     //初始化工作站信息列表 
-    pStationList = new StationList();    
+    pStationList = new StationList();
     // 初始化加载线程
     ConfigLoader* loader = new ConfigLoader();
     loader->moveToThread(&ldconf_thread);
@@ -48,10 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-    if(pStationList!=nullptr)
+    if (pStationList != nullptr)
         delete pStationList;
     if (pTableModel != nullptr)
         delete pTableModel;
+    if (monitor != nullptr)
+        delete monitor;
 }
 
 void MainWindow::on_actionPower_On_triggered()
@@ -80,6 +84,7 @@ void MainWindow::configLoaded(StationList* pStations, bool success)
     pTableModel = new StationTableModel(pStations);
     //订阅状态变化
     pStations->subscribeAllStationsStateChangedEvent(this, SLOT(stationStateChanged(const QObject*)));
+    pStations->subscribeAllStationsChangedEvent(this, SLOT(stationChanged(const QObject*)));
     pStations->subscribeStationAddedEvent(this, SLOT(onStationAdded(StationInfo*)));
     pStations->subscribeListChangedEvent(this, SLOT(onStationListChanged()));
     ui->tableView->setModel(pTableModel);
@@ -90,7 +95,7 @@ void MainWindow::configLoaded(StationList* pStations, bool success)
     //默认小图标模式
     smallIcomMode();
     //启动状态监视
-    Monitor* monitor = new Monitor();
+    monitor = new Monitor();
     monitor->setStationList(pStations);
     monitor->start(QThread::NormalPriority);
     if (iceInitSuccess)
@@ -109,15 +114,19 @@ void MainWindow::sortByColumn(int cloumnIndex)
 //显示悬浮式菜单
 void MainWindow::showFloatingMenu(const QPoint & pos)
 {
+    QModelIndexList selectedIndexs = getSelectedIndexs();
+    if (selectedIndexs.count() == 0)
+        return;
+
     //悬浮式菜单    
     FloatingMenu* menu = new FloatingMenu(this);
     menu->setSize(200);
     //根据选择的工作站添加按钮到右键菜单
     addButtons(menu);
     //设置背景色和外边颜色
-    QPen border(QBrush(QColor(255,255,0)), 3,Qt::DotLine); 
+    QPen border(QBrush(QColor(255, 255, 0)), 3, Qt::DotLine);
     QRadialGradient gradient(0, 0, 120, 0, 0);
-    gradient.setColorAt(0, QColor::fromRgbF(1,1,0,0.8));
+    gradient.setColorAt(0, QColor::fromRgbF(1, 1, 0, 0.8));
     gradient.setColorAt(1, QColor::fromRgbF(0.3, 0.5, 0, 0.5));
     QBrush brush(gradient);
     menu->setBackground(brush);
@@ -138,7 +147,7 @@ void MainWindow::operationMenuToShow()
             action->setEnabled(false);
         }
     }
-    else if(selectedJustOne(selectedIndexs))
+    else if (selectedJustOne(selectedIndexs))
     {
         //只选择了一个
         for (auto action : ui->menuOperation->actions())
@@ -147,11 +156,11 @@ void MainWindow::operationMenuToShow()
             action->setEnabled(false);
         }
         auto station = pStationList->atCurrent(selectedIndexs.first().row());
-        if (station->state()==StationInfo::Unkonown)
+        if (station->state() == StationInfo::Unknown)
         {
             ui->actionPowerOn->setEnabled(true);
         }
-        else if(station->StationIsRunning())
+        else if (station->IsRunning())
         {
             ui->actionReboot->setEnabled(true);
             ui->actionShutdown->setEnabled(true);
@@ -164,11 +173,16 @@ void MainWindow::operationMenuToShow()
             {
                 ui->actionStartApp->setEnabled(true);
             }
-        } 
-        else if(!station->inExecutingState())
+        }
+        else if (!station->inExecutingState())
         {
             ui->actionPowerOn->setEnabled(true);
         }
+
+        //编辑按钮起作用
+        ui->actionEdit->setEnabled(true);
+        //删除按钮起作用
+        ui->actionRemove->setEnabled(true);
     }
     else
     {
@@ -177,6 +191,8 @@ void MainWindow::operationMenuToShow()
         {
             action->setEnabled(true);
         }
+        //编辑按钮禁用
+        ui->actionEdit->setEnabled(false);
     }
     //新增按钮总是起作用
     ui->actionNewStation->setEnabled(true);
@@ -186,18 +202,38 @@ void MainWindow::operationMenuToShow()
 void MainWindow::stationStateChanged(const QObject* pObject)
 {
     StationInfo* pStation = (StationInfo*)pObject;
-    switch (pStation->state())
+    if (pStation->state().getRunningState() != StationInfo::Unknown)
     {
-    case StationInfo::Unkonown:
-        break;
-    case  StationInfo::Powering:
-        ui->msgListWidget->addItem(QStringLiteral("向%1发送开机命令...").arg(pStation->toString()));
-        break;
-    case StationInfo::PowerOnFailure:
-        ui->msgListWidget->addItem(QStringLiteral("%1开机失败.").arg(pStation->toString()));
-        break;
-    default:
-        break;
+        switch (pStation->state().getOperatingStatus())
+        {
+        case  StationInfo::Powering:
+            ui->msgListWidget->addItem(QStringLiteral("向%1发送开机命令...").arg(pStation->toString()));
+            break;
+        case StationInfo::PowerOnFailure:
+            ui->msgListWidget->addItem(QStringLiteral("%1开机失败.").arg(pStation->toString()));
+            break;
+        case StationInfo::AppStarting:
+            //TODO: 添加显示消息
+            break;
+        case  StationInfo::AppStartFailure:
+            break;
+        case StationInfo::Rebooting:
+            break;
+        case  StationInfo::RebootFailure:
+            break;
+        case StationInfo::Shutdowning:
+            break;
+        case  StationInfo::ShutdownFailure:
+            break;
+        case StationInfo::MemoryTooHigh:
+            break;
+        case StationInfo::DiskFull:
+            break;
+        case StationInfo::CPUTooHigh:
+            break;      
+        default:
+            break;
+        }
     }
     ui->msgListWidget->setCurrentItem(ui->msgListWidget->item(ui->msgListWidget->count() - 1));
 }
@@ -206,6 +242,7 @@ void MainWindow::stationStateChanged(const QObject* pObject)
 void MainWindow::onStationAdded(StationInfo* addedStation)
 {
     addedStation->subscribeStateChanged(this, SLOT(stationStateChanged(const QObject*)));
+    addedStation->subscribeStationChanged(this, SLOT(stationChanged(const QObject*)));
 }
 
 //清空消息记录
@@ -244,6 +281,17 @@ void MainWindow::onStationListChanged()
     pStationList->saveToFile(fileName);
 }
 
+//工作站发生变化,用户编辑了工作站属性
+void MainWindow::stationChanged(const QObject*)
+{
+    QDir dir(filePath);
+    if (!dir.exists())
+    {
+        dir.mkdir(filePath);
+    }
+    pStationList->saveToFile(fileName);
+}
+
 /*!
 重载show函数,实现加载配置信息并显示窗口
 @return void
@@ -254,7 +302,7 @@ void MainWindow::show()
 {
     QMainWindow::show();
     ui->statusBar->showMessage(QStringLiteral("开始加载工作站信息..."), 0);
-    QString dir = QApplication::applicationDirPath();    
+    QString dir = QApplication::applicationDirPath();
     //初始化ICE框架,创建监听通道
     try
     {
@@ -284,23 +332,23 @@ void MainWindow::show()
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     //关闭系统
-    if (QMessageBox::information(this, QString::fromLocal8Bit("集中监控程序"), 
-        QString::fromLocal8Bit("确定要退出集中监控程序吗?"),
+    if (QMessageBox::question(this, QStringLiteral("集中监控程序"), QStringLiteral("确定要退出集中监控程序吗?"),
         QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
     {
         try
         {
+            monitor->Stop();
             communicator->destroy();
         }
         catch (const IceUtil::Exception&)
         {
         }
-        event->accept();        
+        event->accept();
     }
     else
     {
         event->ignore();
-    }    
+    }
 }
 
 void MainWindow::on_sortComboBox_currentIndexChanged(int index)
@@ -344,7 +392,7 @@ void MainWindow::on_displayModeComboBox_currentIndexChanged(QString index)
             ui->listView->setIconSize({ 32,32 });
             ui->listView->setViewMode(QListView::ViewMode::ListMode);
         }
-    }    
+    }
 }
 
 //小图标模式（默认模式)
@@ -360,7 +408,7 @@ void MainWindow::smallIcomMode()
 void MainWindow::on_filterToolButton_clicked()
 {
     FilterBuildDialog buildDlg;
-    buildDlg.setGeometry(this->cursor().pos().x(), this->cursor().pos().y()+20, buildDlg.width(), buildDlg.height());
+    buildDlg.setGeometry(this->cursor().pos().x(), this->cursor().pos().y() + 20, buildDlg.width(), buildDlg.height());
     if (buildDlg.exec() == QDialog::Accepted)
     {
         FilterOperations operations = buildDlg.getFilter();
@@ -401,7 +449,7 @@ void MainWindow::on_actionViewDetail_triggered(bool checked)
     else
     {
         ui->detailFrame->setVisible(false);
-    }    
+    }
 }
 
 //是否显示消息
@@ -450,6 +498,7 @@ void MainWindow::on_actionSetInterval_triggered()
             //设置监视间隔
             StationManager* manager = new StationManager(pStationList, communicator);
             manager->setInterval(interval);
+            monitor->setInterval(interval);
         }
         delete dlg;
     }
@@ -479,6 +528,38 @@ void MainWindow::on_actionNewStation_triggered()
     }
 }
 
+//编辑工作站
+void MainWindow::on_actionEdit_triggered()
+{
+    QModelIndexList selectedIndexs = getSelectedIndexs();
+    auto station = pStationList->atCurrent(selectedIndexs.first().row());
+    EditStationDialog dlg(station, EditStationDialog::Edit);
+    dlg.exec();
+}
+
+//删除工作站
+void MainWindow::on_actionRemove_triggered()
+{
+    QModelIndexList selectedIndexs = getSelectedIndexs();
+    if (QMessageBox::question(NULL, QStringLiteral("删除确认"),
+        QStringLiteral("要删除（所有)选定的工作站吗?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    {
+        for (auto index : selectedIndexs)
+        {
+            StationInfo* s = pStationList->atCurrent(index.row());
+            pStationList->remove(s);
+        }
+    }
+}
+
+//设置新建工作站默认监视进程和启动程序
+void MainWindow::on_actionSetDefaultAppAndProc_triggered()
+{
+    //TODO :传递config
+    Option option;
+    DefaultAppProcDialog dlg(option);
+}
+
 //添加按钮到右键菜单
 void MainWindow::addButtons(FloatingMenu* menu)
 {
@@ -492,22 +573,19 @@ void MainWindow::addButtons(FloatingMenu* menu)
         menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
         menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
         menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
-        menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager,SLOT(restartApp()));
+        menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
         menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出程序"), manager, SLOT(exitApp()));
+        menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
     }
     else
     {
         //只选择了一个,则根据状态显示菜单
         auto station = pStationList->atCurrent(selectedIndexs.first().row());
-        if (station->state() == StationInfo::Unkonown)
+        if (station->state() == StationInfo::Unknown)
         {
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
-            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
-            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"));
-            menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"));
-            menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"));
         }
-        else if(station->state() == StationInfo::Powering)
+        else if (station->state() == StationInfo::Powering)
         {
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
             menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"));
@@ -528,6 +606,8 @@ void MainWindow::addButtons(FloatingMenu* menu)
                 menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
             }
         }
+        menu->addButton(":/Icons/52design.com_2006ball_74.png", QStringLiteral("编辑"), this, SLOT(on_actionEdit_triggered()));
+        menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
     }
 }
 
@@ -566,4 +646,44 @@ bool MainWindow::selectedJustOne(QModelIndexList selectedIndexs)
             return false;
     }
     return true;
+}
+
+//加载工作站信息
+void ConfigLoader::load(const QString filename, StationList* pStations)
+{
+    XDocument doc;
+    if (doc.Load(filename))
+    {
+        auto elements = doc.getChild().getChildrenByName(QStringLiteral("指显工作站"));
+        for (XElement el : elements)
+        {
+            StationInfo station;
+            station.setName(el.getChildValue(QStringLiteral("名称")));
+            for (XElement& niElemet : el.getChildrenByName(QStringLiteral("网卡")))
+            {
+                QString mac = niElemet.getChildValue(QStringLiteral("MAC"));
+                QStringList ipList;
+                for (XElement& ipElement : niElemet.getChildrenByName(QStringLiteral("IP")))
+                {
+                    ipList.push_back(ipElement.Value);
+                }
+                NetworkInterface ni(mac, ipList);
+                station.NetworkIntefaces.push_back(ni);
+            }
+            for (XElement& appElement : el.getChildrenByName(QStringLiteral("启动程序/程序")))
+            {
+                station.addStartApp(appElement.Value);
+            }
+            for (XElement& procElement : el.getChildrenByName(QStringLiteral("监视进程/进程")))
+            {
+                station.addMonitorProc(procElement.Value);
+            }
+            pStations->push(station);
+        }
+        emit loaded(pStations, true);
+    }
+    else
+    {
+        emit loaded(pStations, false);
+    }
 }

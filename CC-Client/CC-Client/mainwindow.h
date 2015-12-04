@@ -13,6 +13,7 @@
 #include "floatingmenu.h"
 #include <Ice\Ice.h>
 #include "StationStateReceiver.h"
+#include "monitor.h"
 
 namespace Ui {
     class MainWindow;
@@ -69,6 +70,12 @@ public:
     void on_actionAllowAutoRefreshList_triggered(bool checked);
     //新加工作站
     void on_actionNewStation_triggered();
+    //编辑工作站
+    void on_actionEdit_triggered();
+    //删除工作站
+    void on_actionRemove_triggered();
+    //设置新建工作站默认监视进程和启动程序
+    void on_actionSetDefaultAppAndProc_triggered();
 private:
     Ui::MainWindow *ui;
 
@@ -91,6 +98,9 @@ private:
     StationTableModel *pTableModel = nullptr;
     //table header
     QHeaderView* tableHeader;
+
+    //监视线程
+    Monitor* monitor = nullptr;
 
     //工作站文件目录
     QString filePath;
@@ -126,6 +136,8 @@ private slots:
     void copyAllMessage();
     //工作站列表发生变化
     void onStationListChanged();
+    //工作站发生变化
+    void stationChanged(const QObject*);
 private:
     //添加按钮到右键菜单
     void addButtons(FloatingMenu* menu);
@@ -145,36 +157,7 @@ public:
     ~ConfigLoader() {};
     public slots:
     //加载工作站信息
-    void load(const QString filename, StationList* pStations)
-    {
-        XDocument doc;
-        if (doc.Load(filename))
-        {
-            auto elements = doc.getChild().getChildrenByName(QStringLiteral("指显工作站"));
-            for (XElement el : elements)
-            {
-                StationInfo station;
-                station.name = el.getChildValue(QStringLiteral("名称"));
-                for (XElement& niElemet : el.getChildrenByName(QStringLiteral("网卡")))
-                {
-                    QString mac = niElemet.getChildValue(QStringLiteral("MAC"));
-                    QStringList ipList;
-                    for (XElement& ipElement : niElemet.getChildrenByName(QStringLiteral("IP")))
-                    {
-                        ipList.push_back(ipElement.Value);
-                    }
-                    NetworkInterface ni(mac, ipList);
-                    station.NetworkIntefaces.push_back(ni);
-                }
-                pStations->push(station);
-            }
-            emit loaded(pStations, true);
-        }
-        else
-        {
-            emit loaded(pStations, false);
-        }
-    }
+    void load(const QString filename, StationList* pStations);
 signals:
     /*!
     列表加载完毕信号,当工作站加载完毕时被触发

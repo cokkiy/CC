@@ -42,6 +42,14 @@ public:
     */
     NetworkInterface(std::string mac, std::list<std::string> ips);
 
+    /*!
+    从网卡信息创建一个\class NetworkInterface 对象
+    @param std::pair<std::string,std::list<std::string>> ni  网卡信息
+    @return 
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 10:11:19
+    */
+    NetworkInterface(std::pair<std::string, std::list<std::string>> ni);
 
     /*!
     创建一个\class NetworkInterface 对象

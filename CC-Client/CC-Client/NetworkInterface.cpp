@@ -38,6 +38,12 @@ NetworkInterface::NetworkInterface(QString mac, QStringList ips)
     }
 }
 
+NetworkInterface::NetworkInterface(std::pair<std::string, std::list<std::string>> ni)
+{
+    this->mac = ni.first;
+    this->IPs.insert(this->IPs.end(), ni.second.begin(), ni.second.end());
+}
+
 void NetworkInterface::AddIP(std::string ip)
 {
     this->IPs.push_back(ip);

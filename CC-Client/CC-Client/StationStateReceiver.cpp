@@ -107,36 +107,42 @@ void StationStateReceiver::setStations(StationList* pStations)
 //查找并更新工作站信息
 StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::StationSystemStatePtr& pStationSystemState)
 {
+    StationInfo* pStation = NULL;
     if (pStations != nullptr)
     {
-        bool finded = false; //是否找到
         for (auto& ni : pStationSystemState->NetworkInterfaces)
         {
-            StationInfo* pStation = pStations->find(ni);
+            pStation = pStations->find(ni);
             if (pStation != NULL)
             {
-                pStation->setStationId(pStationSystemState->stationId);
-                pStation->setTotalMemory(pStationSystemState->totalMemory);
-                pStation->setOSName(pStationSystemState->osName);
-                pStation->setOSVersion(pStationSystemState->osVersion);
-                pStation->setLastTick();
-                pStation->setState(StationInfo::Warning); //警告：程序没有启动
-                pStation->setHint(QStringLiteral("应用程序没有启动"));
                 break;
             }
         }
-        if (!finded&&autoRefreshStationList)
+        if (pStation == NULL&&autoRefreshStationList)
         {
-            //如果没有找到并且允许自动更新工作站列表,则添加一个
             StationInfo station;
-            station.name = QString::fromStdString(pStationSystemState->computerName);
-            //station.IP = pStationSystemState->NetworkInterfaces
-            //station.mac = el.getChildValue(QString::fromLocal8Bit("MAC"));
+            station.setStationId(pStationSystemState->stationId);
+            station.setName(QString::fromStdString(pStationSystemState->computerName));
+            for (auto& ccNI : pStationSystemState->NetworkInterfaces)
+            {
+                NetworkInterface ni(ccNI);
+                station.NetworkIntefaces.push_back(ni);
+            }
             pStations->push(station);
+            pStation = pStations->findById(pStationSystemState->stationId);
+        }
+
+        if (pStation != NULL)
+        {
+            pStation->setStationId(pStationSystemState->stationId);
+            pStation->setTotalMemory(pStationSystemState->totalMemory);
+            pStation->setOSName(pStationSystemState->osName);
+            pStation->setOSVersion(pStationSystemState->osVersion);
+            pStation->setLastTick();
+            pStation->setState(StationInfo::Running);
         }
     }
-
-    return NULL;
+    return pStation;
 }
 
 /*!

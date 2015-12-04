@@ -1,17 +1,24 @@
 ﻿#include "StationInfo.h"
 #include <QObject>
+#include <assert.h>
 
-bool StationInfo::StationIsRunning()
+bool StationInfo::IsRunning()
 {
-    return m_StationIsRunning;
+    return m_state != Unknown;
 }
 
-void StationInfo::setStationIsRunning(bool value)
+
+QString StationInfo::Name()
 {
-    if (m_StationIsRunning != value)
+    return m_Name;
+}
+
+void StationInfo::setName(QString value)
+{
+    if (m_Name != value)
     {
-        m_StationIsRunning = value;
-        emit propertyChanged("StationIsRunning", this);
+        m_Name = value;
+        emit propertyChanged("Name", this);
     }
 }
 
@@ -25,7 +32,7 @@ void StationInfo::setExecuteCounting(int value)
     if (m_ExecuteCounting != value)
     {
         m_ExecuteCounting = value;
-        m_hint = QStringLiteral("命令已发送%1秒...").arg(m_ExecuteCounting);
+        m_state.setAttachMessage(QStringLiteral("命令已发送%1秒...").arg(m_ExecuteCounting));
         emit propertyChanged("ExecuteCounting", this);
     }
 }
@@ -44,19 +51,6 @@ void StationInfo::setAppIsRunning(bool value)
     }
 }
 
-QString StationInfo::hint()
-{
-    return m_hint;
-}
-
-void StationInfo::setHint(QString value)
-{
-    if (m_hint != value)
-    {
-        m_hint = value;
-        emit propertyChanged("hint", this);
-    }
-}
 
 float StationInfo::AppMemory()
 {
@@ -152,10 +146,14 @@ void StationInfo::setState(State value)
     if (m_state != value)
     {
         m_state = value;
-        m_hint = QStringLiteral(""); //状态变化时清除原来提示信息
         emit propertyChanged("state", this);
         emit stateChanged(this);
     }
+}
+//设置操作状态和消息
+void StationInfo::setState(OperatingStatus status, QString message)
+{
+    m_state.setStatus(status, message);
 }
 
 float StationInfo::CPU()
@@ -175,8 +173,8 @@ void StationInfo::setCPU(float value)
 /*复制构造函数*/
 StationInfo::StationInfo(const StationInfo& ref)
 {
-    this->name = ref.name;
-    this->NetworkIntefaces.insert(this->NetworkIntefaces.begin(), ref.NetworkIntefaces.begin(), ref.NetworkIntefaces.end());
+    this->m_Name = ref.m_Name;
+    this->NetworkIntefaces = ref.NetworkIntefaces;
     this->m_state = ref.m_state;
     this->m_CPU = ref.m_CPU;
     this->m_Memory = ref.m_Memory;
@@ -187,66 +185,12 @@ StationInfo::StationInfo(const StationInfo& ref)
     this->m_zxCPU = ref.m_zxCPU;
     this->m_ZXMemory = ref.m_ZXMemory;
     this->m_ExecuteCounting = ref.m_ExecuteCounting;
-    this->m_hint = ref.m_hint;
-    this->m_StationIsRunning = ref.m_StationIsRunning;
     this->stationId = ref.stationId;
     this->lastTick = ref.lastTick;
+    this->startAppList = ref.startAppList;
+    this->monitorProcessList = ref.monitorProcessList;
 }
 
-/*!
-返回表示状态的字符
-@return QString \see State表示状态的字符
-作者：cokkiy（张立民)
-创建时间：2015/11/06 16:22:51
-*/
-QString StationInfo::state2String()
-{
-    QString result;
-    switch (m_state)
-    {
-    case StationInfo::Unkonown:
-        result = QObject::tr("Unknown");
-        break;
-    case StationInfo::Normal:
-        result = QObject::tr("Normal");
-        break;
-    case StationInfo::Warning:
-        result = QObject::tr("Warning");
-        break;
-    case StationInfo::Error:
-        result = QObject::tr("Error");
-        break;
-    case Powering:
-        result = QObject::tr("Powering");
-        break;
-    case  AppStarting:
-        result = QObject::tr("AppStarting");
-        break;
-    case Shutdowning:
-        result = QObject::tr("Shutdowning");
-        break;
-    case  Rebooting:
-        result = QObject::tr("Rebooting");
-        break;
-    case PowerOnFailure:
-        result = QObject::tr("PowerOnFailure");
-        break;
-    case RebootFailure:
-        result = QObject::tr("RebootFailure");
-        break;
-    case AppStartFailure:
-        result = QObject::tr("AppStartFailure");
-        break;
-    case ShutdownFailure:
-        result = QObject::tr("ShutdownFailure");
-        break;
-    default:
-        result = QObject::tr("Unknown");
-        break;
-    }
-    result += QStringLiteral("  %1").arg(hint());
-    return result;
-}
 
 /*!
 是否在执行状态
@@ -325,7 +269,7 @@ QString StationInfo::toString()
         allIP += ni.getAllIPString() + ",";
     }
     allIP = allIP.left(allIP.length() - 1);
-    return QStringLiteral("%1 IP(%2)").arg(name).arg(allIP);
+    return QStringLiteral("%1 IP(%2)").arg(m_Name).arg(allIP);
 }
 
 /*!
@@ -369,20 +313,34 @@ QString StationInfo::MAC()
 QString StationInfo::toXmlString()
 {
     QString xml = QStringLiteral("  <指显工作站>\r\n")
-        + QStringLiteral("    <名称>%1</名称>\r\n").arg(name);
+        + QStringLiteral("    <名称>%1</名称>\r\n").arg(m_Name);
     for (auto&ni : NetworkIntefaces)
     {
-        xml += QStringLiteral("    <网卡>")
-            + QStringLiteral("      <MAC>%1</MAC>").arg(ni.getMAC());
+        xml += QStringLiteral("    <网卡>\r\n")
+            + QStringLiteral("      <MAC>%1</MAC>\r\n").arg(ni.getMAC());
         for (auto&ip : ni.getIPList())
         {
-            xml += QStringLiteral("      <IP>%1</IP>").arg(QString::fromStdString(ip));
+            xml += QStringLiteral("      <IP>%1</IP>\r\n").arg(QString::fromStdString(ip));
         }
-        xml += QStringLiteral("    </网卡>");
+        xml += QStringLiteral("    </网卡>\r\n");
     }
+    xml += QStringLiteral("    <启动程序>\r\n"); 
+    for (auto& app : getStartAppNames())
+    {
+        xml += QStringLiteral("      <程序>%1</程序>\r\n").arg(app);
+    }
+    xml += QStringLiteral("    </启动程序>\r\n");
+    xml += QStringLiteral("    <监视进程>\r\n");
+    for (auto& proc : getMonitorProcNames())
+    {
+        xml += QStringLiteral("      <进程>%1</进程>\r\n").arg(proc);
+    }
+    xml += QStringLiteral("    </监视进程>\r\n");
     xml += QStringLiteral("  </指显工作站>\r\n");
     return xml;
 }
+
+
 
 void StationInfo::clearMonitorProc()
 {
@@ -419,6 +377,23 @@ QStringList StationInfo::getMonitorProcNames()
     return monitorProcessList;
 }
 
+void StationInfo::UpdateStation()
+{
+    emit stationChanged(this);
+}
+
+/*!
+判断两个工作站信息是否是同一个对象
+@param const StationInfo & ref 比较对象
+@return bool 相同返回true,否则返回false
+作者：cokkiy（张立民)
+创建时间：2015/12/03 16:02:23
+*/
+bool StationInfo::operator==(const StationInfo& ref)
+{
+    return this == &ref;
+}
+
 /*!
 订阅属性变化事件
 @param const QObject * receiver 接收者
@@ -443,4 +418,264 @@ void StationInfo::subscribePropertyChanged(const QObject* receiver, const char* 
 void StationInfo::subscribeStateChanged(const QObject* receiver, const char* member)
 {
     connect(this, SIGNAL(stateChanged(const QObject*)), receiver, member);
+}
+
+/*!
+订阅由于用户编辑导致的工作站发生变化事件
+@param const QObject * receiver 接收者
+@param const char * member 接收者处理函数
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/11/13 10:55:42
+*/
+void StationInfo::subscribeStationChanged(const QObject* receiver, const char* member)
+{
+    connect(this, SIGNAL(stationChanged(const QObject*)), receiver, member);
+}
+
+bool StationInfo::State::operator!=(const OperatingStatus& status)
+{
+    return operatingStatus != status;
+}
+
+bool StationInfo::State::operator!=(const RunningState& state)
+{
+    return runningState != state;
+}
+
+bool StationInfo::State::operator==(const OperatingStatus& status)
+{
+    return operatingStatus == status;
+}
+
+bool StationInfo::State::operator==(const RunningState& state)
+{
+    return runningState == state;
+}
+
+/*
+设置操作状态(切换操作状态会改变运行状态)
+**/
+StationInfo::State::State(const OperatingStatus& opStatus)
+{
+    setOperatingStatus(opStatus);
+}
+
+/*!
+设置运行状态(切换运行状态会切换操作状态)
+@param RunningState runningState 运行状态,只允许设置为Unknown或Normal,其他状态通过操作状态设置
+@return
+作者：cokkiy（张立民)
+创建时间：2015/12/03 21:33:25
+*/
+StationInfo::State::State(const RunningState& runningState)
+{
+    assert(runningState == Unknown || runningState == Normal);
+    this->runningState = runningState;
+    switch (runningState)
+    {
+    case Unknown:
+        this->operatingStatus = PowerOffOrNetworkFailure;
+        break;
+    case  Normal:
+        this->operatingStatus = Running;
+        break;
+    default:
+        break;
+    }
+}
+
+/*
+ 两个状态是否不相同
+ **/
+bool StationInfo::State::operator!=(const State& right)
+{
+    return this->runningState != right.runningState
+        || this->operatingStatus != right.operatingStatus;
+}
+/*
+两个状态是否相同
+**/
+bool StationInfo::State::operator==(const State& right)
+{
+    return this->runningState == right.runningState
+        && this->operatingStatus == right.operatingStatus;
+}
+
+/*!
+设置操作状态和附加消息
+@param const OperatingStatus & status 操作状态
+@param QString attachMessage 附加消息
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/04 9:10:31
+*/
+void StationInfo::State::setStatus(const StationInfo::OperatingStatus& status, const QString& attachMessage /*= QStringLiteral("")*/)
+{
+    setOperatingStatus(status);
+    this->attachMessage = attachMessage;
+}
+
+/*!
+设置附加消息
+@param QString message 附加消息
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/04 10:37:55
+*/
+void StationInfo::State::setAttachMessage(const QString& message)
+{
+    this->attachMessage = message;
+}
+
+/*!
+获取代表当前状态（包括运行和操作)的字符串
+@return QString 代表当前状态（包括运行和操作)的字符串
+作者：cokkiy（张立民)
+创建时间：2015/12/03 22:14:30
+*/
+QString StationInfo::State::toString()
+{
+    QString result = QStringLiteral("状态：%1 %2 %3");    
+    return result.arg(translate(runningState)).arg(translate(operatingStatus)).arg(attachMessage);
+}
+
+
+/*!
+获取当前运行状态
+@return StationInfo::RunningState 当前运行状态
+作者：cokkiy（张立民)
+创建时间：2015/12/04 9:24:57
+*/
+StationInfo::RunningState StationInfo::State::getRunningState()
+{
+    return runningState;
+}
+
+/*!
+获取当前操作状态
+@return StationInfo::RunningState 当前操作状态
+作者：cokkiy（张立民)
+创建时间：2015/12/04 9:24:57
+*/
+StationInfo::OperatingStatus StationInfo::State::getOperatingStatus()
+{
+    return operatingStatus;
+}
+
+/*
+ 设置操作状态.同时切换运行状态
+ **/
+void StationInfo::State::setOperatingStatus(const OperatingStatus& opStatus)
+{
+    this->operatingStatus = opStatus;
+    switch (opStatus)
+    {
+    case StationInfo::PowerOffOrNetworkFailure:
+        runningState = Unknown;
+        break;
+    case  StationInfo::NoHeartbeat:
+        runningState = Warning;
+        break;
+    case StationInfo::Running:
+        runningState = Normal;
+        break;
+    case StationInfo::Powering:
+        runningState = Unknown;
+        break;
+    case StationInfo::Shutdowning:
+    case StationInfo::Rebooting:
+        runningState = Warning;
+        break;
+    case StationInfo::PowerOnFailure:
+    case StationInfo::AppStartFailure:
+    case StationInfo::ShutdownFailure:
+    case StationInfo::RebootFailure:
+        runningState = Error;
+    case CPUTooHigh:
+    case  MemoryTooHigh:
+    case DiskFull:
+        runningState = Warning;
+        break;
+    default:
+        break;
+    }
+}
+
+/*翻译运行状态*/
+QString StationInfo::State::translate(RunningState state)
+{
+    QString result = QStringLiteral("");
+    switch (state)
+    {
+    case StationInfo::Unknown:
+        result = tr("Unknown");
+        break;
+    case StationInfo::Normal:
+        result = tr("Normal");
+        break;
+    case StationInfo::Warning:
+        result = tr("Warning");
+        break;
+    case StationInfo::Error:
+        result = tr("Error");
+        break;
+    default:
+        break;
+    }
+    return result;
+}
+/*翻译操作状态*/
+QString StationInfo::State::translate(OperatingStatus status)
+{
+    QString result = QStringLiteral("");
+    switch (status)
+    {
+    case StationInfo::PowerOffOrNetworkFailure:
+        result = tr("PowerOffOrNetworkFailure");
+        break;
+    case StationInfo::NoHeartbeat:
+        result = tr("NoHeartbeat");
+        break;
+    case StationInfo::Powering:
+        result = tr("Powering");
+        break;
+    case StationInfo::AppStarting:
+        result = tr("AppStarting");
+        break;
+    case StationInfo::Shutdowning:
+        result = tr("Shutdowning");
+        break;
+    case StationInfo::Rebooting:
+        result = tr("Rebooting");
+        break;
+    case StationInfo::PowerOnFailure:
+        result = tr("PowerOnFailure");
+        break;
+    case StationInfo::AppStartFailure:
+        result = tr("AppStartFailure");
+        break;
+    case StationInfo::ShutdownFailure:
+        result = tr("ShutdownFailure");
+        break;
+    case StationInfo::RebootFailure:
+        result = tr("RebootFailure");
+        break;
+    case StationInfo::MemoryTooHigh:
+        result = tr("MemoryTooHigh");
+        break;
+    case StationInfo::CPUTooHigh:
+        result = tr("CPUTooHigh");
+        break;
+    case StationInfo::DiskFull:
+        result = tr("DiskFull");
+        break;
+    case StationInfo::Running:
+        result = tr("Running");
+        break;
+    default:
+        break;
+    }
+
+    return result;
 }

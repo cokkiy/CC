@@ -279,7 +279,11 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
-           <widget class="QLineEdit" name="appNameLineEdit"/>
+           <widget class="QLineEdit" name="appNameLineEdit">
+            <property name="placeholderText">
+             <string>输入需要启动的应用程序完整路径和参数</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="addStartAppPushButton">
@@ -335,7 +339,11 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
-           <widget class="QLineEdit" name="procNameLineEdit"/>
+           <widget class="QLineEdit" name="procNameLineEdit">
+            <property name="placeholderText">
+             <string>输入需要监视的进程名称</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="addMonitorProcPushButton">

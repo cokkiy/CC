@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <time.h>
 #include <list>
+#include <QMetaEnum>
 #include "NetworkInterface.h"
 /**************************************
  @class: StationInfo 指显工作站信息类,定义了指显工作站
@@ -22,40 +23,168 @@ class StationInfo : public QObject
     Q_PROPERTY(size_t TotalMemory READ TotalMemory WRITE setTotalMemory)
     Q_PROPERTY(float AppMemory READ AppMemory WRITE setAppMemory)
     Q_PROPERTY(bool AppIsRunning READ AppIsRunning WRITE setAppIsRunning)
-    Q_PROPERTY(QString hint READ hint WRITE setHint)
     Q_PROPERTY(int ExecuteCounting READ ExecuteCounting WRITE setExecuteCounting)
-    Q_PROPERTY(bool StationIsRunning READ StationIsRunning WRITE setStationIsRunning)
-private:
-    bool m_StationIsRunning=false;
-public:
-    //获取工作站是否在运行
-    bool StationIsRunning();
-    //设置工作站是否在运行
-    void setStationIsRunning(bool value);
+    Q_PROPERTY(QString Name READ Name WRITE setName)
 
-
-public:
-    //工作站状态
-    enum State
+public:    
+    /*
+     @enum RunningState 工作站运行状态
+     **/
+    enum RunningState
     {
-        Unkonown = 0,/*未知*/
+        Unknown = 0,/*未知*/
         Normal = 1,/*正常*/
         Warning,/*告警*/
         Error,/*异常*/
+    };
+    Q_ENUM(RunningState)
+    /*
+     工作站操作状态
+     **/
+    enum OperatingStatus
+    {
+        PowerOffOrNetworkFailure,/*没有加电或网络故障*/
+        NoHeartbeat,/*没有心跳检测信号*/
         Powering, /*加电中...*/
-        AppStarting,/*指显软件启动中*/
+        AppStarting,/*软件启动中*/
         Shutdowning,/*关机中...*/
         Rebooting,/*重启中*/
         PowerOnFailure,/*加电失败*/
         AppStartFailure,/*指显程序启动失败*/
         ShutdownFailure,/*关机失败*/
         RebootFailure,/*重启失败*/
+        MemoryTooHigh,/*内存占用率太高*/
+        CPUTooHigh,/*CPU占用率太高*/
+        DiskFull,/*磁盘满*/
+        Running,/*正常运行*/
+    };
+    Q_ENUM(OperatingStatus)
+
+    /*
+     工作站状态
+     **/
+    class State
+    {
+    public:
+        /*默认构造函数*/
+        State()
+        {
+            runningState = Unknown;
+            operatingStatus = PowerOffOrNetworkFailure;
+        }
+        /*!
+        设置运行状态
+        @param RunningState runningState 
+        @return 
+        作者：cokkiy（张立民)
+        创建时间：2015/12/03 21:33:25
+        */
+        State(const RunningState& runningState);
+
+        /*
+         设置操作状态(操作状态会改变运行状态)
+         **/
+        State(const OperatingStatus& opStatus);
+
+    public:
+        /*判断运行状态是否相等*/
+        bool operator ==(const RunningState& state);
+        /*判断操作状态是否相等*/
+        bool operator ==(const OperatingStatus& status);
+        /*判断运行状态是否不等于*/
+        bool operator!=(const RunningState& state);
+        /*判断操作状态是否不等于*/
+        bool operator !=(const OperatingStatus& status);
+        /*两个状态是否不相等*/
+        bool operator != (const State& right);
+        /*两个状态是否相等*/
+        bool operator ==(const State& right);
+
+        /*!
+        设置操作状态和附加消息
+        @param const OperatingStatus & status 操作状态
+        @param QString attachMessage 附加消息
+        @return void
+        作者：cokkiy（张立民)
+        创建时间：2015/12/04 9:10:31
+        */
+        void setStatus(const OperatingStatus& status, const QString& attachMessage = QStringLiteral(""));
+
+        /*!
+        设置附加消息
+        @param QString message 附加消息
+        @return void
+        作者：cokkiy（张立民)
+        创建时间：2015/12/04 10:37:55
+        */
+        void setAttachMessage(const QString& message);
+
+        /*!
+        获取代表当前状态（包括运行和操作)的字符串
+        @return QString 代表当前状态（包括运行和操作)的字符串
+        作者：cokkiy（张立民)
+        创建时间：2015/12/03 22:14:30
+        */
+        QString toString();
+
+        /*!
+        获取当前运行状态
+        @return StationInfo::State::RunningState
+        作者：cokkiy（张立民)
+        创建时间：2015/12/04 9:24:57
+        */
+        RunningState getRunningState();
+
+        /*!
+        获取当前操作状态
+        @return StationInfo::State::OperatingStatus
+        作者：cokkiy（张立民)
+        创建时间：2015/12/04 9:24:41
+        */
+        OperatingStatus getOperatingStatus();
+    private:
+        /*
+         工作站运行状态
+         **/
+        StationInfo::RunningState runningState;
+        /*
+         工作站操作状态
+         **/
+        StationInfo::OperatingStatus operatingStatus;
+        /*
+         附加的消息
+         **/
+        QString attachMessage;
+
+        /*
+         设置操作状态
+         **/
+        void setOperatingStatus(const   StationInfo::OperatingStatus& opStatus);
+       /*翻译运行状态*/
+        QString translate(RunningState state);
+        /*翻译操作状态*/
+        QString translate(OperatingStatus status);
     };
 
     const int PowerOnTimeout = 180;//180秒,启动超时
     const int AppStartingTimeout = 30;//30秒,App启动超时
     const int RebootingTimeout = 240;//240秒,重启超时
     const int ShutingdownTimeout = 180;//180秒,关机
+
+private:
+    QString m_Name;
+public:
+    QString Name();
+    void setName(QString value);
+
+public:
+    /*!
+    获取工作站是否在运行
+    @return bool 
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 21:11:40
+    */
+    bool IsRunning();
 
 private:
     int m_ExecuteCounting = 0;
@@ -72,14 +201,6 @@ public:
     bool AppIsRunning();
     //设置指显软件是否在运行
     void setAppIsRunning(bool value);
-
-private:
-    QString m_hint;
-public:
-    //获取提示信息
-    QString hint();
-    //设置提示信息
-    void setHint(QString value);
 
 
 private:
@@ -135,12 +256,14 @@ public:
     void setMemory(float value);
 
 private:
-    State m_state = Unkonown;
+    State m_state = Unknown;
 public:
     //获取工作站状态
     State state();
     //设置工作站状态
     void setState(State value);
+    //设置操作状态和消息
+    void setState(OperatingStatus status, QString message);
 
 private:
     float m_CPU = 0;
@@ -153,18 +276,6 @@ public:
     /*默认构造函数*/
     StationInfo() = default;
     StationInfo(const StationInfo& ref);
-    /*!
-    返回表示状态的字符
-    @return QString \see State表示状态的字符
-    作者：cokkiy（张立民)
-    创建时间：2015/11/06 16:22:51
-    */
-    QString state2String();
-
-    /*
-    工作站名称
-    **/
-    QString name;
 
     /*
     工作站网卡信息
@@ -230,6 +341,12 @@ public:
     */
     void addStartApps(QStringList names);
 
+    /*!
+    清空启动程序列表
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 21:45:48
+    */
     void clearStartApp();
 
     /*!
@@ -274,6 +391,17 @@ public:
     创建时间：2015/11/13 10:55:42
     */
     void subscribeStateChanged(const QObject* receiver, const char* member);
+
+    /*!
+    订阅由于用户编辑导致的工作站发生变化事件
+    @param const QObject * receiver 接收者
+    @param const char * member 接收者处理函数
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/11/13 10:55:42
+    */
+    void subscribeStationChanged(const QObject* receiver, const char* member);
+
     /*!
     是否在执行状态
     @return bool 如果在执行状态,返回true,否则返回false
@@ -349,10 +477,28 @@ public:
     创建时间：2015/12/02 22:49:13
     */
     QString toXmlString();
+
+
+    /*!
+    更新工作站,用户编辑工作站属性后,调用该函数通知更新
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 11:27:57
+    */
+    void UpdateStation();
+
+    /*!
+    判断两个工作站信息是否是同一个对象（指针相同)
+    @param const StationInfo & ref 比较对象
+    @return bool 相同返回true,否则返回false
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 16:02:23
+    */
+    bool operator ==(const StationInfo& ref);
     
 signals:
     /*!
-    属性发生变化
+    属性发生变化事件
     @param QString propertyName 属性名称
     @param QVariant vlaue 属性值
     @return void
@@ -362,6 +508,16 @@ signals:
     void propertyChanged(const QString& propertyName, const QObject* owner);
     /*状态发生变化时事件*/
     void stateChanged(const QObject* owner);    
+
+
+    /*!
+    工作站发生变化（用户编辑了工作站属性)事件
+    @param const QObject * owner 属性发生变化的工作站
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/03 11:24:32
+    */
+    void stationChanged(const QObject* owner);
 };
 
 //注册到metatype中

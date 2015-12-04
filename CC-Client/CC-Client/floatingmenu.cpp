@@ -74,7 +74,7 @@ void FloatingMenu::enterEvent(QEvent * event)
 //鼠标离开
 void FloatingMenu::leaveEvent(QEvent *event)
 {
-    exitTimer->start(1000); //1s后退出
+    exitTimer->start(500); //500ms后退出
 }
 
 /*!
