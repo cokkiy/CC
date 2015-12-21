@@ -14,6 +14,13 @@
 #include <Ice\Ice.h>
 #include "StationStateReceiver.h"
 #include "monitor.h"
+#include "option.h"
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include "cpuplot\plotpart.h"
+
+//性能计数器最多个数
+#define  MaxCountOfCounter 20
 
 namespace Ui {
     class MainWindow;
@@ -76,17 +83,20 @@ public:
     void on_actionRemove_triggered();
     //设置新建工作站默认监视进程和启动程序
     void on_actionSetDefaultAppAndProc_triggered();
+    //查看工作站详细信息
+    void on_actionViewStationDetail_triggered();
+
 private:
     Ui::MainWindow *ui;
 
     // 工作站信息加载完毕
-    void configLoaded(StationList* pStations, bool success);
+    void stationsLoaded(StationList* pStations, bool success);
 
     //小图标模式（默认模式)
     void smallIcomMode();
 
     //加载配置文件线程
-    QThread ldconf_thread;
+    QThread ldstation_thread;
 signals:
     //加载配置文件
     void load(const QString& fileName, StationList* pStations);
@@ -116,7 +126,16 @@ private:
     bool iceInitSuccess = false;
     //工作站信息接收指针
     StationStateReceiver* StationStateReceiverPtr = nullptr;
+    //用户选项
+    Option option;
 
+    //性能曲线数组
+    PerfCurves perfCurves[MaxCountOfCounter];
+
+    //当前选择的工作站
+    StationInfo* currentStation = nullptr;
+    //CPU,内存记录时间数据
+    double timeData[CounterHistoryDataSize];
 private slots:
     //点击标题栏排序
     void sortByColumn(int cloumnIndex);
@@ -138,6 +157,8 @@ private slots:
     void onStationListChanged();
     //工作站发生变化
     void stationChanged(const QObject*);
+    //当前选择的工作站发生变化
+    void currentStationChanged(const QModelIndex &);
 private:
     //添加按钮到右键菜单
     void addButtons(FloatingMenu* menu);
@@ -145,16 +166,19 @@ private:
     QModelIndexList getSelectedIndexs();    
     //是否只选择了一个工作站
     bool selectedJustOne(QModelIndexList selectedIndexs);
-
+    //设置QwtPlot样式
+    void setPlotStyle(QwtPlot* plot, QString title);
+protected:
+        void timerEvent(QTimerEvent *e);
 };
 
-//Class for config loading thread
-class ConfigLoader : public QObject
+//Class for station loading thread
+class StationsLoader : public QObject
 {
     Q_OBJECT
 public:
-    ConfigLoader() {};
-    ~ConfigLoader() {};
+    StationsLoader() {};
+    ~StationsLoader() {};
     public slots:
     //加载工作站信息
     void load(const QString filename, StationList* pStations);
@@ -171,3 +195,5 @@ signals:
 };
 
 #endif // MAINWINDOW_H
+
+

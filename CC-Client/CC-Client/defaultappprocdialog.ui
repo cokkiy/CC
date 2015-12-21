@@ -23,11 +23,23 @@
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string>需要启动程序</string>
+        <string>需要远程启动程序</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QListWidget" name="appListWidget"/>
+         <widget class="QTableWidget" name="appTableWidget">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="columnCount">
+           <number>2</number>
+          </property>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <column/>
+          <column/>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -41,10 +53,20 @@
           <item>
            <widget class="QLineEdit" name="appLineEdit">
             <property name="toolTip">
-             <string>输入需要启动的应用程序完整路径和参数</string>
+             <string>输入需要远程启动的应用程序完整路径和参数</string>
             </property>
             <property name="placeholderText">
-             <string>输入需要启动的应用程序完整路径和参数</string>
+             <string>输入需要远程启动的应用程序完整路径和参数</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="argumentLineEdit">
+            <property name="toolTip">
+             <string>输入程序需要的额外参数</string>
+            </property>
+            <property name="placeholderText">
+             <string>程序参数</string>
             </property>
            </widget>
           </item>
@@ -110,13 +132,23 @@
           </item>
          </layout>
         </item>
+        <item>
+         <widget class="QCheckBox" name="autoAddStartAppToMonitorListCheckBox">
+          <property name="text">
+           <string>程序启动后自动加入监视进程列表</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="title">
-        <string>需要监视程序</string>
+        <string>需要监视进程</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -275,7 +307,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>appListWidget</tabstop>
+  <tabstop>appTableWidget</tabstop>
   <tabstop>appLineEdit</tabstop>
   <tabstop>addAppButton</tabstop>
   <tabstop>removeAppPushButton</tabstop>

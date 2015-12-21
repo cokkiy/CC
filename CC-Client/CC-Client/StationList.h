@@ -232,6 +232,8 @@ public:
     创建时间：2015/12/03 15:44:09
     */
     void remove(StationInfo* s);
+
+   
 private:
     //全部工作站列表
     std::list<StationInfo> allStations;
@@ -261,6 +263,6 @@ signals:
     创建时间：2015/12/02 17:58:20
     */
     void stationAdded(StationInfo* addedStation);
-   
+
 };
 

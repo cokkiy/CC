@@ -133,5 +133,13 @@
         <file>Icons/52design.com_alth_023.png</file>
         <file>Icons/52design.com_2006ball_74.png</file>
         <file>Icons/png-0652.png</file>
+        <file>Icons/52design.com_file_036.png</file>
+        <file>Icons/shutdown0.png</file>
+        <file>Icons/shutdown1.png</file>
+        <file>Icons/shutdown2.png</file>
+        <file>Icons/shutdown3.png</file>
+        <file>Icons/shutdown4.png</file>
+        <file>Icons/startApp0.png</file>
+        <file>Icons/startApp1.png</file>
     </qresource>
 </RCC>

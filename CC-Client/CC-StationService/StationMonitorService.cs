@@ -1,14 +1,6 @@
 ﻿using CC;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CC_StationService
 {
@@ -39,6 +31,8 @@ namespace CC_StationService
         {
             try
             {
+                //设置工作目录为程序所在目录
+                System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
                 //初始化ICE 通信对象
                 Ice.InitializationData initData = new Ice.InitializationData();
                 initData.properties = Ice.Util.createProperties();
@@ -48,17 +42,24 @@ namespace CC_StationService
 
                 //创建控制适配器和对象
                 Ice.ObjectAdapter controlAdapter = ic.createObjectAdapter("Controller");
-                Ice.Object obj = new ControllerImp(watcher);
-                IControllerPrx controlPrx = IControllerPrxHelper.uncheckedCast(controlAdapter.add(obj, ic.stringToIdentity("StationController")));
+                ControllerImp controllerServant = new ControllerImp(ic);
+                //将服务加入适配器并创建控制服务的本地代理
+                Ice.ObjectPrx objectPrx = controlAdapter.add(controllerServant, ic.stringToIdentity("StationController"));
+                IControllerPrx controlPrx = IControllerPrxHelper.uncheckedCast(objectPrx);
+       
+                //初始化监视应用程序列表为空
+                watcher = new SystemWatcher(ic, controlPrx);
+                //为控制代理设置系统监视对象
+                controllerServant.SystemWatcher = watcher;
+
                 //启动控制通道
                 controlAdapter.activate();
                 logger.print("开始监听控制消息...");
 
                 //启动监视线程
-                //初始化监视应用程序列表为空
-                watcher = new SystemWatcher(ic, controlPrx);
                 watcher.StartWatching();
-                logger.print("开始系统资源监视...");               
+                logger.print("开始系统资源监视...");              
+               
             }
             catch (Exception ex)
             {
@@ -103,5 +104,6 @@ namespace CC_StationService
 
             logger.print("服务已停止.");
         }
+      
     }
 }

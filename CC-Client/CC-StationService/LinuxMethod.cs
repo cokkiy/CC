@@ -16,18 +16,18 @@ namespace CC_StationService
                 return totalMemory;
 
             PerformanceCounter memoryCounter = new PerformanceCounter("Mono Memory", "Total Physical Memory");
-            totalMemory = memoryCounter.RawValue;
+            totalMemory =memoryCounter.RawValue;
             return totalMemory;
         }
 
         public void Reboot()
         {
-            System.Diagnostics.Process.Start("shutdown -r 0");
+            System.Diagnostics.Process.Start("shutdown", " -r 0");
         }
 
         public void Shutdown()
         {
-            System.Diagnostics.Process.Start("shutdown -h 0");
+            System.Diagnostics.Process.Start("shutdown", " -h 0");
         }
 
         /// <summary>

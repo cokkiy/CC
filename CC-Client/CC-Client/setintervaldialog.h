@@ -2,12 +2,12 @@
 #define SETINTERVALDIALOG_H
 
 #include <QDialog>
-namespace Ui {class SetIntervalDialog;};
+namespace Ui { class SetIntervalDialog; };
 
 class SetIntervalDialog : public QDialog
 {
     Q_OBJECT
-    Q_PROPERTY(int Interval READ Interval WRITE setInterval)
+        Q_PROPERTY(int Interval READ Interval WRITE setInterval)
 private:
     int m_Interval;
     void setInterval(int value)
@@ -19,19 +19,19 @@ private:
     }
 public:
     /**
-     *获取监视间隔（毫秒)
+     *获取监视间隔（秒)
      ***/
     int Interval()
     {
-        return m_Interval * 1000;
+        return m_Interval;
     }
 
 
 public:
-    SetIntervalDialog(QWidget *parent = 0);
+    SetIntervalDialog(int interval, QWidget *parent = 0);
     ~SetIntervalDialog();
 
-protected slots:
+    protected slots:
     //确定按钮
     void on_okPushButton_clicked();
     //取消按钮

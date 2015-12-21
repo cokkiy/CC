@@ -1,11 +1,12 @@
 #include "setintervaldialog.h"
 #include "ui_setintervaldialog.h"
 
-SetIntervalDialog::SetIntervalDialog(QWidget *parent)
+SetIntervalDialog::SetIntervalDialog(int interval, QWidget *parent)
     : QDialog(parent)
 {
     ui = new Ui::SetIntervalDialog();
     ui->setupUi(this);
+    ui->intervalSpinBox->setValue(interval);
 }
 
 SetIntervalDialog::~SetIntervalDialog()

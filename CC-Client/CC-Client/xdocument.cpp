@@ -256,12 +256,18 @@ bool XDocument::parse(const QString& content)
         }
         else if(c=='/')
         {
-            // 处理'/’字符，'/'字符位于元素结束位置
-            // 可能的位置有两个,(1)<e attr="attr" value="e value"/>
+            // 处理'/’字符，'/'字符位于元素结束位置或在属性值/元素值中
+            // (一)元素结束位置可能的位置有两个,(1)<e attr="attr" value="e value"/>
             // 或者(2)<e attr="attr">value</e>
             //第二种情况下，'/'前面总是跟着<号，标志着开始了元素结束符
             //如果前面不是'<‘,则是第一种情况，标志着着当前元素结束了
-            if(prevChar=='<')
+            // （二)在属性值/元素值中
+            if (inAttrValue || inElementValue || mayElementValueFollowed)
+            {
+                //在属性值/元素值中
+                curToken += c;
+            }
+            else if(prevChar=='<')
             {
                 //第二种情况
                 //beginEndTag=true; //开始处理元素结束符，后面的字符是元素结束符
@@ -415,7 +421,6 @@ bool XDocument::parse(const QString& content)
             //不在<,>之间
             inLittleBiggerPair=false;
         }
-
         else //其他字符
         {
             //可能是元素值，也不是空格，则一定是元素值

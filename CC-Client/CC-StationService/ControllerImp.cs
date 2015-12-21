@@ -24,6 +24,11 @@ namespace CC_StationService
         private SystemWatcher watcher;
 
         /// <summary>
+        /// Ice Communicator 对象
+        /// </summary>
+        private Ice.Communicator ic;
+
+        /// <summary>
         /// 静态构造函数
         /// </summary>
         static ControllerImp()
@@ -34,22 +39,13 @@ namespace CC_StationService
         /// <summary>
         /// 创建一个系统控制类对象
         /// </summary>
-        /// <param name="watcher">系统监视实例</param>
-        public ControllerImp(SystemWatcher watcher)
+        /// <param name="ic">Ice Communicator 对象</param>
+        public ControllerImp(Ice.Communicator ic)
         {
-            this.watcher = watcher;
+            this.ic = ic;
         }
 
-        /// <summary>
-        /// 关闭指定的程序
-        /// </summary>
-        /// <param name="appName">程序名称</param>
-        /// <param name="current__"></param>
-        public override void closeApp(string appName, Current current__)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         /// <summary>
         /// 获取系统信息
         /// </summary>
@@ -71,23 +67,27 @@ namespace CC_StationService
         }
 
         /// <summary>
-        /// 重启指定的应用程序
+        /// 设置系统监视对象
         /// </summary>
-        /// <param name="appName">应用程序名称</param>
-        /// <param name="current__"></param>
-        public override void restartApp(string appName, Current current__)
+        public SystemWatcher SystemWatcher
         {
-            throw new NotImplementedException();
-        }
+            set
+            {
+                this.watcher = value;
+            }
+        }        
 
         /// <summary>
         /// 设置状态监视间隔
         /// </summary>
-        /// <param name="interval">状态监视间隔</param>
+        /// <param name="interval">状态监视间隔,单位秒</param>
         /// <param name="current__"></param>
         public override void setStateGatheringInterval(int interval, Current current__)
         {
-            watcher.Interval = interval;
+            if (watcher != null)
+            {
+                watcher.Interval = interval * 1000;
+            }
         }
 
         /// <summary>
@@ -112,11 +112,63 @@ namespace CC_StationService
         /// <summary>
         /// 启动指定名称的应用程序
         /// </summary>
-        /// <param name="appName">应用程序名称（必须是完成路径)</param>
+        /// <param name="appParams">应用程序名称和参数</param>
         /// <param name="current__"></param>
-        public override void startApp(string appName, Current current__)
+        /// <returns>程序启动结果</returns>
+        public override List<AppStartingResult> startApp(List<AppStartParameter> appParams, Current current__)
         {
-            System.Diagnostics.Process.Start(appName);
+            ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+            try
+            {
+                AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                return luncherPrx.startApp(appParams);
+            }
+            catch (Ice.Exception ex)
+            {
+                if (ex.InnerException != null)
+                    throw new AppControlError("应用程序启动代理接口错误:" + ex.InnerException.Message);
+                else
+                    throw new AppControlError("应用程序启动代理接口错误,没有运行或被阻塞.");
+            }
         }
+
+        /// <summary>
+        /// 关闭指定进程Id的所有程序
+        /// </summary>
+        /// <param name="processIdList">进程Id列表</param>
+        /// <param name="current__"></param>
+        public override List<AppControlResult> closeApp(List<int> processIdList, Current current__)
+        {
+            ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");            
+            try
+            {
+                AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                return luncherPrx.closeApp(processIdList);
+            }
+            catch (Ice.Exception ex)
+            {
+                throw new AppControlError("应用程序启动代理接口错误:" + ex.InnerException.Message);
+            }
+        }
+
+        /// <summary>
+        /// 重启指定的应用程序
+        /// </summary>
+        /// <param name="appName">应用程序名称</param>
+        /// <param name="current__"></param>
+        public override List<AppStartingResult> restartApp(List<AppStartParameter> appParams, Current current__)
+        {
+            ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+            try
+            {
+                AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                return luncherPrx.restartApp(appParams);
+            }
+            catch (Ice.Exception ex)
+            {
+                throw new AppControlError("应用程序启动代理接口错误:" + ex.InnerException.Message);
+            }
+        }
+
     }
 }

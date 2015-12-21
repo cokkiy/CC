@@ -33,11 +33,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ice, Version=3.6.1.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControllerImp.cs" />
+    <Compile Include="generated\AppControlParameter.cs" />
+    <Compile Include="generated\IAppLuncher.cs" />
     <Compile Include="generated\IController.cs" />
     <Compile Include="generated\IStationStateReceiver.cs" />
     <Compile Include="IPlatformMethod.cs" />
@@ -65,6 +72,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StationMonitorServiceInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SystemWatcher.cs" />
     <Compile Include="WindowsLogger.cs" />
     <Compile Include="WindowsMethod.cs" />
@@ -74,6 +84,8 @@
     <None Include="Config.Client">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Slice\AppControlParameter.ice" />
+    <None Include="Slice\IAppLuncher.ice" />
     <None Include="Slice\IController.ice" />
     <None Include="Slice\IStationStateReceiver.ice" />
   </ItemGroup>

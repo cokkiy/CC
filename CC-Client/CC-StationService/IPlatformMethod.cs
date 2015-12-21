@@ -38,42 +38,53 @@ namespace CC_StationService
     /// </summary>
     static class PlatformMethodFactory
     {
+        private static IPlatformMethod platformMethod = null;
+        private static Ice.Logger logger = null;
+
         /// <summary>
-        /// 获取平台相关函数的实现
+        /// 获取平台相关函数的唯一实现
         /// </summary>
-        /// <returns>平台相关函数的实现</returns>
+        /// <returns>平台相关函数的唯一实现</returns>
         public static IPlatformMethod GetPlatformMethod()
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix
-                || Environment.OSVersion.Platform == PlatformID.MacOSX)
+            if (platformMethod == null)
             {
-                // linux,unix,macos
-                return new LinuxMethod();
+                if (Environment.OSVersion.Platform == PlatformID.Unix
+                    || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                {
+                    // linux,unix,macos
+                    platformMethod = new LinuxMethod();
+                }
+                else
+                {
+                    // windows 
+                    platformMethod = new WindowsMethod();
+                }
             }
-            else
-            {
-                // windows 
-                return new WindowsMethod();
-            }
+            return platformMethod;
         }
 
         /// <summary>
-        /// 获取日志记录工具对象
+        /// 获取日志记录工具的唯一对象
         /// </summary>
-        /// <returns>日志记录工具对象</returns>
+        /// <returns>日志记录工具的唯一对象</returns>
         public static Ice.Logger GetLogger()
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix
-                || Environment.OSVersion.Platform == PlatformID.MacOSX)
+            if (logger == null)
             {
-                // linux,unix,macos
-                return new LinuxLogger();
+                if (Environment.OSVersion.Platform == PlatformID.Unix
+                    || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                {
+                    // linux,unix,macos
+                    logger = new LinuxLogger();
+                }
+                else
+                {
+                    // windows 
+                    logger = new WindowsLogger();
+                }
             }
-            else
-            {
-                // windows 
-                return new WindowsLogger();
-            }
+            return logger;
         }
     }
 }

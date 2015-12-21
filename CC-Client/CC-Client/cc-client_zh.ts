@@ -2,6 +2,82 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>DefaultAppProcDialog</name>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="14"/>
+        <source>设置新建工作站默认启动应用和监视进程</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="26"/>
+        <source>需要远程启动程序</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="49"/>
+        <source>程序：</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="56"/>
+        <location filename="defaultappprocdialog.ui" line="59"/>
+        <source>输入需要远程启动的应用程序完整路径和参数</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="66"/>
+        <source>输入程序需要的额外参数</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="69"/>
+        <source>程序参数</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="93"/>
+        <location filename="defaultappprocdialog.ui" line="193"/>
+        <source>添加</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="116"/>
+        <location filename="defaultappprocdialog.ui" line="216"/>
+        <source>删除</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="138"/>
+        <source>程序启动后自动加入监视进程列表</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="151"/>
+        <source>需要监视进程</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="162"/>
+        <source>进程：</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="169"/>
+        <source>输入需要监视进程名称</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="258"/>
+        <source>确定(&amp;O)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="defaultappprocdialog.ui" line="284"/>
+        <source>取消(&amp;C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EditStationDialog</name>
     <message>
         <location filename="editstationdialog.ui" line="14"/>
@@ -50,32 +126,58 @@
     </message>
     <message>
         <location filename="editstationdialog.ui" line="266"/>
-        <source>需要启动程序列表(需要完成路径)</source>
-        <translation></translation>
+        <source>需要远程启动程序列表(输入完整路径和参数)</source>
+        <oldsource>需要启动程序列表(需要完成路径)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editstationdialog.ui" line="287"/>
+        <location filename="editstationdialog.ui" line="292"/>
+        <source>输入需要远程启动的应用程序完整路径和参数</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editstationdialog.ui" line="299"/>
+        <source>输入程序需要的参数</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editstationdialog.ui" line="302"/>
+        <source>程序参数</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editstationdialog.ui" line="309"/>
         <source>添加(&amp;A)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editstationdialog.ui" line="310"/>
-        <location filename="editstationdialog.ui" line="363"/>
+        <location filename="editstationdialog.ui" line="332"/>
+        <location filename="editstationdialog.ui" line="399"/>
         <source>删除</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editstationdialog.ui" line="322"/>
+        <location filename="editstationdialog.ui" line="341"/>
+        <source>程序启动后自动加入监视进程列表</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editstationdialog.ui" line="354"/>
         <source>需要监视进程列表(需要准确进程名称)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editstationdialog.ui" line="343"/>
+        <location filename="editstationdialog.ui" line="372"/>
+        <source>输入需要监视的进程名称</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editstationdialog.ui" line="379"/>
         <source>添加(&amp;M)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editstationdialog.ui" line="392"/>
+        <location filename="editstationdialog.ui" line="428"/>
         <source>查看进程(&amp;V)</source>
         <translation></translation>
     </message>
@@ -359,25 +461,25 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="160"/>
-        <location filename="mainwindow.cpp" line="372"/>
+        <location filename="mainwindow.cpp" line="394"/>
         <source>Small Icons</source>
         <translation>小图标</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="165"/>
-        <location filename="mainwindow.cpp" line="377"/>
+        <location filename="mainwindow.cpp" line="399"/>
         <source>Larger Icons</source>
         <translation>大图标</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="170"/>
-        <location filename="mainwindow.cpp" line="385"/>
+        <location filename="mainwindow.cpp" line="407"/>
         <source>List</source>
         <translation>列表</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="175"/>
-        <location filename="mainwindow.cpp" line="360"/>
+        <location filename="mainwindow.cpp" line="382"/>
         <source>Detail</source>
         <translation>详细信息</translation>
     </message>
@@ -432,335 +534,357 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="430"/>
+        <location filename="mainwindow.ui" line="432"/>
         <source>查看</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="443"/>
+        <location filename="mainwindow.ui" line="445"/>
         <source>CPU</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="451"/>
+        <location filename="mainwindow.ui" line="453"/>
         <source>内存</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="475"/>
+        <location filename="mainwindow.ui" line="479"/>
         <source>全部开机...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="439"/>
+        <location filename="mainwindow.ui" line="441"/>
         <source>选项</source>
         <oldsource>退出指显</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="571"/>
-        <location filename="mainwindow.ui" line="717"/>
+        <location filename="mainwindow.ui" line="575"/>
+        <location filename="mainwindow.ui" line="721"/>
         <source>CPU占用率</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="582"/>
-        <location filename="mainwindow.ui" line="731"/>
-        <location filename="mainwindow.ui" line="734"/>
+        <location filename="mainwindow.ui" line="586"/>
+        <location filename="mainwindow.ui" line="735"/>
+        <location filename="mainwindow.ui" line="738"/>
         <source>内存占用率</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="593"/>
+        <location filename="mainwindow.ui" line="597"/>
         <source>指显CPU占用率</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="604"/>
+        <location filename="mainwindow.ui" line="608"/>
         <source>指显内存占用率</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="612"/>
+        <location filename="mainwindow.ui" line="616"/>
         <source>进程数量</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="620"/>
+        <location filename="mainwindow.ui" line="624"/>
         <source>指显线程数量</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="478"/>
+        <location filename="mainwindow.ui" line="482"/>
         <source>打开指定计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="487"/>
+        <location filename="mainwindow.ui" line="491"/>
         <source>全部开机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="490"/>
+        <location filename="mainwindow.ui" line="494"/>
         <source>开启全部计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="499"/>
+        <location filename="mainwindow.ui" line="503"/>
         <source>关机...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="502"/>
+        <location filename="mainwindow.ui" line="506"/>
         <source>关闭指定计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="511"/>
+        <location filename="mainwindow.ui" line="515"/>
         <source>全部关机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="514"/>
+        <location filename="mainwindow.ui" line="518"/>
         <source>关闭全部计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="524"/>
+        <location filename="mainwindow.ui" line="528"/>
         <source>退出</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="527"/>
-        <location filename="mainwindow.ui" line="530"/>
+        <location filename="mainwindow.ui" line="531"/>
+        <location filename="mainwindow.ui" line="534"/>
         <source>退出控制台</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="539"/>
+        <location filename="mainwindow.ui" line="543"/>
         <source>全部启动程序...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="542"/>
-        <location filename="mainwindow.ui" line="545"/>
+        <location filename="mainwindow.ui" line="546"/>
+        <location filename="mainwindow.ui" line="549"/>
         <source>启动全部工作站应用软件</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="554"/>
+        <location filename="mainwindow.ui" line="558"/>
         <source>全部退出程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="557"/>
-        <location filename="mainwindow.ui" line="560"/>
+        <location filename="mainwindow.ui" line="561"/>
+        <location filename="mainwindow.ui" line="564"/>
         <source>退出全部工作站应用程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="629"/>
+        <location filename="mainwindow.ui" line="633"/>
         <source>开机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="632"/>
-        <location filename="mainwindow.ui" line="635"/>
+        <location filename="mainwindow.ui" line="636"/>
+        <location filename="mainwindow.ui" line="639"/>
         <source>打开选定的计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="644"/>
+        <location filename="mainwindow.ui" line="648"/>
         <source>关机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="647"/>
-        <location filename="mainwindow.ui" line="650"/>
+        <location filename="mainwindow.ui" line="651"/>
+        <location filename="mainwindow.ui" line="654"/>
         <source>关闭选定的计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="655"/>
+        <location filename="mainwindow.ui" line="659"/>
         <source>重启</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="658"/>
-        <location filename="mainwindow.ui" line="661"/>
+        <location filename="mainwindow.ui" line="662"/>
+        <location filename="mainwindow.ui" line="665"/>
         <source>重新启动选定的计算机</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="670"/>
+        <location filename="mainwindow.ui" line="674"/>
         <source>启动程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="673"/>
-        <location filename="mainwindow.ui" line="676"/>
+        <location filename="mainwindow.ui" line="677"/>
+        <location filename="mainwindow.ui" line="680"/>
         <source>启动选定工作站的程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="685"/>
+        <location filename="mainwindow.ui" line="689"/>
         <source>退出程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="688"/>
-        <location filename="mainwindow.ui" line="691"/>
+        <location filename="mainwindow.ui" line="692"/>
+        <location filename="mainwindow.ui" line="695"/>
         <source>退出选定工作站的应用程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="700"/>
+        <location filename="mainwindow.ui" line="704"/>
         <source>重启程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="703"/>
-        <location filename="mainwindow.ui" line="706"/>
+        <location filename="mainwindow.ui" line="707"/>
+        <location filename="mainwindow.ui" line="710"/>
         <source>重新启动选定工作站的应用程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="720"/>
+        <location filename="mainwindow.ui" line="724"/>
         <source>查看CPU占用率</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="737"/>
+        <location filename="mainwindow.ui" line="741"/>
         <source>查看内存占用率</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="748"/>
+        <location filename="mainwindow.ui" line="752"/>
         <source>程序信息</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="751"/>
+        <location filename="mainwindow.ui" line="755"/>
         <source>查看程序进程线程信息</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="762"/>
+        <location filename="mainwindow.ui" line="766"/>
         <source>消息</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="765"/>
-        <location filename="mainwindow.ui" line="768"/>
+        <location filename="mainwindow.ui" line="769"/>
+        <location filename="mainwindow.ui" line="772"/>
         <source>查看消息</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="779"/>
-        <location filename="mainwindow.ui" line="811"/>
+        <location filename="mainwindow.ui" line="783"/>
+        <location filename="mainwindow.ui" line="815"/>
         <source>线性图</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="787"/>
-        <location filename="mainwindow.ui" line="819"/>
+        <location filename="mainwindow.ui" line="791"/>
+        <location filename="mainwindow.ui" line="823"/>
         <source>饼图</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="795"/>
-        <location filename="mainwindow.ui" line="827"/>
+        <location filename="mainwindow.ui" line="799"/>
+        <location filename="mainwindow.ui" line="831"/>
         <source>柱状图</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="800"/>
+        <location filename="mainwindow.ui" line="804"/>
         <source>lineMemory</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="832"/>
+        <location filename="mainwindow.ui" line="836"/>
         <source>全部重启系统</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="835"/>
+        <location filename="mainwindow.ui" line="839"/>
         <source>重新启动全部工作站</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="844"/>
+        <location filename="mainwindow.ui" line="848"/>
         <source>全部重启应用</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="847"/>
+        <location filename="mainwindow.ui" line="851"/>
         <source>重新启动全部工作站应用程序</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="856"/>
+        <location filename="mainwindow.ui" line="860"/>
         <source>删除工作站</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="859"/>
+        <location filename="mainwindow.ui" line="863"/>
         <source>删除选定的工作站</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="862"/>
+        <location filename="mainwindow.ui" line="866"/>
         <source>从列表中删除选定的工作站</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="871"/>
+        <location filename="mainwindow.ui" line="875"/>
         <source>编辑工作站</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="874"/>
+        <location filename="mainwindow.ui" line="878"/>
         <source>编辑工作站信息</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="877"/>
+        <location filename="mainwindow.ui" line="881"/>
         <source>编辑选定工作站信息</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="888"/>
+        <location filename="mainwindow.ui" line="892"/>
         <source>自动更新工作站列表</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="891"/>
-        <location filename="mainwindow.ui" line="894"/>
-        <location filename="mainwindow.ui" line="897"/>
+        <location filename="mainwindow.ui" line="895"/>
+        <location filename="mainwindow.ui" line="898"/>
+        <location filename="mainwindow.ui" line="901"/>
         <source>允许自动更新工作站列表</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="906"/>
+        <location filename="mainwindow.ui" line="910"/>
         <source>设置监视间隔...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="909"/>
-        <location filename="mainwindow.ui" line="912"/>
+        <location filename="mainwindow.ui" line="913"/>
+        <location filename="mainwindow.ui" line="916"/>
         <source>设置工作站监视间隔</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="921"/>
+        <location filename="mainwindow.ui" line="925"/>
         <source>新建工作站</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="924"/>
-        <location filename="mainwindow.ui" line="927"/>
+        <location filename="mainwindow.ui" line="928"/>
+        <location filename="mainwindow.ui" line="931"/>
         <source>新建一个工作站配置项</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="940"/>
+        <source>设置默认程序和进程...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="943"/>
+        <location filename="mainwindow.ui" line="946"/>
+        <source>设置新建工作站默认启动程序和监视进程</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="955"/>
+        <source>详细信息</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="958"/>
+        <location filename="mainwindow.ui" line="961"/>
+        <source>查看工作站详细信息</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -889,94 +1013,119 @@
 <context>
     <name>StationInfo</name>
     <message>
-        <location filename="StationInfo.cpp" line="612"/>
+        <location filename="StationInfo.cpp" line="796"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="615"/>
+        <location filename="StationInfo.cpp" line="799"/>
         <source>Normal</source>
         <translation>正常</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="618"/>
+        <location filename="StationInfo.cpp" line="802"/>
         <source>Warning</source>
         <translation>告警</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="621"/>
+        <location filename="StationInfo.cpp" line="805"/>
         <source>Error</source>
         <translation>异常</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="635"/>
+        <location filename="StationInfo.cpp" line="819"/>
         <source>PowerOffOrNetworkFailure</source>
-        <translation>为加电或网络故障</translation>
+        <translation>未加电或网络故障</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="638"/>
+        <location filename="StationInfo.cpp" line="822"/>
         <source>NoHeartbeat</source>
-        <translation>没有检测信号</translation>
+        <translation>未收到检测信号</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="641"/>
+        <location filename="StationInfo.cpp" line="825"/>
         <source>Powering</source>
         <translation>加电中</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="644"/>
+        <location filename="StationInfo.cpp" line="828"/>
         <source>AppStarting</source>
-        <translation>应用程序启动中</translation>
+        <translation>正在启动应用程序</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="647"/>
+        <location filename="StationInfo.cpp" line="831"/>
         <source>Shutdowning</source>
-        <translation>关机中</translation>
+        <translation>正在关机</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="650"/>
+        <location filename="StationInfo.cpp" line="834"/>
         <source>Rebooting</source>
-        <translation>重启中</translation>
+        <translation>正在重启</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="653"/>
+        <location filename="StationInfo.cpp" line="837"/>
         <source>PowerOnFailure</source>
         <translation>加电失败</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="656"/>
+        <location filename="StationInfo.cpp" line="840"/>
+        <source>AppCloseFailure</source>
+        <translation>应用程序退出失败</translation>
+    </message>
+    <message>
+        <location filename="StationInfo.cpp" line="843"/>
         <source>AppStartFailure</source>
         <translation>应用程序启动失败</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="659"/>
+        <location filename="StationInfo.cpp" line="846"/>
+        <source>AppStarted</source>
+        <translation>程序已启动</translation>
+    </message>
+    <message>
+        <location filename="StationInfo.cpp" line="849"/>
+        <source>AppNotRunning</source>
+        <translation>软件没有启动</translation>
+    </message>
+    <message>
+        <location filename="StationInfo.cpp" line="852"/>
+        <source>SomeAppNotRunning</source>
+        <translation>部分软件没有启动</translation>
+    </message>
+    <message>
+        <location filename="StationInfo.cpp" line="855"/>
         <source>ShutdownFailure</source>
         <translation>关机失败</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="662"/>
+        <location filename="StationInfo.cpp" line="858"/>
         <source>RebootFailure</source>
         <translation>重启失败</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="665"/>
+        <location filename="StationInfo.cpp" line="861"/>
         <source>MemoryTooHigh</source>
         <translation>内存占用率太高</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="668"/>
+        <location filename="StationInfo.cpp" line="864"/>
         <source>CPUTooHigh</source>
         <translation>CPU占用率太高</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="671"/>
+        <location filename="StationInfo.cpp" line="867"/>
         <source>DiskFull</source>
         <translation>磁盘满</translation>
     </message>
     <message>
-        <location filename="StationInfo.cpp" line="674"/>
+        <location filename="StationInfo.cpp" line="870"/>
         <source>Running</source>
         <translation>正常运行中</translation>
+    </message>
+    <message>
+        <location filename="StationInfo.cpp" line="873"/>
+        <source>GeneralError</source>
+        <translation>一般性错误</translation>
     </message>
 </context>
 </TS>

@@ -3,6 +3,10 @@
 #include <QDateTime>
 #include <time.h>
 
+#include <Ice/Ice.h>
+#include "StationStateReceiver.h"
+using namespace std;
+
 
 Monitor::Monitor(int interval, QObject *parent)
     : QThread(parent)
@@ -18,12 +22,11 @@ Monitor::~Monitor()
 //线程执行函数
 //执行监视工作站状态任务
 void Monitor::run()
-{
-    //启动工作站执行动作心跳计数线程    
+{  
     while (true)
     {
         //等待1秒
-        QThread::sleep(interval);
+        QThread::sleep(1);
 
         if(stop)
             break;
@@ -32,21 +35,36 @@ void Monitor::run()
         time_t now = time(NULL);
         for (auto& station : *pStations)
         {
+            int stationInterval = station.inRebootingOrShutdown() ? 1 : interval;
             if (station.IsRunning())
             {
-                if (now - station.lastTick >= 5 * interval)
+                if (now - station.lastTick >= 5 * stationInterval)
                 {
                     //如果大于5 * interval秒仍然没有收到新的状态,则设置为离线
-                    station.setState(StationInfo::Unknown);
+                    station.setState(StationInfo::PowerOffOrNetworkFailure);
                 }
-                else if (now - station.lastTick >= 2 * interval)
+                else if (now - station.lastTick >= 2 * stationInterval && !station.inRebootingOrShutdown())
                 {
-                    //如果大于2秒仍然没有收到新的状态,则报警
+                    //如果大于2*监视间隔秒仍然没有收到新的状态,则报警
                     station.setState(StationInfo::NoHeartbeat, QStringLiteral("%1秒内没有收到该工作站状态,请检查").arg(2 * interval));
                 }
             }
         }
     }
+}
+
+/*!
+开始运行
+@param QThread::Priority priority 线程优先级
+@return void
+作者：cokkiy（张立民)
+创建时间：2015/12/14 21:22:45
+*/
+void Monitor::start(QThread::Priority  priority/*= QThread::NormalPriority*/)
+{
+    executCounting = new ExecutCounting();
+    executCounting->start(priority);
+    QThread::start(priority);
 }
 
 /*!
@@ -79,6 +97,7 @@ void Monitor::setInterval(int interval)
 void Monitor::Stop()
 {
     this->stop = true;
+    executCounting->Stop();
 }
 
 //工作站状态发生变化
@@ -88,34 +107,14 @@ void Monitor::stationStateChanged(const QObject* station)
     StationInfo* pStation = (StationInfo*)station;
     if (pStation->inExecutingState())
     {
-        //在执行状态
-        int id = startTimer(1000);
-        if (id != 0)
-        {
-            stationInExecutingState.insert({ id,pStation });
-        }
+        executCounting->addExecutingStateStation(pStation);
     }
-}
-//定时器事件,提供执行计数工作
-void Monitor::timerEvent(QTimerEvent * event)
-{
-    int id = event->timerId();
-    StationInfo* pStation = stationInExecutingState[id];
-    if (pStation != NULL)
+    else
     {
-        if (pStation->ExecuteCounting() >= pStation->PowerOnTimeout) //180秒
-        {
-            //超过3分钟,加电失败
-            pStation->setState(StationInfo::PowerOnFailure);
-            killTimer(id);
-            stationInExecutingState.erase(id);
-        }
-        else
-        {
-            pStation->setExecuteCounting(pStation->ExecuteCounting() + 1);
-        }
+        executCounting->removeStationFromExecutingStationsList(pStation);
     }
 }
+
 
 //响应工作站被添加事件
 void Monitor::stationAdded(StationInfo* addedStation)

@@ -1,19 +1,27 @@
 ﻿#pragma once
 #include "IStationStateReceiver.ice"
+#include "AppControlParameter.ice"
 
 //Center Control
 module CC
-{
+{	
+
+	/// 应用程序控制异常
+    exception AppControlError
+	{
+	    ///异常原因
+		string Reason;
+	};
 
 	///控制接口,定义了对工作站的控制工作
 	interface IController
 	{
 		///启动指定的APP
-		void startApp(string appName);
+		AppStartingResults startApp(AppStartParameters appParams) throws AppControlError;
 		///关闭指定的应用程序
-		void closeApp(string appName);
+		AppControlResults closeApp(ProcessIdList processIdList)  throws AppControlError;
 		///重启指定的应用程序
-		void restartApp(string appName);
+		AppStartingResults restartApp(AppStartParameters appParams)  throws AppControlError;
 
 		//重启系统
 		void reboot(bool force);
@@ -26,7 +34,7 @@ module CC
 		///设置要监视的进程（名称)列表
 		idempotent void setWatchingApp(stringList procNames);
 
-		///设置状态收集间隔（毫秒)
+		///设置状态收集间隔（秒)
 		idempotent void setStateGatheringInterval(int interval);
 	};
 };

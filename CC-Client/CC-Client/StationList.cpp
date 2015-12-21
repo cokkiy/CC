@@ -313,12 +313,19 @@ void StationList::saveToFile(QString fileName)
 */
 StationInfo* StationList::findById(const std::string& stationId)
 {
-    for (auto& s : allStations)
+    try
     {
-        if (s.stationId.compare(stationId.c_str()) == 0)
+        for (auto& s : allStations)
         {
-            return &s;
+            if (s.stationId.compare(stationId.c_str()) == 0)
+            {
+                return &s;
+            }
         }
+    }
+    catch (...)
+    {
+
     }
     return NULL;
 }

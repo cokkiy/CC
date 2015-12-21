@@ -7,7 +7,7 @@ StateReceiver.Endpoints=udp -h 239.100.1.1 -p 10000 --interface 192.168.0.103
 #
 # The client station create a controller endpoint
 # We use this endpoints to control it
-Controller.Port=10000
+#Controller.Port=10000
 
 #
 # Alternative IPv6 configuration
@@ -41,8 +41,9 @@ Ice.Warn.Connections=1
 
 # Control Client
 #Close connection 
-Ice.ACM.Close=0
+Ice.ACM.Client.Close=1 # CloseOnIdle
+Ice.ACM.Server.Close=0
 # No heat beat ping
 Ice.ACM.Heartbeat=0
 # time out 30
-Ice.ACM.Timeout=30
+Ice.ACM.Client.Timeout=30

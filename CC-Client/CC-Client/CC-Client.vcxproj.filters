@@ -64,6 +64,15 @@
       <UniqueIdentifier>{e5a25725-6770-4dd6-ad10-5f2258986be2}</UniqueIdentifier>
       <Extensions>ice</Extensions>
     </Filter>
+    <Filter Include="Plot">
+      <UniqueIdentifier>{e3a91f65-e139-4aa2-9911-70eb7c6e02b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plot\Header">
+      <UniqueIdentifier>{6773bb61-e15a-403b-b97f-e9e785ac87ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plot\Source">
+      <UniqueIdentifier>{43f82dc8-8a67-4242-9ff0-04e07c07c619}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -150,12 +159,6 @@
     <ClCompile Include="Release\moc_monitor.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="generated\IStationStateReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="generated\IController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StationStateReceiver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -203,6 +206,51 @@
     </ClCompile>
     <ClCompile Include="Release\moc_option.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\IController.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\IStationStateReceiver.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\AppControlParameter.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="executcounting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_executcounting.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_executcounting.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_stationcontrolthread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="qtdispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_qtdispatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_qtdispatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="stationdetaildialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_stationdetaildialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_stationdetaildialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="cpuplot\counterpiemarker.cpp">
+      <Filter>Plot\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="StationHelper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +304,24 @@
     </CustomBuild>
     <CustomBuild Include="option.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="executcounting.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationcontrolthread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qtdispatcher.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationdetaildialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationdetaildialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cpuplot\plotpart.h">
+      <Filter>Plot\Header</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -411,15 +477,6 @@
     <ClInclude Include="GeneratedFiles\ui_floatingmenu.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\IStationStateReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\IController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StationStateReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_setintervaldialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -432,12 +489,36 @@
     <ClInclude Include="GeneratedFiles\ui_defaultappprocdialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\AppControlParameter.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\IController.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\IStationStateReceiver.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_stationdetaildialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpuplot\cpustat.h">
+      <Filter>Plot\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="cpuplot\counterpiemarker.h">
+      <Filter>Plot\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="StationHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <IceBuilder Include="IStationStateReceiver.ice">
       <Filter>Slice Files</Filter>
     </IceBuilder>
     <IceBuilder Include="IController.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="AppControlParameter.ice">
       <Filter>Slice Files</Filter>
     </IceBuilder>
   </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿#include "StationStateReceiver.h"
 #include "StationList.h"
 #include "IController.h"
+#include "option.h"
 
 
 /*!
@@ -25,7 +26,7 @@ StationStateReceiver::StationStateReceiver(StationList* pStations, bool autoRefr
 作者：cokkiy（张立民)
 创建时间：2015/11/24 9:38:28
 */
-void StationStateReceiver::receiveSystemState(const ::CC::StationSystemStatePtr& pStationSystemState, const ::Ice::Current& /*= ::Ice::Current()*/)
+void StationStateReceiver::receiveSystemState(const ::CC::StationSystemState& pStationSystemState, const ::Ice::Current& /*= ::Ice::Current()*/)
 {
     findAndSetStationSystemState(pStationSystemState);
 }
@@ -38,31 +39,38 @@ void StationStateReceiver::receiveSystemState(const ::CC::StationSystemStatePtr&
 作者：cokkiy（张立民)
 创建时间：2015/11/24 9:39:14
 */
-void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunningStatePtr& pStationRunningState, const ::CC::IControllerPrx& controlPrx, const ::Ice::Current& /*= ::Ice::Current()*/)
+void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunningState& stationRunningState, const ::CC::IControllerPrx& controlPrx, const ::Ice::Current& /*= ::Ice::Current()*/)
 {
     if (pStations != nullptr)
     {
-        StationInfo* pStation = pStations->findById(pStationRunningState->stationId);
+        StationInfo* pStation = pStations->findById(stationRunningState.stationId);
         if (pStation != NULL)
         {
-            pStation->setCPU(pStationRunningState->cpu);
-            pStation->setMemory(pStationRunningState->currentMemory);
-            pStation->setProcCount(pStationRunningState->procCount);
+            pStation->setCPU(stationRunningState.cpu);
+            pStation->setMemory(stationRunningState.currentMemory);
+            pStation->setProcCount(stationRunningState.procCount);
             pStation->setLastTick();
         }
         else
         {
             //没有收到工作站基本信息,请求发送基本信息
-            CC::StationSystemStatePtr systemState = controlPrx->getSystemState();
-            StationInfo* pStation = findAndSetStationSystemState(systemState);
-            if (pStation != NULL)
-            {
-                //设置运行状态
-                pStation->setCPU(pStationRunningState->cpu);
-                pStation->setMemory(pStationRunningState->currentMemory);
-                pStation->setProcCount(pStationRunningState->procCount);
-                pStation->setLastTick();
-            }            
+            controlPrx->begin_getSystemState([this,controlPrx,&stationRunningState](const CC::StationSystemState& systemState) {
+                StationInfo* pStation = findAndSetStationSystemState(systemState);
+                if (pStation != NULL)
+                {
+                    //设置控制代理
+                    pStation->controlProxy = controlPrx;
+                    //设置运行状态
+                    pStation->setCPU(stationRunningState.cpu);
+                    pStation->setMemory(stationRunningState.currentMemory);
+                    pStation->setProcCount(stationRunningState.procCount);
+                    pStation->setLastTick();
+                    //设置监视间隔
+                    controlPrx->begin_setStateGatheringInterval(Option::getInstance()->Interval, []() {});
+                    //设置工作站监视进程列表
+                    controlPrx->begin_setWatchingApp(pStation->getAllMonitorProc(), []() {});
+                }
+            });
         }
     }
 }
@@ -75,19 +83,14 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 作者：cokkiy（张立民)
 创建时间：2015/11/24 9:39:34
 */
-void StationStateReceiver::receiveAppRunningState(const ::CC::AppRunningStatePtr& pAppRunningState, const ::Ice::Current& /*= ::Ice::Current()*/)
+void StationStateReceiver::receiveAppRunningState(const ::CC::AppsRunningState& appsRunningState, const ::Ice::Current& /*= ::Ice::Current()*/)
 {
-    if (pStations != nullptr)
+    if (pStations != nullptr&&!appsRunningState.empty())
     {
-        StationInfo* pStation = pStations->findById(pAppRunningState->stationId);
+        StationInfo* pStation = pStations->findById(appsRunningState.front().stationId);
         if (pStation != NULL)
         {
-            pStation->setAppCPU(pAppRunningState->cpu);
-            pStation->setAppMemory(pAppRunningState->currentMemory);
-            pStation->setAppThreadCount(pAppRunningState->threadCount);
-            pStation->setAppIsRunning(true);
-            pStation->setState(StationInfo::Normal);
-            pStation->setLastTick();
+            pStation->setAppsRunningState(appsRunningState);
         }
     }
 }
@@ -105,12 +108,12 @@ void StationStateReceiver::setStations(StationList* pStations)
 }
 
 //查找并更新工作站信息
-StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::StationSystemStatePtr& pStationSystemState)
+StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::StationSystemState& stationSystemState)
 {
     StationInfo* pStation = NULL;
     if (pStations != nullptr)
     {
-        for (auto& ni : pStationSystemState->NetworkInterfaces)
+        for (auto& ni : stationSystemState.NetworkInterfaces)
         {
             pStation = pStations->find(ni);
             if (pStation != NULL)
@@ -121,25 +124,27 @@ StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::Stat
         if (pStation == NULL&&autoRefreshStationList)
         {
             StationInfo station;
-            station.setStationId(pStationSystemState->stationId);
-            station.setName(QString::fromStdString(pStationSystemState->computerName));
-            for (auto& ccNI : pStationSystemState->NetworkInterfaces)
+            station.setStationId(stationSystemState.stationId);
+            station.setName(QString::fromStdString(stationSystemState.computerName));
+            station.autoMonitorRemoteStartApp = Option::getInstance()->AutoMonitorRemoteStartApp;
+            for (auto& ccNI : stationSystemState.NetworkInterfaces)
             {
                 NetworkInterface ni(ccNI);
                 station.NetworkIntefaces.push_back(ni);
             }
+            station.addMonitorProcs(Option::getInstance()->MonitorProcesses);
+            station.addStartApps(Option::getInstance()->StartApps);
             pStations->push(station);
-            pStation = pStations->findById(pStationSystemState->stationId);
+            pStation = pStations->findById(stationSystemState.stationId);
         }
 
         if (pStation != NULL)
         {
-            pStation->setStationId(pStationSystemState->stationId);
-            pStation->setTotalMemory(pStationSystemState->totalMemory);
-            pStation->setOSName(pStationSystemState->osName);
-            pStation->setOSVersion(pStationSystemState->osVersion);
+            pStation->setStationId(stationSystemState.stationId);
+            pStation->setTotalMemory(stationSystemState.totalMemory);
+            pStation->setOSName(stationSystemState.osName);
+            pStation->setOSVersion(stationSystemState.osVersion);
             pStation->setLastTick();
-            pStation->setState(StationInfo::Running);
         }
     }
     return pStation;

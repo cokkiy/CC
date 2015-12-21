@@ -17,7 +17,7 @@ private:
     bool autoRefreshStationList;
 private:
     //查找并更新工作站信息
-    StationInfo* findAndSetStationSystemState(const ::CC::StationSystemStatePtr& pStationSystemState);
+    StationInfo* findAndSetStationSystemState(const ::CC::StationSystemState& pStationSystemState);
 public:
     /*!
     创建一个工作站信息接收对象
@@ -39,7 +39,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/24 9:38:28
     */
-    virtual void receiveSystemState(const ::CC::StationSystemStatePtr&, const ::Ice::Current& = ::Ice::Current()) override;
+    virtual void receiveSystemState(const ::CC::StationSystemState&, const ::Ice::Current& = ::Ice::Current()) override;
 
     /*!
     接收工作站运行状态
@@ -49,7 +49,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/24 9:39:14
     */
-    virtual void receiveStationRunningState(const ::CC::StationRunningStatePtr&, const ::CC::IControllerPrx&, const ::Ice::Current& = ::Ice::Current()) override;
+    virtual void receiveStationRunningState(const ::CC::StationRunningState&, const ::CC::IControllerPrx&, const ::Ice::Current& = ::Ice::Current()) override;
 
     /*!
     接收工作站应用程序状态
@@ -59,7 +59,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/24 9:39:34
     */
-    virtual void receiveAppRunningState(const ::CC::AppRunningStatePtr&, const ::Ice::Current& = ::Ice::Current()) override;
+    virtual void receiveAppRunningState(const ::CC::AppsRunningState&, const ::Ice::Current& = ::Ice::Current()) override;
 
     /*!
     设置工作站列表

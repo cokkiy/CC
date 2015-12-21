@@ -68,6 +68,10 @@ private:
     DisplayMode displayMode = SmallIcons;
     //加电时显示的图标
     QIcon powerOnIcons[4];
+    //启动/关闭程序时图标
+    QIcon startCloseAppIcons[2];
+    //关机/重启图标
+    QIcon shutdownRebootIcons[5];
 
     private slots:
     //工作站状态发生变化

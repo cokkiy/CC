@@ -33,7 +33,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="frameShape">
@@ -305,7 +305,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(170, 255, 127);</string>
+        <string notr="true">QFrame#rightFrame {background-color: rgb(170, 255, 127);}</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -420,6 +420,8 @@
     <addaction name="actionStartApp"/>
     <addaction name="actionRestartApp"/>
     <addaction name="actionExitApp"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewStationDetail"/>
     <addaction name="separator"/>
     <addaction name="actionRemove"/>
     <addaction name="actionEdit"/>
@@ -942,6 +944,21 @@
    </property>
    <property name="statusTip">
     <string>设置新建工作站默认启动程序和监视进程</string>
+   </property>
+  </action>
+  <action name="actionViewStationDetail">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_file_036.png</normaloff>:/Icons/52design.com_file_036.png</iconset>
+   </property>
+   <property name="text">
+    <string>详细信息</string>
+   </property>
+   <property name="toolTip">
+    <string>查看工作站详细信息</string>
+   </property>
+   <property name="statusTip">
+    <string>查看工作站详细信息</string>
    </property>
   </action>
  </widget>

@@ -22,7 +22,7 @@ namespace CC_StationService
             var collection = searcher.Get();
             foreach (var item in collection)
             {
-                totalMemory = (long)item["TotalPhysicalMemory"];
+                totalMemory = (long)(ulong)item["TotalPhysicalMemory"];
                 return totalMemory;
             }
             return 0;
@@ -30,12 +30,12 @@ namespace CC_StationService
 
         public void Reboot()
         {
-            System.Diagnostics.Process.Start("shutdown -r -f");
+            System.Diagnostics.Process.Start("shutdown"," -r -f");
         }
 
         public void Shutdown()
         {
-            System.Diagnostics.Process.Start("shutdown -s -f");
+            System.Diagnostics.Process.Start("shutdown"," -s -f");
         }
 
         /// <summary>

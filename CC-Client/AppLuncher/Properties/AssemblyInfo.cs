@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("CC-Station")]
+[assembly: AssemblyTitle("AppLuncher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CC-Station")]
+[assembly: AssemblyProduct("AppLuncher")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("1d31193b-e004-4b87-8a22-ffd72c9a8298")]
+[assembly: Guid("e255ddbd-e479-46de-9d12-36efca0a1365")]
 
 // 程序集的版本信息由下列四个值组成: 
 //

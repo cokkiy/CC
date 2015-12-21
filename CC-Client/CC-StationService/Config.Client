@@ -7,8 +7,11 @@ StateReceiver.Proxy=stateReceiver:udp -h 239.100.1.1 -p 10000 --sourceAddress 19
 #
 # The Controller endpoint, cc-client can sent control message 
 # to workstation by this point
-#
-Controller.Endpoints=tcp -h 0.0.0.0 -p 10000
+# Listening in all ip address and random port
+Controller.Endpoints=tcp -h 0.0.0.0 -p 0
+
+# Proxy for AppLuncher
+AppLuncher.Proxy=Luncher:tcp -h 127.0.0.1 -p 10001
 
 #
 # Alternative IPv6 configuration
@@ -40,9 +43,13 @@ Ice.Trace.Network=0
 #
 #Ice.Trace.Protocol=1
 
+#Control client
+#close on idle
+Ice.ACM.Client.Close=1 
+
 # Control Server
-#Close connection on idle forceful
-Ice.ACM.Close=4 
+#Don't close
+Ice.ACM.Server.Close=0 
 # No heat beat ping
 Ice.ACM.Heartbeat=0
 # time out 30

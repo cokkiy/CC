@@ -5,6 +5,9 @@
 #include <QTimer>
 #include "StationList.h"
 #include <map>
+#include <thread>
+#include <mutex>
+#include "executcounting.h"
 
 
 /*!
@@ -30,8 +33,18 @@ public:
     */
     Monitor(int interval = 1, QObject *parent = NULL);
     ~Monitor();
-    //线程函数
+
+    //线程核心函数
     virtual void run() override;
+
+    /*!
+    开始运行
+    @param QThread::Priority priority 线程优先级
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/14 21:22:45
+    */
+    virtual void start(QThread::Priority priority = QThread::NormalPriority);
 
     /*!
     设置工作站列表
@@ -62,17 +75,23 @@ private:
     StationList* pStations;
     //正在执行状态的工作站与对应计时器列表
     std::map<int, StationInfo*> stationInExecutingState;
+    //正在执行状态的工作站<->对应计时器列表
+    std::map<void*, int> stationsTimerId;
     //检测间隔
     int interval;
     //是否停止
     bool stop = false;
+    //执行动作计数线程
+    ExecutCounting* executCounting;
+
     private slots:
     //工作站状态发生变化
     void stationStateChanged(const QObject* station);
-    //定时器事件,提供执行计数工作
-    virtual void timerEvent(QTimerEvent *) override;   
+
     //工作站被添加
     void stationAdded(StationInfo* addedStation);
 };
+
+
 
 #endif // MONITOR_H

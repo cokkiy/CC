@@ -5,6 +5,7 @@
 #include "StationList.h"
 #include <QAbstractItemModel>
 #include <Ice/Ice.h>
+
 /************************************************************************
  @class StationManager:工作站管理类,管理工作站启动,关闭,重启,运行程序
  等动作
@@ -17,15 +18,13 @@ public:
     /*!
     创建一个工作站管理类的实例
     @param StationList * stations 工作站列表
-    @param Ice::Communicator communicator ICE通信对象
     @param const QModelIndexList & indexs 选择的工作站索引
     @param QObject * parent 
     @return 
     作者：cokkiy（张立民)
     创建时间：2015/11/10 15:43:35
     */
-    StationManager(StationList* stations, Ice::CommunicatorPtr communicator,
-        const QModelIndexList& indexs = QModelIndexList(), QObject *parent = NULL);
+    StationManager(StationList* stations,  const QModelIndexList& indexs = QModelIndexList(), QObject *parent = NULL);
     ~StationManager() = default;
 
     public slots:
@@ -50,7 +49,7 @@ public:
     创建时间：2015/11/10 15:53:48
     */
     void reboot();
-
+    
     /*!
     关闭选择的计算机
     @return void
@@ -58,6 +57,7 @@ public:
     创建时间：2015/11/10 15:54:00
     */
     void shutdown();
+
     /*!
     重启全部的计算机
     @return void
@@ -72,13 +72,7 @@ public:
     创建时间：2015/11/10 15:54:29
     */
     void shutdownAll();
-    /*!
-    关闭程序（指显程序)
-    @return void
-    作者：cokkiy（张立民)
-    创建时间：2015/11/10 15:54:41
-    */
-    void closeApp();
+
     /*!
     重启程序（指显程序)
     @return void
@@ -86,6 +80,15 @@ public:
     创建时间：2015/11/10 15:55:05
     */
     void restartApp();
+
+    /*!
+    重启全部工作站程序
+    @return void
+    作者：cokkiy（张立民)
+    创建时间：2015/12/16 18:10:25
+    */
+    void restartAllApp();
+
     /*!
     退出程序（指显程序)
     @return void
@@ -93,6 +96,7 @@ public:
     创建时间：2015/11/10 15:55:19
     */
     void exitApp();
+
     /*!
     退出全部工作站指显程序
     @return void
@@ -140,6 +144,20 @@ private:
     //ICE通信对象
     Ice::CommunicatorPtr  communicator;
 
+    //start specified station's app
+    void startApp(StationInfo* s);
+
+    //exit specified station's app
+    void exitApp(StationInfo* s);
+
+    //reboot specified station
+    void reboot(StationInfo* s);
+
+    //shutdown specified station
+    void shutdown(StationInfo* s);
+
+    // restart specified station's app
+    void restartApp(StationInfo* s);
 };
 
 #endif // STATIONMANAGER_H

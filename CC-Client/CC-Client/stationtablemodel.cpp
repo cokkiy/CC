@@ -20,6 +20,13 @@ StationTableModel::StationTableModel(const StationList* pStations, QObject *pare
     powerOnIcons[1].addFile(":/Icons/powerOn-1.png");
     powerOnIcons[2].addFile(":/Icons/powerOn-2.png");
     powerOnIcons[3].addFile(":/Icons/powerOn-3.png");
+    startCloseAppIcons[0].addFile(":/Icons/startApp0.png");
+    startCloseAppIcons[1].addFile(":/Icons/startApp1.png");
+    shutdownRebootIcons[0].addFile(":/Icons/shutdown0.png");
+    shutdownRebootIcons[1].addFile(":/Icons/shutdown1.png");
+    shutdownRebootIcons[2].addFile(":/Icons/shutdown2.png");
+    shutdownRebootIcons[3].addFile(":/Icons/shutdown3.png");
+    shutdownRebootIcons[4].addFile(":/Icons/shutdown4.png");
 }
 
 StationTableModel::~StationTableModel()
@@ -49,9 +56,10 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
     {
         if (displayMode==List)
         {
-            QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存：%4\tCPU：%5");
+            QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存(%)：%4\tCPU：%5");
             StationInfo* s = pStations->atCurrent(index.row());
-            return str.arg(s->Name()).arg(s->IP()).arg(s->state().toString()).arg(s->Memory()).arg(s->CPU());
+            QString memory = QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory() / pStations->atCurrent(index.row())->TotalMemory() * 100, 0, 'f', 2);
+            return str.arg(s->Name()).arg(s->IP()).arg(s->state().toString()).arg(memory).arg(s->CPU());
         }
         else if(displayMode==Details)
         {
@@ -77,7 +85,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
 
     if (role == Qt::ToolTipRole)
     {
-        QString tip = QStringLiteral("%1\r\nIP：%2\r\n %3");
+        QString tip = QStringLiteral("%1\r\nIP：%2\r\n%3");
         auto s = pStations->atCurrent(index.row());
         return tip.arg(s->Name()).arg(s->IP()).arg(s->state().toString());
     }
@@ -141,9 +149,9 @@ QVariant StationTableModel::headerData(int section, Qt::Orientation orientation,
         case 2:
             return QStringLiteral("状态");        
         case 3:
-            return QStringLiteral("总CPU占用率");
+            return QStringLiteral("总CPU占用率(%)");
         case 4:
-            return QStringLiteral("总内存占用率");
+            return QStringLiteral("总内存占用率(%)");
         case 5:
             return QStringLiteral("指显CPU占用率");
         case 6:
@@ -162,6 +170,7 @@ QVariant StationTableModel::headerData(int section, Qt::Orientation orientation,
     }
     else
         return section;
+    return section;
 }
 
 /*!
@@ -205,13 +214,11 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
             return powerOnIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 4];
             break;
         case  StationInfo::AppStarting:
-            icon.addFile(QStringLiteral(":/Icons/App1.jpg"), QSize(64, 64), QIcon::Normal, QIcon::On);
+            return startCloseAppIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 2];
             break;
-            case StationInfo::Rebooting:
-                //TODO:改变图标
-                break;
+        case StationInfo::Rebooting:
         case StationInfo::Shutdowning:
-            icon.addFile(QStringLiteral(":/Icons/PowerOnFailure.png"), QSize(64, 64), QIcon::Normal, QIcon::On);
+            return shutdownRebootIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 5];
             break;
         }
         v.setValue(icon);
@@ -241,13 +248,11 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
             return powerOnIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 4];
             break;
         case  StationInfo::AppStarting:
-            icon.addFile(QStringLiteral(":/Icons/App1.jpg"), QSize(128, 128), QIcon::Normal, QIcon::On);
+            return startCloseAppIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 2];
             break;
         case StationInfo::Rebooting:
-            //TODO:改变图标
-            break;
         case StationInfo::Shutdowning:
-            icon.addFile(QStringLiteral(":/Icons/PowerOnFailure.png"), QSize(128, 128), QIcon::Normal, QIcon::On);
+            return shutdownRebootIcons[pStations->atCurrent(index.row())->ExecuteCounting() % 5];
             break;
         }
         v.setValue(icon);
@@ -269,7 +274,7 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
     case 3:
         return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->CPU(), 0, 'f', 0);
     case 4:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory() / pStations->atCurrent(index.row())->TotalMemory() * 100, 0, 'f', 2);
     case 5:
         return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppCPU(), 0, 'f', 0);
     case 6:
