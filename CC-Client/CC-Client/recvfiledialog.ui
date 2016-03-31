@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RecvFileDialog</class>
+ <widget class="QDialog" name="RecvFileDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>747</width>
+    <height>465</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>接收文件对话框</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="cc-client.qrc">
+    <normaloff>:/Icons/receiveFile.png</normaloff>:/Icons/receiveFile.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>要接收的文件</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="srcFileLineEdit">
+       <property name="placeholderText">
+        <string>输入要接收的文件路径和名称</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>存放位置：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="destLineEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="browsePushButton">
+       <property name="text">
+        <string>选择位置</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="recvPushButton">
+       <property name="text">
+        <string>开始接收</string>
+       </property>
+       <property name="icon">
+        <iconset resource="cc-client.qrc">
+         <normaloff>:/Icons/download.jpg</normaloff>:/Icons/download.jpg</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>727</width>
+        <height>385</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="cc-client.qrc"/>
+ </resources>
+ <connections/>
+</ui>

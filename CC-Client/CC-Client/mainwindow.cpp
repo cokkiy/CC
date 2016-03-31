@@ -27,6 +27,10 @@
 #include <qwt_plot_grid.h>
 #include "cpuplot\plotpart.h"
 #include "cpuplot\counterpiemarker.h"
+#include "sendfiledialog.h"
+#include "recvfiledialog.h"
+#include "detaildialog.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -41,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //绑定菜单显示事件
     connect(ui->menuOperation, SIGNAL(aboutToShow()), this, SLOT(operationMenuToShow()));
+	connect(ui->menuFileTranslation, &QMenu::aboutToShow, this, &MainWindow::fileTransMenuToShow);
     //隐藏tableView,只显示listView
     ui->tableView->setVisible(false);
     tableHeader = ui->tableView->horizontalHeader();
@@ -81,15 +86,23 @@ MainWindow::~MainWindow()
         delete monitor;
 }
 
-void MainWindow::on_actionPower_On_triggered()
+void MainWindow::on_actionPowerOn_triggered()
 {
     //打开指定计算机电源
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->powerOn();
 
 }
 
-void MainWindow::on_actionAll_Power_On_triggered()
+void MainWindow::on_actionAllPower_On_triggered()
 {
     //打开全部计算机
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->powerOnAll();
 }
 
 //工作站信息加载完毕
@@ -103,6 +116,7 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
     {
         ui->statusBar->showMessage(QStringLiteral("无法加载工作站信息，%1无法打开。").arg(fileName), 3000);
     }
+	pStations->sort(StationList::IP);
     //设置模型和视图
     pTableModel = new StationTableModel(pStations);
     //订阅状态变化
@@ -229,6 +243,23 @@ void MainWindow::operationMenuToShow()
     ui->actionNewStation->setEnabled(true);
 }
 
+//文件传输菜单即将显示
+void MainWindow::fileTransMenuToShow()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+	{
+		//没有选择
+		ui->actionSendSelection->setEnabled(false);
+		ui->actionReceiveSelection->setEnabled(false);
+	}
+	else
+	{
+		ui->actionSendSelection->setEnabled(true);
+		ui->actionReceiveSelection->setEnabled(true);
+	}
+}
+
 //工作站状态发生变化
 void MainWindow::stationStateChanged(const QObject* pObject)
 {
@@ -294,7 +325,7 @@ void MainWindow::onStationListChanged()
 }
 
 //工作站发生变化,用户编辑了工作站属性
-void MainWindow::stationChanged(const QObject*)
+void MainWindow::stationChanged(const QObject* pStation)
 {
     QDir dir(filePath);
     if (!dir.exists())
@@ -302,6 +333,14 @@ void MainWindow::stationChanged(const QObject*)
         dir.mkdir(filePath);
     }
     pStationList->saveToFile(fileName);
+
+	// 更新工作站监视程序列表
+	StationInfo* s = const_cast<StationInfo*>(dynamic_cast<const StationInfo*>(pStation));
+	if (s->controlProxy != NULL)
+	{
+		//设置工作站监视进程列表
+		s->controlProxy->begin_setWatchingApp(s->getAllShouldMonitoredProcessesName(), []() {});
+	}
 }
 
 //当前选择的工作站发生变化
@@ -344,41 +383,66 @@ void MainWindow::currentStationChanged(const QModelIndex & current)
 
     perfCurves[0].name = "Total";
 
-    int zOrder = curve->z();
-    int rgb = 0xff0000;
+	int zOrder = curve->z() + 1;
+	int rgb[] = { 0x00FF40,0x00FFFF,0xFF00FF,0xFF8040,0xFF4000,0x00800,0x00FF80,0x80FFFF,0x0080FF,0xFF80C0,
+	0xFF0000,0xFF0000,0x80FF00,0x804040,0x00FF00,0x008080,
+	0x004080,0x808000,0x8000FF};
     int index = 1;
-    for (auto& proc : currentStation->getAllMonitorProc())  //TODO:需要处理
-    {
-        curve = new CounterCurve(QString::fromStdString(proc));
-        curve->setColor(QColor::fromRgb(rgb));
-        rgb += 100;
-        curve->setZ(zOrder--);
-        curve->attach(cpuPlot);
-        perfCurves[index].cpu_curve = curve;
-        perfCurves[index].name = "Idle";
-        index++;
-    }
+	for (auto& proc : currentStation->getAllShouldMonitoredProcessesName())
+	{
+		//CPU 
+		curve = new CounterCurve(QString::fromStdString(proc));
+		curve->setColor(QColor::fromRgb(rgb[index-1]));
+		curve->setZ(zOrder);
+		curve->attach(cpuPlot);
+		curve->setVisible(true);
+		perfCurves[index].cpu_curve = curve;
+
+		//Memory
+		curve = new CounterCurve(QString::fromStdString(proc));
+		curve->setColor(QColor::fromRgb(rgb[index-1]));
+		curve->setZ(zOrder);
+		curve->attach(memoryPlot);
+		curve->setVisible(true);
+		perfCurves[index].memory_curve = curve;
+
+		perfCurves[index].name = proc;
+		zOrder++;
+		index++;
+	}
     // Idle --cpu
     curve = new CounterCurve("Idle");
-    curve->setColor(Qt::darkCyan);
-    curve->setZ(curve->z() - zOrder);
+    curve->setColor(Qt::gray);
+    curve->setZ(zOrder);
     curve->attach(cpuPlot);
+	curve->setVisible(false);
     perfCurves[index].cpu_curve = curve;
+
     // idle - memory 
     curve = new CounterCurve("Idle");
-    curve->setColor(Qt::darkCyan);
-    curve->setZ(curve->z() - zOrder);
+    curve->setColor(Qt::gray);
+    curve->setZ(zOrder);
     curve->attach(memoryPlot);
+	curve->setVisible(false);
     perfCurves[index].memory_curve = curve;
 
     perfCurves[index].name = "Idle";
 
     //show pie marker
-    CounterPieMarker *pie = new CounterPieMarker(perfCurves, MaxCountOfCounter, true);
-    pie->attach(cpuPlot);
+	if (cpuPie != nullptr)
+		delete cpuPie;
 
-    pie = new CounterPieMarker(perfCurves, MaxCountOfCounter, false);
-    pie->attach(memoryPlot);
+    cpuPie = new CounterPieMarker(perfCurves, MaxCountOfCounter, true);
+	cpuPie->attach(cpuPlot);
+
+	if (memoryPie != nullptr)
+		delete memoryPie;
+
+	memoryPie = new CounterPieMarker(perfCurves, MaxCountOfCounter, false);
+	memoryPie->attach(memoryPlot);
+
+	ui->qwtPlotCPU->updateLayout();
+	ui->qwtPlotMemory->updateLayout();
 }
 
 /*!
@@ -457,7 +521,29 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::on_sortComboBox_currentIndexChanged(int index)
 {
-
+	switch (index)
+	{
+	case 0: //IP
+		pStationList->sort(StationList::IP);
+		break;
+	case 1://IP DESC
+		pStationList->sort(StationList::IP_DESC);
+		break;
+	case 2://State
+		pStationList->sort(StationList::State);
+		break;
+	case 3://State DESC
+		pStationList->sort(StationList::State_DESC);
+		break;
+	case 4://Name
+		pStationList->sort(StationList::Name);
+		break;
+	case 5://NAME DESC
+		pStationList->sort(StationList::Name_DESC);
+		break;
+	default:
+		break;
+	}
 }
 
 //显示方式发生变化
@@ -626,9 +712,8 @@ void MainWindow::on_actionAllowAutoRefreshList_triggered(bool checked)
 void MainWindow::on_actionNewStation_triggered()
 {
     StationInfo* pStation = new StationInfo;
-    pStation->autoMonitorRemoteStartApp = option.AutoMonitorRemoteStartApp;
     pStation->addStartApps(option.StartApps);
-    pStation->addMonitorProcs(option.MonitorProcesses);
+    pStation->addStandAloneMonitorProcesses(option.MonitorProcesses);
     EditStationDialog dlg(pStation, EditStationDialog::New);
     if (dlg.exec() == QDialog::Accepted)
     {
@@ -672,7 +757,52 @@ void MainWindow::on_actionSetDefaultAppAndProc_triggered()
 //查看工作站信息信息
 void MainWindow::on_actionViewStationDetail_triggered()
 {
-    //TODO：显示工作站详细信息对话框
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	auto station = pStationList->atCurrent(selectedIndexs.first().row());
+	if (station != NULL)
+	{
+		//显示工作站详细信息对话框
+		DetailDialog dlg(station);
+		dlg.exec();
+	}
+}
+
+//发送文件到选定工作站
+void MainWindow::on_actionSendSelection_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	SendFileDialog* dlg = new SendFileDialog(pStationList, selectedIndexs, false, communicator);
+	dlg->exec();
+}
+//从选定工作站接收文件
+void MainWindow::on_actionReceiveSelection_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	RecvFileDialog* dlg = new RecvFileDialog(pStationList, selectedIndexs, false, communicator);
+	dlg->exec();
+}
+//发送文件到全部工作站
+void MainWindow::on_actionSendAll_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	SendFileDialog* dlg = new SendFileDialog(pStationList, selectedIndexs, true, communicator);
+	dlg->exec();
+}
+
+//接收文件从全部工作站
+void MainWindow::on_actionReceiveAll_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	RecvFileDialog* dlg = new RecvFileDialog(pStationList, selectedIndexs, true, communicator);
+	dlg->exec();
+}
+
+void MainWindow::on_filterLineEdit_returnPressed()
+{
+	QString filter = ui->filterLineEdit->text();
+	pTableModel->beginFilter();
+	pStationList->filter(filter);
+	pTableModel->endFilter();
 }
 
 //添加按钮到右键菜单
@@ -683,14 +813,17 @@ void MainWindow::addButtons(FloatingMenu* menu)
     StationManager* manager = new StationManager(pStationList, selectedIndexs);
     if (!selectedJustOne(selectedIndexs))
     {
+		//扩大menu大小
+		menu->setSize(200);
         //选择了多个
         menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
-        menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
+        //menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
         menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
         menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
-        menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
+        //menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
         menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("关闭程序"), manager, SLOT(exitApp()));
-        menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
+        menu->addButton(":/Icons/receiveFile.png", QStringLiteral("接收文件"), this, SLOT(on_actionReceiveSelection_triggered()));
+		menu->addButton(":/Icons/sendFile.png", QStringLiteral("发送文件"), this, SLOT(on_actionSendSelection_triggered()));
     }
     else
     {
@@ -700,6 +833,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
         {
             //未开机
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+			menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
         }
         else
         {
@@ -708,10 +842,11 @@ void MainWindow::addButtons(FloatingMenu* menu)
             menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
             if (station->state() == StationInfo::AppStarted || station->state() == StationInfo::SomeAppNotRunning)
             {
+				//扩大menu大小
+				menu->setSize(250);
                 menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
                 menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出程序"), manager, SLOT(exitApp()));
-                //扩大menu大小
-                menu->setSize(220);
+               
                 if (station->state() == StationInfo::SomeAppNotRunning)
                 {
                     //有些程序没有启动
@@ -722,13 +857,18 @@ void MainWindow::addButtons(FloatingMenu* menu)
             }
             else if(station->state()==StationInfo::AppNotRunning || station->state() == StationInfo::AppStartFailure)
             {
+				//扩大menu大小
+				menu->setSize(220);
                 //应用程序没有运行
                 menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
             }
+
+			menu->addButton(":/Icons/receiveFile.png", QStringLiteral("接收文件"), this, SLOT(on_actionReceiveSelection_triggered()));
+			menu->addButton(":/Icons/sendFile.png", QStringLiteral("发送文件"), this, SLOT(on_actionSendSelection_triggered()));
+
         }
         menu->addButton(":/Icons/52design.com_file_036.png", QStringLiteral("详细信息"), this, SLOT(on_actionViewStationDetail_triggered()));
         menu->addButton(":/Icons/52design.com_2006ball_74.png", QStringLiteral("编辑"), this, SLOT(on_actionEdit_triggered()));
-        menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
     }
 }
 
@@ -781,8 +921,8 @@ void MainWindow::setPlotStyle(QwtPlot* plot, QString title)
     plot->plotLayout()->setAlignCanvasToScales(true);
 
     QwtLegend *legend = new QwtLegend;
-    legend->setDefaultItemMode(QwtLegendData::Checkable);
-    plot->insertLegend(legend, QwtPlot::RightLegend);
+    legend->setDefaultItemMode(QwtLegendData::Clickable);
+    plot->insertLegend(legend, QwtPlot::LegendPosition::BottomLegend);
 
     // disable x axis
     plot->enableAxis(QwtPlot::xBottom, false);
@@ -841,8 +981,7 @@ void StationsLoader::load(const QString filename, StationList* pStations)
         for (XElement el : elements)
         {
             StationInfo station;
-            station.setName(el.getChildValue(QStringLiteral("名称")));
-            station.autoMonitorRemoteStartApp = el.getChildBoolValue(QStringLiteral("自动监视远程启动程序"));
+            station.setName(el.getChildValue(QStringLiteral("名称")));            
             for (XElement& niElemet : el.getChildrenByName(QStringLiteral("网卡")))
             {
                 QString mac = niElemet.getChildValue(QStringLiteral("MAC"));
@@ -856,13 +995,13 @@ void StationsLoader::load(const QString filename, StationList* pStations)
             }
             for (XElement& appElement : el.getChildrenByName(QStringLiteral("启动程序/程序")))
             {
-                station.addStartApp(appElement.getChildValue(QStringLiteral("路径")),appElement.getChildValue(QStringLiteral("参数")));
+                station.addStartApp(appElement.getChildValue(QStringLiteral("路径")), appElement.getChildValue(QStringLiteral("参数")),
+                    appElement.getChildValue(QStringLiteral("进程名")), appElement.getChildBoolValue(QStringLiteral("允许多实例")));
             }
             for (XElement& procElement : el.getChildrenByName(QStringLiteral("监视进程/进程")))
             {
-                station.addMonitorProc(procElement.Value);
+                station.addStandAloneMonitorProcess(procElement.Value);
             }
-            station.buildAllMonitorProcessList();
             pStations->push(station);
         }
         emit loaded(pStations, true);

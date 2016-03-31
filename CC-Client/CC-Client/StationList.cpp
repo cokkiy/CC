@@ -2,6 +2,9 @@
 #include <QTextStream>
 #include <QFile>
 #include <QTextCodec>
+#include <QValidator>
+#include <QRegExp>
+
 /*!
 获取当前显示工作站数量
 @return int 工作站数量
@@ -213,6 +216,45 @@ void StationList::filter(const FilterOperations& filter)
 }
 
 /*!
+根据filter字符串过滤工作站列表
+@param const QString filter 过滤字符串，只支持IP和名称
+@return void
+作者：cokkiy（张立民）
+创建时间:2016/3/30 10:33:02
+*/
+void StationList::filter(const QString& strFilter)
+{
+	QRegExp ipReg("^((?:(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d))))&");
+	QRegExpValidator validator;
+	validator.setRegExp(ipReg);
+	QString s = strFilter;
+	int pos = 0;
+	currentStations.clear();
+	if (validator.validate(s, pos) == QValidator::Intermediate)
+	{
+		//IP地址
+		for (auto&station : allStations)
+		{
+			if (station.IP().contains(s))
+			{
+				currentStations.push_back(&station);
+			}
+		}
+	}
+	else
+	{
+		//名称
+		for (auto&station : allStations)
+		{
+			if (station.Name().contains(s))
+			{
+				currentStations.push_back(&station);
+			}
+		}
+	}
+}
+
+/*!
 根据\param sortby排序工作站列表
 @param \see SortBy sortby 排序方式
 @return void
@@ -225,33 +267,39 @@ void StationList::sort(SortBy sortby/*= SortBy::IP*/)
     switch (sortby)
     {
     case StationList::IP:
-        //根据IP正排序
+		//根据IP正排序
+		std::sort(currentStations.begin(), currentStations.end(),
+			[](StationInfo* first, StationInfo* second) { return first->IP() >= second->IP();});        
         break;
     case StationList::IP_DESC:
         //根据IP逆排序
+		std::sort(currentStations.begin(), currentStations.end(),
+			[](StationInfo* first, StationInfo* second) { return first->IP() < second->IP();});
         break;
     case StationList::State:
         //根据状态正排序
+		std::sort(currentStations.begin(), currentStations.end(),
+			[](StationInfo* first, StationInfo* second) { return first->state() >= second->state();});
         break;
     case StationList::State_DESC:
         //根据状态逆排序
+		std::sort(currentStations.begin(), currentStations.end(),
+			[](StationInfo* first, StationInfo* second) { return first->state() < second->state();});
         break;
     case StationList::Name:
         //根据名称正排序
+		std::sort(currentStations.begin(), currentStations.end(),
+			[](StationInfo* first, StationInfo* second) { return first->Name() >= second->Name();});
         break;
     case StationList::Name_DESC:
         //根据名称逆排序
+		std::sort(currentStations.begin(), currentStations.end(),
+			[](StationInfo* first, StationInfo* second) { return first->Name() < second->Name();});
         break;
     default:
         //不排序
         break;
     }    
-}
-
-//过滤并排序
-void StationList::filterANDsort()
-{
-
 }
 
 /*!

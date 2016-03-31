@@ -1,0 +1,122 @@
+#include "stationbar.h"
+#include <QFrame>
+#include <QBoxLayout>
+#include <QLabel>
+#include <QProgressBar>
+
+bool StationBar::IsOnline()
+{
+	return m_IsOnline;
+}
+
+void StationBar::setIsOnline(bool value)
+{
+	if (m_IsOnline != value)
+	{
+		m_IsOnline = value;
+		if (m_IsOnline)
+		{
+			iconLabel->setText(stationName_on.arg(m_StationName));
+		}
+		else
+		{
+			iconLabel->setText(stationName_off.arg(m_StationName));
+		}
+	}
+}
+
+QString StationBar::StationName()
+{
+	return m_StationName;
+}
+
+void StationBar::setStationName(QString value)
+{
+	if (m_StationName != value)
+	{
+		m_StationName = value;
+		if(m_IsOnline)
+			iconLabel->setText(stationName_on.arg(m_StationName));
+		else
+		{
+			iconLabel->setText(stationName_off.arg(m_StationName));
+		}
+	}
+}
+
+size_t StationBar::Percent()
+{
+	return m_Percent;
+}
+
+void StationBar::setPercent(size_t value)
+{
+	if (m_Percent != value)
+	{
+		m_Percent = value;
+		int percent = value / (double)maxPercent * 100;
+		progressBar->setValue(percent);
+	}
+}
+
+QString StationBar::TipText()
+{
+	return m_TipText;
+}
+
+void StationBar::setTipText(QString value)
+{
+	if (m_TipText != value)
+	{
+		m_TipText = value;
+		infoLabel->setText(value);
+	}
+}
+
+StationBar::StationBar(QWidget *parent)
+	: QWidget(parent), maxPercent(100)
+{
+	QHBoxLayout* horizontalLayout = new QHBoxLayout(this);
+	horizontalLayout->setSpacing(6);
+	horizontalLayout->setContentsMargins(11, 11, 11, 11);
+	//horizontalLayout->setObjectName(QStringLiteral("horizontalLayout_2"));
+	iconLabel = new QLabel(this);
+	//label->setObjectName(QStringLiteral("label_2"));
+	//iconLabel->setText("<html><head/><body align=\"center\"><p><img src=\":/Icons/ncom003.ico\"/></p><p>\345\267\245\344\275\234\347\253\2311\345\257\271\345\257\271\345\257\271</p></body></html>");
+
+	iconLabel->setTextFormat(Qt::AutoText);
+	iconLabel->setWordWrap(true);
+
+	iconLabel->setMaximumWidth(80);
+	iconLabel->setMinimumWidth(80);
+
+	horizontalLayout->addWidget(iconLabel);
+
+	QVBoxLayout* verticalLayout = new QVBoxLayout();
+	verticalLayout->setSpacing(6);
+	//verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+	infoLabel = new QLabel(this);
+
+	verticalLayout->addWidget(infoLabel);
+
+	progressBar = new QProgressBar(this);
+	progressBar->setMinimum(0);
+	progressBar->setMaximum(100);
+	progressBar->setValue(0);
+
+	verticalLayout->addWidget(progressBar);
+
+	horizontalLayout->addLayout(verticalLayout);
+}
+
+StationBar::~StationBar()
+{
+	delete iconLabel;
+	delete infoLabel;
+	delete progressBar;
+}
+
+void StationBar::setMaxPercent(size_t size)
+{
+	maxPercent = size;
+}

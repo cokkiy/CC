@@ -14,23 +14,32 @@ module CC
 	///进程信息
 	struct AppStartingResult
 	{
+		///应用程序启动参数标识
+		int ParamId;
 		///进程ID
-		int Id;
+		int ProcessId;
 		///进程名称
-		string ProcessName;
-		///返回的应用程序名称（包括路径和启动参数),路径与启动参数之间用 && 连接
-		string AppName;
+		string ProcessName;		
 		///控制结果
-		AppControlResult Result;
+		AppControlResult CtrlResult;
+		///结果说明
+		["cpp:type:wstring"]
+		string Result;
 	};
 
 	///应用程序启动参数
 	struct AppStartParameter
 	{
+		///参数标识,用于返回启动结果
+		int ParamId;
 		///程序路径
 		string AppPath;
 		///程序参数
 		string Arguments;
+		///进程名
+		string ProcessName;
+		///是否允许允许多个实例
+		bool AllowMultiInstance=false;
 	};
 
 	["cpp:type:std::list<CC::AppStartingResult>"]

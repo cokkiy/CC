@@ -96,9 +96,9 @@ bool XDocument::finishToken(int tokenType, stack<XAttribute>& unhandledAttribute
     case 4: //4：代表元素结束值（元素名称）
     {
         XElement element=unhandledElements.top();
-        if(element.Name.compare(curToken,Qt::CaseInsensitive)!=0)
+        if (element.Name.compare(curToken, Qt::CaseInsensitive) != 0)
         {
-            qCritical()<<"xml file format error, unclosed tag: "<<element.Name<<endl;
+            qCritical() << "xml file format error, unclosed tag: " << element.Name << ", at line: " << line << endl;
 
             return false;
         }
@@ -188,8 +188,11 @@ bool XDocument::parse(const QString& content)
     {
         QChar c=content[index];
 
-        if(c=='\r'||c=='\n')
+        if (c == '\r' || c == '\n')
         {
+            line++;
+            if (c == '\n' && prevChar == '\r')
+                line--;
             continue;
         }
 
@@ -367,15 +370,15 @@ bool XDocument::parse(const QString& content)
             }
         }
 
-        else if(c=='!')
+        else if (c == '!' && inLittleBiggerPair)
         {
             //开始注释
-            isComment=true;
+            isComment = true;
         }
-        else if(c=='?')
+        else if (c == '?' && inLittleBiggerPair)
         {
             //xml文件首行
-            isXmlSchemaLine=true;
+            isXmlSchemaLine = true;
         }
         else if(c=='>')
         {

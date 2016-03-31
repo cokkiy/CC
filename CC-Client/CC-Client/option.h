@@ -2,6 +2,9 @@
 #define CONFIG_H
 
 #include <QObject>
+#include <tuple>
+#include "AppControlParameter.h"
+
 /**************************
 \class Option 选项
  **************************/
@@ -14,9 +17,10 @@ public:
     ~Option();
 public:
     /*
-     需要启动的程序列表
+     远程启动程序列表
      **/
-    std::list<std::pair<QString,QString>> StartApps;
+    std::list<CC::AppStartParameter> StartApps;
+
     /*
     需要监视的进程列表
     **/
@@ -26,11 +30,6 @@ public:
      监视间隔
      **/
     int Interval;
-
-    /*
-    自动监视远程启动程序
-    */
-    bool AutoMonitorRemoteStartApp;
 
     /*
      *是否是第一次运行,如果是,则启动就显示默认程序配置对话框

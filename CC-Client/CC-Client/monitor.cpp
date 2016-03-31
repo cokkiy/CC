@@ -43,10 +43,10 @@ void Monitor::run()
                     //如果大于5 * interval秒仍然没有收到新的状态,则设置为离线
                     station.setState(StationInfo::PowerOffOrNetworkFailure);
                 }
-                else if (now - station.lastTick >= 2 * stationInterval && !station.inRebootingOrShutdown())
+                else if (now - station.lastTick >= 3 * stationInterval && !station.inRebootingOrShutdown())
                 {
-                    //如果大于2*监视间隔秒仍然没有收到新的状态,则报警
-                    station.setState(StationInfo::NoHeartbeat, QStringLiteral("%1秒内没有收到该工作站状态,请检查").arg(2 * interval));
+                    //如果大于3*监视间隔秒仍然没有收到新的状态,则报警
+                    station.setState(StationInfo::NoHeartbeat, QStringLiteral("%1秒内没有收到该工作站状态,请检查").arg(3 * interval));
                 }
             }
         }

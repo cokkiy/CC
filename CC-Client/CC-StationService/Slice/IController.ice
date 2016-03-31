@@ -5,6 +5,9 @@
 //Center Control
 module CC
 {	
+    ///字节数组
+	["cpp:array"]
+	sequence<byte> ByteArray;
 
 	/// 应用程序控制异常
     exception AppControlError
@@ -35,6 +38,40 @@ module CC
 		idempotent void setWatchingApp(stringList procNames);
 
 		///设置状态收集间隔（秒)
-		idempotent void setStateGatheringInterval(int interval);
+		idempotent void setStateGatheringInterval(int interval);		
+	};
+
+	///文件传输异常
+	exception FileTransException
+	{
+		["cpp:type:wstring"]
+		string fileName;
+		long offset;
+		int length;
+		int dataLen;
+		["cpp:type:wstring"]
+		string Message;
+	};
+
+	///定义文件传输接口
+	interface IFileTranslation
+	{
+		///创建文件
+		["cpp:type:wstring"]
+		bool createFile(string fileName) throws FileTransException;
+		///传送数据
+		bool transData(long position,int length,ByteArray data) throws FileTransException;
+		///关闭文件
+		bool closeFile() throws FileTransException;
+
+		///获取文件大小
+		long getSize(string fileName) throws FileTransException;
+
+		///获取文件数据
+		/*
+		* return：当返回false时，文件尚未读取完，返回true时，文件读取完毕
+		*/
+		["cpp:type:wstring"]
+		bool getData(string fileName,long position,out int length,out ByteArray data) throws FileTransException;
 	};
 };

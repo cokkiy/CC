@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>882</width>
-    <height>506</height>
+    <width>870</width>
+    <height>528</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -265,7 +265,7 @@
        <property name="title">
         <string>需要远程启动程序列表(输入完整路径和参数)</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTableWidget" name="startAppTableWidget">
           <property name="sizePolicy">
@@ -274,22 +274,46 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="columnCount">
-           <number>2</number>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
           </property>
           <attribute name="verticalHeaderVisible">
            <bool>false</bool>
           </attribute>
-          <column/>
-          <column/>
+          <column>
+           <property name="text">
+            <string>程序路径和名称</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>参数</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>进程名</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>允许多实例</string>
+           </property>
+          </column>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QLineEdit" name="appNameLineEdit">
+            <property name="toolTip">
+             <string>输入需要远程启动的应用程序完整路径和名称</string>
+            </property>
             <property name="placeholderText">
-             <string>输入需要远程启动的应用程序完整路径和参数</string>
+             <string>完整路径和名称</string>
             </property>
            </widget>
           </item>
@@ -299,9 +323,52 @@
              <string>输入程序需要的参数</string>
             </property>
             <property name="placeholderText">
-             <string>程序参数</string>
+             <string>参数</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="appProcNameLineEdit">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>输入对应的进程名称,以便监控其状态</string>
+            </property>
+            <property name="placeholderText">
+             <string>进程名</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="allowMultiInstanceCheckBox">
+            <property name="toolTip">
+             <string>是否允许运行程序的多个实例</string>
+            </property>
+            <property name="text">
+             <string>允许多实例</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <spacer name="horizontalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="addStartAppPushButton">
@@ -320,7 +387,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>10</width>
+              <width>13</width>
               <height>20</height>
              </size>
             </property>
@@ -333,17 +400,20 @@
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="horizontalSpacer_12">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="autoAddStartAppToMonitorListCheckBox">
-          <property name="text">
-           <string>程序启动后自动加入监视进程列表</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
@@ -357,7 +427,7 @@
         <item>
          <widget class="QListWidget" name="monitorListWidget">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -443,15 +513,20 @@
   <tabstop>nameLineEdit</tabstop>
   <tabstop>NIMACLineEdit</tabstop>
   <tabstop>NIIPLineEdit</tabstop>
+  <tabstop>addNiPushButton</tabstop>
+  <tabstop>removeNIPushButton</tabstop>
   <tabstop>startAppTableWidget</tabstop>
   <tabstop>appNameLineEdit</tabstop>
-  <tabstop>addStartAppPushButton</tabstop>
+  <tabstop>argumentLineEdit</tabstop>
+  <tabstop>appProcNameLineEdit</tabstop>
   <tabstop>removeStartAppPushButton</tabstop>
   <tabstop>monitorListWidget</tabstop>
   <tabstop>procNameLineEdit</tabstop>
   <tabstop>addMonitorProcPushButton</tabstop>
   <tabstop>removeMonitorProcPushButton</tabstop>
   <tabstop>viewProcPushButton</tabstop>
+  <tabstop>OKPushButton</tabstop>
+  <tabstop>CancelPushButton</tabstop>
  </tabstops>
  <resources>
   <include location="cc-client.qrc"/>

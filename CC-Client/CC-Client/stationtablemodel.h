@@ -46,6 +46,11 @@ public:
 
     //排序方法
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
+	//开始过滤
+	virtual void beginFilter();
+	//结束过滤
+	virtual void endFilter();
     //view获取行标题和列标题
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 

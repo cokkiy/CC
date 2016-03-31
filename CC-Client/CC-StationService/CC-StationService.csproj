@@ -55,6 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControllerImp.cs" />
+    <Compile Include="FileTranslation.cs" />
+    <Compile Include="FileTranslationImp.cs" />
     <Compile Include="generated\AppControlParameter.cs" />
     <Compile Include="generated\IAppLuncher.cs" />
     <Compile Include="generated\IController.cs" />

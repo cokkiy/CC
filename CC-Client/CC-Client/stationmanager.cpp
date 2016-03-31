@@ -7,6 +7,9 @@
 #include <Ice/Ice.h>
 #include "AppControlParameter.h"
 #include <QMessageBox>
+#include <QtNetwork>
+#include <QHostAddress>
+#include <QByteArray>
 using namespace std;
 using namespace CC;
 
@@ -34,7 +37,14 @@ StationManager::StationManager(StationList* stations, const QModelIndexList& ind
 */
 void StationManager::powerOnAll()
 {
-
+	for (auto iter = pStations->begin();iter != pStations->end();iter++)
+	{
+		if (!iter->IsRunning())
+		{
+			iter->setState(StationInfo::Powering);
+			sendPowerOnPacket(&*iter);
+		}
+	}
 }
 /*!
 开机选择的计算机
@@ -48,9 +58,34 @@ void StationManager::powerOn()
     {
         StationInfo* s = pStations->atCurrent(index.row());
         s->setState(StationInfo::Powering);
-        //TODO:发送ICMP开机包
+		sendPowerOnPacket(s);
     }
 }
+
+//发送开机指令包
+void StationManager::sendPowerOnPacket(StationInfo* s)
+{
+	//开机包格式：6个0xFF加上16个目标网卡MAC地址，共计6+16*6=102个字节
+	QUdpSocket udpSocket;
+	//向目标机的每个网卡发送开机指令
+	QStringList macs = s->MAC().split(",", QString::SkipEmptyParts);
+	for (QString& mac : macs)
+	{
+		QByteArray powerOnData;
+		powerOnData.fill(0xFF, 6);
+		QByteArray macByte = MAC2Byte(mac);
+		for (int i = 0; i < 16; i++)
+		{
+			powerOnData.append(macByte);
+		}
+
+		for (int i = 0; i < 5; i++)
+		{
+			udpSocket.writeDatagram(powerOnData.data(), powerOnData.size(), QHostAddress::Broadcast, 5555);
+		}
+	}
+}
+
 /*!
 重启选择的计算机
 @return void
@@ -209,22 +244,14 @@ void StationManager::restartApp()
 // restart specified station's app
 void StationManager::restartApp(StationInfo* s)
 {
-    //每次启动程序,都清空远程启动程序监视列表
-    s->clearTempMonitorProcess();
-
     IControllerPrx prx = s->controlProxy;
     if (prx != NULL)
     {
         s->setState(StationInfo::AppStarting);
         auto& apps = s->getStartAppNames();
-        list<AppStartParameter> params;
-        for (auto& app : apps)
-        {
-            params.push_back(AppStartParameter{ app.first.toStdString(),app.second.toStdString() });
-        }
         try
         {
-            prx->begin_restartApp(params,
+            prx->begin_restartApp(apps,
                 [s](const AppStartingResults& results)
             {
                 //处理返回结果
@@ -232,21 +259,20 @@ void StationManager::restartApp(StationInfo* s)
                 QString message = QStringLiteral("");
                 for (auto& result : results)
                 {
-                    if (result.Result == FailToStart)
+                    if (result.CtrlResult == FailToStart)
                     {
                         ok = false;
-                        message += QStringLiteral("%1启动失败 ").arg(QString::fromStdString(result.AppName));
+                        message += QStringLiteral("%1启动失败 ").arg(s->getStartAppNameByIndex(result.ParamId));
                     }
-                    else if (result.Result == AlreadyRunning)
+                    else if (result.CtrlResult == AlreadyRunning)
                     {
-                        message += QStringLiteral("%1已经在运行 ").arg(QString::fromStdString(result.AppName));
+                        message += QStringLiteral("%1已经在运行 ").arg(s->getStartAppNameByIndex(result.ParamId));
                     }
 
                     //如果自动监视启动进程
-                    if (s->autoMonitorRemoteStartApp && (result.Result == AlreadyRunning || result.Result == Started))
+                    if (result.CtrlResult == AlreadyRunning || result.CtrlResult == Started)
                     {
                         //添加自动监视进程信息
-                        s->addTempMonitorProcess(result.AppName, result.Id);
                     }
                 }
                 if (ok)
@@ -261,7 +287,7 @@ void StationManager::restartApp(StationInfo* s)
                 //设置新的监视列表
                 try
                 {
-                    s->controlProxy->begin_setWatchingApp(s->getAllMonitorProc(), []() {});
+                    s->controlProxy->begin_setWatchingApp(s->getAllShouldMonitoredProcessesName(), []() {});
                 }
                 catch (...)
                 {
@@ -311,6 +337,26 @@ void StationManager::restartApp(StationInfo* s)
     }
 }
 
+//mac地址到bytearray
+QByteArray StationManager::MAC2Byte(QString mac)
+{
+	QByteArray result;
+	QStringList macByte;
+	if (mac.contains(":"))
+	{
+		macByte = mac.split(":", QString::SkipEmptyParts);
+	}
+	else
+	{
+		macByte = mac.split("-", QString::SkipEmptyParts);
+	}
+	for (QString& b : macByte)
+	{
+		result.append((byte)b.toUInt(0,16));
+	}
+	return result;
+}
+
 /*!
 重启全部工作站程序
 @return void
@@ -346,7 +392,7 @@ void StationManager::exitApp()
 //退出指定工作站的全部远程启动程序
 void StationManager::exitApp(StationInfo* s)
 {
-    list<int> processesId = s->getRunningProcessesId();
+	list<int> processesId= s->getStartedAppProcessIds();
     if (processesId.empty())
     {
         s->setState(StationInfo::AppNotRunning, QStringLiteral("程序没有运行."));
@@ -444,46 +490,34 @@ void StationManager::startApp()
 //start specified stations app
 void StationManager::startApp(StationInfo* s)
 {
-    //每次启动程序,都清空远程启动程序监视列表
-    s->clearTempMonitorProcess();
-
     IControllerPrx prx = s->controlProxy;
     if (prx != NULL)
     {
         s->setState(StationInfo::AppStarting);
         auto& apps = s->getStartAppNames();
-        list<AppStartParameter> params;
-        for (auto& app : apps)
-        {
-            params.push_back(AppStartParameter{ app.first.toStdString(),app.second.toStdString() });
-        }
         try
         {
-            prx->begin_startApp(params, 
+            prx->begin_startApp(apps,
                 [s](const AppStartingResults& results)
             {
                 //处理返回结果
                 bool ok = true;
                 QString message = QStringLiteral("");
-                for (auto& result : results)
-                {
-                    if (result.Result == FailToStart)
-                    {
-                        ok = false;
-                        message += QStringLiteral("%1启动失败 ").arg(QString::fromStdString(result.AppName));
-                    }
-                    else if (result.Result == AlreadyRunning)
-                    {
-                        message += QStringLiteral("%1已经在运行 ").arg(QString::fromStdString(result.AppName));
-                    }
+				for (auto& result : results)
+				{
+					if (result.CtrlResult == FailToStart || result.CtrlResult == Error)
+					{
+						ok = false;
+						message += QStringLiteral("%1启动失败:%2 ")
+							.arg(s->getStartAppNameByIndex(result.ParamId))
+							.arg(QString::fromStdWString(result.Result));
+					}
+					else if (result.CtrlResult == AlreadyRunning)
+					{
+						message += QStringLiteral("%1已经在运行 ").arg(s->getStartAppNameByIndex(result.ParamId));
+					}
 
-                    //如果自动监视启动进程
-                    if (s->autoMonitorRemoteStartApp && (result.Result == AlreadyRunning || result.Result == Started))
-                    {
-                        //添加自动监视进程信息
-                        s->addTempMonitorProcess(result.AppName, result.Id);
-                    }
-                }
+				}
                 if (ok)
                 {
                     s->setState(StationInfo::AppStarted, message);
@@ -493,15 +527,6 @@ void StationManager::startApp(StationInfo* s)
                     s->setState(StationInfo::AppStartFailure, message);
                 }
 
-                //设置新的监视列表
-                try
-                {
-                    s->controlProxy->begin_setWatchingApp(s->getAllMonitorProc(), []() {});
-                }
-                catch (...)
-                {
-                    s->setState(StationInfo::GeneralError, QStringLiteral("设置工作站列表错误"));
-                }
             },
                 [s](const Ice::Exception& ex)
             {

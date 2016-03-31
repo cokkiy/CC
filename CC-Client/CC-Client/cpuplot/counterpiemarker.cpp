@@ -32,32 +32,44 @@ void CounterPieMarker::draw( QPainter *painter,
     pieRect.setHeight( yMap.transform( 80.0 ) );
     pieRect.setWidth( pieRect.height() );
 
-    int angle = static_cast<int>( 5760 * 0.75 );
+    int angleOfTotalAndIdle = static_cast<int>( 5760 * 0.75 ); //total和idle角度 total+idle=100%
+	int angleOfApp= static_cast<int>(5760 * 0.75); //监视程序角度
+	int indexOfIdle = 0; //Idle使用量索引
+	for (int i = 0; i < size; i++)
+	{
+		const QwtPlotCurve *curve = isCPUPlot ? perfCurves[i].cpu_curve : perfCurves[i].memory_curve;
+		if (curve == NULL)
+		{
+			indexOfIdle = i - 1;
+			break;
+		}
+	}
     for (int i = 0; i < size; i++)
     {
         const QwtPlotCurve *curve = isCPUPlot ? perfCurves[i].cpu_curve : perfCurves[i].memory_curve;
-        int index = 0;
         if (curve != NULL && curve->dataSize() > 0)
         {
-            const int value = static_cast<int>(5760 * curve->sample(0).y() / 100.0);
-
-            painter->save();
-            painter->setBrush(QBrush(curve->brush().color(), Qt::SolidPattern));
-            if (value != 0)
-                painter->drawPie(pieRect, -angle, -value);
-            painter->restore();
-
-            if (curve->dataSize() > 2 && index > 0)
-            {
-                // index 0: total 是其他的总和
-                angle += value;
-            }
-            else
-            {
-                angle += value;
-            }
-
-            index++;
+			const int value = static_cast<int>(5760 * curve->sample(0).y() / 100.0);
+			painter->save();
+			painter->setBrush(QBrush(curve->brush().color(), Qt::SolidPattern));
+			if (i == 0) //total
+			{
+				if (value != 0)
+					painter->drawPie(pieRect, -angleOfTotalAndIdle, -value);
+				angleOfTotalAndIdle += value;
+			}
+			else if(i==indexOfIdle) //idle
+			{
+				if (value != 0)
+					painter->drawPie(pieRect, -angleOfTotalAndIdle, -value);
+			}
+			else //其他app
+			{
+				if (value != 0)
+					painter->drawPie(pieRect, -angleOfApp, -value);
+				angleOfApp += value;
+			}
+			painter->restore();			
         }
     }    
 }

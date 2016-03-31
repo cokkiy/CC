@@ -138,10 +138,17 @@ StationInfo::State StationInfo::state()
 //设置操作状态和消息
 void StationInfo::setState(OperatingStatus status, const QString& message)
 {
-    m_state.setStatus(status, message);
-    operatingHistoryMessages.push_back(m_state.toHtmlString());
-    emit propertyChanged("state", this);
-    emit stateChanged(this);
+	if (m_state != status)
+	{
+		m_state.setStatus(status, message);
+		if (m_state == Error)
+		{
+			lastTick = time(NULL);
+		}
+		operatingHistoryMessages.push_back(m_state.toHtmlString());
+		emit propertyChanged("state", this);
+		emit stateChanged(this);
+	}
 }
 
 float StationInfo::CPU()
@@ -182,10 +189,7 @@ StationInfo::StationInfo(const StationInfo& ref)
     this->stationId = ref.stationId;
     this->lastTick = ref.lastTick;
     this->startAppList = ref.startAppList;
-    this->monitorProcessList = ref.monitorProcessList;
-    this->autoMonitorRemoteStartApp = ref.autoMonitorRemoteStartApp;
-    this->allMonitorProcess = ref.allMonitorProcess;
-    this->shouldMonitorProcessesCount = ref.shouldMonitorProcessesCount;
+    this->standAloneMonitorProcessList = ref.standAloneMonitorProcessList;
 }
 
 
@@ -247,65 +251,72 @@ void StationInfo::setOSVersion(const std::string& osVersion)
 作者：cokkiy（张立民)
 创建时间：2015/11/25 12:17:13
 */
-void StationInfo::setLastTick(const time_t& time /*= time(NULL)*/)
+void StationInfo::setLastTick(const time_t& tickTime /*= time(NULL)*/)
 {
-    this->lastTick = time;
-    //如果状态不是Error并且不在执行状态,错误状态则一直保持
-    if (m_state != Error && !inExecutingState())
-    {
-        //首先设置为正常状态
-        setState(Running);
-        //检查程序运行状态
-        if (AppsRunningState.size() >= getShouldMonitorProcessesCount())
-        {
-            //结果和监视数量一致
-            bool allRunning = true; //全都在运行
-            for (auto& r : AppsRunningState)
-            {
-                if (!r.isRunning)
-                {
-                    allRunning = false;
-                    break;
-                }
-            }
-            if (allRunning)
-            {
-                setState(AppStarted);
-            }
-            else
-            {
-                setState(SomeAppNotRunning, QStringLiteral("详情可通过\"详细信息\"查看."));
-            }
-        }
-        else
-        {
-            //结果和监视数量不一致
-            bool noRunning = true;
-            for (auto& r : AppsRunningState)
-            {
-                if (r.isRunning)
-                {
-                    noRunning = false;
-                    break;
-                }
-            }
-            if (noRunning)
-            {
-                setState(AppNotRunning);
-            }
-            else
-            {
-                setState(SomeAppNotRunning,QStringLiteral("详情可通过\"详细信息\"查看."));
-            }
-        }
+	this->lastTick = tickTime;
+	if (m_state == Error && tickTime - lastErrorTime < 5)
+	{
+		//错误状态需要保持5秒
+		return;
+	}
+	//不改变执行状态
+	if (inExecutingState())
+		return;
 
-        //检查CPU占用率,内存占用率和磁盘占用率
-        if (m_CPU > 90)
-            setState(CPUTooHigh);
+	//检查CPU占用率,内存占用率和磁盘占用率
+	if (m_CPU > 90)
+	{
+		setState(CPUTooHigh);
+		return;
+	}
 
-        if (m_Memory / m_TotalMemory > 0.9)
-            setState(MemoryTooHigh);
-    }
+	if (m_Memory / m_TotalMemory > 0.9)
+	{
+		setState(MemoryTooHigh);
+		return;
+	}
+
+	//检查程序运行状态
+	if (AppsRunningState.size() >= getShouldMonitoredProcessesCount())
+	{
+		//结果和监视数量一致
+		auto running=find_if(AppsRunningState.begin(), AppsRunningState.end(), 
+			[](CC::AppRunningState& state) { return state.isRunning;});
+		auto notRunning = find_if(AppsRunningState.begin(), AppsRunningState.end(),
+			[](CC::AppRunningState& state) { return !state.isRunning;});
+		if (notRunning == AppsRunningState.end())
+		{
+			//全部都在运行
+			setState(AppStarted);
+		}
+		else if(running== AppsRunningState.end())
+		{
+			//全部没有运行
+			setState(AppNotRunning);
+		}
+		else
+		{
+			//部分运行
+			setState(SomeAppNotRunning, QStringLiteral("详情可通过\"详细信息\"查看."));
+		}
+	}
+	else
+	{
+		//结果和监视数量不一致
+		auto running = find_if(AppsRunningState.begin(), AppsRunningState.end(),
+			[](CC::AppRunningState& state) { return state.isRunning;});
+		if (running == AppsRunningState.end())
+		{
+			//全部没有运行
+			setState(AppNotRunning);
+		}
+		else
+		{
+			//至少有一个在运行
+			setState(SomeAppNotRunning, QStringLiteral("详情可通过\"详细信息\"查看."));
+		}
+	}
+	
 }
 
 /*!
@@ -367,7 +378,6 @@ QString StationInfo::toXmlString()
 {
     QString xml = QStringLiteral("  <指显工作站>\r\n")
         + QStringLiteral("    <名称>%1</名称>\r\n").arg(m_Name);
-    xml += QStringLiteral("    <自动监视远程启动程序>%1</自动监视远程启动程序>\r\n").arg(this->autoMonitorRemoteStartApp);
     for (auto&ni : NetworkIntefaces)
     {
         xml += QStringLiteral("    <网卡>\r\n")
@@ -381,11 +391,19 @@ QString StationInfo::toXmlString()
     xml += QStringLiteral("    <启动程序>\r\n");
     for (auto& app : getStartAppNames())
     {
-        xml += QStringLiteral("      <程序><路径>%1</路径><参数>%2</参数></程序>\r\n").arg(app.first).arg(app.second);
+        xml += QStringLiteral("      <程序>\r\n"
+            "        <路径>%1</路径>\r\n"
+            "        <参数>%2</参数>\r\n"
+            "        <进程名>%3</进程名>\r\n"
+            "        <允许多实例>%4</允许多实例>\r\n"
+            "     </程序>\r\n").arg(QString::fromStdString(app.AppPath))
+            .arg(QString::fromStdString(app.Arguments))
+            .arg(QString::fromStdString(app.ProcessName))
+            .arg(app.AllowMultiInstance);
     }
     xml += QStringLiteral("    </启动程序>\r\n");
     xml += QStringLiteral("    <监视进程>\r\n");
-    for (auto& proc : getMonitorProcNames())
+    for (auto& proc : getStandAloneMonitorProcNames())
     {
         xml += QStringLiteral("      <进程>%1</进程>\r\n").arg(proc);
     }
@@ -396,19 +414,19 @@ QString StationInfo::toXmlString()
 
 
 
-void StationInfo::clearMonitorProc()
+void StationInfo::clearStandAloneMonitorProc()
 {
-    this->monitorProcessList.clear();
+    this->standAloneMonitorProcessList.clear();
 }
 
-void StationInfo::addMonitorProc(const QString& procName)
+void StationInfo::addStandAloneMonitorProcess(const QString& procName)
 {
-    this->monitorProcessList.push_back(procName);
+    this->standAloneMonitorProcessList.push_back(procName);
 }
 
-void StationInfo::addMonitorProcs(const std::list<QString>& processes)
+void StationInfo::addStandAloneMonitorProcesses(const std::list<QString>& processes)
 {
-    this->monitorProcessList.append(QStringList::fromStdList(processes));
+    this->standAloneMonitorProcessList.append(QStringList::fromStdList(processes));
 }
 
 void StationInfo::clearOperatingHistoryMessages()
@@ -421,17 +439,24 @@ std::list<QString> StationInfo::getOperatingHistoryMessages()
     return operatingHistoryMessages;
 }
 
-std::list<std::pair<QString, QString>> StationInfo::getStartAppNames()
+/*!
+获取需要启动程序列表
+@returnstd::list<CC::AppStartParameter> 需要启动程序名称,参数和对应进程名列表
+作者：cokkiy（张立民)
+创建时间：2015/12/01 22:25:20
+*/
+std::list<CC::AppStartParameter> StationInfo::getStartAppNames()
 {
     return startAppList;
 }
 
-void StationInfo::addStartApp(const QString& path, const QString& arguments)
+void StationInfo::addStartApp(const QString& path, const QString& arguments, const QString& procName, bool allowMultiInstance)
 {
-    startAppList.push_back({ path,arguments });
+    CC::AppStartParameter param{ (int)startAppList.size(), path.toStdString(), arguments.toStdString(), procName.toStdString(), allowMultiInstance };
+    startAppList.push_back(param);
 }
 
-void StationInfo::addStartApps(const std::list<std::pair<QString, QString>>& apps)
+void StationInfo::addStartApps(const std::list<CC::AppStartParameter>& apps)
 {
     startAppList.insert(startAppList.end(), apps.begin(), apps.end());
 }
@@ -441,14 +466,13 @@ void StationInfo::clearStartApp()
     startAppList.clear();
 }
 
-QStringList StationInfo::getMonitorProcNames()
+QStringList StationInfo::getStandAloneMonitorProcNames()
 {
-    return monitorProcessList;
+    return standAloneMonitorProcessList;
 }
 
 void StationInfo::UpdateStation()
 {
-    buildAllMonitorProcessList();
     emit stationChanged(this);
 }
 
@@ -481,109 +505,80 @@ bool StationInfo::timeout()
 }
 
 /*!
-获取需要监视的进程名称列表（包括已经启动的程序)
-@return std::list<std::string> 需要监视的进程名称列表（包括已经启动的程序)
+获取所有应该监视的进程名称列表
+@return std::list<std::string> 所有应该监视的进程名称列表
 作者：cokkiy（张立民)
 创建时间：2015/12/11 9:01:20
 */
-std::list<std::string> StationInfo::getAllMonitorProc()
+std::list<std::string> StationInfo::getAllShouldMonitoredProcessesName()
 {
     list<string> processes;
-    for (auto& proc : allMonitorProcess)
+    for (auto& process : standAloneMonitorProcessList)
     {
-        processes.push_back(proc.toStdString());
+        processes.push_back(process.toStdString());
+    }   
+    for (auto&param : startAppList)
+    {
+        processes.push_back(param.ProcessName);
     }
     return processes;
 }
 
-/*!
-清空远程启动进程监视列表
-@return void
-作者：cokkiy（张立民)
-创建时间：2015/12/14 10:09:56
-*/
-void StationInfo::clearTempMonitorProcess()
-{
-    tempMonitorProcesses.clear();
-    buildAllMonitorProcessList();
-}
 
 /*!
-添加远程启动进程到临时监视列表
-@param const ::std::string&  startParam 启动参数 = 路径 && 参数
-@param int Id 进程Id, Id=0的进程没有启动
-@return void
+根据参数标识获取程序名称
+@param int ParamId 参数标识
+@return QString 参数标识对应的程序名称
 作者：cokkiy（张立民)
-创建时间：2015/12/11 10:07:37
+创建时间：2015/12/24 9:19:23
 */
-void StationInfo::addTempMonitorProcess(const ::std::string&  startParam, int Id)
+QString StationInfo::getStartAppNameByIndex(int ParamId)
 {
-    tempMonitorProcesses[startParam] = Id;
-    buildAllMonitorProcessList();
-}
-
-/*!
-获取全部正在运行的被监控程序进程Id
-@return  list<int> 全部正在运行的被监控程序进程Id
-作者：cokkiy（张立民)
-创建时间：2015/12/16 10:34:18
-*/
-list<int> StationInfo::getRunningProcessesId()
-{
-    list<int> ids;
-
-    for (auto& runningState : this->AppsRunningState)
+    for (auto& param : startAppList)
     {
-        if (runningState.isRunning)
-        {
-            ids.push_back(runningState.Process.Id);
-        }
+        if (param.ParamId == ParamId)
+            return QString::fromStdString(param.AppPath);
     }
-    
-    return ids;
+
+    return QStringLiteral("");
 }
 
+
 /*!
-获取指定远程启动程序进程Id
-@param const ::std::string&  startParam 启动参数 = 路径 && 参数
-@return int 进程Id
-作者：cokkiy（张立民)
-创建时间：2015/12/16 10:37:21
+获取所有已运行(远程启动)程序进程ID列表
+@return list<int>
+作者：cokkiy（张立民）
+创建时间:2016/3/9 9:09:20
 */
-int StationInfo::getRemoteStartedProcessId(const ::std::string& startParam)
+list<int> StationInfo::getStartedAppProcessIds()
 {
-    auto iter = tempMonitorProcesses.find(startParam);
-    return iter != tempMonitorProcesses.end() ? iter->second : -1;
+	list<int> allIds;
+	for (auto& runningState : AppsRunningState)
+	{
+		if (runningState.isRunning)
+		{
+			auto app = find_if(startAppList.begin(), startAppList.end(),
+				[&](const CC::AppStartParameter param) { return param.ProcessName == runningState.Process.ProcessMonitorName;});
+			if (app != startAppList.end())
+			{
+				allIds.push_back(runningState.Process.Id);
+			}
+		}
+	}
+	return allIds;
 }
 
 /*!
 获取应该监视进程数量
-@return int 应该监视进程数量=监视进程列表数量+（如果自动监控)远程启动程序数量
+@return int 应该监视进程数量=监视进程列表数量+远程启动程序数量
 作者：cokkiy（张立民)
 创建时间：2015/12/14 15:36:46
 */
-int StationInfo::getShouldMonitorProcessesCount()
+int StationInfo::getShouldMonitoredProcessesCount()
 {
-    return shouldMonitorProcessesCount;
+    return standAloneMonitorProcessList.size() + startAppList.size();
 }
 
-/*
-构建全部监视进程列表
-**/
-void StationInfo::buildAllMonitorProcessList()
-{
-    allMonitorProcess.clear();
-    for (auto& proc : monitorProcessList)
-    {
-        allMonitorProcess.push_back(proc);
-    }
-    for (auto&temp : tempMonitorProcesses)
-    {
-        //进程Id用Id:xxx标识,xxx表示进程Id
-        allMonitorProcess.push_back(QStringLiteral("Id:%1").arg(temp.second));
-    }
-    shouldMonitorProcessesCount = monitorProcessList.count() + autoMonitorRemoteStartApp ? startAppList.size() : 0;
-}
 
 /*!
 设置应用程序运行状态
@@ -610,7 +605,7 @@ void StationInfo::setAppsRunningState(const ::CC::AppsRunningState& appsRunningS
                 }
             }
             counterData[runningState.Process.ProcessName].cpuData[0] = runningState.cpu;
-            counterData[runningState.Process.ProcessName].memoryData[0] = runningState.currentMemory / TotalMemory();
+			counterData[runningState.Process.ProcessName].memoryData[0] = runningState.currentMemory / (double)TotalMemory() * 100;
         }
     }
 }
@@ -707,6 +702,32 @@ bool StationInfo::State::operator==(const State& right)
 {
     return this->runningState == right.runningState
         && this->operatingStatus == right.operatingStatus;
+}
+
+/*是否大于等于right状态*/
+bool StationInfo::State::operator>=(const State& right)
+{
+	if (this->runningState != right.runningState)
+	{
+		return this->runningState > right.runningState;
+	}
+	else
+	{
+		return this->operatingStatus > this->operatingStatus;
+	}
+}
+
+/*是否小于right状态*/
+bool StationInfo::State::operator<(const State& right)
+{
+	if (this->runningState != right.runningState)
+	{
+		return this->runningState < right.runningState;
+	}
+	else
+	{
+		return this->operatingStatus < this->operatingStatus;
+	}
 }
 
 /*!

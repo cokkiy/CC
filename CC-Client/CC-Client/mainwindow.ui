@@ -95,18 +95,21 @@
                 </size>
                </property>
                <property name="toolTip">
-                <string>输入过滤条件</string>
+                <string>输入过滤条件，然后按回车键过滤</string>
                </property>
                <property name="statusTip">
-                <string>输入过滤条件</string>
+                <string>输入过滤条件，然后按回车键过滤</string>
                </property>
-               <property name="readOnly">
-                <bool>true</bool>
+               <property name="placeholderText">
+                <string>输入名称或IP</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QToolButton" name="filterToolButton">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string>编辑过滤条件</string>
                </property>
@@ -255,6 +258,15 @@
             <widget class="QListView" name="listView">
              <property name="contextMenuPolicy">
               <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="dragEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragDrop</enum>
+             </property>
+             <property name="defaultDropAction">
+              <enum>Qt::MoveAction</enum>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -440,31 +452,43 @@
     <property name="title">
      <string>选项</string>
     </property>
-    <widget class="QMenu" name="menuCPUOption">
-     <property name="title">
-      <string>CPU</string>
-     </property>
-     <addaction name="actionLineCPU"/>
-     <addaction name="actionPieCPU"/>
-     <addaction name="actionRectCPU"/>
-    </widget>
-    <widget class="QMenu" name="menuViewMemoryOption">
-     <property name="title">
-      <string>内存</string>
-     </property>
-     <addaction name="actionViewLineMemory"/>
-     <addaction name="actionPieMemory"/>
-     <addaction name="actionRectMemory"/>
-    </widget>
-    <addaction name="menuCPUOption"/>
-    <addaction name="menuViewMemoryOption"/>
     <addaction name="actionAllowAutoRefreshList"/>
     <addaction name="separator"/>
     <addaction name="actionSetInterval"/>
     <addaction name="actionSetDefaultAppAndProc"/>
    </widget>
+   <widget class="QMenu" name="menuFileTranslation">
+    <property name="title">
+     <string>文件传输</string>
+    </property>
+    <widget class="QMenu" name="menuSend">
+     <property name="title">
+      <string>发送</string>
+     </property>
+     <property name="icon">
+      <iconset resource="cc-client.qrc">
+       <normaloff>:/Icons/sendFile.png</normaloff>:/Icons/sendFile.png</iconset>
+     </property>
+     <addaction name="actionSendAll"/>
+     <addaction name="actionSendSelection"/>
+    </widget>
+    <widget class="QMenu" name="menuReceive">
+     <property name="title">
+      <string>接收</string>
+     </property>
+     <property name="icon">
+      <iconset resource="cc-client.qrc">
+       <normaloff>:/Icons/receiveFile.png</normaloff>:/Icons/receiveFile.png</iconset>
+     </property>
+     <addaction name="actionReceiveAll"/>
+     <addaction name="actionReceiveSelection"/>
+    </widget>
+    <addaction name="menuSend"/>
+    <addaction name="menuReceive"/>
+   </widget>
    <addaction name="menuControl"/>
    <addaction name="menuOperation"/>
+   <addaction name="menuFileTranslation"/>
    <addaction name="menuMonitor"/>
    <addaction name="menuView"/>
    <addaction name="menuOption"/>
@@ -961,6 +985,26 @@
     <string>查看工作站详细信息</string>
    </property>
   </action>
+  <action name="actionSendAll">
+   <property name="text">
+    <string>全部工作站...</string>
+   </property>
+  </action>
+  <action name="actionSendSelection">
+   <property name="text">
+    <string>选定工作站...</string>
+   </property>
+  </action>
+  <action name="actionReceiveAll">
+   <property name="text">
+    <string>全部工作站...</string>
+   </property>
+  </action>
+  <action name="actionReceiveSelection">
+   <property name="text">
+    <string>选定工作站...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -968,6 +1012,7 @@
    <class>QwtPlot</class>
    <extends>QFrame</extends>
    <header>qwt_plot.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

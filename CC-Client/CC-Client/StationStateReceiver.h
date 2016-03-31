@@ -49,7 +49,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/24 9:39:14
     */
-    virtual void receiveStationRunningState(const ::CC::StationRunningState&, const ::CC::IControllerPrx&, const ::Ice::Current& = ::Ice::Current()) override;
+    virtual void receiveStationRunningState(const ::CC::StationRunningState&, const ::CC::IControllerPrx&, const ::CC::IFileTranslationPrx&, const ::Ice::Current& = ::Ice::Current()) override;
 
     /*!
     接收工作站应用程序状态

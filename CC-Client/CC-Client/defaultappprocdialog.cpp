@@ -1,6 +1,8 @@
 ﻿#include "defaultappprocdialog.h"
 #include "ui_defaultappprocdialog.h"
 #include <QMessageBox>
+#include <tuple>
+using namespace std;
 
 DefaultAppProcDialog::DefaultAppProcDialog(Option& option, QWidget *parent)
     : QDialog(parent)
@@ -8,21 +10,22 @@ DefaultAppProcDialog::DefaultAppProcDialog(Option& option, QWidget *parent)
     ui = new Ui::DefaultAppProcDialog();
     ui->setupUi(this);
     this->option = &option;
-    QStringList header;
-    header<< QStringLiteral("路径") << QStringLiteral("参数");
-    ui->appTableWidget->setHorizontalHeaderLabels(header);
     ui->appTableWidget->setRowCount(this->option->StartApps.size());
     int row = 0;
     for (auto& param : this->option->StartApps)
     {
-        QTableWidgetItem *pathItem = new QTableWidgetItem(param.first);
+        QTableWidgetItem *pathItem = new QTableWidgetItem(QString::fromStdString(param.AppPath));
         ui->appTableWidget->setItem(row, 0, pathItem);
-        QTableWidgetItem *argItem = new QTableWidgetItem(param.second);
+        QTableWidgetItem *argItem = new QTableWidgetItem(QString::fromStdString(param.Arguments));
         ui->appTableWidget->setItem(row, 1, argItem);
+        QTableWidgetItem *proceNameItem = new QTableWidgetItem(QString::fromStdString(param.ProcessName));
+        ui->appTableWidget->setItem(row, 2, proceNameItem);
+        QTableWidgetItem *allowMultiInstanceItem = new QTableWidgetItem();
+        allowMultiInstanceItem->setCheckState(param.AllowMultiInstance ? Qt::Checked : Qt::Unchecked);
+        ui->appTableWidget->setItem(row, 3, allowMultiInstanceItem);
         row++;
     }
     ui->procListWidget->addItems(QStringList::fromStdList(this->option->MonitorProcesses));
-    ui->autoAddStartAppToMonitorListCheckBox->setChecked(option.AutoMonitorRemoteStartApp);
 }
 
 DefaultAppProcDialog::~DefaultAppProcDialog()
@@ -34,17 +37,27 @@ void DefaultAppProcDialog::on_addAppButton_clicked()
 {
     if (ui->appLineEdit->text() == QStringLiteral(""))
     {
-        QMessageBox::warning(NULL, QStringLiteral("错误"), QStringLiteral("必须填写需要启动程序完整名称"));
+        QMessageBox::warning(NULL, QStringLiteral("错误"), QStringLiteral("必须填写需要启动程序完整路径和名称"));
         return;
+    }
+    if (ui->appProcNameLineEdit->text() == QStringLiteral(""))
+    {
+        ui->appProcNameLineEdit->setText(ui->appLineEdit->text());
     }
     int row = ui->appTableWidget->rowCount();
     ui->appTableWidget->setRowCount(row + 1);
     QTableWidgetItem *pathItem = new QTableWidgetItem(ui->appLineEdit->text());
     QTableWidgetItem *argItem= new QTableWidgetItem(ui->argumentLineEdit->text());
+    QTableWidgetItem *procNameItem = new QTableWidgetItem(ui->appProcNameLineEdit->text());
+    QTableWidgetItem *allowMultiInstanceItem = new QTableWidgetItem();
+    allowMultiInstanceItem->setCheckState(ui->allowMultiInstanceCheckBox->checkState());
     ui->appTableWidget->setItem(row, 0, pathItem);
     ui->appTableWidget->setItem(row, 1, argItem);
+    ui->appTableWidget->setItem(row, 2, procNameItem);
+    ui->appTableWidget->setItem(row, 3, allowMultiInstanceItem);
     ui->appLineEdit->setText("");
     ui->argumentLineEdit->setText("");
+    ui->appProcNameLineEdit->setText("");
 }
 
 void DefaultAppProcDialog::on_removeAppPushButton_clicked()
@@ -87,11 +100,15 @@ void DefaultAppProcDialog::on_removeProcPushButton_clicked()
 void DefaultAppProcDialog::on_OKPushButton_clicked()
 {
     option->StartApps.clear();
-    option->AutoMonitorRemoteStartApp = ui->autoAddStartAppToMonitorListCheckBox->isChecked();
     option->MonitorProcesses.clear();
     for (int i = 0; i < ui->appTableWidget->rowCount(); i++)
     {
-        option->StartApps.push_back({ ui->appTableWidget->item(i,0)->text(), ui->appTableWidget->item(i,1)->text() });
+        CC::AppStartParameter param;
+        param.AppPath = ui->appTableWidget->item(i, 0)->text().toStdString();
+        param.Arguments = ui->appTableWidget->item(i, 1)->text().toStdString();
+        param.ProcessName = ui->appTableWidget->item(i, 2)->text().toStdString();       
+        param.AllowMultiInstance = ui->appTableWidget->item(i, 3)->checkState() == Qt::Checked;
+        option->StartApps.push_back(param);
     }
     for (int i = 0; i < ui->procListWidget->count(); i++)
     {

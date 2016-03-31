@@ -92,6 +92,10 @@ public:
         bool operator != (const State& right);
         /*两个状态是否相等*/
         bool operator ==(const State& right);
+		/*是否大于等于right状态*/
+		bool operator >=(const State& right);
+		/*是否小于right状态*/
+		bool operator <(const State& right);
 
         /*!
         设置操作状态和附加消息
@@ -185,7 +189,18 @@ public:
 private:
     QString m_Name;
 public:
+	/*!
+	获取工作站名称
+	@return QString 名称
+	作者：cokkiy（张立民)
+	创建时间：2015/12/03 21:11:40
+	*/
     QString Name();
+	/*!
+	设置工作站名称
+	作者：cokkiy（张立民)
+	创建时间：2015/12/03 21:11:40
+	*/
     void setName(QString value);
 
 public:
@@ -304,11 +319,6 @@ public:
     最后一次收到工作站状态时间
      **/
     time_t lastTick;
-
-    /*
-    自动监视远程启动程序
-    */
-    bool autoMonitorRemoteStartApp = true;
 private:
 
     /*
@@ -317,54 +327,37 @@ private:
     std::list<CC::AppRunningState> AppsRunningState;
 
     /*
-    需要启动程序名称列表
+    需要远程启动的程序<路径（名称),参数和进程名>列表
     **/
-    std::list<std::pair<QString, QString>> startAppList;
+    std::list<CC::AppStartParameter> startAppList;
 
     /*
-    需要监视进程列表
+    单独设置的监视进程名称列表
     **/
-    QStringList monitorProcessList;
-
-    /*
-     需要监视的远程启动程序进程信息
-     **/
-    std::map<std::string, int> tempMonitorProcesses;
-
-    /*
-     所有监视进程名称列表,远程启动的进程用Id:xxx代表,xxx表示进程Id
-     **/
-    QStringList allMonitorProcess;
+    QStringList standAloneMonitorProcessList;
 
     /*
      操作历史消息
      **/
     std::list<QString> operatingHistoryMessages;
 
-    /*
-     应该监视进程总数
-     **/
-    int shouldMonitorProcessesCount = 0;   
+	time_t lastErrorTime = 0;
 
 public:
 
     /*
     所有被监视性能数据集合
     **/
+
     std::map<std::string, PerfCounterData> counterData;
 
     /*!
-    获取应该监视进程数量
-    @return int 应该监视进程数量=监视进程列表数量+（如果自动监控)远程启动程序数量
+    获取所有应该监视进程数量
+    @return int 应该监视进程数量=监视进程列表数量+远程启动程序数量
     作者：cokkiy（张立民)
     创建时间：2015/12/14 15:36:46
     */
-    int getShouldMonitorProcessesCount();
-
-    /*
-    构建全部监视进程列表
-    **/
-    void buildAllMonitorProcessList();
+    int getShouldMonitoredProcessesCount();
 
     /*!
     设置应用程序运行状态
@@ -395,32 +388,38 @@ public:
      *控制代理,通过此代理向工作站发送控制命令
      **/
     CC::IControllerPrx controlProxy;
+	/*
+	*文件传输代理，通过此代理可实现文件传输
+	*/
+	CC::IFileTranslationPrx fileProxy;
     /*!
-    获取需要启动程序名称列表
-    @return std::list<std::pair<QString, QString>> 需要启动程序名称和参数列表
+    获取需要启动程序列表
+    @returnstd::list<CC::AppStartParameter> 需要启动程序名称,参数和对应进程名列表
     作者：cokkiy（张立民)
     创建时间：2015/12/01 22:25:20
     */
-    std::list<std::pair<QString, QString>> getStartAppNames();
+    std::list<CC::AppStartParameter> getStartAppNames();
 
     /*!
     添加启动程序
-    @param QString path 启动程序路径
-    @param QString arguments 启动程序参数
+    @param const QString& path 启动程序路径
+    @param const QString& arguments 启动程序参数
+    @param const QString& procName 进程名
+    @param bool allowMultiInstance 是否允许多个实例运行
     @return void
     作者：cokkiy（张立民)
     创建时间：2015/12/02 16:47:03
     */
-    void addStartApp(const QString& path, const QString& arguments);
+    void addStartApp(const QString& path, const QString& arguments, const QString& procName,bool allowMultiInstance);
 
     /*!
     添加一系列启动程序
-    @param const std::list<std::pair<QString, QString>>& apps 启动程序名称列表
+    @param const std::list<CC::AppStartParameter>& apps 启动程序列表
     @return void
     作者：cokkiy（张立民)
     创建时间：2015/12/02 16:47:31
     */
-    void addStartApps(const std::list<std::pair<QString, QString>>& apps);
+    void addStartApps(const std::list<CC::AppStartParameter>& apps);
 
     /*!
     清空启动程序列表
@@ -431,37 +430,38 @@ public:
     void clearStartApp();
 
     /*!
-    获取需要监视进程列表
-    @return QStringList 需要监视进程列表
+    获取单独设置的监视进程列表
+    @return QStringList 单独设置的监视进程列表
     作者：cokkiy（张立民)
     创建时间：2015/12/01 22:26:23
     */
-    QStringList getMonitorProcNames();
+    QStringList getStandAloneMonitorProcNames();
 
     /*!
-    清空监视进程列表
+    清空单独设置的监视进程列表
     @return void
     作者：cokkiy（张立民)
     创建时间：2015/12/02 16:48:20
     */
-    void clearMonitorProc();
+    void clearStandAloneMonitorProc();
+
     /*!
-    添加一个监视进程名称
+    添加一个单独设置的监视进程名称
     @param QString procName
     @return void
     作者：cokkiy（张立民)
     创建时间：2015/12/02 16:48:48
     */
-    void addMonitorProc(const QString& procName);
+    void addStandAloneMonitorProcess(const QString& procName);
 
     /*!
-    添加需要监视的进程列表
-    @param const std::list<QString>& processes 需要监视的进程列表
+    将一系列进程名添加到单独设置的监视进程列表
+    @param const std::list<QString>& processes 需要监视的进程名列表
     @return void
     作者：cokkiy（张立民)
     创建时间：2015/12/04 16:19:47
     */
-    void addMonitorProcs(const std::list<QString>& processes);
+    void addStandAloneMonitorProcesses(const std::list<QString>& processes);
     /*!
     订阅属性变化事件
     @param const QObject * receiver 接收者
@@ -541,7 +541,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/25 12:17:13
     */
-    void setLastTick(const time_t& time = time(NULL));
+    void setLastTick(const time_t& tickTime = time(NULL));
 
     /*!
     返回描述工作站的字符串
@@ -593,47 +593,38 @@ public:
     bool timeout();
 
     /*!
-    获取需要监视的进程名称列表（包括已经启动的程序)
-    @return std::list<std::string> 需要监视的进程名称列表（包括已经启动的程序)
+    获取所有应该监视进程的名称列表（所有应该监视进程=监视进程列表进程+远程启动进程)
+    @return std::list<std::string> 所有应该监视进程的名称列表
     作者：cokkiy（张立民)
     创建时间：2015/12/11 9:03:22
     */
-    std::list<std::string> getAllMonitorProc();
+    std::list<std::string> getAllShouldMonitoredProcessesName();
 
     /*!
-    清空远程启动进程监视列表
-    @return void
+    根据参数标识获取程序名称
+    @param int ParamId 参数标识
+    @return QString 参数标识对应的程序名称
     作者：cokkiy（张立民)
-    创建时间：2015/12/14 10:09:56
+    创建时间：2015/12/24 9:19:23
     */
-    void clearTempMonitorProcess();
+    QString getStartAppNameByIndex(int ParamId);
 
-    /*!
-    添加远程启动进程到临时监视列表
-    @param const ::std::string&  startParam 启动参数 = 路径 && 参数 
-    @param int Id 进程Id
-    @return void
-    作者：cokkiy（张立民)
-    创建时间：2015/12/11 10:07:37
-    */
-    void addTempMonitorProcess(const ::std::string& startParam, int Id);
+	/*!
+	添加已启动应用程序到已启动应用程序列表
+	@param const CC::AppStartingResult & result 程序启动结果
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/3/8 17:50:43
+	*/
+	void addStartedApp(const CC::AppStartingResult& result);
 
-    /*!
-    获取全部正在运行的被监控程序进程Id
-    @return  list<int> 全部正在运行的被监控程序进程Id
-    作者：cokkiy（张立民)
-    创建时间：2015/12/16 10:34:18
-    */
-    std::list<int> getRunningProcessesId();
-
-    /*!
-    获取指定远程启动程序进程Id
-    @param const ::std::string&  startParam 启动参数 = 路径 && 参数 
-    @return int 进程Id
-    作者：cokkiy（张立民)
-    创建时间：2015/12/16 10:37:21
-    */
-    int getRemoteStartedProcessId(const ::std::string&  startParam);
+	/*!
+	获取所有已运行程序进程ID列表
+	@return list<int>
+	作者：cokkiy（张立民）
+	创建时间:2016/3/9 9:09:20
+	*/
+	std::list<int> getStartedAppProcessIds();
 
     /*!
     判断两个工作站信息是否是同一个对象（指针相同)
@@ -667,6 +658,12 @@ signals:
     */
     void stationChanged(const QObject* owner);
 
+	
+private:
+    /*
+     \class StationHelper 是friend class
+     **/
+    friend class StationHelper;
 };
 
 //注册到metatype中

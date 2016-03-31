@@ -197,6 +197,16 @@ public:
     */
     void filter(const FilterOperations& filter);
 
+
+	/*!
+	根据filter字符串过滤工作站列表
+	@param const QString filter 过滤字符串，只支持IP和名称
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/3/30 10:33:02
+	*/
+	void filter(const QString& strFilter);
+
     /*!
     根据\param sortby排序工作站列表
     @param \see SortBy sortby 排序方式
@@ -243,9 +253,6 @@ private:
     FilterOperations filterOperations;
     //排序方式
     SortBy sortby;
-
-    //过滤并排序
-    void filterANDsort();
 
 signals:    
     /*!

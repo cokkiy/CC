@@ -39,7 +39,8 @@ void StationStateReceiver::receiveSystemState(const ::CC::StationSystemState& pS
 作者：cokkiy（张立民)
 创建时间：2015/11/24 9:39:14
 */
-void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunningState& stationRunningState, const ::CC::IControllerPrx& controlPrx, const ::Ice::Current& /*= ::Ice::Current()*/)
+void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunningState& stationRunningState, const ::CC::IControllerPrx& controlPrx,
+	const ::CC::IFileTranslationPrx& fileProxy, const ::Ice::Current& /*= ::Ice::Current()*/)
 {
     if (pStations != nullptr)
     {
@@ -54,22 +55,23 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
         else
         {
             //没有收到工作站基本信息,请求发送基本信息
-            controlPrx->begin_getSystemState([this,controlPrx,&stationRunningState](const CC::StationSystemState& systemState) {
+            controlPrx->begin_getSystemState([this,controlPrx,fileProxy,&stationRunningState](const CC::StationSystemState& systemState) {
                 StationInfo* pStation = findAndSetStationSystemState(systemState);
-                if (pStation != NULL)
-                {
-                    //设置控制代理
-                    pStation->controlProxy = controlPrx;
-                    //设置运行状态
-                    pStation->setCPU(stationRunningState.cpu);
-                    pStation->setMemory(stationRunningState.currentMemory);
-                    pStation->setProcCount(stationRunningState.procCount);
-                    pStation->setLastTick();
-                    //设置监视间隔
-                    controlPrx->begin_setStateGatheringInterval(Option::getInstance()->Interval, []() {});
-                    //设置工作站监视进程列表
-                    controlPrx->begin_setWatchingApp(pStation->getAllMonitorProc(), []() {});
-                }
+				if (pStation != NULL)
+				{
+					//设置控制代理
+					pStation->controlProxy = controlPrx;
+					pStation->fileProxy = fileProxy;
+					//设置运行状态
+					pStation->setCPU(stationRunningState.cpu);
+					pStation->setMemory(stationRunningState.currentMemory);
+					pStation->setProcCount(stationRunningState.procCount);
+					pStation->setLastTick();
+					//设置监视间隔
+					controlPrx->begin_setStateGatheringInterval(Option::getInstance()->Interval, []() {});
+					//设置工作站监视进程列表
+					controlPrx->begin_setWatchingApp(pStation->getAllShouldMonitoredProcessesName(), []() {});
+				}
             });
         }
     }
@@ -126,13 +128,12 @@ StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::Stat
             StationInfo station;
             station.setStationId(stationSystemState.stationId);
             station.setName(QString::fromStdString(stationSystemState.computerName));
-            station.autoMonitorRemoteStartApp = Option::getInstance()->AutoMonitorRemoteStartApp;
             for (auto& ccNI : stationSystemState.NetworkInterfaces)
             {
                 NetworkInterface ni(ccNI);
                 station.NetworkIntefaces.push_back(ni);
             }
-            station.addMonitorProcs(Option::getInstance()->MonitorProcesses);
+            station.addStandAloneMonitorProcesses(Option::getInstance()->MonitorProcesses);
             station.addStartApps(Option::getInstance()->StartApps);
             pStations->push(station);
             pStation = pStations->findById(stationSystemState.stationId);

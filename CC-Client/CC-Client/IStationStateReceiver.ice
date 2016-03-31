@@ -8,6 +8,7 @@ module CC
 {
 	// 预定义控制接口
 	interface IController;
+	interface IFileTranslation; 
 
 	// string list, can't defines sequence<string> direct in struct
 	["cpp:type:std::list<std::string>"]
@@ -95,7 +96,7 @@ module CC
 		///收集系统状态
 		idempotent void receiveSystemState(StationSystemState systemState);
 		///收集工作站运行动态
-		idempotent void  receiveStationRunningState(StationRunningState stationRunningState, IController* controller);
+		idempotent void  receiveStationRunningState(StationRunningState stationRunningState, IController* controller,IFileTranslation* fileProxy );
 		///收集程序运行状态
 		idempotent void receiveAppRunningState(AppsRunningState appsRunningState);
 	};

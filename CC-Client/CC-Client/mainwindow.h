@@ -18,6 +18,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include "cpuplot\plotpart.h"
+#include "cpuplot\counterpiemarker.h"
 
 //性能计数器最多个数
 #define  MaxCountOfCounter 20
@@ -52,9 +53,9 @@ public:
 
     private slots:
     //选择机子开机
-    void on_actionPower_On_triggered();
+    void on_actionPowerOn_triggered();
     //全部开机
-    void on_actionAll_Power_On_triggered();
+    void on_actionAllPower_On_triggered();
     //排序方式发生变化
     void on_sortComboBox_currentIndexChanged(int index);
     //显示方式发生变化
@@ -85,6 +86,17 @@ public:
     void on_actionSetDefaultAppAndProc_triggered();
     //查看工作站详细信息
     void on_actionViewStationDetail_triggered();
+	//发送文件到选定工作站
+	void on_actionSendSelection_triggered();
+	//从选定工作站接收文件
+	void on_actionReceiveSelection_triggered();
+	//发送文件到全部工作站
+	void on_actionSendAll_triggered();
+	//接收文件从全部工作站
+	void on_actionReceiveAll_triggered();
+
+	//过滤输入框输入回车键
+	void on_filterLineEdit_returnPressed();
 
 private:
     Ui::MainWindow *ui;
@@ -132,6 +144,10 @@ private:
     //性能曲线数组
     PerfCurves perfCurves[MaxCountOfCounter];
 
+	//CPU和内存图
+	CounterPieMarker* cpuPie = nullptr;
+	CounterPieMarker* memoryPie = nullptr;
+
     //当前选择的工作站
     StationInfo* currentStation = nullptr;
     //CPU,内存记录时间数据
@@ -143,6 +159,8 @@ private slots:
     void showFloatingMenu(const QPoint & pos);
     // 操作菜单即将显示
     void operationMenuToShow();
+	//文件传输菜单即将显示
+	void fileTransMenuToShow();
     //工作站状态发生变化
     void stationStateChanged(const QObject*);
     //工作站被添加事件处理函数
@@ -169,7 +187,7 @@ private:
     //设置QwtPlot样式
     void setPlotStyle(QwtPlot* plot, QString title);
 protected:
-        void timerEvent(QTimerEvent *e);
+    void timerEvent(QTimerEvent *e);
 };
 
 //Class for station loading thread

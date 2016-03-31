@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CC;
 using Ice;
+using System.IO;
 
 namespace CC_StationService
 {
@@ -112,7 +113,7 @@ namespace CC_StationService
         /// <summary>
         /// 启动指定名称的应用程序
         /// </summary>
-        /// <param name="appParams">应用程序名称和参数</param>
+        /// <param name="appParams">应用程序启动参数信息</param>
         /// <param name="current__"></param>
         /// <returns>程序启动结果</returns>
         public override List<AppStartingResult> startApp(List<AppStartParameter> appParams, Current current__)
@@ -169,6 +170,6 @@ namespace CC_StationService
                 throw new AppControlError("应用程序启动代理接口错误:" + ex.InnerException.Message);
             }
         }
-
+        
     }
 }

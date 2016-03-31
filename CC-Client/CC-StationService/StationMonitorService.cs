@@ -43,12 +43,17 @@ namespace CC_StationService
                 //创建控制适配器和对象
                 Ice.ObjectAdapter controlAdapter = ic.createObjectAdapter("Controller");
                 ControllerImp controllerServant = new ControllerImp(ic);
-                //将服务加入适配器并创建控制服务的本地代理
+                //将控制服务加入适配器并创建控制服务的本地代理
                 Ice.ObjectPrx objectPrx = controlAdapter.add(controllerServant, ic.stringToIdentity("StationController"));
                 IControllerPrx controlPrx = IControllerPrxHelper.uncheckedCast(objectPrx);
-       
+
+                //创建文件传输服务
+                FileTranslation fileTrans = new FileTranslation();
+                objectPrx = controlAdapter.add(fileTrans, ic.stringToIdentity("FileTranslation"));
+                IFileTranslationPrx filePrx = IFileTranslationPrxHelper.uncheckedCast(objectPrx);
+
                 //初始化监视应用程序列表为空
-                watcher = new SystemWatcher(ic, controlPrx);
+                watcher = new SystemWatcher(ic, controlPrx, filePrx);
                 //为控制代理设置系统监视对象
                 controllerServant.SystemWatcher = watcher;
 

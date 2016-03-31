@@ -141,5 +141,9 @@
         <file>Icons/shutdown4.png</file>
         <file>Icons/startApp0.png</file>
         <file>Icons/startApp1.png</file>
+        <file>Icons/receiveFile.png</file>
+        <file>Icons/sendFile.png</file>
+        <file>Icons/download.jpg</file>
+        <file>Icons/detail.png</file>
     </qresource>
 </RCC>

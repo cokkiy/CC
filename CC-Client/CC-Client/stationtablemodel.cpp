@@ -132,6 +132,17 @@ void StationTableModel::sort(int column, Qt::SortOrder order /*= Qt::AscendingOr
 
 }
 
+void StationTableModel::beginFilter()
+{
+	beginResetModel();
+	
+}
+
+void StationTableModel::endFilter()
+{
+	endResetModel();
+}
+
 //view获取行标题和列标题
 QVariant StationTableModel::headerData(int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {

@@ -5,6 +5,7 @@
 #include "StationList.h"
 #include <QAbstractItemModel>
 #include <Ice/Ice.h>
+#include <QByteArray>
 
 /************************************************************************
  @class StationManager:工作站管理类,管理工作站启动,关闭,重启,运行程序
@@ -42,7 +43,10 @@ public:
     创建时间：2015/11/10 15:53:33
     */
     void powerOn();
-    /*!
+
+	
+
+	/*!
     重启选择的计算机
     @return void
     作者：cokkiy（张立民)
@@ -158,6 +162,11 @@ private:
 
     // restart specified station's app
     void restartApp(StationInfo* s);
+
+	//mac 2 bytearray
+	QByteArray MAC2Byte(QString mac);
+	// 发送开机指令包
+	void sendPowerOnPacket(StationInfo* s);
 };
 
 #endif // STATIONMANAGER_H

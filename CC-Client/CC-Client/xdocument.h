@@ -48,6 +48,9 @@ private:
 
     //结束一个元素
     void finishElement(stack<XElement>& /*未处理完的元素列表*/);
+
+    //行计数
+    int line = 1;
 };
 
 #endif // XDOCUMENT_H
