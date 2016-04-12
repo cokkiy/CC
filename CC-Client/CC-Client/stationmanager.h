@@ -25,7 +25,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/10 15:43:35
     */
-    StationManager(StationList* stations,  const QModelIndexList& indexs = QModelIndexList(), QObject *parent = NULL);
+    StationManager(StationList* stations=NULL,  const QModelIndexList& indexs = QModelIndexList(), QObject *parent = NULL);
     ~StationManager() = default;
 
     public slots:
@@ -133,13 +133,55 @@ public:
 
     /*!
     设置监视间隔
-    @param int interval 监视间隔（毫秒)
+    @param int interval 监视间隔
     @return void
     作者：cokkiy（张立民)
     创建时间：2015/12/01 11:42:42
     */
     void setInterval(int interval);
+
+public:
+
+	/*!
+	开机指定工作站
+	@param StationInfo * s 要开机的工作站
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/4/5 15:52:56
+	*/
+	void powerOn(StationInfo* s);
+	
+	/*!
+	重启指定工作站
+	@param StationInfo * s
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/4/5 15:53:20
+	*/
+	void reboot(StationInfo* s);
+
+	/*!
+	关闭指定工作站
+	@param StationInfo * s
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/4/5 15:53:38
+	*/
+	void shutdown(StationInfo* s);
+
+	/*!
+	设置指定工作站监视间隔
+	@param StationInfo * s
+	@param int second 监视间隔（秒）
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/4/5 15:53:55
+	*/
+	void setInterval(StationInfo* s, int second);
 private:
+	//监视间隔（秒）
+	int interval;
+
     //全部工作站列表
     StationList* pStations;
     //选择的工作站索引
@@ -152,13 +194,7 @@ private:
     void startApp(StationInfo* s);
 
     //exit specified station's app
-    void exitApp(StationInfo* s);
-
-    //reboot specified station
-    void reboot(StationInfo* s);
-
-    //shutdown specified station
-    void shutdown(StationInfo* s);
+    void exitApp(StationInfo* s);   
 
     // restart specified station's app
     void restartApp(StationInfo* s);

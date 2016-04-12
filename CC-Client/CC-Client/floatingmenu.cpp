@@ -5,7 +5,7 @@
 #include <QParallelAnimationGroup>
 #include <QtMath>
 #include <QScreen>
-
+#include <QMainWindow>
 //初始化为空指针
 FloatingMenu* FloatingMenu::instance = nullptr;
 
@@ -14,6 +14,7 @@ void FloatingMenu::AmendPosition(int &posX, int &posY)
 {
     QPoint point = mapToGlobal(QPoint(posX, posY));
     QSize screenSize = QGuiApplication::primaryScreen()->availableSize();
+
     if (point.x() - size() / 2 < 0)
     {
         //左边
@@ -36,6 +37,34 @@ void FloatingMenu::AmendPosition(int &posX, int &posY)
     }
 }
 
+#ifdef NeoLinux
+void FloatingMenu::AmendPositionForNeoLinx(int &posX, int &posY)
+{
+    QMainWindow* parent=(QMainWindow*)this->parent();
+    if (posX - size() / 2 < 0)
+    {
+        //左边
+        posX += size() / 2 - posX;
+    }
+    else if (posX + size() / 2 > parent->width())
+    {
+        //右边
+        posX = parent->width() - size() / 2;
+    }
+    if (posY - size() / 2 < 0)
+    {
+        //上边
+        posY += size() / 2 - posY;
+    }
+    else if (posY + size() / 2 > parent->height())
+    {
+        //下边
+        posY = parent->height() - size() / 2;
+    }
+}
+
+#endif
+
 //关闭菜单
 void FloatingMenu::closeMe()
 {
@@ -44,13 +73,19 @@ void FloatingMenu::closeMe()
 
 //初始化
 FloatingMenu::FloatingMenu(QWidget *parent)
-    : QDialog(parent), borderPen(QBrush(QColor(255, 170, 0)), 3, Qt::DotLine/*Qt::NoPen*/), background(QColor(170, 255, 127, 20))
+    : QDialog(parent), borderPen(QBrush(QColor(255, 170, 0)), 3, Qt::DotLine), background(QColor(170, 255, 127, 20))
 {
     ui = new Ui::FloatingMenu();
     ui->setupUi(this);
-    //没有标题栏,不在任务栏显示
+
+#ifdef NeoLinux
+    this->setWindowFlags(Qt::FramelessWindowHint);
+#else
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+#endif
+    //没有标题栏,不在任务栏显示
     this->setAttribute(Qt::WA_TranslucentBackground);
+
     //启动退出计时器
     exitTimer = new QTimer();
     connect(exitTimer, SIGNAL(timeout()), this, SLOT(close()));
@@ -88,6 +123,11 @@ void FloatingMenu::leaveEvent(QEvent *event)
 */
 void FloatingMenu::show(int posX, int posY)
 {
+#ifdef NeoLinux
+    QMainWindow* parent=(QMainWindow*)this->parent();
+    posX=posX-parent->geometry().left();
+    posY=posY-parent->geometry().top();
+#endif
     if (instance != nullptr)
     {
         instance->close();
@@ -95,8 +135,12 @@ void FloatingMenu::show(int posX, int posY)
     }
     instance = this;
 
+#ifdef NeoLinux
+    AmendPositionForNeoLinx(posX,posY);
+#else
     //修正坐标,不要超出屏幕边距
     AmendPosition(posX, posY);
+#endif
 
     //动画组
     QAnimationGroup* animationGroup = new QParallelAnimationGroup();

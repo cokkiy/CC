@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>871</width>
-    <height>580</height>
+    <width>937</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,13 +26,13 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>名称：</string>
+        <string>主机名：</string>
        </property>
       </widget>
      </item>
@@ -43,6 +43,73 @@
          <width>300</width>
          <height>0</height>
         </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>进程总数</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="processCountLineEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="powerOnPushButton">
+       <property name="text">
+        <string>开机</string>
+       </property>
+       <property name="icon">
+        <iconset resource="cc-client.qrc">
+         <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="powerOffPushButton">
+       <property name="text">
+        <string>关机</string>
+       </property>
+       <property name="icon">
+        <iconset resource="cc-client.qrc">
+         <normaloff>:/Icons/52design.com_jingying_108.png</normaloff>:/Icons/52design.com_jingying_108.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="rebootPushButton">
+       <property name="text">
+        <string>重启</string>
+       </property>
+       <property name="icon">
+        <iconset resource="cc-client.qrc">
+         <normaloff>:/Icons/2009724113238761.png</normaloff>:/Icons/2009724113238761.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="screenCapturePushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>屏幕快照</string>
+       </property>
+       <property name="icon">
+        <iconset resource="cc-client.qrc">
+         <normaloff>:/Icons/screencapture.png</normaloff>:/Icons/screencapture.png</iconset>
        </property>
       </widget>
      </item>
@@ -82,6 +149,40 @@
      </item>
      <item>
       <widget class="QLineEdit" name="MACLineEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>内存大小（MB）：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="memorySizeLineEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>CPU占用率（%）</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="CPURateLineEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>内存占用率(%)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="memoryRateLineEdit"/>
      </item>
     </layout>
    </item>
@@ -126,17 +227,12 @@
         <widget class="QTableWidget" name="processTableWidget">
          <column>
           <property name="text">
+           <string>进程ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
            <string>进程名</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>启动路径</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>参数</string>
           </property>
          </column>
          <column>
@@ -159,13 +255,16 @@
            <string>线程数</string>
           </property>
          </column>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="iewAllProcessCheckBox">
-         <property name="text">
-          <string>查看系统全部进程</string>
-         </property>
+         <column>
+          <property name="text">
+           <string>启动路径</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>参数</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>

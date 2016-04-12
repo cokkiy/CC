@@ -6,6 +6,10 @@ module CC
 	["clr:generic:List"]	
 	sequence<int> ProcessIdList;	
 
+	///字节数组	
+	sequence<byte> ByteArray;
+
+
 	///程序控制结果
 	enum AppControlResult {AlreadyRunning, Started, FailToStart,NotRunnning,Closed, FailToClose, Error};
 
@@ -37,6 +41,16 @@ module CC
 		string ProcessName;
 		///是否允许允许多个实例
 		bool AllowMultiInstance=false;
+	};
+
+	///文件传输异常
+	exception FileTransException
+	{
+		string fileName;
+		long offset;
+		int length;
+		int dataLen;
+		string Message;
 	};
 
 	["clr:generic:List"]

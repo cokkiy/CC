@@ -331,6 +331,9 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="opaqueResize">
+           <bool>true</bool>
+          </property>
           <widget class="QwtPlot" name="qwtPlotCPU"/>
           <widget class="QwtPlot" name="qwtPlotMemory"/>
           <widget class="QFrame" name="detailFrame">
@@ -341,20 +344,6 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>线程数：</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="threadCountlineEdit"/>
-              </item>
-             </layout>
-            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -408,19 +397,6 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuMonitor">
-    <property name="title">
-     <string>监视(&amp;M)</string>
-    </property>
-    <addaction name="actionCPU"/>
-    <addaction name="actionMemory"/>
-    <addaction name="separator"/>
-    <addaction name="actionAppCPU"/>
-    <addaction name="actionAppMemory"/>
-    <addaction name="separator"/>
-    <addaction name="actionAppThreadCount"/>
-    <addaction name="actionProcCount"/>
-   </widget>
    <widget class="QMenu" name="menuOperation">
     <property name="title">
      <string>操作</string>
@@ -433,11 +409,13 @@
     <addaction name="actionRestartApp"/>
     <addaction name="actionExitApp"/>
     <addaction name="separator"/>
+    <addaction name="actionScreenCapture"/>
     <addaction name="actionViewStationDetail"/>
     <addaction name="separator"/>
-    <addaction name="actionRemove"/>
     <addaction name="actionEdit"/>
     <addaction name="actionNewStation"/>
+    <addaction name="separator"/>
+    <addaction name="actionRemove"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -489,7 +467,6 @@
    <addaction name="menuControl"/>
    <addaction name="menuOperation"/>
    <addaction name="menuFileTranslation"/>
-   <addaction name="menuMonitor"/>
    <addaction name="menuView"/>
    <addaction name="menuOption"/>
   </widget>
@@ -773,10 +750,13 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>程序信息</string>
+    <string>进程数</string>
+   </property>
+   <property name="toolTip">
+    <string>查看或关闭进程数</string>
    </property>
    <property name="statusTip">
-    <string>查看程序进程线程信息</string>
+    <string>查看或关闭工作站进程数量信息</string>
    </property>
   </action>
   <action name="actionViewMessage">
@@ -904,6 +884,9 @@
    <property name="statusTip">
     <string>编辑选定工作站信息</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="actionAllowAutoRefreshList">
    <property name="checkable">
@@ -954,6 +937,9 @@
    <property name="statusTip">
     <string>新建一个工作站配置项</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionSetDefaultAppAndProc">
    <property name="icon">
@@ -1003,6 +989,21 @@
   <action name="actionReceiveSelection">
    <property name="text">
     <string>选定工作站...</string>
+   </property>
+  </action>
+  <action name="actionScreenCapture">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/screencapture.png</normaloff>:/Icons/screencapture.png</iconset>
+   </property>
+   <property name="text">
+    <string>屏幕快照</string>
+   </property>
+   <property name="toolTip">
+    <string>捕获工作站屏幕快照</string>
+   </property>
+   <property name="statusTip">
+    <string>捕获选定工作站屏幕快照</string>
    </property>
   </action>
  </widget>

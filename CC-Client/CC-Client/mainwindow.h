@@ -11,14 +11,14 @@
 #include "StationList.h"
 #include "stationtablemodel.h"
 #include "floatingmenu.h"
-#include <Ice\Ice.h>
+#include <Ice/Ice.h>
 #include "StationStateReceiver.h"
 #include "monitor.h"
 #include "option.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
-#include "cpuplot\plotpart.h"
-#include "cpuplot\counterpiemarker.h"
+#include "cpuplot/plotpart.h"
+#include "cpuplot/counterpiemarker.h"
 
 //性能计数器最多个数
 #define  MaxCountOfCounter 20
@@ -52,10 +52,35 @@ public:
     virtual void closeEvent(QCloseEvent * event);
 
     private slots:
-    //选择机子开机
-    void on_actionPowerOn_triggered();
+    
     //全部开机
     void on_actionAllPower_On_triggered();
+	//启动全部工作站程序
+	void on_actionStartAllApp_triggered();
+	//全部重启
+	void on_actionRebootAll_triggered();
+	//全部重启程序
+	void on_actionRestartAll_triggered();
+	//全部退出程序
+	void on_actionExitAllZXApp_triggered();
+	//全部关机
+	void on_actionAll_Shutdown_triggered();
+
+
+	//选择工作站开机
+	void on_actionPowerOn_triggered();
+	//选择工作站关机
+	void on_actionPoweroff_triggered();
+	//选择工作站重启
+	void on_actionReboot_triggered();
+	//选择工作站启动程序
+	void on_actionStartApp_triggered();
+	//选择工作站重启程序
+	void on_actionRestartApp_triggered();
+	//选择工作站退出程序
+	void on_actionExitApp_triggered();
+
+
     //排序方式发生变化
     void on_sortComboBox_currentIndexChanged(int index);
     //显示方式发生变化
@@ -94,9 +119,10 @@ public:
 	void on_actionSendAll_triggered();
 	//接收文件从全部工作站
 	void on_actionReceiveAll_triggered();
-
 	//过滤输入框输入回车键
 	void on_filterLineEdit_returnPressed();
+	//屏幕快照
+	void on_actionScreenCapture_triggered();
 
 private:
     Ui::MainWindow *ui;

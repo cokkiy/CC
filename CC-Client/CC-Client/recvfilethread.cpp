@@ -1,4 +1,4 @@
-#include "recvfilethread.h"
+ï»¿#include "recvfilethread.h"
 #include "StationInfo.h"
 #include <Ice/Initialize.h>
 #include <Ice/Stream.h>
@@ -49,7 +49,7 @@ void RecvFileThread::run()
 				}
 				else
 				{
-					emit createFileError(s, fileName, QStringLiteral("ÎŞ·¨´´½¨±¾µØÎÄ¼ş¡£"));
+					emit createFileError(s, fileName, QStringLiteral("æ— æ³•åˆ›å»ºæœ¬åœ°æ–‡ä»¶ã€‚"));
 				}
 			}
 			catch (const std::exception& ex)
@@ -57,7 +57,7 @@ void RecvFileThread::run()
 				const CC::FileTransException* exception = dynamic_cast<const CC::FileTransException*>(&ex);
 				if (exception != NULL)
 				{
-					emit getDataError(s, QStringLiteral("´íÎó£º%1,%2").arg(srcFile).arg(QString::fromStdWString(exception->Message)));
+					emit getDataError(s, QStringLiteral("é”™è¯¯ï¼š%1,%2").arg(srcFile).arg(QString::fromStdWString(exception->Message)));
 				}
 				else
 				{
@@ -67,13 +67,13 @@ void RecvFileThread::run()
 		}
 		else
 		{
-			//²»ÄÜ½ÓÊÕ£¬¹¤×÷Õ¾Ã»¿ª»ú»òÒÑÀëÏß
-			emit getDataError(s, QStringLiteral("¹¤×÷Õ¾ÒÑÀëÏß»òÖĞ¿Ø·şÎñÎ´Æô¶¯¡£"));
+			//ä¸èƒ½æ¥æ”¶ï¼Œå·¥ä½œç«™æ²¡å¼€æœºæˆ–å·²ç¦»çº¿
+			emit getDataError(s, QStringLiteral("å·¥ä½œç«™å·²ç¦»çº¿æˆ–ä¸­æ§æœåŠ¡æœªå¯åŠ¨ã€‚"));
 		}
 	}
 }
 
-//»ñÈ¡Êı¾İ
+//è·å–æ•°æ®
 void RecvFileThread::getData(StationInfo* s, size_t position, FILE* pf)
 {
 	std::vector< Ice::Byte > inParams;
@@ -101,18 +101,18 @@ void RecvFileThread::getData(StationInfo* s, size_t position, FILE* pf)
 			in->read(eof);
 			in->endEncapsulation();
 
-			//Ğ´Êı¾İµ½ÎÄ¼ş
+			//å†™æ•°æ®åˆ°æ–‡ä»¶
 			fseek(pf, position, SEEK_SET);
 			if (fwrite(&data[0], 1, length, pf) == length)
 			{
-				//¶ÁÈ¡Ê£ÓàÎÄ¼ş
+				//è¯»å–å‰©ä½™æ–‡ä»¶
 				if (!eof)
 				{
 					getData(s, position + length, pf);
 				}
 				else
 				{
-					//¹Ø±ÕÎÄ¼ş
+					//å…³é—­æ–‡ä»¶
 					fclose(pf);
 					emit transFileComplete(s);
 				}
@@ -121,7 +121,7 @@ void RecvFileThread::getData(StationInfo* s, size_t position, FILE* pf)
 			{
 				fclose(pf);
 
-				emit getDataError(s, QStringLiteral("Ğ´ÈëÎÄ¼şÊ±·¢Éú´íÎó¡£"));
+				emit getDataError(s, QStringLiteral("å†™å…¥æ–‡ä»¶æ—¶å‘ç”Ÿé”™è¯¯ã€‚"));
 			}
 
 			emit fileGeted(s, position + length);
@@ -130,7 +130,7 @@ void RecvFileThread::getData(StationInfo* s, size_t position, FILE* pf)
 		}
 		else
 		{
-			//·¢ÉúÒì³£
+			//å‘ç”Ÿå¼‚å¸¸
 			Ice::InputStreamPtr in = Ice::createInputStream(communicator, outDatas);
 			in->startEncapsulation();
 			CC::FileTransException ex;

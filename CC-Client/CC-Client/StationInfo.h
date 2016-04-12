@@ -41,7 +41,8 @@ public:
         Warning,/*告警*/
         Error,/*异常*/
     };
-    Q_ENUM(RunningState)
+
+    Q_ENUMS(RunningState)
         /*
          工作站操作状态
          **/
@@ -68,7 +69,7 @@ public:
         GeneralError,/*一般性错误*/
         CanNotOperating,/*不能操作*/
     };
-    Q_ENUM(OperatingStatus)
+    Q_ENUMS(OperatingStatus)
 
         /*
          工作站状态
@@ -368,6 +369,15 @@ public:
     */
     void setAppsRunningState(const ::CC::AppsRunningState& appsRunningState);
 
+	/*!
+	获取工作站监视进程运行状态
+	@return ::CC::AppsRunningState 监视进程运行状态
+	作者：cokkiy（张立民）
+	创建时间:2016/3/31 16:23:05
+	*/
+	::CC::AppsRunningState getAppRunningState();
+
+
     /*!
     清空历史消息
     @return void
@@ -657,7 +667,6 @@ signals:
     创建时间：2015/12/03 11:24:32
     */
     void stationChanged(const QObject* owner);
-
 	
 private:
     /*

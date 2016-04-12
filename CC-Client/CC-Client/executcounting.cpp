@@ -1,4 +1,5 @@
 ﻿#include "executcounting.h"
+#include <thread>
 using namespace std;
 
 ExecutCounting::ExecutCounting(QObject *parent)

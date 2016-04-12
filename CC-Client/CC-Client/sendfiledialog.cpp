@@ -1,4 +1,4 @@
-#include "sendfiledialog.h"
+ï»¿#include "sendfiledialog.h"
 #include "ui_sendfiledialog.h"
 #include "StationList.h"
 #include <QFileDialog>
@@ -8,14 +8,14 @@
 #include "sendfilethread.h"
 
 /*!
-´´½¨·¢ËÍÎÄ¼þ¶Ô»°¿ò
-@param StationList * pStations È«²¿¹¤×÷Õ¾ÁÐ±í
-@param const QModelIndexList & selectedIndexs Ñ¡¶¨µÄ¹¤×÷ÔúË÷Òý
-@param bool allStations ÊÇ·ñÊÇÈ«²¿¹¤×÷Õ¾
+åˆ›å»ºå‘é€æ–‡ä»¶å¯¹è¯æ¡†
+@param StationList * pStations å…¨éƒ¨å·¥ä½œç«™åˆ—è¡¨
+@param const QModelIndexList & selectedIndexs é€‰å®šçš„å·¥ä½œæ‰Žç´¢å¼•
+@param bool allStations æ˜¯å¦æ˜¯å…¨éƒ¨å·¥ä½œç«™
 @param QWidget * parent
 @return
-×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-´´½¨Ê±¼ä:2016/3/23 10:59:55
+ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+åˆ›å»ºæ—¶é—´:2016/3/23 10:59:55
 */
 SendFileDialog::SendFileDialog(StationList* pStations, const QModelIndexList& selectedIndexs,
 	bool allStations/*=true*/, Ice::CommunicatorPtr communicator, QWidget *parent /*= 0*/)
@@ -35,7 +35,7 @@ SendFileDialog::~SendFileDialog()
 	delete ui;
 }
 
-//Ñ¡ÔñÒª·¢ËÍµÄÎÄ¼þ
+//é€‰æ‹©è¦å‘é€çš„æ–‡ä»¶
 void SendFileDialog::on_browserPushButton_clicked()
 {
 	QFileDialog dialog(this);
@@ -56,22 +56,22 @@ void SendFileDialog::on_browserPushButton_clicked()
 	}
 }
 
-//·¢ËÍÎÄ¼þ
+//å‘é€æ–‡ä»¶
 void SendFileDialog::on_sendPushButton_clicked()
 {
 	if (fileNames.empty())
 	{
-		QMessageBox::warning(this, QStringLiteral("¾¯¸æ"), QStringLiteral("Ã»ÓÐÑ¡ÔñÒª·¢ËÍµÄÎÄ¼þ¡£"));
+		QMessageBox::warning(this, QStringLiteral("è­¦å‘Š"), QStringLiteral("æ²¡æœ‰é€‰æ‹©è¦å‘é€çš„æ–‡ä»¶ã€‚"));
 		return;
 	}
 
 	if (ui->destLineEdit->text()=="")
 	{
-		QMessageBox::warning(this, QStringLiteral("¾¯¸æ"), QStringLiteral("±ØÐëÌîÐ´ÎÄ¼þ±£´æÎ»ÖÃ¡£"));
+		QMessageBox::warning(this, QStringLiteral("è­¦å‘Š"), QStringLiteral("å¿…é¡»å¡«å†™æ–‡ä»¶ä¿å­˜ä½ç½®ã€‚"));
 		return;
 	}
 
-	//Æô¶¯·¢ËÍÏß³Ì
+	//å¯åŠ¨å‘é€çº¿ç¨‹
 	SendFileThread* sendThread = new SendFileThread(fileNames, ui->destLineEdit->text(), stations, communicator);
 	connect(sendThread, &SendFileThread::failToSendFile, this, &SendFileDialog::on_failToSendFile);
 	connect(sendThread, &SendFileThread::newFileSize, this, &SendFileDialog::on_newFileSize);
@@ -91,7 +91,7 @@ void SendFileDialog::createLayout(StationList* pStations, const QModelIndexList&
 		for (auto iter = pStations->begin();iter != pStations->end();iter++)
 		{
 			StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
-			stationBar->setTipText(QStringLiteral("×¼±¸·¢ËÍÎÄ¼þ..."));
+			stationBar->setTipText(QStringLiteral("å‡†å¤‡å‘é€æ–‡ä»¶..."));
 			stationBar->setIsOnline(iter->IsRunning());
 			stationBar->setStationName(iter->Name());
 			verticalLayout->addWidget(stationBar);
@@ -105,7 +105,7 @@ void SendFileDialog::createLayout(StationList* pStations, const QModelIndexList&
 		{
 			StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
 			StationInfo* s = pStations->atCurrent(iter->row());
-			stationBar->setTipText(QStringLiteral("×¼±¸·¢ËÍÎÄ¼þ..."));
+			stationBar->setTipText(QStringLiteral("å‡†å¤‡å‘é€æ–‡ä»¶..."));
 			stationBar->setIsOnline(s->IsRunning());
 			stationBar->setStationName(s->Name());
 			verticalLayout->addWidget(stationBar);
@@ -128,20 +128,20 @@ void SendFileDialog::on_failToSendFile(StationInfo* station, QString fileName, Q
 void SendFileDialog::on_newFileSize(StationInfo* station, QString fileName, size_t size)
 {
 	StationBar* bar = station_bar[station];
-	bar->setTipText(QStringLiteral("×¼±¸·¢ËÍÎÄ¼þ%1").arg(fileName));
+	bar->setTipText(QStringLiteral("å‡†å¤‡å‘é€æ–‡ä»¶%1").arg(fileName));
 	bar->setMaxPercent(size);
 }
 
 void SendFileDialog::on_sendFileCompleted(StationInfo* station, QString fileName)
 {
 	StationBar* bar = station_bar[station];
-	bar->setTipText(QStringLiteral("ÎÄ¼þ%1·¢ËÍÍê±Ï¡£").arg(fileName));
+	bar->setTipText(QStringLiteral("æ–‡ä»¶%1å‘é€å®Œæ¯•ã€‚").arg(fileName));
 }
 
 void SendFileDialog::on_fileSended(StationInfo* station, QString fileName, size_t size)
 {
 	StationBar* bar = station_bar[station];
-	bar->setTipText(QStringLiteral("ÕýÔÚ·¢ËÍÎÄ¼þ%1...").arg(fileName));
+	bar->setTipText(QStringLiteral("æ­£åœ¨å‘é€æ–‡ä»¶%1...").arg(fileName));
 	bar->setPercent(size);
 	update();
 }

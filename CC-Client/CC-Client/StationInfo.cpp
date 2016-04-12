@@ -260,7 +260,7 @@ void StationInfo::setLastTick(const time_t& tickTime /*= time(NULL)*/)
 		return;
 	}
 	//不改变执行状态
-	if (inExecutingState())
+	if (inExecutingState() && m_state != Powering)
 		return;
 
 	//检查CPU占用率,内存占用率和磁盘占用率
@@ -566,6 +566,17 @@ list<int> StationInfo::getStartedAppProcessIds()
 		}
 	}
 	return allIds;
+}
+
+/*!
+获取工作站监视进程运行状态
+@return ::CC::AppsRunningState
+作者：cokkiy（张立民）
+创建时间:2016/3/31 16:23:05
+*/
+::CC::AppsRunningState StationInfo::getAppRunningState()
+{
+	return this->AppsRunningState;
 }
 
 /*!

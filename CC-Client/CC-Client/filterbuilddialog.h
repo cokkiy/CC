@@ -2,7 +2,7 @@
 #define FILTERBUILDDIALOG_H
 
 #include <QDialog>
-#include "ui_filterbuilddialog.h"
+#include "ui_filterBuildDialog.h"
 #include "FilterOperations.h"
 #include <QRegExp>
 

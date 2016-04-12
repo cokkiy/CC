@@ -4,10 +4,7 @@
 
 //Center Control
 module CC
-{	
-    ///字节数组
-	["cpp:array"]
-	sequence<byte> ByteArray;
+{	   
 
 	/// 应用程序控制异常
     exception AppControlError
@@ -15,6 +12,7 @@ module CC
 	    ///异常原因
 		string Reason;
 	};
+	
 
 	///控制接口,定义了对工作站的控制工作
 	interface IController
@@ -38,20 +36,14 @@ module CC
 		idempotent void setWatchingApp(stringList procNames);
 
 		///设置状态收集间隔（秒)
-		idempotent void setStateGatheringInterval(int interval);		
+		idempotent void setStateGatheringInterval(int interval);	
+		
+		///捕获屏幕快照
+		//*？ long position: 如果为0，则捕获新快照，否则，传送后续数据
+		//*？ return：当返回false时，快照内容尚未读取完，返回true时，快照内容读取完毕
+		bool captureScreen(long position,out int length,out ByteArray data) throws FileTransException;	
 	};
-
-	///文件传输异常
-	exception FileTransException
-	{
-		["cpp:type:wstring"]
-		string fileName;
-		long offset;
-		int length;
-		int dataLen;
-		["cpp:type:wstring"]
-		string Message;
-	};
+	
 
 	///定义文件传输接口
 	interface IFileTranslation

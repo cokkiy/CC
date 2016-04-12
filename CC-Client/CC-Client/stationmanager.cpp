@@ -13,6 +13,10 @@
 using namespace std;
 using namespace CC;
 
+#ifdef Q_OS_LINUX
+using byte=unsigned char;
+#endif
+
 /*!
 创建一个工作站管理类的实例
 @param StationList * stations 工作站列表
@@ -23,10 +27,10 @@ using namespace CC;
 创建时间：2015/11/10 15:43:35
 */
 StationManager::StationManager(StationList* stations, const QModelIndexList& indexs /*= QModelIndexList()*/, QObject *parent /*= NULL*/)
-    :QObject(parent)
+	:QObject(parent), interval(1)
 {
-    this->pStations = stations;
-    this->stationIndexs = indexs;
+	this->pStations = stations;
+	this->stationIndexs = indexs;
 }
 
 /*!
@@ -57,9 +61,21 @@ void StationManager::powerOn()
     for (auto index : stationIndexs)
     {
         StationInfo* s = pStations->atCurrent(index.row());
-        s->setState(StationInfo::Powering);
-		sendPowerOnPacket(s);
+		powerOn(s);
     }
+}
+
+/*!
+开机指定工作站
+@param StationInfo * s 要开机的工作站
+@return void
+作者：cokkiy（张立民）
+创建时间:2016/4/5 15:52:56
+*/
+void StationManager::powerOn(StationInfo* s)
+{
+	s->setState(StationInfo::Powering);
+	sendPowerOnPacket(s);
 }
 
 //发送开机指令包
@@ -116,7 +132,7 @@ void StationManager::reboot(StationInfo* s)
         try
         {
             //设置监视间隔
-            setInterval(1);
+			setInterval(s, 1);
             prx->begin_reboot(true, []() {});
         }
         catch (Ice::CommunicatorDestroyedException*)
@@ -170,7 +186,7 @@ void StationManager::shutdown(StationInfo* s)
         try
         {
             //设置监视间隔为1秒
-            setInterval(1);
+			setInterval(s, 1);
             prx->begin_shutdown([]() {});
         }
         catch (Ice::CommunicatorDestroyedException*)
@@ -248,7 +264,7 @@ void StationManager::restartApp(StationInfo* s)
     if (prx != NULL)
     {
         s->setState(StationInfo::AppStarting);
-        auto& apps = s->getStartAppNames();
+        auto apps = s->getStartAppNames();
         try
         {
             prx->begin_restartApp(apps,
@@ -494,7 +510,7 @@ void StationManager::startApp(StationInfo* s)
     if (prx != NULL)
     {
         s->setState(StationInfo::AppStarting);
-        auto& apps = s->getStartAppNames();
+        auto apps = s->getStartAppNames();
         try
         {
             prx->begin_startApp(apps,
@@ -615,4 +631,20 @@ void StationManager::setInterval(int interval)
     }
 }
 
+
+/*!
+设置指定工作站监视间隔
+@param StationInfo * s
+@param int second 监视间隔（秒）
+@return void
+作者：cokkiy（张立民）
+创建时间:2016/4/5 15:53:55
+*/
+void StationManager::setInterval(StationInfo* s, int second)
+{
+	if (s->controlProxy != NULL)
+	{
+		s->controlProxy->begin_setStateGatheringInterval(second, []() {});
+	}
+}
 

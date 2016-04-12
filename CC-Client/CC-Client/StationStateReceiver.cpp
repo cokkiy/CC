@@ -55,7 +55,9 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
         else
         {
             //没有收到工作站基本信息,请求发送基本信息
-            controlPrx->begin_getSystemState([this,controlPrx,fileProxy,&stationRunningState](const CC::StationSystemState& systemState) {
+            controlPrx->begin_getSystemState(
+				[this,controlPrx,fileProxy,&stationRunningState](const CC::StationSystemState& systemState) 
+			{
                 StationInfo* pStation = findAndSetStationSystemState(systemState);
 				if (pStation != NULL)
 				{
@@ -72,7 +74,10 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 					//设置工作站监视进程列表
 					controlPrx->begin_setWatchingApp(pStation->getAllShouldMonitoredProcessesName(), []() {});
 				}
-            });
+            },
+				[](const Ice::Exception& ex)
+			{
+			});
         }
     }
 }

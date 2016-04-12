@@ -7,7 +7,7 @@
 #include <QToolButton>
 #include <QPropertyAnimation>
 
-namespace Ui { class FloatingMenu; };
+namespace Ui { class FloatingMenu; }
 
 class FloatingMenu : public QDialog
 {
@@ -122,6 +122,10 @@ private:
 
     //修正位置
     void AmendPosition(int &posX, int &posY);    
+
+#ifdef NeoLinux
+    void AmendPositionForNeoLinx(int &posX, int &posY);
+#endif
 
 private slots:
     //关闭菜单

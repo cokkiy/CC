@@ -1,4 +1,4 @@
-#ifndef STATIONBAR_H
+ï»¿#ifndef STATIONBAR_H
 #define STATIONBAR_H
 
 #include <QWidget>
@@ -6,8 +6,8 @@ class QProgressBar;
 class QLabel;
 
 /************************************************************************/
-/* ¹¤×÷Õ¾Í¼±êÌõ¿Ø¼ş
-/* ´øÍ¼±êºÍ½ø¶ÈÌõ
+/* å·¥ä½œç«™å›¾æ ‡æ¡æ§ä»¶
+/* å¸¦å›¾æ ‡å’Œè¿›åº¦æ¡
 /************************************************************************/
 class StationBar : public QWidget
 {
@@ -18,27 +18,27 @@ class StationBar : public QWidget
 	Q_PROPERTY(bool IsOnline READ IsOnline WRITE setIsOnline)
 
 private:
-	//´øÍ¼±êµÄ¹¤×÷Õ¾Ãû³Æ--ÔÚÏß
+	//å¸¦å›¾æ ‡çš„å·¥ä½œç«™åç§°--åœ¨çº¿
 	const QString stationName_on = QStringLiteral("<html><head / ><body align = \"center\"><p><img src=\":/Icons/ncom003.ico\"/></p><p>%1</p></body></html>");
-	//´øÍ¼±êµÄ¹¤×÷Õ¾Ãû³Æ--²»ÔÚÏß
+	//å¸¦å›¾æ ‡çš„å·¥ä½œç«™åç§°--ä¸åœ¨çº¿
 	const QString stationName_off = QStringLiteral("<html><head / ><body align = \"center\"><p><img src=\":/Icons/ncom002.ico\"/></p><p>%1</p></body></html>");
 
 private:
 	bool m_IsOnline;
 public:
 	/*!
-	»ñÈ¡ÊÇ·ñÔÚÏß
+	è·å–æ˜¯å¦åœ¨çº¿
 	@return bool
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:56:22
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:56:22
 	*/
 	bool IsOnline();
 	/*!
-	ÉèÖÃÊÇ·ñÔÚÏß
-	@param bool value ÊÇ·ñÔÚÏß
+	è®¾ç½®æ˜¯å¦åœ¨çº¿
+	@param bool value æ˜¯å¦åœ¨çº¿
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:56:34
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:56:34
 	*/
 	void setIsOnline(bool value);
 
@@ -47,18 +47,18 @@ private:
 public:
 	
 	/*!
-	»ñÈ¡¹¤×÷Õ¾Ãû³Æ
-	@return QString ¹¤×÷Õ¾Ãû³Æ
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:37:16
+	è·å–å·¥ä½œç«™åç§°
+	@return QString å·¥ä½œç«™åç§°
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:37:16
 	*/
 	QString StationName();
 	/*!
-	ÉèÖÃ¹¤×÷Õ¾Ãû³Æ
-	@param QString value ¹¤×÷Õ¾Ãû³Æ
+	è®¾ç½®å·¥ä½œç«™åç§°
+	@param QString value å·¥ä½œç«™åç§°
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:37:41
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:37:41
 	*/
 	void setStationName(QString value);
 
@@ -68,19 +68,19 @@ private:
 	size_t m_Percent;
 public:
 	/*!
-	»ñÈ¡µ±Ç°½ø¶È
-	@return int µ±Ç°½ø¶È
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:34:38
+	è·å–å½“å‰è¿›åº¦
+	@return int å½“å‰è¿›åº¦
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:34:38
 	*/
 	size_t Percent();
 
 	/*!
-	ÉèÖÃ½ø¶È
-	@param int value ½ø¶È
+	è®¾ç½®è¿›åº¦
+	@param int value è¿›åº¦
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:34:58
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:34:58
 	*/
 	void setPercent(size_t value);
 
@@ -89,18 +89,18 @@ private:
 	QString m_TipText;
 public:
 	/*!
-	»ñÈ¡µ±Ç°ÌáÊ¾ĞÅÏ¢
-	@return QString µ±Ç°ÌáÊ¾ĞÅÏ¢
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:35:14
+	è·å–å½“å‰æç¤ºä¿¡æ¯
+	@return QString å½“å‰æç¤ºä¿¡æ¯
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:35:14
 	*/
 	QString TipText();
 	/*!
-	ÉèÖÃµ±Ç°ÌáÊ¾ĞÅÏ¢
-	@param QString value ÒªÉèÖÃµÄÌáÊ¾ĞÅÏ¢
+	è®¾ç½®å½“å‰æç¤ºä¿¡æ¯
+	@param QString value è¦è®¾ç½®çš„æç¤ºä¿¡æ¯
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 15:35:46
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 15:35:46
 	*/
 	void setTipText(QString value);
 

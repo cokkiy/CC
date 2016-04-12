@@ -269,12 +269,12 @@ void StationList::sort(SortBy sortby/*= SortBy::IP*/)
     case StationList::IP:
 		//根据IP正排序
 		std::sort(currentStations.begin(), currentStations.end(),
-			[](StationInfo* first, StationInfo* second) { return first->IP() >= second->IP();});        
+			[](StationInfo* first, StationInfo* second) { return first->IP() < second->IP();});        
         break;
     case StationList::IP_DESC:
         //根据IP逆排序
 		std::sort(currentStations.begin(), currentStations.end(),
-			[](StationInfo* first, StationInfo* second) { return first->IP() < second->IP();});
+			[](StationInfo* first, StationInfo* second) { return first->IP() >= second->IP();});
         break;
     case StationList::State:
         //根据状态正排序

@@ -1,4 +1,4 @@
-#include "sendfilethread.h"
+ï»¿#include "sendfilethread.h"
 #include "StationInfo.h"
 #include <Ice/Initialize.h>
 #include <Ice/Stream.h>
@@ -7,13 +7,13 @@
 using namespace std;
 
 /*!
-´´½¨·¢ËÍÎÄ¼şÏß³Ì¶ÔÏó
-@param QStringList fileNames ĞèÒª·¢ËÍµÄÎÄ¼şÃû³ÆÁĞ±í
-@param std::list<StationInfo * > stations ĞèÒª·¢ËÍµ½µÄ¹¤×÷Õ¾ÁĞ±í
+åˆ›å»ºå‘é€æ–‡ä»¶çº¿ç¨‹å¯¹è±¡
+@param QStringList fileNames éœ€è¦å‘é€çš„æ–‡ä»¶åç§°åˆ—è¡¨
+@param std::list<StationInfo * > stations éœ€è¦å‘é€åˆ°çš„å·¥ä½œç«™åˆ—è¡¨
 @param QObject * parent
-@return ·¢ËÍÎÄ¼şÏß³Ì¶ÔÏó
-×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-´´½¨Ê±¼ä:2016/3/24 9:31:41
+@return å‘é€æ–‡ä»¶çº¿ç¨‹å¯¹è±¡
+ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+åˆ›å»ºæ—¶é—´:2016/3/24 9:31:41
 */
 SendFileThread::SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
 	Ice::CommunicatorPtr communicator, QObject *parent)
@@ -27,7 +27,7 @@ SendFileThread::~SendFileThread()
 
 }
 
-//ÊµÏÖÎÄ¼ş·¢ËÍ
+//å®ç°æ–‡ä»¶å‘é€
 void SendFileThread::run()
 {
 	for (StationInfo* s : stations)
@@ -37,7 +37,7 @@ void SendFileThread::run()
 			for (QString& file : fileNames)
 			{
 				QFileInfo fileInfo(file);
-				//Í¨ÖªÎÄ¼ş´óĞ¡
+				//é€šçŸ¥æ–‡ä»¶å¤§å°
 				emit newFileSize(s, file, fileInfo.size());
 
 				QString name = fileInfo.fileName();
@@ -48,48 +48,48 @@ void SendFileThread::run()
 					{
 						sendFile(file, s);
 
-						//ÎÄ¼ş·¢ËÍÍê±Ï
+						//æ–‡ä»¶å‘é€å®Œæ¯•
 						emit sendFileCompleted(s, file);
 						s->fileProxy->closeFile();
 					}
 					else
 					{
-						//´´½¨ÎÄ¼şÊ§°Ü
-						emit failToSendFile(s, file, QStringLiteral("ÎŞ·¨·¢ËÍÎÄ¼ş£¬¹¤×÷Õ¾´´½¨ÎÄ¼şÊ§°Ü¡£"));
+						//åˆ›å»ºæ–‡ä»¶å¤±è´¥
+						emit failToSendFile(s, file, QStringLiteral("æ— æ³•å‘é€æ–‡ä»¶ï¼Œå·¥ä½œç«™åˆ›å»ºæ–‡ä»¶å¤±è´¥ã€‚"));
 					}
 				}
 				catch (const CC::FileTransException& exception)
 				{
-					emit failToSendFile(s, file, QStringLiteral("ÎŞ·¨·¢ËÍÎÄ¼ş£¬¹¤×÷Õ¾´´½¨ÎÄ¼şÊ§°Ü:%1¡£")
+					emit failToSendFile(s, file, QStringLiteral("æ— æ³•å‘é€æ–‡ä»¶ï¼Œå·¥ä½œç«™åˆ›å»ºæ–‡ä»¶å¤±è´¥:%1ã€‚")
 						.arg(QString::fromStdWString(exception.Message)));
 				}
 				catch (const Ice::Exception& ex)
 				{
-					emit failToSendFile(s, file, QStringLiteral("ÎŞ·¨·¢ËÍÎÄ¼ş£¬·¢ËÍÎÄ¼ş¹ı³ÌÖĞ·¢ÉúÒì³£:%1¡£").arg(ex.what()));
+					emit failToSendFile(s, file, QStringLiteral("æ— æ³•å‘é€æ–‡ä»¶ï¼Œå‘é€æ–‡ä»¶è¿‡ç¨‹ä¸­å‘ç”Ÿå¼‚å¸¸:%1ã€‚").arg(ex.what()));
 				}
 				catch (...)
 				{
-					emit failToSendFile(s, file, QStringLiteral("ÎŞ·¨·¢ËÍÎÄ¼ş£¬·¢ËÍÎÄ¼ş¹ı³ÌÖĞ·¢ÉúÎ´ÖªÒì³£¡£"));
+					emit failToSendFile(s, file, QStringLiteral("æ— æ³•å‘é€æ–‡ä»¶ï¼Œå‘é€æ–‡ä»¶è¿‡ç¨‹ä¸­å‘ç”ŸæœªçŸ¥å¼‚å¸¸ã€‚"));
 				}
 			}
 		}
 		else
 		{
-			// ÎŞ·¨·¢ËÍÎÄ¼ş
-			emit failToSendFile(s, QStringLiteral("È«²¿ÎÄ¼ş"), QStringLiteral("ÎŞ·¨·¢ËÍÎÄ¼ş£¬¹¤×÷Õ¾²»ÔÚÏß»òÖĞ¿Ø·şÎñÎ´Æô¶¯¡£"));
+			// æ— æ³•å‘é€æ–‡ä»¶
+			emit failToSendFile(s, QStringLiteral("å…¨éƒ¨æ–‡ä»¶"), QStringLiteral("æ— æ³•å‘é€æ–‡ä»¶ï¼Œå·¥ä½œç«™ä¸åœ¨çº¿æˆ–ä¸­æ§æœåŠ¡æœªå¯åŠ¨ã€‚"));
 		}
 	}
 }
 
 void SendFileThread::sendFile(QString &file, StationInfo* s)
 {
-	//´´½¨ÎÄ¼ş³É¹¦£¬¿ªÊ¼·¢ËÍÎÄ¼şÄÚÈİ													 .
+	//åˆ›å»ºæ–‡ä»¶æˆåŠŸï¼Œå¼€å§‹å‘é€æ–‡ä»¶å†…å®¹													 .
 	std::vector< Ice::Byte > inParams, resultParams;
-	size_t position = 0; //ÎÄ¼şÆğÊ¼Î»ÖÃ
+	size_t position = 0; //æ–‡ä»¶èµ·å§‹ä½ç½®
 	int packetLength = 100 * 1024;//10K Bytes
 	int maxPackets = 100;
 	char* buf = new char[packetLength];
-	//ÒÔbinaryÄ£Ê½´ò¿ªÎÄ¼ş
+	//ä»¥binaryæ¨¡å¼æ‰“å¼€æ–‡ä»¶
 #ifdef Q_OS_WIN
 	FILE* fp = _wfopen(file.toStdWString().c_str(), L"rb");
 #else
@@ -122,7 +122,7 @@ void SendFileThread::sendFile(QString &file, StationInfo* s)
 			}
 		}
 
-		//µÈ´ı×îºóµÄÊı¾İ·¢ËÍÍê±Ï
+		//ç­‰å¾…æœ€åçš„æ•°æ®å‘é€å®Œæ¯•
 		while (!asyncResults.empty())
 		{
 			waitComplete(asyncResults, s, resultParams);
@@ -131,8 +131,8 @@ void SendFileThread::sendFile(QString &file, StationInfo* s)
 	}
 	else
 	{
-		//ÎÄ¼ş²»´æÔÚ
-		emit failToSendFile(s, file, QStringLiteral("ÎÄ¼ş²»´æÔÚ¡£"));
+		//æ–‡ä»¶ä¸å­˜åœ¨
+		emit failToSendFile(s, file, QStringLiteral("æ–‡ä»¶ä¸å­˜åœ¨ã€‚"));
 	}
 }
 
@@ -148,12 +148,12 @@ void SendFileThread::waitComplete(list <tuple<Ice::AsyncResultPtr, QString&, siz
 	{
 		if (s->fileProxy->end_ice_invoke(resultParams, r))
 		{
-			//Õı³£Ö´ĞĞÍê±Ï
+			//æ­£å¸¸æ‰§è¡Œå®Œæ¯•
 			emit fileSended(s, fileName, (long long)position);
 		}
 		else
 		{
-			//·¢ÉúÓÃ»§×Ô¶¨ÒåÒì³£
+			//å‘ç”Ÿç”¨æˆ·è‡ªå®šä¹‰å¼‚å¸¸
 			Ice::InputStreamPtr in = Ice::createInputStream(communicator, resultParams);
 			in->startEncapsulation();
 			Ice::BoolSeq result;
@@ -161,18 +161,18 @@ void SendFileThread::waitComplete(list <tuple<Ice::AsyncResultPtr, QString&, siz
 			CC::FileTransException ex;
 			ex.__read(in);
 			in->endEncapsulation();
-			emit failToSendFile(s, fileName, QStringLiteral("¹¤×÷Õ¾ÎŞ·¨Ğ´ÈëÎÄ¼ş:%1").arg(QString::fromStdWString(ex.Message)));
+			emit failToSendFile(s, fileName, QStringLiteral("å·¥ä½œç«™æ— æ³•å†™å…¥æ–‡ä»¶:%1").arg(QString::fromStdWString(ex.Message)));
 		}
 	}
 	catch (const Ice::Exception& ex)
 	{
-		//·¢ÉúÏµÍ³Òì³£
+		//å‘ç”Ÿç³»ç»Ÿå¼‚å¸¸
 		emit failToSendFile(s, fileName, QString::fromStdString(ex.what()));
 
 	}
 	catch (...)
 	{
-		//·¢ÉúÏµÍ³Òì³£
-		emit failToSendFile(s, fileName, QStringLiteral("·¢ÉúÎ´ÖªÒì³£¡£"));
+		//å‘ç”Ÿç³»ç»Ÿå¼‚å¸¸
+		emit failToSendFile(s, fileName, QStringLiteral("å‘ç”ŸæœªçŸ¥å¼‚å¸¸ã€‚"));
 	}
 }

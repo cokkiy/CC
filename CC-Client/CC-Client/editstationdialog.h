@@ -1,11 +1,10 @@
-﻿#ifndef NEWSTATIONDIALOG_H
-#define NEWSTATIONDIALOG_H
-
+﻿#pragma once
 #include <QDialog>
 #include "StationInfo.h"
 #include <QValidator>
 #include <QRegExp>
-namespace Ui {class EditStationDialog;};
+
+namespace Ui {class EditStationDialog;}
 
 /*
  编辑工作站信息对话框
@@ -55,7 +54,7 @@ private:
     //初始化UI
     void initUI();
     //添加网卡配置控件
-    void AddNIConfigControl(QString mac=QStringLiteral(""),QString IPs=QStringLiteral(""));
+    void AddNIConfigControl(QString mac,QString IPs);
     //更新工作站数据
     void UpdateStation();
 private:
@@ -65,4 +64,3 @@ private:
     QRegExpValidator macValidator, ipValidator;
 };
 
-#endif // NEWSTATIONDIALOG_H

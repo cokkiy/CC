@@ -1,4 +1,4 @@
-#include "detaildialog.h"
+ï»¿#include "detaildialog.h"
 #include "StationInfo.h"
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
@@ -7,6 +7,11 @@
 #include "cpuplot/plotpart.h"
 #include <qwt_plot_layout.h>
 #include "cpuplot/counterpiemarker.h"
+#include <list>
+#include "AppControlParameter.h"
+#include "stationmanager.h"
+#include "screenimagedialog.h"
+using namespace std;
 
 DetailDialog::DetailDialog(StationInfo* station, QWidget *parent)
 	: QDialog(parent), station(station)
@@ -17,16 +22,44 @@ DetailDialog::DetailDialog(StationInfo* station, QWidget *parent)
 	ui.IPLineEdit->setText(station->IP());
 	ui.MACLineEdit->setText(station->MAC());
 
+	station->subscribeStateChanged(this, SLOT(stationStateChanged(const QObject*)));
+
+	manager = new StationManager();
+
+	setButtonState();
+
+
 	setupPlot();
 
-	//³õÊ¼»¯Ê±¼äÊı¾İ
+	//åˆå§‹åŒ–æ—¶é—´æ•°æ®
 	for (int i = 0; i < CounterHistoryDataSize; i++)
 	{
 		timeData[i] = CounterHistoryDataSize - i;
 	}
 
-	//Æô¶¯¶¨Ê±Æ÷
+	//æ€»å†…å­˜å¤§å°
+	ui.memorySizeLineEdit->setText(QStringLiteral("%1").arg(station->TotalMemory() / 1024 / 1024));
+
+	//å¯åŠ¨å®šæ—¶å™¨
 	startTimer(1000);  // 1 second
+}
+
+void DetailDialog::setButtonState()
+{
+	if (station->IsRunning())
+	{
+		ui.powerOnPushButton->setEnabled(false);
+		ui.powerOffPushButton->setEnabled(true);
+		ui.screenCapturePushButton->setEnabled(true);
+		ui.rebootPushButton->setEnabled(true);
+	}
+	else
+	{
+		ui.powerOffPushButton->setEnabled(false);
+		ui.screenCapturePushButton->setEnabled(false);
+		ui.rebootPushButton->setEnabled(false);
+		ui.powerOnPushButton->setEnabled(true);
+	}
 }
 
 void DetailDialog::setupPlot()
@@ -37,11 +70,11 @@ void DetailDialog::setupPlot()
 	memoryPlot->setMaximumHeight(250);
 	ui.plotVerticalLayout->addWidget(cpuPlot);
 	ui.plotVerticalLayout->addWidget(memoryPlot);
-	setPlotStyle(cpuPlot, QStringLiteral("CPUÊ¹ÓÃÇé¿ö [%]"));
-	setPlotStyle(memoryPlot, QStringLiteral("ÄÚ´æÊ¹ÓÃÇé¿ö [%]"));
+	setPlotStyle(cpuPlot, QStringLiteral("CPUä½¿ç”¨æƒ…å†µ [%]"));
+	setPlotStyle(memoryPlot, QStringLiteral("å†…å­˜ä½¿ç”¨æƒ…å†µ [%]"));
 
 
-	//ÏÔÊ¾CPUºÍÄÚ´æÕ¼ÓÃÂÊ
+	//æ˜¾ç¤ºCPUå’Œå†…å­˜å ç”¨ç‡
 	CounterCurve *curve;
 
 	//CPU total
@@ -128,6 +161,36 @@ DetailDialog::~DetailDialog()
 	delete memoryPlot;	
 }
 
+void DetailDialog::on_powerOnPushButton_clicked()
+{
+	manager->powerOn(station);
+}
+
+void DetailDialog::on_powerOffPushButton_clicked()
+{
+	manager->shutdown(station);
+}
+
+void DetailDialog::on_rebootPushButton_clicked()
+{
+	manager->reboot(station);
+}
+
+void DetailDialog::on_screenCapturePushButton_clicked()
+{
+	if (station != NULL&&station->controlProxy != NULL)
+	{
+		ScreenImageDialog dlg(station);
+		dlg.exec();
+	}
+}
+
+//å·¥ä½œç«™çŠ¶æ€è½¬åŒ–
+void DetailDialog::stationStateChanged(const QObject* obj)
+{
+	setButtonState();
+}
+
 void DetailDialog::setPlotStyle(QwtPlot* plot, QString title)
 {
 	plot->setAutoReplot(false);
@@ -159,7 +222,7 @@ void DetailDialog::setPlotStyle(QwtPlot* plot, QString title)
 	bg->attach(plot);
 }
 
-//»æÖÆCPUºÍÄÚ´æÕ¼ÓÃÂÊ
+//ç»˜åˆ¶CPUå’Œå†…å­˜å ç”¨ç‡
 void DetailDialog::timerEvent(QTimerEvent *e)
 {
 	if (station != nullptr)
@@ -182,6 +245,67 @@ void DetailDialog::timerEvent(QTimerEvent *e)
 			}
 		}
 		cpuPlot->replot();
-		memoryPlot->replot();		
+		memoryPlot->replot();
+
+		//æ›´æ–°æ€»ä½“ä¿¡æ¯
+		ui.processCountLineEdit->setText(QStringLiteral("%1").arg(station->ProcCount()));
+		ui.CPURateLineEdit->setText(QStringLiteral("%1").arg(station->CPU()));
+		ui.memoryRateLineEdit->setText(QStringLiteral("%1").arg(station->Memory() * 100 / (float)station->TotalMemory()));
+		//é‡ç½®è¿›ç¨‹ä¿¡æ¯è¡¨æ ¼
+		resetTableWidget(8);
+		UpdateMonitoredProcessInfo();
+	}
+}
+
+void DetailDialog::resetTableWidget(int columnCount)
+{
+	int rowCount = ui.processTableWidget->rowCount();
+	for (int row = 0; row < rowCount; row++)
+	{
+		for (int coloum = 0; coloum < columnCount; coloum++)
+		{
+			QTableWidgetItem* item = ui.processTableWidget->takeItem(row, 0);
+			if (item != NULL)
+				delete item;
+		}
+	}
+	ui.processTableWidget->setRowCount(0);
+}
+
+void DetailDialog::UpdateMonitoredProcessInfo()
+{
+	::CC::AppsRunningState runningStates = station->getAppRunningState();
+	for (auto& state : runningStates)
+	{
+		int row = ui.processTableWidget->rowCount();
+		ui.processTableWidget->setRowCount(row + 1);
+		QTableWidgetItem *idItem = new QTableWidgetItem(QStringLiteral("%1").arg(state.Process.Id));
+		ui.processTableWidget->setItem(row, 0, idItem);
+		QTableWidgetItem *nameItem = new QTableWidgetItem(QString::fromStdString(state.Process.ProcessName));
+		ui.processTableWidget->setItem(row, 1, nameItem);
+		QTableWidgetItem *isRunningItem = new QTableWidgetItem(state.isRunning ? QStringLiteral("æ˜¯") : QStringLiteral("å¦"));
+		ui.processTableWidget->setItem(row, 2, isRunningItem);
+		QTableWidgetItem *cpuItem = new QTableWidgetItem(QStringLiteral("%1").arg(state.cpu));
+		ui.processTableWidget->setItem(row, 3, cpuItem);
+		QTableWidgetItem *memoryItem = new QTableWidgetItem(QStringLiteral("%1").arg(state.currentMemory / (float)station->TotalMemory() * 100));
+		ui.processTableWidget->setItem(row, 4, memoryItem);
+		QTableWidgetItem *threadCountItem = new QTableWidgetItem(QStringLiteral("%1").arg(state.threadCount));
+		ui.processTableWidget->setItem(row, 5, threadCountItem);
+
+		list<CC::AppStartParameter> params = station->getStartAppNames();
+		auto finded = find_if(params.begin(), params.end(),
+			[&state](const CC::AppStartParameter& para)
+		{
+			return state.Process.ProcessMonitorName == para.ProcessName;
+		});
+		if (finded != params.end())
+		{
+			QString startPath = QString::fromStdString(finded->AppPath);
+			QString arguments = QString::fromStdString(finded->Arguments);
+			QTableWidgetItem *startPathItem = new QTableWidgetItem(startPath);
+			ui.processTableWidget->setItem(row, 6, startPathItem);
+			QTableWidgetItem *argumentItem = new QTableWidgetItem(arguments);
+			ui.processTableWidget->setItem(row, 7, argumentItem);
+		}
 	}
 }

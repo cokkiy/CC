@@ -9,6 +9,8 @@ using CC;
 using SysProcess = System.Diagnostics.Process;
 using System.IO;
 using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace AppLuncher
 {
@@ -277,6 +279,63 @@ namespace AppLuncher
                 }
             }                
             return results;
+        }
+
+        //保存屏幕快照的内存流
+        MemoryStream stream = null;
+        //传送缓冲区大小
+        const int bufSize = 4096; //4K Bytes
+
+        /// <summary>
+        /// 实现截屏功能
+        /// </summary>
+        /// <param name="position">快照内容传送位置，如果为0，则捕获新快照，否则从该位置继续传送后续内容</param>
+        /// <param name="length">传送数据长度</param>
+        /// <param name="data">传送的数据</param>
+        /// <param name="current__"></param>
+        /// <returns>传送是否完毕</returns>
+        public override bool captureScreen(long position, out int length, out byte[] data, Current current__)
+        {
+            if (position == 0)
+            {
+                try
+                {
+                    //捕获新快照
+                    Rectangle rect = System.Windows.Forms.Screen.PrimaryScreen.Bounds;
+                    Bitmap image = new Bitmap(rect.Width, rect.Height);
+                    Graphics g = Graphics.FromImage(image);
+                    g.CopyFromScreen(new Point(0, 0), new Point(0, 0), new Size(rect.Width, rect.Height));
+                    stream = new MemoryStream();
+                    image.Save(stream, ImageFormat.Png);
+                }
+                catch (System.Exception ex)
+                {
+                    throw new FileTransException("屏幕快照", position, 0, 0, ex.ToString());
+                }
+            }
+
+            if (stream == null)
+            {
+                throw new FileTransException("屏幕快照", position, 0, 0, "没有捕获快照");
+            }
+            else
+            {
+                try
+                {
+                    data = new byte[bufSize];
+                    stream.Seek(position, SeekOrigin.Begin);
+                    length = stream.Read(data, 0, bufSize);
+                    if (length < bufSize)
+                    {
+                        stream.Close();
+                    }
+                    return length < bufSize;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new FileTransException("屏幕快照", position, 0, 0, ex.ToString());
+                }
+            }
         }
     }
 }

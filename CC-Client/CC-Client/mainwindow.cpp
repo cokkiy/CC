@@ -25,11 +25,12 @@
 #include <qwt_plot.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_grid.h>
-#include "cpuplot\plotpart.h"
-#include "cpuplot\counterpiemarker.h"
+#include "cpuplot/plotpart.h"
+#include "cpuplot/counterpiemarker.h"
 #include "sendfiledialog.h"
 #include "recvfiledialog.h"
 #include "detaildialog.h"
+#include "screenimagedialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -37,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_NoMousePropagation);
     //设置CPU和内存使用记录样式
     QwtPlot* cpuPlot = ui->qwtPlotCPU;
     setPlotStyle(cpuPlot, QStringLiteral("CPU使用情况 [%]"));
@@ -96,13 +98,100 @@ void MainWindow::on_actionPowerOn_triggered()
 
 }
 
-void MainWindow::on_actionAllPower_On_triggered()
-{
-    //打开全部计算机
+void MainWindow::on_actionPoweroff_triggered()
+{	
 	QModelIndexList selectedIndexs = getSelectedIndexs();
 	//创建工作站管理类
 	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	//关机
+	manager->shutdown();
+}
+
+void MainWindow::on_actionReboot_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	//重启
+	manager->reboot();
+}
+
+void MainWindow::on_actionStartApp_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	//启动程序
+	manager->startApp();
+}
+
+void MainWindow::on_actionRestartApp_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	//启动程序
+	manager->restartApp();
+}
+
+void MainWindow::on_actionExitApp_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	//退出程序
+	manager->exitApp();
+}
+
+void MainWindow::on_actionAllPower_On_triggered()
+{    
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	//打开全部计算机
 	manager->powerOnAll();
+}
+//启动全部工作站程序
+void MainWindow::on_actionStartAllApp_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->startAllApp();
+}
+
+//全部重启
+void MainWindow::on_actionRebootAll_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->rebootAll();
+}
+//全部重启应用
+void MainWindow::on_actionRestartAll_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->restartAllApp();
+}
+
+//全部退出程序
+void MainWindow::on_actionExitAllZXApp_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->exitAllApp();
+}
+//全部关机
+void MainWindow::on_actionAll_Shutdown_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->shutdownAll();
 }
 
 //工作站信息加载完毕
@@ -205,6 +294,7 @@ void MainWindow::operationMenuToShow()
         {
             ui->actionReboot->setEnabled(true);
             ui->actionPoweroff->setEnabled(true);
+			ui->actionScreenCapture->setEnabled(true);
             //如果(部分)应用已经启动
             if (station->state() == StationInfo::AppStarted || station->state() == StationInfo::SomeAppNotRunning)
             {
@@ -689,7 +779,6 @@ void MainWindow::on_actionSetInterval_triggered()
             //设置监视间隔
             StationManager* manager = new StationManager(pStationList);
             manager->setInterval(option.Interval);
-            monitor->setInterval(option.Interval);
         }
         delete dlg;
     }
@@ -725,9 +814,12 @@ void MainWindow::on_actionNewStation_triggered()
 void MainWindow::on_actionEdit_triggered()
 {
     QModelIndexList selectedIndexs = getSelectedIndexs();
-    auto station = pStationList->atCurrent(selectedIndexs.first().row());
-    EditStationDialog dlg(station, EditStationDialog::Edit);
-    dlg.exec();
+	if (!selectedIndexs.isEmpty())
+	{
+		auto station = pStationList->atCurrent(selectedIndexs.first().row());
+		EditStationDialog dlg(station, EditStationDialog::Edit);
+		dlg.exec();
+	}
 }
 
 //删除工作站
@@ -797,12 +889,25 @@ void MainWindow::on_actionReceiveAll_triggered()
 	dlg->exec();
 }
 
+//过滤
 void MainWindow::on_filterLineEdit_returnPressed()
 {
 	QString filter = ui->filterLineEdit->text();
 	pTableModel->beginFilter();
 	pStationList->filter(filter);
 	pTableModel->endFilter();
+}
+
+//屏幕快照
+void MainWindow::on_actionScreenCapture_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	auto station = pStationList->atCurrent(selectedIndexs.first().row());
+	if (station != NULL&&station->controlProxy != NULL)
+	{
+		ScreenImageDialog dlg(station);
+		dlg.exec();
+	}
 }
 
 //添加按钮到右键菜单
@@ -833,6 +938,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
         {
             //未开机
             menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+			menu->addButton(":/Icons/52design.com_2006ball_74.png", QStringLiteral("编辑"), this, SLOT(on_actionEdit_triggered()));
 			menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
         }
         else
@@ -865,10 +971,10 @@ void MainWindow::addButtons(FloatingMenu* menu)
 
 			menu->addButton(":/Icons/receiveFile.png", QStringLiteral("接收文件"), this, SLOT(on_actionReceiveSelection_triggered()));
 			menu->addButton(":/Icons/sendFile.png", QStringLiteral("发送文件"), this, SLOT(on_actionSendSelection_triggered()));
+			menu->addButton(":/Icons/screencapture.png", QStringLiteral("屏幕快照"), this, SLOT(on_actionScreenCapture_triggered()));
 
         }
         menu->addButton(":/Icons/52design.com_file_036.png", QStringLiteral("详细信息"), this, SLOT(on_actionViewStationDetail_triggered()));
-        menu->addButton(":/Icons/52design.com_2006ball_74.png", QStringLiteral("编辑"), this, SLOT(on_actionEdit_triggered()));
     }
 }
 
@@ -967,7 +1073,6 @@ void MainWindow::timerEvent(QTimerEvent *e)
 
         //显示线程数和进程数
         ui->procCountlineEdit->setText(QStringLiteral("%1").arg(currentStation->ProcCount()));
-        ui->threadCountlineEdit->setText(QStringLiteral("%1").arg(currentStation->AppThreadCount()));
     }
 }
 

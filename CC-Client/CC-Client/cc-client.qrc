@@ -145,5 +145,7 @@
         <file>Icons/sendFile.png</file>
         <file>Icons/download.jpg</file>
         <file>Icons/detail.png</file>
+        <file>Icons/screencapture.png</file>
+        <file>Icons/bk.png</file>
     </qresource>
 </RCC>

@@ -164,16 +164,10 @@ QVariant StationTableModel::headerData(int section, Qt::Orientation orientation,
         case 4:
             return QStringLiteral("总内存占用率(%)");
         case 5:
-            return QStringLiteral("指显CPU占用率");
-        case 6:
-            return QStringLiteral("指显内存占用率");
-        case 7:
             return QStringLiteral("总内存");
-        case 8:
+        case 6:
             return QStringLiteral("总进程数");
-        case 9:
-            return QStringLiteral("指显线程数");
-        case 10:
+        case 7:
             return QStringLiteral("MAC地址");
         default:
             break;
@@ -287,16 +281,10 @@ QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
     case 4:
         return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory() / pStations->atCurrent(index.row())->TotalMemory() * 100, 0, 'f', 2);
     case 5:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppCPU(), 0, 'f', 0);
-    case 6:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppMemory(), 0, 'f', 0);
-    case 7:
         return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->TotalMemory());
-    case 8:
+    case 6:
         return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->ProcCount());
-    case 9:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->AppThreadCount());
-    case 10:
+    case 7:
         return pStations->atCurrent(index.row())->MAC();
     default:
         break;

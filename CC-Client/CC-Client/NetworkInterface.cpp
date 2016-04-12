@@ -1,4 +1,5 @@
 ﻿#include "NetworkInterface.h"
+#include <QStringList>
 
 NetworkInterface::operator std::pair<std::string, std::list<std::string>>()
 {

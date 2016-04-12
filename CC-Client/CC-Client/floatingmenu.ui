@@ -13,6 +13,11 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
   <property name="contextMenuPolicy">
    <enum>Qt::NoContextMenu</enum>
   </property>
@@ -21,8 +26,6 @@
   </property>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="cc-client.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

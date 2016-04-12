@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using CC;
 using Ice;
-using System.IO;
 
 namespace CC_StationService
 {
@@ -170,6 +165,34 @@ namespace CC_StationService
                 throw new AppControlError("应用程序启动代理接口错误:" + ex.InnerException.Message);
             }
         }
-        
+
+
+        /// <summary>
+        /// 捕获屏幕快照
+        /// </summary>
+        /// <param name="position">快照内容传送位置，如果为0，则捕获新快照，否则从该位置继续传送后续内容</param>
+        /// <param name="length">传送数据长度</param>
+        /// <param name="data">传送的数据</param>
+        /// <param name="current__"></param>
+        /// <returns>传送是否完毕</returns>
+        public override bool captureScreen(long position, out int length, out byte[] data, Current current__)
+        {
+            ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+            try
+            {
+                AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                return luncherPrx.captureScreen(position, out length, out data);
+            }
+            catch (Ice.Exception ex)
+            {
+                PlatformMethodFactory.GetLogger().error("捕获屏幕快照失败：" + ex.ToString());
+                throw new FileTransException("屏幕快照:应用程序启动代理接口错误", position, 0, 0, ex.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                PlatformMethodFactory.GetLogger().error("捕获屏幕快照失败：" + ex.ToString());
+                throw new FileTransException("屏幕快照", position, 0, 0, ex.ToString());
+            }
+        }
     }
 }

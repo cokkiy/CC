@@ -23,7 +23,7 @@ public:
     };
 
     //行数
-    const int totalColumnCount = 11;
+    const int totalColumnCount = 8;
 
     /*!
     创建\see StationTableModel对象实例

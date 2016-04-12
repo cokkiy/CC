@@ -38,7 +38,7 @@ EditStationDialog::~EditStationDialog()
 
 void EditStationDialog::on_addNiPushButton_clicked()
 {
-    AddNIConfigControl();
+    AddNIConfigControl("","");
 
 }
 //添加网卡配置控件
@@ -96,11 +96,11 @@ void EditStationDialog::on_OKPushButton_clicked()
         QMessageBox::warning(NULL, QStringLiteral("错误"), QStringLiteral("工作站MAC地址不能为空"));
         return;
     }
-    if (ui->NIIPLineEdit->text() == QStringLiteral(""))
-    {
-        QMessageBox::warning(NULL, QStringLiteral("错误"), QStringLiteral("工作站IP地址不能为空\r\n至少要提供一个IP地址"));
-        return;
-    }
+//     if (ui->NIIPLineEdit->text() == QStringLiteral(""))
+//     {
+//         QMessageBox::warning(NULL, QStringLiteral("错误"), QStringLiteral("工作站IP地址不能为空\r\n至少要提供一个IP地址"));
+//         return;
+//     }
     //获取新值
     UpdateStation();
     this->done(QDialog::Accepted);
@@ -236,7 +236,7 @@ void EditStationDialog::initUI()
                 AddNIConfigControl(iter->getMAC(), iter->getAllIPString());
             }
         }
-        auto& appList = station->getStartAppNames();
+        auto appList = station->getStartAppNames();
         ui->startAppTableWidget->setRowCount(appList.size());
         int row = 0;
         for (auto& app : appList)
