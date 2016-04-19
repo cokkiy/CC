@@ -48,8 +48,12 @@ public:
     void on_addMonitorProcPushButton_clicked();
     //删除监视进程
     void on_removeMonitorProcPushButton_clicked();
-    //查看当前运行进程
-    void on_viewProcPushButton_clicked();
+    //为监视进程选择当前运行进程
+    void on_selectViewProcPushButton_clicked();
+	//为添加启动程序选择当前运行进程
+	void on_selectProcPushButton_clicked();
+	//选择启动程序路径
+	void on_selecApptPushButton_clicked();
 private:
     //初始化UI
     void initUI();

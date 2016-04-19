@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CCVersion.cs" />
     <Compile Include="ControllerImp.cs" />
     <Compile Include="FileTranslation.cs" />
     <Compile Include="FileTranslationImp.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="generated\IAppLuncher.cs" />
     <Compile Include="generated\IController.cs" />
     <Compile Include="generated\IStationStateReceiver.cs" />
+    <Compile Include="generated\Version.cs" />
     <Compile Include="IPlatformMethod.cs" />
     <Compile Include="LinuxMethod.cs" />
     <Compile Include="LinuxLogger.cs" />
@@ -90,6 +92,7 @@
     <None Include="Slice\IAppLuncher.ice" />
     <None Include="Slice\IController.ice" />
     <None Include="Slice\IStationStateReceiver.ice" />
+    <None Include="Slice\Version.ice" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="StationMonitorService.resx">

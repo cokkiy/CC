@@ -1,4 +1,4 @@
-#ifndef SENDFILETHREAD_H
+ï»¿#ifndef SENDFILETHREAD_H
 #define SENDFILETHREAD_H
 
 #include <QThread>
@@ -6,85 +6,92 @@
 #include <QStringList>
 #include <Ice/Communicator.h>
 #include <mutex>
+#include <QFileInfo>
 class StationInfo;
 /************************************************************************/
-/* ÎÄ¼ş·¢ËÍÏß³Ì£¬ÊµÏÖ¶ÀÁ¢Ïß³Ì·¢ËÍÎÄ¼ş                                                                     */
+/* æ–‡ä»¶å‘é€çº¿ç¨‹ï¼Œå®ç°ç‹¬ç«‹çº¿ç¨‹å‘é€æ–‡ä»¶                                         */
 /************************************************************************/
+using ResultTuple = std::tuple<Ice::AsyncResultPtr, const QString&, size_t>;
+
 class SendFileThread : public QThread
 {
 	Q_OBJECT
 
 public:
 	/*!
-	´´½¨·¢ËÍÎÄ¼şÏß³Ì¶ÔÏó
-	@param QStringList fileNames ĞèÒª·¢ËÍµÄÎÄ¼şÃû³ÆÁĞ±í
-	@param QString dest ÎÄ¼ş±£´æÎ»ÖÃ
-	@param std::list<StationInfo * > stations ĞèÒª·¢ËÍµ½µÄ¹¤×÷Õ¾ÁĞ±í
+	åˆ›å»ºå‘é€æ–‡ä»¶çº¿ç¨‹å¯¹è±¡
+	@param QStringList fileNames éœ€è¦å‘é€çš„æ–‡ä»¶åç§°åˆ—è¡¨
+	@param QString dest æ–‡ä»¶ä¿å­˜ä½ç½®
+	@param std::list<StationInfo * > stations éœ€è¦å‘é€åˆ°çš„å·¥ä½œç«™åˆ—è¡¨
 	@param QObject * parent
-	@return ·¢ËÍÎÄ¼şÏß³Ì¶ÔÏó
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/24 9:31:41
+	@return å‘é€æ–‡ä»¶çº¿ç¨‹å¯¹è±¡
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/24 9:31:41
 	*/
 	SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
 		Ice::CommunicatorPtr communicator, QObject *parent = NULL);
 	~SendFileThread();
 	virtual void run() override;
 
-
 private:
 	QStringList fileNames;
 	std::list<StationInfo*> stations;
 	Ice::CommunicatorPtr communicator;
 	QString dest;
+	QString soureDir;
+	//ä¿æŒæ–‡ä»¶å¤¹ç»“æ„
+	bool keepDirStructure = false;
 
-
-	//ÏòÖ¸¶¨¹¤×÷Õ¾·¢ËÍÎÄ¼ş
-	void sendFile(QString &file, StationInfo* s);
-	//Íê³É·¢ËÍ·½·¨
-	void waitComplete(std::list < std::tuple<Ice::AsyncResultPtr, QString&, size_t>>& asyncResults, StationInfo* s, std::vector< Ice::Byte > resultParams);
-
+	//å‘æŒ‡å®šå·¥ä½œç«™å‘é€æ–‡ä»¶å†…å®¹
+	void sendFileContents(const QString &file, StationInfo* s);
+	//å®Œæˆå‘é€æ–¹æ³•
+	void waitComplete(std::list <ResultTuple>& asyncResults, StationInfo* s, std::vector< Ice::Byte > resultParams);
+	//å‘é€æ–‡ä»¶å¤¹ä¸­çš„æ‰€æœ‰æ–‡ä»¶
+	void SendFilesInDir(StationInfo* s, const QString& fileName, QFileInfo &fileInfo);
+	//å‘é€æ–‡ä»¶
+	void sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo);
 
 signals:
-	//ĞÅºÅ
+	//ä¿¡å·
 	/*!
-	ÎŞ·¨·¢ËÍÎÄ¼şÊÂ¼ş£¬µ±ÎÄ¼şÎŞ·¨·¢ËÍÊ±´¥·¢
-	@param StationInfo * station ¹¤×÷Õ¾ĞÅÏ¢
-	@param QString fileName ÎÄ¼şÃû
-	@param QString message ÏûÏ¢
+	æ— æ³•å‘é€æ–‡ä»¶äº‹ä»¶ï¼Œå½“æ–‡ä»¶æ— æ³•å‘é€æ—¶è§¦å‘
+	@param StationInfo * station å·¥ä½œç«™ä¿¡æ¯
+	@param QString fileName æ–‡ä»¶å
+	@param QString message æ¶ˆæ¯
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/25 15:35:19
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/25 15:35:19
 	*/
 	void failToSendFile(StationInfo* station, QString fileName, QString message);
 
 	/*!
-	ÎÄ¼ş´«ËÍÍê±ÏÊÂ¼ş
-	@param StationInfo * station ¹¤×÷Õ¾ĞÅÏ¢
-	@param QString fileName ÎÄ¼şÃû
+	æ–‡ä»¶ä¼ é€å®Œæ¯•äº‹ä»¶
+	@param StationInfo * station å·¥ä½œç«™ä¿¡æ¯
+	@param QString fileName æ–‡ä»¶å
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/25 15:53:37
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/25 15:53:37
 	*/
 	void sendFileCompleted(StationInfo* station, QString fileName);
 	/*!
-	ĞÂÎÄ¼ş´óĞ¡ÊÂ¼ş£¬Í¨ÖªÎÄ¼ş´óĞ¡
-	@param StationInfo * station ¹¤×÷Õ¾
-	@param QString fileName ÎÄ¼şÃû
-	@param size_t size ÎÄ¼ş´óĞ¡
+	æ–°æ–‡ä»¶å¤§å°äº‹ä»¶ï¼Œé€šçŸ¥æ–‡ä»¶å¤§å°
+	@param StationInfo * station å·¥ä½œç«™
+	@param QString fileName æ–‡ä»¶å
+	@param size_t size æ–‡ä»¶å¤§å°
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/25 16:00:41
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/25 16:00:41
 	*/
 	void newFileSize(StationInfo* station, QString fileName, long long size);
 
 	/*!
-	ÎÄ¼şÒÑ·¢ËÍsize×Ö½ÚÄÚÈİ
-	@param StationInfo * station ¹¤×÷Õ¾
-	@param QString fileName ÎÄ¼şÃû
-	@param size_t size ·¢ËÍ´óĞ¡
+	æ–‡ä»¶å·²å‘é€sizeå­—èŠ‚å†…å®¹
+	@param StationInfo * station å·¥ä½œç«™
+	@param QString fileName æ–‡ä»¶å
+	@param size_t size å‘é€å¤§å°
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/25 16:21:28
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/25 16:21:28
 	*/
 	void fileSended(StationInfo* station, QString fileName, long long size);
 };

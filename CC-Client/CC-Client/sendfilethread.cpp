@@ -17,9 +17,10 @@ using namespace std;
 */
 SendFileThread::SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
 	Ice::CommunicatorPtr communicator, QObject *parent)
-	: QThread(parent), stations(stations), fileNames(fileNames), communicator(communicator), dest(dest)
+	: QThread(parent), stations(stations), fileNames(fileNames), 
+	communicator(communicator)
 {
-
+	this->dest = dest.replace("\\", "/");
 }
 
 SendFileThread::~SendFileThread()
@@ -37,40 +38,27 @@ void SendFileThread::run()
 			for (QString& file : fileNames)
 			{
 				QFileInfo fileInfo(file);
-				//通知文件大小
-				emit newFileSize(s, file, fileInfo.size());
+				if (fileInfo.isDir())
+				{
+					soureDir = file.replace("\\", "/");
+					QString srcFilePath = fileInfo.filePath().replace("\\", "/");
+					QString lastSrcPath = srcFilePath.section("/", -1);
+					QString lastDestPath = dest.section("/", -1);
 
-				QString name = fileInfo.fileName();
-				QString destFile = QStringLiteral("%1/%2").arg(dest).arg(name);
-				try
-				{							
-					if (s->fileProxy->createFile(destFile.toStdWString()))
+					if (lastDestPath != lastSrcPath)
 					{
-						sendFile(file, s);
+						if (!dest.endsWith("/"))
+						{
+							dest += "/";
+						}
 
-						//文件发送完毕
-						emit sendFileCompleted(s, file);
-						s->fileProxy->closeFile();
+						dest = QStringLiteral("%1%2").arg(dest).arg(lastSrcPath);
 					}
-					else
-					{
-						//创建文件失败
-						emit failToSendFile(s, file, QStringLiteral("无法发送文件，工作站创建文件失败。"));
-					}
+
+					//如果是文件夹，则保持文件夹结构
+					keepDirStructure = true;					
 				}
-				catch (const CC::FileTransException& exception)
-				{
-					emit failToSendFile(s, file, QStringLiteral("无法发送文件，工作站创建文件失败:%1。")
-						.arg(QString::fromStdWString(exception.Message)));
-				}
-				catch (const Ice::Exception& ex)
-				{
-					emit failToSendFile(s, file, QStringLiteral("无法发送文件，发送文件过程中发生异常:%1。").arg(ex.what()));
-				}
-				catch (...)
-				{
-					emit failToSendFile(s, file, QStringLiteral("无法发送文件，发送文件过程中发生未知异常。"));
-				}
+				SendFilesInDir(s, file, fileInfo);
 			}
 		}
 		else
@@ -81,9 +69,86 @@ void SendFileThread::run()
 	}
 }
 
-void SendFileThread::sendFile(QString &file, StationInfo* s)
+//发送文件夹中的所有文件
+void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName, QFileInfo &fileInfo)
 {
-	//创建文件成功，开始发送文件内容													 .
+	if (fileInfo.isDir())
+	{
+		//如果是目录
+		QDir dir(fileInfo.filePath());
+		QString p = dir.path();
+		QFileInfoList entries = dir.entryInfoList(QDir::Files | QDir::AllDirs |	QDir::NoDotAndDotDot);
+		for (QFileInfo entry : entries)
+		{
+			if (entry.isDir())
+			{
+				//目录
+				SendFilesInDir(s, entry.filePath(), entry);
+			}
+			else
+			{
+				//文件
+				sendFile(s, entry.filePath(), entry);
+			}
+		}
+
+	}
+	else
+	{
+		//文件
+		sendFile(s, fileName, fileInfo);
+	}
+}
+
+//发送文件
+void SendFileThread::sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo)
+{
+	//通知文件大小
+	emit newFileSize(s, file, fileInfo.size());
+
+	QString name = fileInfo.fileName();
+	QString destFile = QStringLiteral("%1/%2").arg(dest).arg(name);
+
+	if (keepDirStructure)
+	{
+		QString srcFilePath = fileInfo.filePath().replace("\\", "/");
+		QString path = srcFilePath.remove(soureDir);
+		destFile = QStringLiteral("%1%2").arg(dest).arg(path);
+	}	
+	try
+	{
+		if (s->fileProxy->createFile(destFile.toStdWString()))
+		{
+			sendFileContents(file, s);
+
+			//文件发送完毕
+			emit sendFileCompleted(s, file);
+			s->fileProxy->closeFile();
+		}
+		else
+		{
+			//创建文件失败
+			emit failToSendFile(s, file, QStringLiteral("无法发送文件，工作站创建文件失败。"));
+		}
+	}
+	catch (const CC::FileTransException& exception)
+	{
+		emit failToSendFile(s, file, QStringLiteral("无法发送文件，工作站创建文件失败:%1。")
+			.arg(QString::fromStdWString(exception.Message)));
+	}
+	catch (const Ice::Exception& ex)
+	{
+		emit failToSendFile(s, file, QStringLiteral("无法发送文件，发送文件过程中发生异常:%1。").arg(ex.what()));
+	}
+	catch (...)
+	{
+		emit failToSendFile(s, file, QStringLiteral("无法发送文件，发送文件过程中发生未知异常。"));
+	}
+}
+
+void SendFileThread::sendFileContents(const QString &file, StationInfo* s)
+{
+	//创建文件成功，开始发送文件内容.													 
 	std::vector< Ice::Byte > inParams, resultParams;
 	size_t position = 0; //文件起始位置
 	int packetLength = 100 * 1024;//10K Bytes
@@ -95,7 +160,7 @@ void SendFileThread::sendFile(QString &file, StationInfo* s)
 #else
 	FILE* fp = fopen(file.toStdString().c_str(), "rb");
 #endif
-	list<tuple<Ice::AsyncResultPtr, QString&, size_t>> asyncResults;
+	list<ResultTuple> asyncResults;
 	if (fp != NULL)
 	{
 		while (!feof(fp))
@@ -112,7 +177,7 @@ void SendFileThread::sendFile(QString &file, StationInfo* s)
 				Ice::Normal, inParams);
 			asyncResult->waitForSent();
 			position += length;
-			tuple<Ice::AsyncResultPtr, QString&, size_t> p(asyncResult, file, position);
+			ResultTuple p(asyncResult, file, position);
 			asyncResults.push_back(p);
 			
 
@@ -136,7 +201,8 @@ void SendFileThread::sendFile(QString &file, StationInfo* s)
 	}
 }
 
-void SendFileThread::waitComplete(list <tuple<Ice::AsyncResultPtr, QString&, size_t>>& asyncResults, StationInfo* s, std::vector< Ice::Byte > resultParams)
+void SendFileThread::waitComplete(list <ResultTuple>& asyncResults, StationInfo* s, 
+	std::vector< Ice::Byte > resultParams)
 {
 	auto ar = asyncResults.front();
 	Ice::AsyncResultPtr r = get<0>(ar);

@@ -53,6 +53,8 @@ private:
 	void on_browserPushButton_clicked();
 	//发送按钮按下
 	void on_sendPushButton_clicked();
+	//选择目标文件夹
+	void on_selectDestPushButton_clicked();
 	
 };
 

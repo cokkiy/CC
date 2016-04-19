@@ -1,6 +1,8 @@
 ﻿#include "editstationdialog.h"
 #include "ui_editstationdialog.h"
 #include <QMessageBox>
+#include "filebrowserdialog.h"
+#include "processdialog.h"
 using namespace std;
 
 EditStationDialog::EditStationDialog(StationInfo* station, EditType editType /*= EditType::Edit*/, QWidget *parent /*= 0*/)
@@ -176,10 +178,42 @@ void EditStationDialog::on_removeMonitorProcPushButton_clicked()
     }
 }
 
-//查看当前运行进程
-void EditStationDialog::on_viewProcPushButton_clicked()
+//为监视进程选择当前运行进程
+void EditStationDialog::on_selectViewProcPushButton_clicked()
 {
+	ProcessDialog dlg(station);
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		ui->procNameLineEdit->setText(dlg.ProcessName());
+	}
+}
+//为添加启动程序选择当前运行进程
+void EditStationDialog::on_selectProcPushButton_clicked()
+{
+	ProcessDialog dlg(station);
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		ui->appProcNameLineEdit->setText(dlg.ProcessName());
+	}
+}
 
+//选择启动程序路径
+void EditStationDialog::on_selecApptPushButton_clicked()
+{
+	FileBrowserDialog dlg(station, false);
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		QString path = dlg.SelectedPath();
+		if (path.endsWith(".sh"))
+		{
+			ui->appNameLineEdit->setText("/bin/sh");
+			ui->argumentLineEdit->setText(path);
+		}
+		else
+		{
+			ui->appNameLineEdit->setText(path);
+		}
+	}
 }
 
 //更新工作站数据

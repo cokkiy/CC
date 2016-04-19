@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "stationbar.h"
 #include "recvfilethread.h"
+#include "filebrowserdialog.h"
 
 RecvFileDialog::RecvFileDialog(StationList* pStations, const QModelIndexList& selectedIndexs,
 	bool allStations, Ice::CommunicatorPtr communicator, QWidget *parent)
@@ -64,6 +65,16 @@ void RecvFileDialog::on_recvPushButton_clicked()
 }
 
 
+//选择远程文件
+void RecvFileDialog::on_selectFilePushButton_clicked()
+{
+	FileBrowserDialog dlg(*stations.begin(), false, ui->destLineEdit->text());
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		ui->srcFileLineEdit->setText(dlg.SelectedPath());
+	}
+}
+
 void RecvFileDialog::on_notifyFileSize(StationInfo* station, long long size)
 {
 	StationBar* bar = station_bar[station];
@@ -119,14 +130,21 @@ void RecvFileDialog::createLayout(StationList* pStations, const QModelIndexList&
 	{
 		for (auto iter = selectedIndexs.begin();iter != selectedIndexs.end();iter++)
 		{
-			StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
 			StationInfo* s = pStations->atCurrent(iter->row());
-			stationBar->setTipText(QStringLiteral("准备接收文件..."));
-			stationBar->setIsOnline(s->IsRunning());
-			stationBar->setStationName(s->Name());
-			verticalLayout->addWidget(stationBar);
-			stations.push_back(s);
-			station_bar[s] = stationBar;
+			auto finded = find_if(stations.begin(), stations.end(), [=](StationInfo* station)
+			{
+				return station == s;
+			});
+			if (finded == stations.end())
+			{
+				StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
+				stationBar->setTipText(QStringLiteral("准备发送文件..."));
+				stationBar->setIsOnline(s->IsRunning());
+				stationBar->setStationName(s->Name());
+				verticalLayout->addWidget(stationBar);
+				stations.push_back(s);
+				station_bar[s] = stationBar;
+			}
 		}
 	}
 

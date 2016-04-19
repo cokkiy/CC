@@ -32,6 +32,9 @@ public:
 	void on_powerOffPushButton_clicked();
 	//重启
 	void on_rebootPushButton_clicked();
+	//查看全部进程信息
+	void on_viewALlPushButton_clicked();
+
 	//屏幕快照
 	void on_screenCapturePushButton_clicked();
 	//工作站状态变化

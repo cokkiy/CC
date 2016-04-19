@@ -58,7 +58,9 @@ SOURCES += main.cpp\
     stationtablemodel.cpp \
     xattribute.cpp \
     xdocument.cpp \
-    xelement.cpp
+    xelement.cpp \
+    processdialog.cpp \
+    filebrowserdialog.cpp
 
 HEADERS  += mainwindow.h \
     selectcomputerdialog.h \
@@ -96,7 +98,9 @@ HEADERS  += mainwindow.h \
     stationtablemodel.h \
     xattribute.h \
     xdocument.h \
-    xelement.h
+    xelement.h \
+    processdialog.h \
+    filebrowserdialog.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -108,7 +112,9 @@ FORMS    += mainwindow.ui \
     setintervaldialog.ui \
     stationdetaildialog.ui \
     sendfiledialog.ui \
-    editstationdialog.ui
+    editstationdialog.ui \
+    processdialog.ui \
+    filebrowserdialog.ui
 
 RESOURCES += \
     cc-client.qrc

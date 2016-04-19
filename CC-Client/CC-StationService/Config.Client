@@ -2,7 +2,7 @@
 # The client reads this property to create the reference to the
 # "StateReceiver" object in the server.
 # Multicast address between 233.0.0.0 to 239.255.255.255
-StateReceiver.Proxy=stateReceiver:udp -h 239.100.1.1 -p 10000 --sourceAddress 192.168.0.233 --interface 192.168.0.233 --ttl 255
+StateReceiver.Proxy=stateReceiver:udp -h 239.100.1.1 -p 10000 --sourceAddress 192.168.0.203 --interface 192.168.0.203 --ttl 255
 
 #
 # The Controller endpoint, cc-client can sent control message 

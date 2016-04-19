@@ -11,6 +11,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Diagnostics;
 
 namespace AppLuncher
 {
@@ -336,6 +337,21 @@ namespace AppLuncher
                     throw new FileTransException("屏幕快照", position, 0, 0, ex.ToString());
                 }
             }
+        }
+
+        public override CC.Version getAppLuncherVersion(Current current__)
+        {
+            CC.Version v = new CC.Version();
+            try
+            {
+                string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                v = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "AppLuncher.exe"));
+            }
+            catch
+            {
+
+            }
+            return v;
         }
     }
 }

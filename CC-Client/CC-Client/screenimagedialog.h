@@ -33,6 +33,17 @@ private:
 	bool errorOccured = false;
 	bool finished = false;
 	QString message;
+
+	StationInfo* station;
+
+protected:
+	void mouseDoubleClickEvent(QMouseEvent * event) override;
+
+	protected slots:
+	//保存快照
+	void on_saveToolButton_clicked();
+	//再次捕获快照
+	void on_captureToolButton_clicked();
 };
 
 #endif // SCREENIMAGEDIALOG_H

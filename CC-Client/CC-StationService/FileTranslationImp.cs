@@ -38,6 +38,16 @@ namespace CC_StationService
             Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
             try
             {
+                string dir = fileName;
+                int pos = fileName.LastIndexOf(Path.DirectorySeparatorChar);
+                if (pos != -1)
+                {
+                    dir = fileName.Substring(0, pos + 1);
+                }
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
                 writeStream = File.Create(fileName);
                 logger.print("成功创建文件:"+fileName);
                 outStream.startEncapsulation();

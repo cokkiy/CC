@@ -312,6 +312,27 @@
     <ClCompile Include="Release\moc_screenimagedialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="filebrowserdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_filebrowserdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_filebrowserdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="processdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_processdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_processdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\Version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.h">
@@ -368,9 +389,6 @@
     <CustomBuild Include="executcounting.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="stationcontrolthread.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="qtdispatcher.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -414,6 +432,18 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="screenimagedialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="filebrowserdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="filebrowserdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="processdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="processdialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -615,6 +645,15 @@
     <ClInclude Include="GeneratedFiles\ui_screenimagedialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_filebrowserdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_processdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <IceBuilder Include="IStationStateReceiver.ice">
@@ -624,6 +663,9 @@
       <Filter>Slice Files</Filter>
     </IceBuilder>
     <IceBuilder Include="AppControlParameter.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="Version.ice">
       <Filter>Slice Files</Filter>
     </IceBuilder>
   </ItemGroup>

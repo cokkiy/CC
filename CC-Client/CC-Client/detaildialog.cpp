@@ -11,6 +11,7 @@
 #include "AppControlParameter.h"
 #include "stationmanager.h"
 #include "screenimagedialog.h"
+#include "processdialog.h"
 using namespace std;
 
 DetailDialog::DetailDialog(StationInfo* station, QWidget *parent)
@@ -39,6 +40,32 @@ DetailDialog::DetailDialog(StationInfo* station, QWidget *parent)
 
 	//总内存大小
 	ui.memorySizeLineEdit->setText(QStringLiteral("%1").arg(station->TotalMemory() / 1024 / 1024));
+
+	//获取版本信息
+	if (station != NULL&&station->controlProxy != NULL)
+	{
+		try
+		{
+			station->controlProxy->begin_getServerVersion(
+				[=](const CC::ServerVersion& serverVersion)
+			{
+				ui.servicesVersionLineEdit->setText(QString::fromStdString(serverVersion.ServicesVersion.ProductVersion));
+				ui.appProxyVersionLineEdit->setText(QString::fromStdString(serverVersion.AppLuncherVersion.ProductVersion));
+			},
+				[=](const Ice::Exception& ex)
+			{
+				ui.servicesVersionLineEdit->setText(ex.what());
+				ui.appProxyVersionLineEdit->setText(ex.what());
+			}
+			);
+		}
+		catch (...)
+		{
+			ui.servicesVersionLineEdit->setText(QStringLiteral("无法获取版本信息。"));
+			ui.appProxyVersionLineEdit->setText(QStringLiteral("无法获取版本信息。"));
+		}
+		
+	}
 
 	//启动定时器
 	startTimer(1000);  // 1 second
@@ -176,6 +203,12 @@ void DetailDialog::on_rebootPushButton_clicked()
 	manager->reboot(station);
 }
 
+void DetailDialog::on_viewALlPushButton_clicked()
+{
+	ProcessDialog dlg(station);
+	dlg.exec();
+}
+
 void DetailDialog::on_screenCapturePushButton_clicked()
 {
 	if (station != NULL&&station->controlProxy != NULL)
@@ -264,7 +297,7 @@ void DetailDialog::resetTableWidget(int columnCount)
 	{
 		for (int coloum = 0; coloum < columnCount; coloum++)
 		{
-			QTableWidgetItem* item = ui.processTableWidget->takeItem(row, 0);
+			QTableWidgetItem* item = ui.processTableWidget->takeItem(row, coloum);
 			if (item != NULL)
 				delete item;
 		}

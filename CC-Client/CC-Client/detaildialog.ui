@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
+    <width>938</width>
     <height>587</height>
    </rect>
   </property>
@@ -187,6 +187,30 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>中控服务版本：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="servicesVersionLineEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>应用程序启动代理版本：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="appProxyVersionLineEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QSplitter" name="splitter">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -265,6 +289,17 @@
            <string>参数</string>
           </property>
          </column>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="viewALlPushButton">
+         <property name="text">
+          <string>查看全部进程信息</string>
+         </property>
+         <property name="icon">
+          <iconset resource="cc-client.qrc">
+           <normaloff>:/Icons/AUDIO.ico</normaloff>:/Icons/AUDIO.ico</iconset>
+         </property>
         </widget>
        </item>
       </layout>

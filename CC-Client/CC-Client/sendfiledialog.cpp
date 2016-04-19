@@ -6,6 +6,7 @@
 #include "stationbar.h"
 #include <QMessageBox>
 #include "sendfilethread.h"
+#include "filebrowserdialog.h"
 
 /*!
 创建发送文件对话框
@@ -35,11 +36,20 @@ SendFileDialog::~SendFileDialog()
 	delete ui;
 }
 
+
 //选择要发送的文件
 void SendFileDialog::on_browserPushButton_clicked()
 {
 	QFileDialog dialog(this);
-	dialog.setFileMode(QFileDialog::ExistingFiles);
+	if (ui->sendDirCheckBox->isChecked())
+	{
+		dialog.setFileMode(QFileDialog::Directory);
+	}
+	else
+	{
+		dialog.setFileMode(QFileDialog::ExistingFiles);
+	}
+	
 	dialog.setViewMode(QFileDialog::Detail);
 	dialog.setDirectory(QDir::home());
 	
@@ -80,6 +90,16 @@ void SendFileDialog::on_sendPushButton_clicked()
 	sendThread->start();
 }
 
+//选择目标文件夹
+void SendFileDialog::on_selectDestPushButton_clicked()
+{
+	FileBrowserDialog dlg(*(stations.begin()), true, ui->destLineEdit->text());
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		ui->destLineEdit->setText(dlg.SelectedPath());
+	}
+}
+
 void SendFileDialog::createLayout(StationList* pStations, const QModelIndexList& selectedIndexs, bool allStations)
 {
 	QVBoxLayout* verticalLayout = new QVBoxLayout(ui->scrollAreaWidgetContents);
@@ -103,14 +123,21 @@ void SendFileDialog::createLayout(StationList* pStations, const QModelIndexList&
 	{
 		for (auto iter = selectedIndexs.begin();iter != selectedIndexs.end();iter++)
 		{
-			StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
 			StationInfo* s = pStations->atCurrent(iter->row());
-			stationBar->setTipText(QStringLiteral("准备发送文件..."));
-			stationBar->setIsOnline(s->IsRunning());
-			stationBar->setStationName(s->Name());
-			verticalLayout->addWidget(stationBar);
-			stations.push_back(s);
-			station_bar[s] = stationBar;
+			auto finded=find_if(stations.begin(), stations.end(), [=](StationInfo* station) 
+			{
+				return station == s;
+			});
+			if (finded == stations.end())
+			{
+				StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
+				stationBar->setTipText(QStringLiteral("准备发送文件..."));
+				stationBar->setIsOnline(s->IsRunning());
+				stationBar->setStationName(s->Name());
+				verticalLayout->addWidget(stationBar);
+				stations.push_back(s);
+				station_bar[s] = stationBar;
+			}
 		}
 	}
 

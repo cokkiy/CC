@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>732</width>
-    <height>465</height>
+    <height>468</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,6 +54,16 @@
         <enum>QPlainTextEdit::NoWrap</enum>
        </property>
        <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="sendDirCheckBox">
+       <property name="text">
+        <string>发送文件夹</string>
+       </property>
+       <property name="checked">
         <bool>true</bool>
        </property>
       </widget>
@@ -108,8 +118,18 @@
      </item>
      <item>
       <widget class="QLineEdit" name="destLineEdit">
+       <property name="text">
+        <string>/home</string>
+       </property>
        <property name="placeholderText">
         <string>输入文件在工作站上的保存位置，不能为空</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="selectDestPushButton">
+       <property name="text">
+        <string>选择文件夹</string>
        </property>
       </widget>
      </item>

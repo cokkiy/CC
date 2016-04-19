@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>870</width>
-    <height>528</height>
+    <width>919</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <iconset resource="cc-client.qrc">
     <normaloff>:/Icons/52design.com_alth_109.png</normaloff>:/Icons/52design.com_alth_109.png</iconset>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_11">
+  <layout class="QHBoxLayout" name="horizontalLayout_8">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_8">
      <item>
@@ -259,7 +259,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_7">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
       <widget class="QGroupBox" name="groupBox_4">
        <property name="title">
@@ -318,6 +318,17 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="selecApptPushButton">
+            <property name="text">
+             <string>选择程序</string>
+            </property>
+            <property name="icon">
+             <iconset resource="cc-client.qrc">
+              <normaloff>:/Icons/search.ico</normaloff>:/Icons/search.ico</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLineEdit" name="argumentLineEdit">
             <property name="toolTip">
              <string>输入程序需要的参数</string>
@@ -327,14 +338,12 @@
             </property>
            </widget>
           </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
            <widget class="QLineEdit" name="appProcNameLineEdit">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
             <property name="toolTip">
              <string>输入对应的进程名称,以便监控其状态</string>
             </property>
@@ -344,7 +353,26 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="selectProcPushButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>选择进程</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="allowMultiInstanceCheckBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="toolTip">
              <string>是否允许运行程序的多个实例</string>
             </property>
@@ -423,11 +451,11 @@
        <property name="title">
         <string>需要监视进程列表(需要准确进程名称)</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
          <widget class="QListWidget" name="monitorListWidget">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -442,6 +470,32 @@
              <string>输入需要监视的进程名称</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="selectViewProcPushButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>选择进程</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>10</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="addMonitorProcPushButton">
@@ -486,19 +540,6 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QPushButton" name="viewProcPushButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>查看进程(&amp;V)</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>
@@ -518,13 +559,11 @@
   <tabstop>startAppTableWidget</tabstop>
   <tabstop>appNameLineEdit</tabstop>
   <tabstop>argumentLineEdit</tabstop>
-  <tabstop>appProcNameLineEdit</tabstop>
   <tabstop>removeStartAppPushButton</tabstop>
   <tabstop>monitorListWidget</tabstop>
   <tabstop>procNameLineEdit</tabstop>
   <tabstop>addMonitorProcPushButton</tabstop>
   <tabstop>removeMonitorProcPushButton</tabstop>
-  <tabstop>viewProcPushButton</tabstop>
   <tabstop>OKPushButton</tabstop>
   <tabstop>CancelPushButton</tabstop>
  </tabstops>

@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CC;
 using Ice;
+using System.IO;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CC_StationService
 {
@@ -193,6 +197,138 @@ namespace CC_StationService
                 PlatformMethodFactory.GetLogger().error("捕获屏幕快照失败：" + ex.ToString());
                 throw new FileTransException("屏幕快照", position, 0, 0, ex.ToString());
             }
+        }
+
+        public override List<CC.FileInfo> getFileInfo(CC.Path path, Current current__)
+        {
+            if(path.Name=="/" && Environment.OSVersion.Platform==PlatformID.Win32NT)
+            {
+                try
+                {
+                    //Windows 返回磁盘列表
+                    string[] drivers = Directory.GetLogicalDrives();
+                    List<CC.FileInfo> infos = new List<CC.FileInfo>();
+                    foreach (var item in drivers)
+                    {
+                        CC.FileInfo info = new CC.FileInfo();
+                        info.Parent = "/";
+                        info.Path = item;
+                        info.isDirectory = true;
+                        info.CreationTime = "";
+                        info.LastModify = "";
+                        infos.Add(info);
+                    }
+                    return infos;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new DirectoryAccessError("/", "访问被拒绝", ex);
+                }
+            }
+
+            if(path.Name=="")
+            {
+                path.Name = "/home";
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    path.Name = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments);
+                }
+            }
+            if (Directory.Exists(path.Name))
+            {
+
+                try
+                {
+                    List<CC.FileInfo> infos = new List<CC.FileInfo>();
+                    DirectoryInfo dir = new DirectoryInfo(path.Name);
+                    var dirs = dir.EnumerateDirectories();
+                    foreach (var item in dirs)
+                    {
+                        CC.FileInfo info = new CC.FileInfo();
+                        info.Parent = path.Name;
+                        info.Path = item.Name;
+                        info.isDirectory = true;
+                        info.CreationTime = item.CreationTime.ToLongDateString();
+                        info.LastModify = item.LastWriteTime.ToLongDateString();
+                        infos.Add(info);
+                    }
+                    var files = dir.EnumerateFiles();
+                    foreach (var item in files)
+                    {
+                        CC.FileInfo info = new CC.FileInfo();
+                        info.Parent = path.Name;
+                        info.Path = item.Name;
+                        info.isDirectory = false;
+                        info.CreationTime = item.CreationTime.ToLongDateString();
+                        info.LastModify = item.LastWriteTime.ToLongDateString();
+                        infos.Add(info);
+                    }
+
+                    return infos;
+                }
+                catch(System.Exception ex)
+                {
+                    throw new DirectoryAccessError(path.Name, ex.Message, ex);
+                }
+            }
+            else
+            {
+                throw new DirectoryAccessError(path.Name, "目录不存在。");
+            }
+        }
+
+        /// <summary>
+        /// 获取当前运行的全部进程信息
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns>当前运行的全部进程信息</returns>
+        public override List<ProcessInfo> getAllProcessInfo(Current current__)
+        {
+            List<ProcessInfo> infos = new List<ProcessInfo>();
+            var processes = System.Diagnostics.Process.GetProcesses();
+            foreach (var p in processes)
+            {
+                try
+                {
+                    if (p.Id != 0)
+                    {
+                        ProcessInfo info = new ProcessInfo();
+                        info.Id = p.Id;
+                        info.Name = p.ProcessName;
+                        info.Time = p.TotalProcessorTime.ToString();
+                        info.MemorySize = p.WorkingSet64;
+                        infos.Add(info);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return infos;
+        }
+
+        /// <summary>
+        /// 获取服务端版本信息，包括服务程序版本和代理版本
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns></returns>
+        public override ServerVersion getServerVersion(Current current__)
+        {
+            CC.Version serviceVersion = new CC.Version();
+            CC.Version appVersion = new CC.Version();
+            try
+            {
+                string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                serviceVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "CC-StationService.exe"));
+                ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+                AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                appVersion = luncherPrx.getAppLuncherVersion();
+            }
+            catch
+            {
+            }
+            return new ServerVersion(serviceVersion, appVersion);
         }
     }
 }

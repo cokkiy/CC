@@ -147,5 +147,8 @@
         <file>Icons/detail.png</file>
         <file>Icons/screencapture.png</file>
         <file>Icons/bk.png</file>
+        <file>Icons/capture.png</file>
+        <file>Icons/dir.png</file>
+        <file>Icons/file.png</file>
     </qresource>
 </RCC>

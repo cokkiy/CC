@@ -294,6 +294,7 @@ void MainWindow::operationMenuToShow()
         {
             ui->actionReboot->setEnabled(true);
             ui->actionPoweroff->setEnabled(true);
+			//屏幕截图
 			ui->actionScreenCapture->setEnabled(true);
             //如果(部分)应用已经启动
             if (station->state() == StationInfo::AppStarted || station->state() == StationInfo::SomeAppNotRunning)
@@ -328,6 +329,10 @@ void MainWindow::operationMenuToShow()
         }
         //编辑按钮禁用
         ui->actionEdit->setEnabled(false);
+		//详细信息菜单禁用
+		ui->actionViewStationDetail->setEnabled(false);
+		//屏幕截图
+		ui->actionScreenCapture->setEnabled(false);
     }
     //新增按钮总是起作用
     ui->actionNewStation->setEnabled(true);
@@ -850,6 +855,10 @@ void MainWindow::on_actionSetDefaultAppAndProc_triggered()
 void MainWindow::on_actionViewStationDetail_triggered()
 {
 	QModelIndexList selectedIndexs = getSelectedIndexs();
+
+	if (selectedIndexs.isEmpty())
+		return;
+
 	auto station = pStationList->atCurrent(selectedIndexs.first().row());
 	if (station != NULL)
 	{
@@ -863,6 +872,9 @@ void MainWindow::on_actionViewStationDetail_triggered()
 void MainWindow::on_actionSendSelection_triggered()
 {
 	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+		return;
+
 	SendFileDialog* dlg = new SendFileDialog(pStationList, selectedIndexs, false, communicator);
 	dlg->exec();
 }
@@ -870,6 +882,8 @@ void MainWindow::on_actionSendSelection_triggered()
 void MainWindow::on_actionReceiveSelection_triggered()
 {
 	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+		return;
 	RecvFileDialog* dlg = new RecvFileDialog(pStationList, selectedIndexs, false, communicator);
 	dlg->exec();
 }
@@ -902,6 +916,8 @@ void MainWindow::on_filterLineEdit_returnPressed()
 void MainWindow::on_actionScreenCapture_triggered()
 {
 	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+		return;
 	auto station = pStationList->atCurrent(selectedIndexs.first().row());
 	if (station != NULL&&station->controlProxy != NULL)
 	{

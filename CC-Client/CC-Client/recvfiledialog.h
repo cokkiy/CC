@@ -31,6 +31,7 @@ public:
 protected slots:
 	void on_browsePushButton_clicked();
 	void on_recvPushButton_clicked();
+	void on_selectFilePushButton_clicked();
 
 	//文件大小处理事件
 	void on_notifyFileSize(StationInfo* station, long long size);
