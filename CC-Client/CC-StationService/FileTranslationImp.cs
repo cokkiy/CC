@@ -172,7 +172,12 @@ namespace CC_StationService
             }
             else
             {
+                string fileName = writeStream.Name;
                 writeStream.Close();
+                if(isExecutable(fileName))
+                {
+                    chmod2Exe(fileName);
+                }
                 logger.print("文件已成功关闭。");
                 outStream.startEncapsulation();
                 outStream.writeBool(true);
@@ -299,6 +304,64 @@ namespace CC_StationService
             outStream.destroy();
 
             return result;
+        }
+
+        /// <summary>
+        /// 检查指定的文件是否是Linux可执行文件
+        /// Linux可执行文件包括：可执行程序，sh脚本和Python脚本等
+        /// </summary>
+        /// <param name="fileName">检查的文件名</param>
+        /// <returns>如果是可执行文件，返回true,否则返回false</returns>
+        private bool isExecutable(string fileName)
+        {
+            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                try
+                {
+                    System.Diagnostics.Process fileProcess = new System.Diagnostics.Process();
+                    fileProcess.StartInfo.FileName = "/usr/bin/file";
+                    fileProcess.StartInfo.UseShellExecute = false;
+                    fileProcess.StartInfo.Arguments = fileName;
+                    fileProcess.StartInfo.RedirectStandardOutput = true;
+                    fileProcess.Start();
+                    string output = fileProcess.StandardOutput.ReadToEnd();
+                    fileProcess.WaitForExit();
+                    if (output.Contains("ELF 64-bit LSB executable")
+                        || output.Contains("ELF 32-bit LSB executable")
+                        || output.Contains("PE32 executable")
+                        || output.Contains("PE32+ executable")
+                        || output.Contains("shell script")
+                        || output.Contains("python script")
+                        || output.Contains("Python script"))
+                        return true;
+                }
+                catch(System.Exception ex)
+                {
+                    Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                    logger.error(string.Format("isExecutable Error. fileName:{0} {1}", fileName, ex.ToString()));
+                }
+            }
+            return false;
+        }
+
+        //设置文件为可执行模式
+        private void chmod2Exe(string fileName)
+        {
+            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                try {
+                    System.Diagnostics.Process chmodProcess = new System.Diagnostics.Process();
+                    chmodProcess.StartInfo.FileName = "chmod";
+                    chmodProcess.StartInfo.UseShellExecute = true;
+                    chmodProcess.StartInfo.Arguments = "777 " + fileName;
+                    chmodProcess.Start();
+                }
+                catch(System.Exception ex)
+                {
+                    Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                    logger.error(string.Format("chmod2Exe Error. fileName:{0} {1}", fileName, ex.ToString()));
+                }
+            }
         }
     }
 }
