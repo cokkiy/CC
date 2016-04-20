@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1021</width>
     <height>768</height>
    </rect>
   </property>
@@ -378,7 +378,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
+     <width>1021</width>
      <height>23</height>
     </rect>
    </property>
@@ -408,6 +408,8 @@
     <addaction name="actionStartApp"/>
     <addaction name="actionRestartApp"/>
     <addaction name="actionExitApp"/>
+    <addaction name="separator"/>
+    <addaction name="actionBatchScreenCapture"/>
     <addaction name="separator"/>
     <addaction name="actionScreenCapture"/>
     <addaction name="actionViewStationDetail"/>
@@ -1004,6 +1006,15 @@
    </property>
    <property name="statusTip">
     <string>捕获选定工作站屏幕快照</string>
+   </property>
+  </action>
+  <action name="actionBatchScreenCapture">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/capture.png</normaloff>:/Icons/capture.png</iconset>
+   </property>
+   <property name="text">
+    <string>批量截图</string>
    </property>
   </action>
  </widget>

@@ -31,6 +31,7 @@
 #include "recvfiledialog.h"
 #include "detaildialog.h"
 #include "screenimagedialog.h"
+#include "batchcapturedialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -925,6 +926,15 @@ void MainWindow::on_actionScreenCapture_triggered()
 		dlg.exec();
 	}
 }
+//批量屏幕快照
+void MainWindow::on_actionBatchScreenCapture_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+		return;
+	BatchCaptureDialog dlg(pStationList, selectedIndexs, this);
+	dlg.exec();
+}
 
 //添加按钮到右键菜单
 void MainWindow::addButtons(FloatingMenu* menu)
@@ -935,7 +945,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
     if (!selectedJustOne(selectedIndexs))
     {
 		//扩大menu大小
-		menu->setSize(200);
+		menu->setSize(220);
         //选择了多个
         menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
         //menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
@@ -945,6 +955,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
         menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("关闭程序"), manager, SLOT(exitApp()));
         menu->addButton(":/Icons/receiveFile.png", QStringLiteral("接收文件"), this, SLOT(on_actionReceiveSelection_triggered()));
 		menu->addButton(":/Icons/sendFile.png", QStringLiteral("发送文件"), this, SLOT(on_actionSendSelection_triggered()));
+		menu->addButton(":/Icons/capture.png", QStringLiteral("批量截屏"), this, SLOT(on_actionBatchScreenCapture_triggered()));
     }
     else
     {

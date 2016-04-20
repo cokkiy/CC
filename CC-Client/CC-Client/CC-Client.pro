@@ -17,6 +17,10 @@ QMAKE_CXXFLAGS += -std=c++11
 # Ice lib and qwt lib
 unix:LIBS += -L/opt/Ice-3.6.1/lib64/c++11/ -lIce
 
+VER_MAJ=1
+VER_MIN=0
+VER_PAT=4366
+
 #如果是中标麒麟，则定义Neolnux，版本太低，需要特殊处理
 DEFINES += NeoLinux
 
@@ -60,7 +64,9 @@ SOURCES += main.cpp\
     xdocument.cpp \
     xelement.cpp \
     processdialog.cpp \
-    filebrowserdialog.cpp
+    filebrowserdialog.cpp \
+    batchcapturedialog.cpp \
+    batchcaputrethread.cpp
 
 HEADERS  += mainwindow.h \
     selectcomputerdialog.h \
@@ -100,7 +106,9 @@ HEADERS  += mainwindow.h \
     xdocument.h \
     xelement.h \
     processdialog.h \
-    filebrowserdialog.h
+    filebrowserdialog.h \
+    batchcapturedialog.h \
+    batchcaputrethread.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -114,7 +122,8 @@ FORMS    += mainwindow.ui \
     sendfiledialog.ui \
     editstationdialog.ui \
     processdialog.ui \
-    filebrowserdialog.ui
+    filebrowserdialog.ui \
+    batchcapturedialog.ui
 
 RESOURCES += \
     cc-client.qrc

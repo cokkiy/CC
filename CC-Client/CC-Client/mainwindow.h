@@ -123,6 +123,8 @@ public:
 	void on_filterLineEdit_returnPressed();
 	//屏幕快照
 	void on_actionScreenCapture_triggered();
+	//批量屏幕快照
+	void on_actionBatchScreenCapture_triggered();
 
 private:
     Ui::MainWindow *ui;
