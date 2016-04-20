@@ -18,7 +18,7 @@ QMAKE_CXXFLAGS += -std=c++11
 unix:LIBS += -L/opt/Ice-3.6.1/lib64/c++11/ -lIce
 
 VER_MAJ=1
-VER_MIN=0
+VER_MIN=1
 VER_PAT=4366
 
 #如果是中标麒麟，则定义Neolnux，版本太低，需要特殊处理
@@ -66,7 +66,8 @@ SOURCES += main.cpp\
     processdialog.cpp \
     filebrowserdialog.cpp \
     batchcapturedialog.cpp \
-    batchcaputrethread.cpp
+    batchcaputrethread.cpp \
+    aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
     selectcomputerdialog.h \
@@ -108,7 +109,8 @@ HEADERS  += mainwindow.h \
     processdialog.h \
     filebrowserdialog.h \
     batchcapturedialog.h \
-    batchcaputrethread.h
+    batchcaputrethread.h \
+    aboutdialog.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -123,7 +125,8 @@ FORMS    += mainwindow.ui \
     editstationdialog.ui \
     processdialog.ui \
     filebrowserdialog.ui \
-    batchcapturedialog.ui
+    batchcapturedialog.ui \
+    aboutdialog.ui
 
 RESOURCES += \
     cc-client.qrc

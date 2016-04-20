@@ -32,6 +32,7 @@
 #include "detaildialog.h"
 #include "screenimagedialog.h"
 #include "batchcapturedialog.h"
+#include "aboutdialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -933,6 +934,13 @@ void MainWindow::on_actionBatchScreenCapture_triggered()
 	if (selectedIndexs.isEmpty())
 		return;
 	BatchCaptureDialog dlg(pStationList, selectedIndexs, this);
+	dlg.exec();
+}
+
+//显示关于对话框
+void MainWindow::on_actionAbout_triggered()
+{
+	AboutDialog dlg;
 	dlg.exec();
 }
 

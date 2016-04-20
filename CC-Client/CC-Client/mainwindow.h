@@ -126,6 +126,9 @@ public:
 	//批量屏幕快照
 	void on_actionBatchScreenCapture_triggered();
 
+	//显示关于对话框
+	void on_actionAbout_triggered();
+
 private:
     Ui::MainWindow *ui;
 
