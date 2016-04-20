@@ -18,6 +18,8 @@ AboutDialog::AboutDialog(QWidget *parent)
 		QString info = file.readAll();
 		//info.replace("\r", "<p\>");
 		ui->infoTextBrowser->setText(info);
+
+		file.close();
 	}
 }
 
