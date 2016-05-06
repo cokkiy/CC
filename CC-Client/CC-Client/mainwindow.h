@@ -137,6 +137,10 @@ public:
 	void on_prevPagePushButton_clicked();
 	//下一页
 	void on_nextPushButton_clicked();
+	//获取画面
+	void on_fetchPagePushButton_clicked();
+	//推送画面
+	void on_pushPagePushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

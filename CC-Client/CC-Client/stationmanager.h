@@ -213,6 +213,13 @@ public:
 	创建时间:2016/5/6 8:39:36
 	*/
 	void nextPage();
+	/*!
+	获取当前页面
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/6 11:02:53
+	*/
+	void fetchPage();
 private:
 	//监视间隔（秒）
 	int interval;
@@ -238,6 +245,7 @@ private:
 	QByteArray MAC2Byte(QString mac);
 	// 发送开机指令包
 	void sendPowerOnPacket(StationInfo* s);
+	
 };
 
 #endif // STATIONMANAGER_H

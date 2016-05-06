@@ -988,6 +988,25 @@ void MainWindow::on_nextPushButton_clicked()
 	StationManager* manager = new StationManager(pStationList, selectedIndexs);
 	manager->nextPage();
 }
+//获取画面
+void MainWindow::on_fetchPagePushButton_clicked()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedJustOne(selectedIndexs))
+	{
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->fetchPage();
+	}
+	else
+	{
+		QMessageBox::warning(this, QStringLiteral("错误"), QStringLiteral("必须选择一个工作站获取画面。"));
+	}
+}
+//推送画面
+void MainWindow::on_pushPagePushButton_clicked()
+{
+
+}
 
 //添加按钮到右键菜单
 void MainWindow::addButtons(FloatingMenu* menu)

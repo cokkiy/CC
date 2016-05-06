@@ -488,6 +488,7 @@
     <CustomBuild Include="aboutdialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="version.txt" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.ui">

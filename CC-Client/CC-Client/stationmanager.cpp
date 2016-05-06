@@ -102,6 +102,21 @@ void StationManager::sendPowerOnPacket(StationInfo* s)
 	}
 }
 
+void StationManager::fetchPage()
+{
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				
+			}
+		}
+	}
+}
+
 void StationManager::clearPage()
 {
 	for (auto index : stationIndexs)
