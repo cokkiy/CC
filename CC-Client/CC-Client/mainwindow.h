@@ -125,9 +125,18 @@ public:
 	void on_actionScreenCapture_triggered();
 	//批量屏幕快照
 	void on_actionBatchScreenCapture_triggered();
-
 	//显示关于对话框
 	void on_actionAbout_triggered();
+	//清屏
+	void on_clearPagePushButton_clicked();
+	//全屏
+	void on_fullDcreenPushButton_clicked();
+	//实时模式
+	void on_realtimePushButton_clicked();
+	//前一页
+	void on_prevPagePushButton_clicked();
+	//下一页
+	void on_nextPushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

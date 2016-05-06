@@ -59,6 +59,16 @@ module CC
 	}; 
 	["clr:generic:List"]
 	sequence<ProcessInfo> ProcessInfos;
+
+	//指显软件显示控制命令
+	enum DisplayCommand
+	{
+		FullScreen,
+		RealtimeMode,
+		ClearPage,
+		NextPage,
+		PrevPage,	
+	};
 	
 
 	///控制接口,定义了对工作站的控制工作
@@ -99,6 +109,9 @@ module CC
 
 		///获取服务器版本
 		ServerVersion getServerVersion();
+
+		//切换指显显示模式
+		void switchDisplayPageAndMode(DisplayCommand cmd);
 	};
 	
 

@@ -5,6 +5,8 @@ using Ice;
 using System.IO;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Net.Sockets;
+using System.Net;
 
 namespace CC_StationService
 {
@@ -329,6 +331,27 @@ namespace CC_StationService
             {
             }
             return new ServerVersion(serviceVersion, appVersion);
+        }
+
+        /// <summary>
+        /// 切换指显软件显示模式和页面切换
+        /// </summary>
+        /// <param name="cmd">显示命令</param>
+        /// <param name="current__"></param>
+        public override void switchDisplayPageAndMode(DisplayCommand cmd, Current current__)
+        {
+            UdpClient client = new UdpClient(AddressFamily.InterNetwork);
+            System.Net.IPEndPoint receiver = new System.Net.IPEndPoint(IPAddress.Loopback, 9008);
+            byte[] cmdData = new byte[512];        
+            Array.Copy(BitConverter.GetBytes((int)cmd), cmdData, sizeof(int));
+            try
+            {
+                client.Send(cmdData, 512, receiver);
+            }
+            catch(System.Exception ex)
+            {
+                PlatformMethodFactory.GetLogger().error(string.Format("发送指显控制命令失败，命令{0},错误详细内容：{1}", cmd, ex.ToString()));
+            }
         }
     }
 }

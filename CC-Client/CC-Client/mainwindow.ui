@@ -298,6 +298,124 @@
              </attribute>
             </widget>
            </item>
+           <item>
+            <widget class="QFrame" name="">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="clearPagePushButton">
+                <property name="toolTip">
+                 <string>清除选定工作站指显画面</string>
+                </property>
+                <property name="statusTip">
+                 <string>清除选定工作站指显画面（Ctrl+Shift+C）</string>
+                </property>
+                <property name="whatsThis">
+                 <string>清除选定工作站指显画面</string>
+                </property>
+                <property name="text">
+                 <string>清屏(&amp;C)</string>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+Shift+C</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="fullDcreenPushButton">
+                <property name="toolTip">
+                 <string>选定工作站指显画面全屏显示</string>
+                </property>
+                <property name="statusTip">
+                 <string>选定工作站指显画面全屏显示（Ctrl+Return）</string>
+                </property>
+                <property name="text">
+                 <string>全屏(&amp;F)</string>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+Return</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="realtimePushButton">
+                <property name="toolTip">
+                 <string>选定工作站切换到实时模式</string>
+                </property>
+                <property name="statusTip">
+                 <string>选定工作站切换到实时模式（Ctrl+R）</string>
+                </property>
+                <property name="text">
+                 <string>实时模式</string>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+R</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="prevPagePushButton">
+                <property name="toolTip">
+                 <string>选定工作站切换到上一页</string>
+                </property>
+                <property name="statusTip">
+                 <string>选定工作站切换到上一页（Ctrl+Shift+P）</string>
+                </property>
+                <property name="text">
+                 <string>上一页</string>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+Shift+P</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="nextPushButton">
+                <property name="toolTip">
+                 <string>选定工作站切换到下一页</string>
+                </property>
+                <property name="statusTip">
+                 <string>选定工作站切换到下一页（Ctrl+Shift+N）</string>
+                </property>
+                <property name="text">
+                 <string>下一页</string>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+Shift+N</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>

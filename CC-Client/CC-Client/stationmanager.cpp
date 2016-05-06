@@ -102,6 +102,106 @@ void StationManager::sendPowerOnPacket(StationInfo* s)
 	}
 }
 
+void StationManager::clearPage()
+{
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				s->controlProxy->begin_switchDisplayPageAndMode(ClearPage, 
+					[]() {},
+					[](const Ice::Exception& ex)
+				{
+
+				});
+			}
+		}
+	}
+}
+
+void StationManager::fullScreen()
+{
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				s->controlProxy->begin_switchDisplayPageAndMode(FullScreen,
+					[]() {},
+					[](const Ice::Exception& ex)
+				{
+
+				});
+			}
+		}
+	}
+}
+
+void StationManager::realTime()
+{
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				s->controlProxy->begin_switchDisplayPageAndMode(RealtimeMode,
+					[]() {},
+					[](const Ice::Exception& ex)
+				{
+
+				});
+			}
+		}
+	}
+}
+
+void StationManager::prevPage()
+{
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				s->controlProxy->begin_switchDisplayPageAndMode(PrevPage,
+					[]() {},
+					[](const Ice::Exception& ex)
+				{
+
+				});
+			}
+		}
+	}
+}
+
+void StationManager::nextPage()
+{
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				s->controlProxy->begin_switchDisplayPageAndMode(NextPage,
+					[]() {},
+					[](const Ice::Exception& ex)
+				{
+
+				});
+			}
+		}
+	}
+}
+
 /*!
 重启选择的计算机
 @return void

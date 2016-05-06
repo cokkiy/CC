@@ -178,6 +178,41 @@ public:
 	创建时间:2016/4/5 15:53:55
 	*/
 	void setInterval(StationInfo* s, int second);
+	/*!
+	选定工作站清屏
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/6 8:38:22
+	*/
+	void clearPage();
+	/*!
+	选定工作站全屏
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/6 8:38:39
+	*/
+	void fullScreen();
+	/*!
+	选定工作站切换到实时模式
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/6 8:39:05
+	*/
+	void realTime();
+	/*!
+	选定工作站切换到前一页
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/6 8:39:20
+	*/
+	void prevPage();
+	/*!
+	选定工作站切换到下一页
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/6 8:39:36
+	*/
+	void nextPage();
 private:
 	//监视间隔（秒）
 	int interval;

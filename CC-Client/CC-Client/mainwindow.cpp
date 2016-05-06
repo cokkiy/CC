@@ -944,6 +944,51 @@ void MainWindow::on_actionAbout_triggered()
 	dlg.exec();
 }
 
+//清屏
+void MainWindow::on_clearPagePushButton_clicked()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->clearPage();
+}
+
+//全屏
+void MainWindow::on_fullDcreenPushButton_clicked()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->fullScreen();
+}
+
+//实时模式
+void MainWindow::on_realtimePushButton_clicked()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->realTime();
+}
+
+//前一页
+void MainWindow::on_prevPagePushButton_clicked()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->prevPage();
+}
+
+//下一页
+void MainWindow::on_nextPushButton_clicked()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	//创建工作站管理类
+	StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	manager->nextPage();
+}
+
 //添加按钮到右键菜单
 void MainWindow::addButtons(FloatingMenu* menu)
 {

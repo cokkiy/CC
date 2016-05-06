@@ -19,7 +19,7 @@ unix:LIBS += -L/opt/Ice-3.6.1/lib64/c++11/ -lIce
 
 VER_MAJ=1
 VER_MIN=1
-VER_PAT=4366
+VER_PAT=4367
 
 #如果是中标麒麟，则定义Neolnux，版本太低，需要特殊处理
 DEFINES += NeoLinux
