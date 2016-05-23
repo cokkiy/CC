@@ -21,5 +21,8 @@ module AppController
 
 		///获取应用程序启动代理版本
 		CC::Version getAppLuncherVersion();
+
+		///获取应用程序启动代理程序绝对路径
+		string getAppLuncherPath();
 	};
 };

@@ -2,6 +2,8 @@
 #include "StationList.h"
 #include "IController.h"
 #include "option.h"
+#include "updatemanager.h"
+using namespace std;
 
 
 /*!
@@ -11,10 +13,11 @@
 作者：cokkiy（张立民)
 创建时间：2015/11/23 21:16:50
 */
-StationStateReceiver::StationStateReceiver(StationList* pStations, bool autoRefreshStationList)
+StationStateReceiver::StationStateReceiver(UpdateManager* updateManager, StationList* pStations, bool autoRefreshStationList)
 {
     this->pStations = pStations;
     this->autoRefreshStationList = autoRefreshStationList;
+	this->updateManager = updateManager;
 }
 
 
@@ -51,6 +54,25 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
             pStation->setMemory(stationRunningState.currentMemory);
             pStation->setProcCount(stationRunningState.procCount);
             pStation->setLastTick();
+
+			if (!pStation->VersionGetted)
+			{
+				//获取版本信息
+				controlPrx->begin_getServerVersion(
+					[this, pStation](const CC::ServerVersion& serverVersion)
+				{
+					if (serverVersion.AppLuncherVersion.Major != 0)
+					{
+						updateManager->addStationVersion(pStation, serverVersion);
+						pStation->VersionGetted = true;
+					}
+					
+				},
+					[](const Ice::Exception& ex)
+				{
+
+				});
+			}
         }
         else
         {
@@ -77,7 +99,7 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
             },
 				[](const Ice::Exception& ex)
 			{
-			});
+			});			
         }
     }
 }

@@ -24,7 +24,6 @@ private:
 	Ice::CommunicatorPtr communicator;
 	std::list<StationInfo*> stations;
 
-
 	//获取数据
 	void getData(StationInfo* s, size_t position, FILE* pf);
 

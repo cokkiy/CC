@@ -13,9 +13,10 @@ TEMPLATE = app
 
 #c++ 11 supports
 QMAKE_CXXFLAGS += -std=c++11
+#QMAKE_CXXFLAGS += -std=c++14
 
-# Ice lib and qwt lib
-unix:LIBS += -L/opt/Ice-3.6.1/lib64/c++11/ -lIce
+# Ice lib
+unix:LIBS += -L/opt/Ice-3.6.1/lib64/c++11 -lIce -lIceUtil
 
 VER_MAJ=1
 VER_MIN=1
@@ -67,7 +68,8 @@ SOURCES += main.cpp\
     filebrowserdialog.cpp \
     batchcapturedialog.cpp \
     batchcaputrethread.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    updatemanager.cpp
 
 HEADERS  += mainwindow.h \
     selectcomputerdialog.h \
@@ -110,7 +112,8 @@ HEADERS  += mainwindow.h \
     filebrowserdialog.h \
     batchcapturedialog.h \
     batchcaputrethread.h \
-    aboutdialog.h
+    aboutdialog.h \
+    updatemanager.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \

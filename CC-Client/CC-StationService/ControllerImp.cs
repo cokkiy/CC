@@ -353,5 +353,60 @@ namespace CC_StationService
                 PlatformMethodFactory.GetLogger().error(string.Format("发送指显控制命令失败，命令{0},错误详细内容：{1}", cmd, ex.ToString()));
             }
         }
+
+        /// <summary>
+        /// 获取中控服务程序所在绝对路径
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns></returns>
+        public override string getServicePath(Current current__)
+        {
+            string path = System.AppDomain.CurrentDomain.BaseDirectory;
+            return System.IO.Path.Combine(path, "CC-StationService.exe");
+        }
+
+        /// <summary>
+        /// 获取应用程序启动代理程序所在绝对路径
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns></returns>
+        public override string getLuncherProxyPath(Current current__)
+        {
+            ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+            try
+            {
+                AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                return luncherPrx.getAppLuncherPath();
+            }
+            catch(System.Exception ex)
+            {
+                PlatformMethodFactory.GetLogger().error(string.Format("获取应用程序代理绝对路径失败,发生错误：{0}", ex.ToString()));
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 对指定的文件进行改名
+        /// </summary>
+        /// <param name="oldName">原文件名称</param>
+        /// <param name="newName">新文件名</param>
+        /// <param name="current__"></param>
+        /// <returns>改名操作是否成功</returns>
+        public override bool renameFile(string oldName, string newName, Current current__)
+        {
+            if (File.Exists(oldName))
+            {
+                try
+                {
+                    File.Move(oldName, newName);
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    PlatformMethodFactory.GetLogger().error(string.Format("文件改名操作失败,发生错误：{0}", ex.ToString()));
+                }
+            }
+            return false;
+        }
     }
 }

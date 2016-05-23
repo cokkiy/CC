@@ -20,6 +20,8 @@
 #include "cpuplot/plotpart.h"
 #include "cpuplot/counterpiemarker.h"
 
+class UpdateManager;
+
 //性能计数器最多个数
 #define  MaxCountOfCounter 20
 
@@ -141,6 +143,9 @@ public:
 	void on_fetchPagePushButton_clicked();
 	//推送画面
 	void on_pushPagePushButton_clicked();
+	
+	//升级工作站
+	void on_actionUpdateStation_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -178,6 +183,10 @@ private:
     Ice::CommunicatorPtr communicator;
     // Adapter for communicator 
     Ice::ObjectAdapterPtr adapter;
+
+	//更新管理器
+	UpdateManager* updateManager = NULL;
+
     //ICE框架初始化是否成功
     bool iceInitSuccess = false;
     //工作站信息接收指针
@@ -194,6 +203,7 @@ private:
 
     //当前选择的工作站
     StationInfo* currentStation = nullptr;
+
     //CPU,内存记录时间数据
     double timeData[CounterHistoryDataSize];
 private slots:
@@ -221,6 +231,8 @@ private slots:
     void stationChanged(const QObject*);
     //当前选择的工作站发生变化
     void currentStationChanged(const QModelIndex &);
+	//更新状态发生变化
+	void on_UpdatingProgressReported(int percent, QString message);
 private:
     //添加按钮到右键菜单
     void addButtons(FloatingMenu* menu);

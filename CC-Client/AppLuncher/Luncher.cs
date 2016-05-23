@@ -339,6 +339,11 @@ namespace AppLuncher
             }
         }
 
+        /// <summary>
+        /// 获取应用程序代理版本
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns></returns>
         public override CC.Version getAppLuncherVersion(Current current__)
         {
             CC.Version v = new CC.Version();
@@ -352,6 +357,17 @@ namespace AppLuncher
 
             }
             return v;
+        }
+
+        /// <summary>
+        /// 获取应用程序代理程序绝对路径
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns>应用程序代理程序绝对路径</returns>
+        public override string getAppLuncherPath(Current current__)
+        {
+            string path = System.AppDomain.CurrentDomain.BaseDirectory;
+            return Path.Combine(path, "AppLuncher.exe");
         }
     }
 }

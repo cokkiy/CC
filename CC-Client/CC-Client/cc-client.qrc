@@ -150,5 +150,7 @@
         <file>Icons/capture.png</file>
         <file>Icons/dir.png</file>
         <file>Icons/file.png</file>
+        <file>Icons/ncom003-up.png</file>
+        <file>Icons/ncom008-up.png</file>
     </qresource>
 </RCC>

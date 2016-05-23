@@ -33,6 +33,7 @@
 #include "screenimagedialog.h"
 #include "batchcapturedialog.h"
 #include "aboutdialog.h"
+#include "updatemanager.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -232,7 +233,9 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
     monitor->start(QThread::NormalPriority);
     if (iceInitSuccess)
     {
-        StationStateReceiverPtr = new StationStateReceiver(pStations);
+		updateManager = new UpdateManager(communicator, this);
+		connect(updateManager, &UpdateManager::UpdatingProgressReport, this, &MainWindow::on_UpdatingProgressReported);
+		StationStateReceiverPtr = new StationStateReceiver(updateManager, pStations);
         adapter->add(StationStateReceiverPtr, communicator->stringToIdentity("stateReceiver"));
         adapter->activate();
     }
@@ -540,6 +543,15 @@ void MainWindow::currentStationChanged(const QModelIndex & current)
 
 	ui->qwtPlotCPU->updateLayout();
 	ui->qwtPlotMemory->updateLayout();
+}
+
+//工作站更新状态发生变化
+void MainWindow::on_UpdatingProgressReported(int percent, QString message)
+{
+	QString text = QStringLiteral("已完成%1\%，%2").arg(percent).arg(message);
+	QListWidgetItem* item = new QListWidgetItem(text);
+	ui->msgListWidget->addItem(item);
+	ui->msgListWidget->setCurrentItem(ui->msgListWidget->item(ui->msgListWidget->count() - 1));
 }
 
 /*!
@@ -1006,6 +1018,20 @@ void MainWindow::on_fetchPagePushButton_clicked()
 void MainWindow::on_pushPagePushButton_clicked()
 {
 
+}
+
+//升级工作站
+void MainWindow::on_actionUpdateStation_triggered()
+{
+	if (QMessageBox::question(this, QStringLiteral("确认升级"),
+		QStringLiteral("升级结束后将会自动重启被升级的系统，确认升级吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		if (updateManager != NULL)
+		{
+			updateManager->start();
+		}
+	}
 }
 
 //添加按钮到右键菜单

@@ -542,6 +542,7 @@
     <addaction name="actionExitAllZXApp"/>
     <addaction name="actionAll_Shutdown"/>
     <addaction name="separator"/>
+    <addaction name="actionUpdateStation"/>
     <addaction name="actionAbout"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -1169,6 +1170,14 @@
   <action name="actionAbout">
    <property name="text">
     <string>关于...</string>
+   </property>
+  </action>
+  <action name="actionUpdateStation">
+   <property name="text">
+    <string>升级工作站</string>
+   </property>
+   <property name="statusTip">
+    <string>升级工作站中控服务和应用代理</string>
    </property>
   </action>
  </widget>

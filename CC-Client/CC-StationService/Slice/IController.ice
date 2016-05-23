@@ -112,6 +112,13 @@ module CC
 
 		//切换指显显示模式
 		void switchDisplayPageAndMode(DisplayCommand cmd);
+
+		//获取中控服务安装绝对路径
+		string getServicePath();
+		//获取应用代理安装绝对路径
+		string getLuncherProxyPath();
+		//重命名文件
+		bool renameFile(string oldName,string newName);
 	};
 	
 

@@ -239,3 +239,4 @@ qttools.pro.user.*
 **/Icons
 *.amplxeproj
 *.d
+*.opendb

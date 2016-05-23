@@ -9,6 +9,23 @@ bool StationInfo::IsRunning()
 }
 
 
+bool StationInfo::NeedUpdate()
+{
+	return m_NeedUpdate;
+}
+
+void StationInfo::setNeedUpdate(bool value)
+{
+	if (m_NeedUpdate != value)
+	{
+		m_NeedUpdate = value;		
+		if (m_NeedUpdate)
+			m_state.setAttachMessage(QStringLiteral("需要升级"));
+		emit propertyChanged("NeedUpdate", this);
+		emit stateChanged(this); //通知激发状态变化通知
+	}
+}
+
 QString StationInfo::Name()
 {
     return m_Name;
@@ -140,7 +157,15 @@ void StationInfo::setState(OperatingStatus status, const QString& message)
 {
 	if (m_state != status)
 	{
-		m_state.setStatus(status, message);
+		if (message == QStringLiteral("") && m_NeedUpdate)
+		{
+			m_state.setStatus(status, QStringLiteral("需要升级"));
+		}
+		else
+		{
+			m_state.setStatus(status, message);
+		}
+		
 		if (m_state == Error)
 		{
 			lastTick = time(NULL);

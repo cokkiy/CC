@@ -204,10 +204,24 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
             icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
             break;
         case StationInfo::Normal:
-            icon.addFile(QStringLiteral(":/Icons/ncom003.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
+			if (pStations->atCurrent(index.row())->NeedUpdate())
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom003-up.png"), QSize(64, 64), QIcon::Normal, QIcon::On);
+			}
+			else
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom003.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
+			}
             break;
         case  StationInfo::Warning:
-            icon.addFile(QStringLiteral(":/Icons/ncom008.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
+			if (pStations->atCurrent(index.row())->NeedUpdate())
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom008-up.png"), QSize(64, 64), QIcon::Normal, QIcon::On);
+			}
+			else
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom008.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
+			}
             break;
         case  StationInfo::Error:
             icon.addFile(QStringLiteral(":/Icons/ncom006.ico"), QSize(64, 64), QIcon::Normal, QIcon::On);
@@ -235,16 +249,30 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
         switch (pStations->atCurrent(index.row())->state().getRunningState())
         {
         case StationInfo::Unknown:
-            icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(128, 128), QIcon::Normal, QIcon::On);
+            icon.addFile(QStringLiteral(":/Icons/ncom002.ico"), QSize(48, 48), QIcon::Normal, QIcon::On);
             break;
         case StationInfo::Normal:
-            icon.addFile(QStringLiteral(":/Icons/ncom003.ico"), QSize(128, 128), QIcon::Normal, QIcon::On);
+			if (pStations->atCurrent(index.row())->NeedUpdate())
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom003-up.png"), QSize(48, 48), QIcon::Normal, QIcon::On);
+			}
+			else
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom003.ico"), QSize(48, 48), QIcon::Normal, QIcon::On);
+			}
             break;
         case  StationInfo::Warning:
-            icon.addFile(QStringLiteral(":/Icons/ncom008.ico"), QSize(128, 128), QIcon::Normal, QIcon::On);
+			if (pStations->atCurrent(index.row())->NeedUpdate())
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom008-up.png"), QSize(48, 48), QIcon::Normal, QIcon::On);
+			}
+			else
+			{
+				icon.addFile(QStringLiteral(":/Icons/ncom008.ico"), QSize(48, 48), QIcon::Normal, QIcon::On);
+			}
             break;
         case  StationInfo::Error:
-            icon.addFile(QStringLiteral(":/Icons/ncom006.ico"), QSize(128, 128), QIcon::Normal, QIcon::On);
+            icon.addFile(QStringLiteral(":/Icons/ncom006.ico"), QSize(48, 48), QIcon::Normal, QIcon::On);
             break;
         }
         switch (pStations->atCurrent(index.row())->state().getOperatingStatus())

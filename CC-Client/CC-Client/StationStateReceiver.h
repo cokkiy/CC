@@ -2,6 +2,7 @@
 #include "IStationStateReceiver.h"
 #include <Ice/Ice.h>
 #include "StationList.h"
+class UpdateManager;
 //////////////////////////////////////////////////////////////////////////
 //
 // \class StationStateReceiver 实现工作站状态接收接口\see CC::IStationStateReceiver
@@ -15,19 +16,22 @@ private:
     StationList* pStations;
     //是否自动更新工作站列表
     bool autoRefreshStationList;
+	//更新管理器
+	UpdateManager* updateManager;
 private:
     //查找并更新工作站信息
     StationInfo* findAndSetStationSystemState(const ::CC::StationSystemState& pStationSystemState);
 public:
     /*!
     创建一个工作站信息接收对象
+	@param UpdateManager* updateManager 更新管理器
     @param StationList* pStations 工作站列表
     @param bool autoRefreshStationList 是否自动更新工作站列表
     @return 工作站信息接收对象
     作者：cokkiy（张立民)
     创建时间：2015/11/23 21:16:50
     */
-    StationStateReceiver(StationList* pStations, bool autoRefreshStationList = true);
+    StationStateReceiver(UpdateManager* updateManager, StationList* pStations, bool autoRefreshStationList = true);
     /*释放资源*/
     ~StationStateReceiver() = default;
 

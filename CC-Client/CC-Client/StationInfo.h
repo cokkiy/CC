@@ -29,6 +29,7 @@ class StationInfo : public QObject
         Q_PROPERTY(float AppMemory READ AppMemory WRITE setAppMemory)
         Q_PROPERTY(int ExecuteCounting READ ExecuteCounting WRITE setExecuteCounting)
         Q_PROPERTY(QString Name READ Name WRITE setName)
+		Q_PROPERTY(bool NeedUpdate READ NeedUpdate WRITE setNeedUpdate)
 
 public:
     /*
@@ -186,7 +187,30 @@ public:
     const int PowerOnTimeout = 180;//180秒,启动超时
     const int AppStartingTimeout = 30;//30秒,App启动超时
     const int RebootingTimeout = 240;//240秒,重启超时
-    const int ShutingdownTimeout = 180;//180秒,关机    
+    const int ShutingdownTimeout = 180;//180秒,关机   
+
+private:
+	bool m_NeedUpdate = false;
+public:
+	/*!
+	获取是否需要升级
+	@return bool
+	作者：cokkiy（张立民）
+	创建时间:2016/5/10 17:50:28
+	*/
+	bool NeedUpdate();
+	/*!
+	设置是否需要升级
+	@param bool needUpdate 是否需要升级
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/5/10 17:50:05
+	*/
+	void setNeedUpdate(bool value);
+
+public:
+	/*版本信息是否已经被获取*/
+	bool VersionGetted = false;
 private:
     QString m_Name;
 public:
@@ -342,6 +366,9 @@ private:
      **/
     std::list<QString> operatingHistoryMessages;
 
+	/*
+	最后一次错误发生时间
+	*/
 	time_t lastErrorTime = 0;
 
 public:
@@ -643,7 +670,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/12/03 16:02:23
     */
-    bool operator ==(const StationInfo& ref);
+    bool operator ==(const StationInfo& ref);	
 
 signals:
     /*!
