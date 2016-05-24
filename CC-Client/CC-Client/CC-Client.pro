@@ -69,7 +69,8 @@ SOURCES += main.cpp\
     batchcapturedialog.cpp \
     batchcaputrethread.cpp \
     aboutdialog.cpp \
-    updatemanager.cpp
+    updatemanager.cpp \
+    qpagenumdialog.cpp
 
 HEADERS  += mainwindow.h \
     selectcomputerdialog.h \
@@ -113,7 +114,8 @@ HEADERS  += mainwindow.h \
     batchcapturedialog.h \
     batchcaputrethread.h \
     aboutdialog.h \
-    updatemanager.h
+    updatemanager.h \
+    qpagenumdialog.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -129,7 +131,8 @@ FORMS    += mainwindow.ui \
     processdialog.ui \
     filebrowserdialog.ui \
     batchcapturedialog.ui \
-    aboutdialog.ui
+    aboutdialog.ui \
+    qpagenumdialog.ui
 
 RESOURCES += \
     cc-client.qrc

@@ -139,10 +139,9 @@ public:
 	void on_prevPagePushButton_clicked();
 	//下一页
 	void on_nextPushButton_clicked();
-	//获取画面
-	void on_fetchPagePushButton_clicked();
-	//推送画面
-	void on_pushPagePushButton_clicked();
+	
+	//打开指定画面
+	void on_openSpecPagePushButton_clicked();
 	
 	//升级工作站
 	void on_actionUpdateStation_triggered();

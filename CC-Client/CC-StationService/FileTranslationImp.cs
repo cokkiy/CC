@@ -40,6 +40,8 @@ namespace CC_StationService
             {
                 string dir = fileName;
                 int pos = fileName.LastIndexOf(Path.DirectorySeparatorChar);
+                if (pos == -1)
+                    pos = fileName.LastIndexOf(Path.AltDirectorySeparatorChar);
                 if (pos != -1)
                 {
                     dir = fileName.Substring(0, pos + 1);

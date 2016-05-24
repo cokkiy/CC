@@ -365,7 +365,7 @@ StationInfo* StationList::findById(const std::string& stationId)
     {
         for (auto& s : allStations)
         {
-            if (s.stationId.compare(stationId.c_str()) == 0)
+            if (s.stationId!= NULL && s.stationId.compare(stationId.c_str()) == 0)
             {
                 return &s;
             }

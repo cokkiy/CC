@@ -43,50 +43,54 @@ void UpdateManager::run()
 				}
 			}
 		}
-		//获取最新的文件
-		if (!newVersionDownloaded)
-		{
-			if (highestVersionedStation->controlProxy != NULL)
-			{
-				emit UpdatingProgressReport(0, QStringLiteral("开始准备升级..."));
-				try
-				{
-					wstring servicePath = highestVersionedStation->controlProxy->getServicePath();
-					wstring proxyPath = highestVersionedStation->controlProxy->getLuncherProxyPath();
-					if (highestVersionedStation->fileProxy != NULL)
-					{
-						QString tempPath = QDir::tempPath();
-						QString localServiceFile = tempPath + "/" + "~CC-StationService.exe";
-						getNewVersionFile(localServiceFile, servicePath);
-						emit UpdatingProgressReport(1, QStringLiteral("新版中控服务已准备好"));
-						UpdateFile(localServiceFile, Service);
 
-						QString localProxyFile = tempPath + "/" + "~AppLuncher.exe";
-						if (proxyPath != L"")
-						{
-							getNewVersionFile(localProxyFile, proxyPath);
-							UpdateFile(localServiceFile, Proxy);
-						}
-					}
-				}
-				catch (CC::FileTransException)
-				{
-					
-				}
-				catch (Ice::Exception)
-				{
- 				}
-				catch (...)
-				{
-				}				
-			}
-			else
+		if (highestVersionedStation->controlProxy != NULL)
+		{
+			emit UpdatingProgressReport(0, QStringLiteral("开始准备升级..."));
+			try
 			{
-				emit UpdatingProgressReport(0, QStringLiteral("无法获取最新版文件"));
+				wstring servicePath = highestVersionedStation->controlProxy->getServicePath();
+				wstring proxyPath = highestVersionedStation->controlProxy->getLuncherProxyPath();
+				if (highestVersionedStation->fileProxy != NULL)
+				{
+					QString tempPath = QDir::tempPath();
+					QString localServiceFile = tempPath + "/" + "~CC-StationService.exe";
+					getNewVersionFile(localServiceFile, servicePath);
+					emit UpdatingProgressReport(1 /(float)newVersionDownloaded * 100, QStringLiteral("新版中控服务已准备好"));
+					UpdateFile(localServiceFile, Service);
+
+					QString localProxyFile = tempPath + "/" + "~AppLuncher.exe";
+					if (proxyPath != L"")
+					{
+						getNewVersionFile(localProxyFile, proxyPath);
+						UpdateFile(localProxyFile, Proxy);
+					}
+
+					for_each(toBeUpdatingStations.begin(), toBeUpdatingStations.end(),
+						[](const StationUpdateState& ss)
+					{
+						if (ss.serviceUpdated)
+						{
+							ss.Station->setState(StationInfo::Rebooting);
+							ss.Station->controlProxy->reboot(true);
+						}
+					});
+				}
+			}
+			catch (CC::FileTransException)
+			{
+
+			}
+			catch (Ice::Exception)
+			{
+			}
+			catch (...)
+			{
 			}
 		}
 		else
 		{
+			emit UpdatingProgressReport(0, QStringLiteral("无法获取最新版文件"));
 		}
 	}
 	else
@@ -132,7 +136,7 @@ void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy
 					pos = remotePath.find_last_of('\\');
 				size_t number = remotePath.length() - pos - 1;
 				wstring newServicePath = remotePath;
-				newServicePath.replace(pos + 1, number, tmpName);
+				newServicePath = newServicePath.replace(pos + 1, number, tmpName);
 				try
 				{
 					if (ss.Station->fileProxy->createFile(newServicePath))
@@ -142,21 +146,21 @@ void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy
 							if (ss.Station->fileProxy->closeFile())
 							{
 								wstring oldServiceTmpName = remotePath;
-								oldServiceTmpName.replace(pos + 1, number, L"~" + tmpName);
+								oldServiceTmpName = oldServiceTmpName.replace(pos + 1, number, L"~" + tmpName);
 								if (ss.Station->controlProxy->renameFile(remotePath, oldServiceTmpName))
 								{
 									if (ss.Station->controlProxy->renameFile(newServicePath, remotePath))
 									{
 										if (serviceorProxy == Service)
 										{
-											emit UpdatingProgressReport(++count, QStringLiteral("%1已完成中控服务更新。").arg(ss.Station->Name()));
+											ss.serviceUpdated = true;
+											emit UpdatingProgressReport(++count/ (float)needUpdateCount * 100, QStringLiteral("%1已完成中控服务更新。").arg(ss.Station->Name()));
 										}
 										else
 										{
-											emit UpdatingProgressReport(++count, QStringLiteral("%1已完成应用代理更新。").arg(ss.Station->Name()));
-										}
-										//重启
-										ss.Station->controlProxy->reboot(true);
+											ss.proxyUpdated = true;
+											emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1已完成应用代理更新。").arg(ss.Station->Name()));
+										}										
 									}
 									else
 									{
@@ -167,11 +171,11 @@ void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy
 								{
 									if (serviceorProxy == Service)
 									{
-										emit UpdatingProgressReport(++count, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
+										emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
 									}
 									else
 									{
-										emit UpdatingProgressReport(++count, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
+										emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
 									}
 								}
 							}
@@ -180,17 +184,17 @@ void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy
 				}
 				catch (const Ice::OperationNotExistException&)
 				{
-					emit UpdatingProgressReport(++count, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
+					emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
 				}
 				catch (...)
 				{
-					emit UpdatingProgressReport(++count, QStringLiteral("%1无法更新,发生未知错误，请手动升级。").arg(ss.Station->Name()));
+					emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,发生未知错误，请手动升级。").arg(ss.Station->Name()));
 				}
 			}
 		}
 		else
 		{
-			emit UpdatingProgressReport(++count, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
+			emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
 		}
 	});
 }

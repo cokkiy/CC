@@ -401,31 +401,15 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="fetchPagePushButton">
+               <widget class="QPushButton" name="openSpecPagePushButton">
                 <property name="toolTip">
-                 <string>获取选定工作站指显画面，准备推送到其他工作站</string>
+                 <string>打开选定工作站指定编号画面</string>
                 </property>
                 <property name="statusTip">
-                 <string>获取选定工作站指显画面，准备推送到其他工作站</string>
+                 <string>打开选定工作站指定编号画面</string>
                 </property>
                 <property name="text">
-                 <string>获取画面</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushPagePushButton">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>推送已经获取的画面到选定的工作站</string>
-                </property>
-                <property name="statusTip">
-                 <string>推送已经获取的画面到选定的工作站，当前未获取画面，请先获取画面</string>
-                </property>
-                <property name="text">
-                 <string>推送画面</string>
+                 <string>打开指定画面</string>
                 </property>
                </widget>
               </item>

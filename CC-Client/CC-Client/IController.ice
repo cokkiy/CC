@@ -113,6 +113,9 @@ module CC
 		//切换指显显示模式
 		void switchDisplayPageAndMode(DisplayCommand cmd);
 
+		//打开指定画面
+		void openSpecPage(int pageNum);
+
 		//获取中控服务安装绝对路径
 		string getServicePath();
 

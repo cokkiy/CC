@@ -369,6 +369,15 @@
     <ClCompile Include="Release\moc_updatemanager.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="qpagenumdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_qpagenumdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_qpagenumdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.h">
@@ -500,6 +509,12 @@
     <CustomBuild Include="version.txt" />
     <CustomBuild Include="updatemanager.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qpagenumdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qpagenumdialog.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -706,13 +721,16 @@
     <ClInclude Include="GeneratedFiles\ui_processdialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\Version.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_batchcapturedialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_aboutdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_qpagenumdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\Version.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -213,13 +213,15 @@ public:
 	创建时间:2016/5/6 8:39:36
 	*/
 	void nextPage();
+
 	/*!
-	获取当前页面
+	打开指定画面
+	@param int pageNum 画面编号
 	@return void
 	作者：cokkiy（张立民）
-	创建时间:2016/5/6 11:02:53
+	创建时间:2016/5/24 9:05:35
 	*/
-	void fetchPage();
+	void openPage(int pageNum); 
 private:
 	//监视间隔（秒）
 	int interval;
@@ -246,6 +248,7 @@ private:
 	// 发送开机指令包
 	void sendPowerOnPacket(StationInfo* s);
 	
+
 };
 
 #endif // STATIONMANAGER_H

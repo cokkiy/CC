@@ -102,7 +102,8 @@ void StationManager::sendPowerOnPacket(StationInfo* s)
 	}
 }
 
-void StationManager::fetchPage()
+//打开指定编号
+void StationManager::openPage(int pageNum)
 {
 	for (auto index : stationIndexs)
 	{
@@ -111,7 +112,20 @@ void StationManager::fetchPage()
 			StationInfo* s = pStations->atCurrent(index.row());
 			if (s->controlProxy != NULL)
 			{
-				
+				s->controlProxy->begin_openSpecPage(pageNum,
+					[] (){},
+					[s](const Ice::Exception& ex)
+				{
+					const Ice::OperationNotExistException *pONE = dynamic_cast<const Ice::OperationNotExistException*>(&ex);
+					if (pONE != NULL)
+					{
+						QMessageBox::warning(NULL, QStringLiteral("发生错误"), QStringLiteral("工作站%1不支持该操作，需要升级中控服务。").arg(s->Name()));
+					}
+					else
+					{
+						QMessageBox::warning(NULL, QStringLiteral("发生错误"), QStringLiteral("%1").arg(ex.what()));
+					}
+				});
 			}
 		}
 	}

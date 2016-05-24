@@ -347,8 +347,33 @@ namespace CC_StationService
             try
             {
                 client.Send(cmdData, 512, receiver);
+                client.Close();
             }
             catch(System.Exception ex)
+            {
+                PlatformMethodFactory.GetLogger().error(string.Format("发送指显控制命令失败，命令{0},错误详细内容：{1}", cmd, ex.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// 打开指定画面
+        /// </summary>
+        /// <param name="pageNum"></param>
+        /// <param name="current__"></param>
+        public override void openSpecPage(int pageNum, Current current__)
+        {
+            UdpClient client = new UdpClient(AddressFamily.InterNetwork);
+            System.Net.IPEndPoint receiver = new System.Net.IPEndPoint(IPAddress.Loopback, 9008);
+            byte[] cmdData = new byte[512];
+            int cmd = 10; //open spec page
+            Array.Copy(BitConverter.GetBytes((int)cmd), cmdData, sizeof(int));
+            Array.Copy(BitConverter.GetBytes(pageNum), 0, cmdData, sizeof(int), sizeof(int));
+            try
+            {
+                client.Send(cmdData, 512, receiver);
+                client.Close();
+            }
+            catch (System.Exception ex)
             {
                 PlatformMethodFactory.GetLogger().error(string.Format("发送指显控制命令失败，命令{0},错误详细内容：{1}", cmd, ex.ToString()));
             }
@@ -398,6 +423,10 @@ namespace CC_StationService
             {
                 try
                 {
+                    if (File.Exists(newName))
+                    {
+                        File.Delete(newName);
+                    }
                     File.Move(oldName, newName);
                     return true;
                 }
@@ -408,5 +437,6 @@ namespace CC_StationService
             }
             return false;
         }
+        
     }
 }

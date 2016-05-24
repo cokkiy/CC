@@ -55,7 +55,7 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
             pStation->setProcCount(stationRunningState.procCount);
             pStation->setLastTick();
 
-			if (!pStation->VersionGetted)
+			if (!pStation->VersionGetted&&pStation->VersionGetTimes < 150)
 			{
 				//获取版本信息
 				controlPrx->begin_getServerVersion(
@@ -66,12 +66,13 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 						updateManager->addStationVersion(pStation, serverVersion);
 						pStation->VersionGetted = true;
 					}
-					
+
 				},
 					[](const Ice::Exception& ex)
 				{
 
 				});
+				pStation->VersionGetTimes++;
 			}
         }
         else

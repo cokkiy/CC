@@ -34,6 +34,7 @@
 #include "batchcapturedialog.h"
 #include "aboutdialog.h"
 #include "updatemanager.h"
+#include "qpagenumdialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -1000,25 +1001,26 @@ void MainWindow::on_nextPushButton_clicked()
 	StationManager* manager = new StationManager(pStationList, selectedIndexs);
 	manager->nextPage();
 }
-//获取画面
-void MainWindow::on_fetchPagePushButton_clicked()
+
+//打开指定画面
+void MainWindow::on_openSpecPagePushButton_clicked()
 {
 	QModelIndexList selectedIndexs = getSelectedIndexs();
-	if (selectedJustOne(selectedIndexs))
+	if (!selectedIndexs.empty())
 	{
-		StationManager* manager = new StationManager(pStationList, selectedIndexs);
-		manager->fetchPage();
+		QPageNumDialog dlg;
+		if (dlg.exec() == QDialog::Accepted)
+		{
+			StationManager* manager = new StationManager(pStationList, selectedIndexs);
+			manager->openPage(dlg.value());
+		}
 	}
 	else
 	{
-		QMessageBox::warning(this, QStringLiteral("错误"), QStringLiteral("必须选择一个工作站获取画面。"));
+		QMessageBox::warning(this, QStringLiteral("警告"), QStringLiteral("必须至少选择一个工作站。"));
 	}
 }
-//推送画面
-void MainWindow::on_pushPagePushButton_clicked()
-{
 
-}
 
 //升级工作站
 void MainWindow::on_actionUpdateStation_triggered()
