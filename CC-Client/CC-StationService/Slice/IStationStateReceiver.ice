@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Version.ice"
 [["cpp:include:list"]]
 [["cpp:include:string"]]
 
@@ -48,6 +49,8 @@ module CC
 		float cpu;
 		///系统进程数量
 		int procCount;
+		///中控服务和代理版本信息
+		ServerVersion Version;
 	};
 
 	///进程信息

@@ -208,11 +208,6 @@ public:
 	*/
 	void setNeedUpdate(bool value);
 
-public:
-	/*版本信息是否已经被获取*/
-	bool VersionGetted = false;
-	/*版本信息获取次数*/
-	int VersionGetTimes = 0;
 private:
     QString m_Name;
 public:

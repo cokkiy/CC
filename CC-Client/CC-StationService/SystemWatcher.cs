@@ -1,6 +1,7 @@
 ﻿using CC;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -131,6 +132,7 @@ namespace CC_StationService
                         {
                             //收集工作站运行状态
                             var runningState = StateGatherer.GatherRunningState();
+                            runningState.Version = getVersion();
                             //汇报运行状态
                             receiverProxy.receiveStationRunningState(runningState, controlPrx, filePrx);
 
@@ -181,6 +183,40 @@ namespace CC_StationService
                     Thread.Sleep(Interval); //汇报间隔
                 }
             }
+        }
+
+        //版本信息
+        private static CC.ServerVersion serverVersion = null;
+
+        //获取版本信息
+        private ServerVersion getVersion()
+        {
+            if(serverVersion==null)
+            {
+                serverVersion = new ServerVersion(new CC.Version(), new CC.Version());
+            }
+            if (serverVersion.AppLuncherVersion.Major != 0)
+                return serverVersion;
+
+            if (serverVersion.ServicesVersion.Major == 0)
+            {
+                string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                serverVersion.ServicesVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "CC-StationService.exe"));
+            }
+            if (serverVersion.AppLuncherVersion.Major == 0)
+            {
+                try
+                {
+                    Ice.ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+                    AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                    serverVersion.AppLuncherVersion = luncherPrx.getAppLuncherVersion();
+                }
+                catch
+                {
+                }
+            }
+
+            return serverVersion;
         }
 
         /// <summary>

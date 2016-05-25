@@ -54,25 +54,9 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
             pStation->setMemory(stationRunningState.currentMemory);
             pStation->setProcCount(stationRunningState.procCount);
             pStation->setLastTick();
-
-			if (!pStation->VersionGetted&&pStation->VersionGetTimes < 150)
+			if (stationRunningState.Version.AppLuncherVersion.Major != 0)
 			{
-				//获取版本信息
-				controlPrx->begin_getServerVersion(
-					[this, pStation](const CC::ServerVersion& serverVersion)
-				{
-					if (serverVersion.AppLuncherVersion.Major != 0)
-					{
-						updateManager->addStationVersion(pStation, serverVersion);
-						pStation->VersionGetted = true;
-					}
-
-				},
-					[](const Ice::Exception& ex)
-				{
-
-				});
-				pStation->VersionGetTimes++;
+				updateManager->addStationVersion(pStation, stationRunningState.Version);
 			}
         }
         else
