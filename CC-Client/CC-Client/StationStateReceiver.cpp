@@ -54,9 +54,9 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
             pStation->setMemory(stationRunningState.currentMemory);
             pStation->setProcCount(stationRunningState.procCount);
             pStation->setLastTick();
-			if (stationRunningState.Version.AppLuncherVersion.Major != 0)
+            if (stationRunningState.Version.AppLuncherVersion.Major != 0)
 			{
-				updateManager->addStationVersion(pStation, stationRunningState.Version);
+                updateManager->addStationVersion(pStation, stationRunningState.Version);
 			}
         }
         else

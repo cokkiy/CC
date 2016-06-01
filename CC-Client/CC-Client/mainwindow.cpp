@@ -616,7 +616,8 @@ void MainWindow::closeEvent(QCloseEvent * event)
         try
         {
             monitor->Stop();
-            communicator->destroy();
+			//adapter->destroy();
+            //communicator->destroy();
         }
         catch (const IceUtil::Exception&)
         {
