@@ -41,6 +41,7 @@ private:
 	QString soureDir;
 	//保持文件夹结构
 	bool keepDirStructure = false;
+    int total=0;
 
 	//向指定工作站发送文件内容
 	void sendFileContents(const QString &file, StationInfo* s);
@@ -85,7 +86,7 @@ signals:
 	void newFileSize(StationInfo* station, QString fileName, long long size);
 
 	/*!
-	文件已发送size字节内容
+	文件已发送size字节内容通知事件
 	@param StationInfo * station 工作站
 	@param QString fileName 文件名
 	@param size_t size 发送大小
@@ -94,6 +95,15 @@ signals:
 	创建时间:2016/3/25 16:21:28
 	*/
 	void fileSended(StationInfo* station, QString fileName, long long size);
+	/*!
+	全部文件发送完毕事件
+	@param StationInfo * station
+	@param int total 文件数
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/6/3 17:04:03
+	*/
+	void allCompleted(StationInfo* station, int total);
 };
 
 #endif // SENDFILETHREAD_H

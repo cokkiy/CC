@@ -46,6 +46,7 @@ private:
 	void on_newFileSize(StationInfo* station, QString fileName, size_t size);
 	void on_sendFileCompleted(StationInfo* station, QString fileName);
 	void on_fileSended(StationInfo* station, QString fileName, size_t size);
+	void on_allCompleted(StationInfo* station, int total);
 
 	//槽函数
 	private slots:
@@ -54,7 +55,7 @@ private:
 	//发送按钮按下
 	void on_sendPushButton_clicked();
 	//选择目标文件夹
-	void on_selectDestPushButton_clicked();
+	void on_selectDestPushButton_clicked();	
 	
 };
 

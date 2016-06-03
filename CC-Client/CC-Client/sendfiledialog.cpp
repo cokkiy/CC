@@ -87,6 +87,7 @@ void SendFileDialog::on_sendPushButton_clicked()
 	connect(sendThread, &SendFileThread::newFileSize, this, &SendFileDialog::on_newFileSize);
 	connect(sendThread, &SendFileThread::fileSended, this, &SendFileDialog::on_fileSended);
 	connect(sendThread, &SendFileThread::sendFileCompleted, this, &SendFileDialog::on_sendFileCompleted);
+	connect(sendThread, &SendFileThread::allCompleted, this, &SendFileDialog::on_allCompleted);
 	sendThread->start();
 }
 
@@ -171,5 +172,11 @@ void SendFileDialog::on_fileSended(StationInfo* station, QString fileName, size_
 	bar->setTipText(QStringLiteral("正在发送文件%1...").arg(fileName));
 	bar->setPercent(size);
 	update();
+}
+
+void SendFileDialog::on_allCompleted(StationInfo* station, int total)
+{
+	StationBar* bar = station_bar[station];
+	bar->setTipText(QStringLiteral("发送完毕,共发送%1个文件。").arg(total));
 }
 

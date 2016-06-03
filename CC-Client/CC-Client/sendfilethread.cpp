@@ -4,6 +4,7 @@
 #include <Ice/Stream.h>
 #include <QDir>
 #include <stdio.h>
+#include <QDebug>
 using namespace std;
 
 /*!
@@ -67,6 +68,15 @@ void SendFileThread::run()
 			emit failToSendFile(s, QStringLiteral("全部文件"), QStringLiteral("无法发送文件，工作站不在线或中控服务未启动。"));
 		}
 	}
+
+	for (StationInfo* s : stations)
+	{
+		if (s->fileProxy != NULL)
+		{
+			emit allCompleted(s, total);
+		}
+	}
+    //qDebug() << QStringLiteral("共发送%1个文件").arg(total);
 }
 
 //发送文件夹中的所有文件
@@ -76,7 +86,6 @@ void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName, QFi
 	{
 		//如果是目录
 		QDir dir(fileInfo.filePath());
-		QString p = dir.path();
 		QFileInfoList entries = dir.entryInfoList(QDir::Files | QDir::AllDirs |	QDir::NoDotAndDotDot);
 		for (QFileInfo entry : entries)
 		{
@@ -84,6 +93,7 @@ void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName, QFi
 			{
 				//目录
 				SendFilesInDir(s, entry.filePath(), entry);
+                //qDebug() << QStringLiteral("进入文件夹%1").arg(entry.absolutePath());
 			}
 			else
 			{
@@ -119,11 +129,13 @@ void SendFileThread::sendFile(StationInfo* s, const QString& file, QFileInfo &fi
 	{
 		if (s->fileProxy->createFile(destFile.toStdWString()))
 		{
-			sendFileContents(file, s);
-
-			//文件发送完毕
-			emit sendFileCompleted(s, file);
-			s->fileProxy->closeFile();
+			sendFileContents(file, s);			
+//			s->fileProxy->closeFile();
+            //文件发送完毕
+            emit sendFileCompleted(s, file);
+            //qDebug() << QStringLiteral("文件%1发送完毕").arg(file);
+            //qDebug() << QStringLiteral("%1").arg(file);
+            total++;
 		}
 		else
 		{
@@ -178,8 +190,7 @@ void SendFileThread::sendFileContents(const QString &file, StationInfo* s)
 			asyncResult->waitForSent();
 			position += length;
 			ResultTuple p(asyncResult, file, position);
-			asyncResults.push_back(p);
-			
+			asyncResults.push_back(p);			
 
 			while (asyncResults.size() > maxPackets)
 			{
@@ -193,11 +204,13 @@ void SendFileThread::sendFileContents(const QString &file, StationInfo* s)
 			waitComplete(asyncResults, s, resultParams);
 		}
 
+        fclose(fp);
 	}
 	else
 	{
 		//文件不存在
 		emit failToSendFile(s, file, QStringLiteral("文件不存在。"));
+        //qDebug() << QStringLiteral("%1文件不存在。").arg(file);
 	}
 }
 
@@ -234,11 +247,12 @@ void SendFileThread::waitComplete(list <ResultTuple>& asyncResults, StationInfo*
 	{
 		//发生系统异常
 		emit failToSendFile(s, fileName, QString::fromStdString(ex.what()));
-
+        //qDebug() << QStringLiteral("%1发送失败，原因:%2").arg(fileName).arg(ex.what());
 	}
 	catch (...)
 	{
 		//发生系统异常
 		emit failToSendFile(s, fileName, QStringLiteral("发生未知异常。"));
+        //qDebug() << QStringLiteral("%1发送失败，原因:发生未知异常").arg(fileName);
 	}
 }
