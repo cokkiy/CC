@@ -32,6 +32,7 @@ namespace CC_StationService
             Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
             inStream.startEncapsulation();
             string fileName = inStream.readString();
+            string userName = inStream.readString();
             inStream.endEncapsulation();
             inStream.destroy();
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
@@ -49,6 +50,10 @@ namespace CC_StationService
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
+                    if(!string.IsNullOrWhiteSpace(userName))
+                    {
+                        chown(dir, userName);
+                    }
                 }
                 writeStream = File.Create(fileName);
                 logger.print("成功创建文件:"+fileName);
@@ -159,6 +164,11 @@ namespace CC_StationService
             bool result = false;
             // closeFile
             Ice.Communicator communicator = current.adapter.getCommunicator();
+            Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
+            inStream.startEncapsulation();
+            string userName = inStream.readString();
+            inStream.endEncapsulation();
+            inStream.destroy();
             Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
             if (writeStream == null)
@@ -180,6 +190,7 @@ namespace CC_StationService
                 {
                     chmod2Exe(fileName);
                 }
+                chown(fileName, userName);
                 logger.print("文件已成功关闭。");
                 outStream.startEncapsulation();
                 outStream.writeBool(true);
@@ -362,6 +373,31 @@ namespace CC_StationService
                 {
                     Ice.Logger logger = PlatformMethodFactory.GetLogger();
                     logger.error(string.Format("chmod2Exe Error. fileName:{0} {1}", fileName, ex.ToString()));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 修改指定文件、文件夹的所有者
+        /// </summary>
+        /// <param name="fileName">文件名或文件夹名称</param>
+        /// <param name="user">新的所有者</param>
+        private void chown(string fileName,string user)
+        {
+            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                try
+                {
+                    System.Diagnostics.Process chownProcess = new System.Diagnostics.Process();
+                    chownProcess.StartInfo.FileName = "chown";
+                    chownProcess.StartInfo.UseShellExecute = true;
+                    chownProcess.StartInfo.Arguments = string.Format("{0} {1}", user, fileName);
+                    chownProcess.Start();
+                }
+                catch (System.Exception ex)
+                {
+                    Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                    logger.error(string.Format("chown Error. fileName:{0}, new owner:{1}. {2}", fileName, user, ex.ToString()));
                 }
             }
         }
