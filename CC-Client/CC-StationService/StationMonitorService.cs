@@ -91,6 +91,9 @@ namespace CC_StationService
 
         protected override void OnStop()
         {
+            //停止下载气象云图
+            WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
+            downloader.Stop();
             //停止监视系统
             watcher.StopWatching();
             //释放通信资源

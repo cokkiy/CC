@@ -67,6 +67,7 @@
     <Compile Include="LinuxMethod.cs" />
     <Compile Include="LinuxLogger.cs" />
     <Compile Include="MemoryInfo.cs" />
+    <Compile Include="PictureType.cs" />
     <Compile Include="StateGatherer.cs" />
     <Compile Include="StationMonitorService.cs">
       <SubType>Component</SubType>
@@ -80,6 +81,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="SystemWatcher.cs" />
+    <Compile Include="WeartherImageDownloader.cs" />
+    <Compile Include="WeatherImageHelper.cs" />
     <Compile Include="WindowsLogger.cs" />
     <Compile Include="WindowsMethod.cs" />
   </ItemGroup>

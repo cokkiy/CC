@@ -437,6 +437,20 @@ namespace CC_StationService
             }
             return false;
         }
-        
+
+        /// <summary>
+        /// 设置气象云图下载选项，并启动下载线程
+        /// </summary>
+        /// <param name="option">气象云图下载选项</param>
+        /// <param name="current__"></param>
+        public override void setWeatherPictureDownloadOption(WeatherPictureDowlnloadOption option, Current current__)
+        {
+            WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
+            downloader.Option = option;
+            if(!downloader.IsRunning)
+            {
+                downloader.Start();
+            }
+        }
     }
 }

@@ -220,7 +220,6 @@ namespace CC_StationService
         /// <returns>Mac Address->IP Address 列表</returns>
         private static Dictionary<string, List<string>> getAllNIInfo()
         {
-
             Dictionary<string, List<string>> niInfo = new Dictionary<string, List<string>>();
             NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
             foreach (var ni in nis)
