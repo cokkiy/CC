@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CC_StationService.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FtpUrl" Type="(Web Service URL)" Scope="User">
+      <Value Profile="(Default)">ftp://192.168.0.163</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">anonymous</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastHours" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="Interval" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="SavePathForLinux" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/home/WeatherImages</Value>
+    </Setting>
+    <Setting Name="SavePathForWindows" Type="System.String" Scope="User">
+      <Value Profile="(Default)">d:\WeatherImages</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -445,12 +445,26 @@ namespace CC_StationService
         /// <param name="current__"></param>
         public override void setWeatherPictureDownloadOption(WeatherPictureDowlnloadOption option, Current current__)
         {
+            if (string.IsNullOrWhiteSpace(option.Url) || option.Interval <= 0 || option.LastHours <= 0)
+                return;
+
             WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
             downloader.Option = option;
-            if(!downloader.IsRunning)
-            {
-                downloader.Start();
-            }
+            SaveToSetting(option);           
+            
+        }
+
+        //把气象云图下载设置保存到系统设置
+        private void SaveToSetting(WeatherPictureDowlnloadOption option)
+        {
+            Properties.Settings.Default.FtpUrl = option.Url;
+            Properties.Settings.Default.UserName = option.UserName;
+            Properties.Settings.Default.Password = option.Password;
+            Properties.Settings.Default.LastHours = option.LastHours;
+            Properties.Settings.Default.Interval = option.Interval;
+            Properties.Settings.Default.SavePathForLinux = option.SavePathForLinux;
+            Properties.Settings.Default.SavePathForWindows = option.SavePathForWindows;
+            Properties.Settings.Default.Save();
         }
     }
 }

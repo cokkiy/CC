@@ -102,6 +102,28 @@ void StationManager::sendPowerOnPacket(StationInfo* s)
 	}
 }
 
+//设置气象云图下载选项
+void StationManager::setWeatherImageDownloadOption(const Option::WeatherImageDownloadOption& weatherImageDownloadOption)
+{
+	CC::WeatherPictureDowlnloadOption ccOption;
+	ccOption.Url = weatherImageDownloadOption.Url.toStdString();
+	ccOption.UserName = weatherImageDownloadOption.UserName.toStdString();
+	ccOption.Password = weatherImageDownloadOption.Password.toStdString();
+	ccOption.LastHours = weatherImageDownloadOption.LastHours;
+	ccOption.Interval = weatherImageDownloadOption.Interval;
+	ccOption.SavePathForWindows = weatherImageDownloadOption.SavePathForWindows.toStdWString();
+	ccOption.SavePathForLinux = weatherImageDownloadOption.SavePathForLinux.toStdWString();
+	
+	for (auto& station : *pStations)
+	{
+		IControllerPrx prx = station.controlProxy;
+		if (prx != NULL)
+		{
+			prx->begin_setWeatherPictureDownloadOption(ccOption);
+		}
+	}
+}
+
 //打开指定编号
 void StationManager::openPage(int pageNum)
 {

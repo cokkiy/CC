@@ -48,6 +48,13 @@ void Option::Save()
         procs += QStringLiteral("%1|").arg(proc);
     }
     settings.setValue("ControlAndMonitor/MonitorProc", procs);
+	settings.setValue("WeatherImageDownloadOption/Url", this->weatherImageDownloadOption.Url);
+	settings.setValue("WeatherImageDownloadOption/UserName", this->weatherImageDownloadOption.UserName);
+	settings.setValue("WeatherImageDownloadOption/Password", this->weatherImageDownloadOption.Password);
+	settings.setValue("WeatherImageDownloadOption/LastHours", this->weatherImageDownloadOption.LastHours);
+	settings.setValue("WeatherImageDownloadOption/Interval", this->weatherImageDownloadOption.Interval);
+	settings.setValue("WeatherImageDownloadOption/SavePathForLinux", this->weatherImageDownloadOption.SavePathForLinux);
+	settings.setValue("WeatherImageDownloadOption/SavePathForWindows", this->weatherImageDownloadOption.SavePathForWindows);
 }
 
 /*!
@@ -81,4 +88,12 @@ void Option::Load()
     QString proc = settings.value("ControlAndMonitor/MonitorProc", "").toString();
     QStringList procList = proc.split("|", QString::SkipEmptyParts);
     this->MonitorProcesses = procList.toStdList();
+
+	this->weatherImageDownloadOption.Url = settings.value("WeatherImageDownloadOption/Url").toString();
+	this->weatherImageDownloadOption.UserName = settings.value("WeatherImageDownloadOption/UserName").toString();
+	this->weatherImageDownloadOption.Password = settings.value("WeatherImageDownloadOption/Password").toString();
+	this->weatherImageDownloadOption.LastHours = settings.value("WeatherImageDownloadOption/LastHours").toInt();
+	this->weatherImageDownloadOption.Interval = settings.value("WeatherImageDownloadOption/Interval").toInt();
+	this->weatherImageDownloadOption.SavePathForLinux = settings.value("WeatherImageDownloadOption/SavePathForLinux").toString();
+	this->weatherImageDownloadOption.SavePathForWindows = settings.value("WeatherImageDownloadOption/SavePathForWindows").toString();
 }

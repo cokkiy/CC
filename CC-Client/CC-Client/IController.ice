@@ -70,6 +70,27 @@ module CC
 		PrevPage,		
 	};
 
+	//气象云图下载选项
+	struct WeatherPictureDowlnloadOption
+	{
+		// ftp 服务器地址
+		string Url;
+		// 用户名
+		string UserName;
+		// 密码
+		string Password;
+		// 下载间隔
+		int Interval;
+		// 下载最近几小时的图片
+		int LastHours;
+		// 保存位置(Linux)
+		["cpp:type:wstring"]
+		string SavePathForLinux;
+		//保存位置(Windows)
+		["cpp:type:wstring"]
+		string SavePathForWindows;
+	};
+
 	///控制接口,定义了对工作站的控制工作
 	["cpp:type:wstring"]
 	interface IController
@@ -94,6 +115,9 @@ module CC
 
 		///设置状态收集间隔（秒)
 		idempotent void setStateGatheringInterval(int interval);
+
+		//设置气象图片下载选项
+		idempotent void setWeatherPictureDownloadOption(WeatherPictureDowlnloadOption option);
 
 		///捕获屏幕快照
 		//*？ long position: 如果为0，则捕获新快照，否则，传送后续数据
@@ -132,11 +156,11 @@ module CC
 	interface IFileTranslation
 	{
 		///创建文件		
-		bool createFile(string fileName) throws FileTransException;
+		bool createFile(string fileName,string userName) throws FileTransException;
 		///传送数据
 		bool transData(long position,int length, ByteArray data) throws FileTransException;
 		///关闭文件
-		bool closeFile() throws FileTransException;
+		bool closeFile(string userName) throws FileTransException;
 
 		///获取文件大小
 		long getSize(string fileName) throws FileTransException;

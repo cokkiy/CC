@@ -50,9 +50,12 @@
     <Compile Include="generated\IAppLuncher.cs" />
     <Compile Include="generated\IController.cs" />
     <Compile Include="generated\IStationStateReceiver.cs" />
+    <Compile Include="PictureType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SysConfEnum.cs" />
+    <Compile Include="WeartherImageDownloader.cs" />
+    <Compile Include="WeatherImageHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

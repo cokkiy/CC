@@ -133,6 +133,29 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>文件所有者：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="userNameLineEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>目的机上的用户名</string>
+       </property>
+       <property name="text">
+        <string>root</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

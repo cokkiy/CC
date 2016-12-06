@@ -80,6 +80,16 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 					controlPrx->begin_setStateGatheringInterval(Option::getInstance()->Interval, []() {});
 					//设置工作站监视进程列表
 					controlPrx->begin_setWatchingApp(pStation->getAllShouldMonitoredProcessesName(), []() {});
+					CC::WeatherPictureDowlnloadOption ccOption;
+					Option* option = Option::getInstance();
+					ccOption.Url = option->weatherImageDownloadOption.Url.toStdString();
+					ccOption.UserName = option->weatherImageDownloadOption.UserName.toStdString();
+					ccOption.Password = option->weatherImageDownloadOption.Password.toStdString();
+					ccOption.LastHours = option->weatherImageDownloadOption.LastHours;
+					ccOption.Interval = option->weatherImageDownloadOption.Interval;
+					ccOption.SavePathForWindows = option->weatherImageDownloadOption.SavePathForWindows.toStdWString();
+					ccOption.SavePathForLinux = option->weatherImageDownloadOption.SavePathForLinux.toStdWString();
+					controlPrx->begin_setWeatherPictureDownloadOption(ccOption, []() {});
 				}
             },
 				[](const Ice::Exception& ex)

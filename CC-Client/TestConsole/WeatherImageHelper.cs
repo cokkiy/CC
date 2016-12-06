@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CC_StationService
+namespace TestConsole
 {
     /// <summary>
     /// 气象云图辅助类
@@ -29,8 +29,8 @@ namespace CC_StationService
             }
             catch (Exception ex)
             {
-                //PlatformMethodFactory.GetLogger().error(ex.Message);
-                //PlatformMethodFactory.GetLogger().error(ex.ToString());
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.ToString());
                 return new List<string>();
             }
         }
@@ -70,8 +70,8 @@ namespace CC_StationService
                 }
                 catch(Exception ex)
                 {
-                    //PlatformMethodFactory.GetLogger().error(ex.Message);
-                    //PlatformMethodFactory.GetLogger().error(ex.ToString());
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.ToString());
                 }
                 finally
                 {
@@ -222,6 +222,11 @@ namespace CC_StationService
             {
                 responseStream = response.GetResponseStream();
                 readStream = new BinaryReader(responseStream);
+                // Display information about the data received from the server.
+                Console.WriteLine("Bytes received: {0}", response.ContentLength);
+
+                Console.WriteLine("Message from server: {0}", response.StatusDescription);
+                Console.WriteLine("Resource: {0}", response.ResponseUri);
 
                 // Write the bytes received from the server to the local file. 
                 if (readStream != null)
@@ -246,8 +251,8 @@ namespace CC_StationService
             }
             catch(Exception ex)
             {
-                //PlatformMethodFactory.GetLogger().error(ex.Message);
-                //PlatformMethodFactory.GetLogger().error(ex.ToString());
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.ToString());
             }
             finally
             {

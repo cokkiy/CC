@@ -28,7 +28,7 @@ public:
 	作者：cokkiy（张立民）
 	创建时间:2016/3/24 9:31:41
 	*/
-	SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
+	SendFileThread(QStringList fileNames,QString userName, QString dest, std::list<StationInfo*> stations,
 		Ice::CommunicatorPtr communicator, QObject *parent = NULL);
 	~SendFileThread();
 	virtual void run() override;
@@ -39,6 +39,7 @@ private:
 	Ice::CommunicatorPtr communicator;
 	QString dest;
 	QString soureDir;
+	QString userName;
 	//保持文件夹结构
 	bool keepDirStructure = false;
     int total=0;
@@ -48,9 +49,9 @@ private:
 	//完成发送方法
 	void waitComplete(std::list <ResultTuple>& asyncResults, StationInfo* s, std::vector< Ice::Byte > resultParams);
 	//发送文件夹中的所有文件
-	void SendFilesInDir(StationInfo* s, const QString& fileName, QFileInfo &fileInfo);
+	void SendFilesInDir(StationInfo* s, const QString& fileName,const QString& userName, QFileInfo &fileInfo);
 	//发送文件
-	void sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo);
+	void sendFile(StationInfo* s, const QString& file, const QString& userName, QFileInfo &fileInfo);
 
 signals:
 	//信号

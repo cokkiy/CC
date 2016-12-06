@@ -68,6 +68,12 @@
     <Compile Include="LinuxLogger.cs" />
     <Compile Include="MemoryInfo.cs" />
     <Compile Include="PictureType.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="StateGatherer.cs" />
     <Compile Include="StationMonitorService.cs">
       <SubType>Component</SubType>
@@ -90,6 +96,10 @@
     <None Include="App.config" />
     <None Include="Config.Client">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Slice\AppControlParameter.ice" />
     <None Include="Slice\IAppLuncher.ice" />

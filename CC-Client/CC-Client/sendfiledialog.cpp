@@ -82,7 +82,7 @@ void SendFileDialog::on_sendPushButton_clicked()
 	}
 
 	//启动发送线程
-	SendFileThread* sendThread = new SendFileThread(fileNames, ui->destLineEdit->text(), stations, communicator);
+	SendFileThread* sendThread = new SendFileThread(fileNames, ui->destLineEdit->text(),ui->userNameLineEdit->text(), stations, communicator);
 	connect(sendThread, &SendFileThread::failToSendFile, this, &SendFileDialog::on_failToSendFile);
 	connect(sendThread, &SendFileThread::newFileSize, this, &SendFileDialog::on_newFileSize);
 	connect(sendThread, &SendFileThread::fileSended, this, &SendFileDialog::on_fileSended);

@@ -111,6 +111,8 @@ public:
     void on_actionRemove_triggered();
     //设置新建工作站默认监视进程和启动程序
     void on_actionSetDefaultAppAndProc_triggered();
+	//设置气象云图下载选项
+	void on_actionSetWeatherDownloadOption_triggered();
     //查看工作站详细信息
     void on_actionViewStationDetail_triggered();
 	//发送文件到选定工作站

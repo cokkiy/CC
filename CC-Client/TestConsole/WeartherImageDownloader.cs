@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CC_StationService
+namespace TestConsole
 {
     /// <summary>
     /// 气象云图下载器
@@ -17,7 +17,7 @@ namespace CC_StationService
         /// <summary>
         /// 获取或设置气象云图下载选项
         /// </summary>
-        public WeatherPictureDowlnloadOption Option { get; set; }
+        //public WeatherPictureDowlnloadOption Option { get; set; }
 
         public bool IsRunning { get; private set; }
 
@@ -40,13 +40,15 @@ namespace CC_StationService
             bStop = false;
             try
             {
+                Console.WriteLine(bStop);
                 Thread downloadThread = new Thread(DownloadProc);
                 downloadThread.Start();
                 IsRunning = true;
             }
             catch(Exception ex)
             {
-                PlatformMethodFactory.GetLogger().error(ex.Message);
+                //PlatformMethodFactory.GetLogger().error(ex.Message);
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -60,9 +62,11 @@ namespace CC_StationService
         {
             while (true)
             {
-                if ((DateTime.Now - lastDownloadTime).TotalMinutes > Option.Interval)
+                Console.WriteLine(".....................");
+                if ((DateTime.Now - lastDownloadTime).TotalMinutes > 1)
                 {
-                    List<string> files = WeatherImageHelper.ListFile(Option.Url, Option.UserName, Option.Password);
+                    Console.WriteLine("List file...");
+                    List<string> files = WeatherImageHelper.ListFile("ftp://192.168.0.100", "anonymous", "");
 
                     foreach (var file in files)
                     {
@@ -86,36 +90,43 @@ namespace CC_StationService
                                 break;
                         }
 
-                        if ((DateTime.Now - time).TotalHours < Option.LastHours)
+                        if ((DateTime.Now - time).TotalHours < 2)
                         {
-                            string url = Option.Url + "/" + file;
+                            string url = "ftp://192.168.0.100" + "/" + file;
                             string localFile = "";
                             if (Environment.OSVersion.Platform == PlatformID.Unix
                                 || Environment.OSVersion.Platform == PlatformID.MacOSX)
                             {
-                                if (!Directory.Exists(Option.SavePathForLinux))
+                                if (!Directory.Exists("/home/WeatherImages"))
                                 {
-                                    Directory.CreateDirectory(Option.SavePathForLinux);
+                                    Directory.CreateDirectory("/home/WeatherImages");
                                 }
-                                localFile = Option.SavePathForLinux + "/" + file;
+                                localFile = "/home/WeatherImages" + "/" + file;
                             }
                             else
                             {
-                                if (!Directory.Exists(Option.SavePathForWindows))
+                                if (!Directory.Exists("D:\\WeatherImages"))
                                 {
-                                    Directory.CreateDirectory(Option.SavePathForWindows);
+                                    Directory.CreateDirectory("D:\\WeatherImages");
                                 }
-                                localFile = Option.SavePathForWindows + "/" + file;
+                                localFile = "D:\\WeatherImages" + "/" + file;
                             }
-                            WeatherImageHelper.DownloadFile(url, localFile, Option.UserName, Option.Password);
+
+                            Console.WriteLine("start download {0} ...", url);
+                            WeatherImageHelper.DownloadFile(url, localFile, "anonymous", "");
                         }
                     }
                     //更新最后下载时间
                     lastDownloadTime = DateTime.Now;
                 }
+
+                Console.WriteLine("sleep");
                 Thread.Sleep(1000);//休眠1秒
+                Console.WriteLine("wake up");
+                Console.WriteLine(bStop);
                 if (bStop)
                 {
+                    Console.WriteLine("stopped");
                     IsRunning = false;
                     break;
                 }

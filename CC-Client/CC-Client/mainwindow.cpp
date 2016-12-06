@@ -35,6 +35,7 @@
 #include "aboutdialog.h"
 #include "updatemanager.h"
 #include "qpagenumdialog.h"
+#include "weatherimageoptiondlg.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -799,7 +800,7 @@ void MainWindow::on_actionSetInterval_triggered()
             option.Save();
             //设置监视间隔
             StationManager* manager = new StationManager(pStationList);
-            manager->setInterval(option.Interval);
+            manager->setWeatherImageDownloadOption(option.weatherImageDownloadOption);
         }
         delete dlg;
     }
@@ -867,6 +868,20 @@ void MainWindow::on_actionSetDefaultAppAndProc_triggered()
         option.Save();
     }
 }
+
+//设置气象云图下载选项
+void MainWindow::on_actionSetWeatherDownloadOption_triggered()
+{
+	WeatherImageOptionDlg dlg(&option.weatherImageDownloadOption);
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		option.Save();
+		//设置监视间隔
+		StationManager* manager = new StationManager(pStationList);
+		manager->setWeatherImageDownloadOption(option.weatherImageDownloadOption);
+	}
+}
+
 //查看工作站信息信息
 void MainWindow::on_actionViewStationDetail_triggered()
 {

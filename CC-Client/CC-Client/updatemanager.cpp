@@ -101,102 +101,102 @@ void UpdateManager::run()
 
 void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy)
 {
-#ifdef Q_OS_WIN
-	FILE* fp = _wfopen(localFile.toStdWString().c_str(), L"rb");
-#else
-	FILE* fp = fopen(localFile.toStdString().c_str(), "rb");
-#endif
-	char* buf = new char[MaxFileSize]; //假定程序大小不超过512k
-	long long int length = fread(buf, 1, MaxFileSize, fp);
-	CC::ByteArray bytes;
-	bytes.insert(bytes.begin(), buf, buf + length);
-	if (!feof(fp))
-	{
-		emit UpdatingProgressReport(0, QStringLiteral("文件太大，无法自动更新。"));
-		throw;
-	}
-	int count = 1;
-	wstring tmpName = L"~CC-StationService.exe";
-	if (serviceorProxy == Proxy)
-		tmpName = L"~AppLuncher.exe";
-	for_each(toBeUpdatingStations.begin(), toBeUpdatingStations.end(),
-		[&](StationUpdateState& ss)
-	{
-		wstring remotePath;
-		if (serviceorProxy == Service)
-			remotePath = ss.servicePath;
-		else
-			remotePath = ss.proxyPath;
-		if (remotePath != L"")
-		{
-			if (serviceorProxy == Service ? ss.serviceNeedUpdate : ss.proxyNeedUpdate)
-			{
-				size_t pos = remotePath.find_last_of('/');
-				if (pos == wstring::npos)
-					pos = remotePath.find_last_of('\\');
-				size_t number = remotePath.length() - pos - 1;
-				wstring newServicePath = remotePath;
-				newServicePath = newServicePath.replace(pos + 1, number, tmpName);
-				try
-				{
-					if (ss.Station->fileProxy->createFile(newServicePath))
-					{
-						if (ss.Station->fileProxy->transData(0, length, bytes))
-						{
-							if (ss.Station->fileProxy->closeFile())
-							{
-								wstring oldServiceTmpName = remotePath;
-								oldServiceTmpName = oldServiceTmpName.replace(pos + 1, number, L"~" + tmpName);
-								if (ss.Station->controlProxy->renameFile(remotePath, oldServiceTmpName))
-								{
-									if (ss.Station->controlProxy->renameFile(newServicePath, remotePath))
-									{
-										if (serviceorProxy == Service)
-										{
-											ss.serviceUpdated = true;
-											emit UpdatingProgressReport(++count/ (float)needUpdateCount * 100, QStringLiteral("%1已完成中控服务更新。").arg(ss.Station->Name()));
-										}
-										else
-										{
-											ss.proxyUpdated = true;
-											emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1已完成应用代理更新。").arg(ss.Station->Name()));
-										}										
-									}
-									else
-									{
-										ss.Station->controlProxy->renameFile(oldServiceTmpName, remotePath);
-									}
-								}
-								else
-								{
-									if (serviceorProxy == Service)
-									{
-										emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
-									}
-									else
-									{
-										emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
-									}
-								}
-							}
-						}
-					}
-				}
-				catch (const Ice::OperationNotExistException&)
-				{
-					emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
-				}
-				catch (...)
-				{
-					emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,发生未知错误，请手动升级。").arg(ss.Station->Name()));
-				}
-			}
-		}
-		else
-		{
-			emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
-		}
-	});
+// #ifdef Q_OS_WIN
+// 	FILE* fp = _wfopen(localFile.toStdWString().c_str(), L"rb");
+// #else
+// 	FILE* fp = fopen(localFile.toStdString().c_str(), "rb");
+// #endif
+// 	char* buf = new char[MaxFileSize]; //假定程序大小不超过512k
+// 	long long int length = fread(buf, 1, MaxFileSize, fp);
+// 	CC::ByteArray bytes;
+// 	bytes.insert(bytes.begin(), buf, buf + length);
+// 	if (!feof(fp))
+// 	{
+// 		emit UpdatingProgressReport(0, QStringLiteral("文件太大，无法自动更新。"));
+// 		throw;
+// 	}
+// 	int count = 1;
+// 	wstring tmpName = L"~CC-StationService.exe";
+// 	if (serviceorProxy == Proxy)
+// 		tmpName = L"~AppLuncher.exe";
+// 	for_each(toBeUpdatingStations.begin(), toBeUpdatingStations.end(),
+// 		[&](StationUpdateState& ss)
+// 	{
+// 		wstring remotePath;
+// 		if (serviceorProxy == Service)
+// 			remotePath = ss.servicePath;
+// 		else
+// 			remotePath = ss.proxyPath;
+// 		if (remotePath != L"")
+// 		{
+// 			if (serviceorProxy == Service ? ss.serviceNeedUpdate : ss.proxyNeedUpdate)
+// 			{
+// 				size_t pos = remotePath.find_last_of('/');
+// 				if (pos == wstring::npos)
+// 					pos = remotePath.find_last_of('\\');
+// 				size_t number = remotePath.length() - pos - 1;
+// 				wstring newServicePath = remotePath;
+// 				newServicePath = newServicePath.replace(pos + 1, number, tmpName);
+// 				try
+// 				{
+// 					if (ss.Station->fileProxy->createFile(newServicePath))
+// 					{
+// 						if (ss.Station->fileProxy->transData(0, length, bytes))
+// 						{
+// 							if (ss.Station->fileProxy->closeFile())
+// 							{
+// 								wstring oldServiceTmpName = remotePath;
+// 								oldServiceTmpName = oldServiceTmpName.replace(pos + 1, number, L"~" + tmpName);
+// 								if (ss.Station->controlProxy->renameFile(remotePath, oldServiceTmpName))
+// 								{
+// 									if (ss.Station->controlProxy->renameFile(newServicePath, remotePath))
+// 									{
+// 										if (serviceorProxy == Service)
+// 										{
+// 											ss.serviceUpdated = true;
+// 											emit UpdatingProgressReport(++count/ (float)needUpdateCount * 100, QStringLiteral("%1已完成中控服务更新。").arg(ss.Station->Name()));
+// 										}
+// 										else
+// 										{
+// 											ss.proxyUpdated = true;
+// 											emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1已完成应用代理更新。").arg(ss.Station->Name()));
+// 										}										
+// 									}
+// 									else
+// 									{
+// 										ss.Station->controlProxy->renameFile(oldServiceTmpName, remotePath);
+// 									}
+// 								}
+// 								else
+// 								{
+// 									if (serviceorProxy == Service)
+// 									{
+// 										emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
+// 									}
+// 									else
+// 									{
+// 										emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新应用代理。").arg(ss.Station->Name()));
+// 									}
+// 								}
+// 							}
+// 						}
+// 					}
+// 				}
+// 				catch (const Ice::OperationNotExistException&)
+// 				{
+// 					emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
+// 				}
+// 				catch (...)
+// 				{
+// 					emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,发生未知错误，请手动升级。").arg(ss.Station->Name()));
+// 				}
+// 			}
+// 		}
+// 		else
+// 		{
+// 			emit UpdatingProgressReport(++count / (float)needUpdateCount * 100, QStringLiteral("%1无法更新,该工作站版本太低，不支持自动更新。").arg(ss.Station->Name()));
+// 		}
+// 	});
 }
 
 void UpdateManager::getNewVersionFile(QString &localFile, wstring remotePath)

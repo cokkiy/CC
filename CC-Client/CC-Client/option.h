@@ -13,6 +13,19 @@ class Option : public QObject
     Q_OBJECT
 
 public:
+	//气象图片下载选项
+	struct WeatherImageDownloadOption
+	{
+		QString Url;
+		QString UserName;
+		QString Password;
+		int LastHours;
+		int Interval;
+		QString SavePathForLinux;
+		QString SavePathForWindows;
+	} weatherImageDownloadOption;
+
+public:
     Option(QObject *parent=NULL);
     ~Option();
 public:

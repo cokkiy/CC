@@ -154,11 +154,11 @@ module CC
 	{
 		///创建文件
 		["cpp:type:wstring"]
-		bool createFile(string fileName) throws FileTransException;
+		bool createFile(string fileName,string userName) throws FileTransException;
 		///传送数据
 		bool transData(long position,int length,ByteArray data) throws FileTransException;
 		///关闭文件
-		bool closeFile() throws FileTransException;
+		bool closeFile(string userName) throws FileTransException;
 
 		///获取文件大小
 		long getSize(string fileName) throws FileTransException;

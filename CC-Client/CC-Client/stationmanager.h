@@ -6,6 +6,7 @@
 #include <QAbstractItemModel>
 #include <Ice/Ice.h>
 #include <QByteArray>
+#include "option.h"
 
 /************************************************************************
  @class StationManager:工作站管理类,管理工作站启动,关闭,重启,运行程序
@@ -140,6 +141,16 @@ public:
     */
     void setInterval(int interval);
 
+	/*!
+	设置气象云图下载选项
+	@param const Option::WeatherImageDownloadOption & weatherImageDownloadOption 气象云图下载选项
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2016/12/2 9:44:53
+	*/
+	void setWeatherImageDownloadOption(const Option::WeatherImageDownloadOption& weatherImageDownloadOption);
+
+
 public:
 
 	/*!
@@ -246,8 +257,7 @@ private:
 	//mac 2 bytearray
 	QByteArray MAC2Byte(QString mac);
 	// 发送开机指令包
-	void sendPowerOnPacket(StationInfo* s);
-	
+	void sendPowerOnPacket(StationInfo* s);	
 
 };
 

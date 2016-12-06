@@ -570,6 +570,7 @@
     <addaction name="separator"/>
     <addaction name="actionSetInterval"/>
     <addaction name="actionSetDefaultAppAndProc"/>
+    <addaction name="actionSetWeatherDownloadOption"/>
    </widget>
    <widget class="QMenu" name="menuFileTranslation">
     <property name="title">
@@ -1162,6 +1163,15 @@
    </property>
    <property name="statusTip">
     <string>升级工作站中控服务和应用代理</string>
+   </property>
+  </action>
+  <action name="actionSetWeatherDownloadOption">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/weather.png</normaloff>:/Icons/weather.png</iconset>
+   </property>
+   <property name="text">
+    <string>设置气象云图下载选型...</string>
    </property>
   </action>
  </widget>

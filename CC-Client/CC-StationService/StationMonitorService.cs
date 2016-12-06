@@ -63,8 +63,17 @@ namespace CC_StationService
 
                 //启动监视线程
                 watcher.StartWatching();
-                logger.print("开始系统资源监视...");              
-               
+                logger.print("开始系统资源监视...");
+
+                //启动气象云图下载线程
+                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
+                downloader.Option = LoadFromSetting();
+
+                if (!downloader.IsRunning)
+                {
+                    downloader.Start();
+                }
+
             }
             catch (Exception ex)
             {
@@ -72,7 +81,20 @@ namespace CC_StationService
             }
         }
 
-        
+        //从设置中加载气象云图下载选项
+        private WeatherPictureDowlnloadOption LoadFromSetting()
+        {
+            WeatherPictureDowlnloadOption option = new WeatherPictureDowlnloadOption();
+            option.Url = Properties.Settings.Default.FtpUrl;
+            option.UserName = Properties.Settings.Default.UserName;
+            option.Password = Properties.Settings.Default.Password;
+            option.LastHours = Properties.Settings.Default.LastHours;
+            option.Interval = Properties.Settings.Default.Interval;
+            option.SavePathForLinux = Properties.Settings.Default.SavePathForLinux;
+            option.SavePathForWindows = Properties.Settings.Default.SavePathForWindows;
+            return option;
+        }
+
         protected override void OnPause()
         {
             //停止监视系统
