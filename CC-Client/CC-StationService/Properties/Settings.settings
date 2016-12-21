@@ -23,5 +23,14 @@
     <Setting Name="SavePathForWindows" Type="System.String" Scope="User">
       <Value Profile="(Default)">d:\WeatherImages</Value>
     </Setting>
+    <Setting Name="DeletePreviousFiles" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DeleteHowHoursAgo" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="SubDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -70,10 +70,10 @@ SOURCES += main.cpp\
     batchcaputrethread.cpp \
     aboutdialog.cpp \
     updatemanager.cpp \
-    qpagenumdialog.cpp
+    qpagenumdialog.cpp \
+    weatherimageoptiondlg.cpp
 
 HEADERS  += mainwindow.h \
-    selectcomputerdialog.h \
     cpuplot/counterpiemarker.h \
     cpuplot/cpustat.h \
     cpuplot/plotpart.h \
@@ -115,7 +115,8 @@ HEADERS  += mainwindow.h \
     batchcaputrethread.h \
     aboutdialog.h \
     updatemanager.h \
-    qpagenumdialog.h
+    qpagenumdialog.h \
+    weatherimageoptiondlg.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -132,7 +133,8 @@ FORMS    += mainwindow.ui \
     filebrowserdialog.ui \
     batchcapturedialog.ui \
     aboutdialog.ui \
-    qpagenumdialog.ui
+    qpagenumdialog.ui \
+    weatherimageoptiondlg.ui
 
 RESOURCES += \
     cc-client.qrc

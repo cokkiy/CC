@@ -107,5 +107,41 @@ namespace CC_StationService.Properties {
                 this["SavePathForWindows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DeletePreviousFiles {
+            get {
+                return ((bool)(this["DeletePreviousFiles"]));
+            }
+            set {
+                this["DeletePreviousFiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int DeleteHowHoursAgo {
+            get {
+                return ((int)(this["DeleteHowHoursAgo"]));
+            }
+            set {
+                this["DeleteHowHoursAgo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SubDirectory {
+            get {
+                return ((string)(this["SubDirectory"]));
+            }
+            set {
+                this["SubDirectory"] = value;
+            }
+        }
     }
 }

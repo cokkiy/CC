@@ -1,4 +1,4 @@
-#include "weatherimageoptiondlg.h"
+ï»¿#include "weatherimageoptiondlg.h"
 #include "ui_weatherimageoptiondlg.h"
 #include <QMessageBox>
 
@@ -12,6 +12,9 @@ WeatherImageOptionDlg::WeatherImageOptionDlg(Option::WeatherImageDownloadOption*
 	this->ui->passwordLineEdit->setText(option->Password);
 	this->ui->lastHoursSpinBox->setValue(option->LastHours);
 	this->ui->intervalSpinBox->setValue(option->Interval);
+	this->ui->deleteFileCheckBox->setChecked(option->DeletePreviousFiles);
+	this->ui->deleteFileSpinBox->setValue(option->DeleteHowHoursAgo);
+	this->ui->subDirLineEdit->setText(option->SubDirectory);
 	this->ui->savePathForLinuxLineEdit->setText(option->SavePathForLinux);
 	this->ui->savePathForWindowsLineEdit->setText(option->SavePathForWindows);
 }
@@ -25,18 +28,18 @@ void WeatherImageOptionDlg::on_okPushButton_clicked()
 {
 	if (!this->ui->ftpAddressLineEdit->text().startsWith("ftp://"))
 	{
-		QMessageBox::warning(this, QStringLiteral("´íÎó"), QStringLiteral("FTPµØÖ·±ØÐëÒÔftp://¿ªÊ¼"));
+		QMessageBox::warning(this, QStringLiteral("é”™è¯¯"), QStringLiteral("FTPåœ°å€å¿…é¡»ä»¥ftp://å¼€å§‹"));
 		return;
 	}
 	if (!this->ui->savePathForLinuxLineEdit->text().startsWith("/"))
 	{
-		QMessageBox::warning(this, QStringLiteral("´íÎó"), QStringLiteral("LinuxÏµÍ³±£´æÎ»ÖÃ±ØÐëÒÔ'/'¿ªÊ¼¡£"));
+		QMessageBox::warning(this, QStringLiteral("é”™è¯¯"), QStringLiteral("Linuxç³»ç»Ÿä¿å­˜ä½ç½®å¿…é¡»ä»¥'/'å¼€å§‹ã€‚"));
 		return;
 	}
 
 	if (this->ui->savePathForWindowsLineEdit->text() == "")
 	{
-		QMessageBox::warning(this, QStringLiteral("´íÎó"), QStringLiteral("WindowsÏµÍ³±£´æÎ»ÖÃ²»ÄÜÎª¿Õ¡£"));
+		QMessageBox::warning(this, QStringLiteral("é”™è¯¯"), QStringLiteral("Windowsç³»ç»Ÿä¿å­˜ä½ç½®ä¸èƒ½ä¸ºç©ºã€‚"));
 		return;
 	}
 
@@ -51,8 +54,12 @@ void WeatherImageOptionDlg::on_okPushButton_clicked()
 	option->Password = this->ui->passwordLineEdit->text();
 	option->LastHours = this->ui->lastHoursSpinBox->value();
 	option->Interval = this->ui->intervalSpinBox->value();
+	option->DeletePreviousFiles = this->ui->deleteFileCheckBox->isChecked();
+	option->DeleteHowHoursAgo = this->ui->deleteFileSpinBox->value();
+	option->SubDirectory = this->ui->subDirLineEdit->text();
 	option->SavePathForLinux = this->ui->savePathForLinuxLineEdit->text();
 	option->SavePathForWindows = this->ui->savePathForWindowsLineEdit->text();
+
 	this->done(QDialog::Accepted);
 }
 

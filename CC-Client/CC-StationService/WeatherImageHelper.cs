@@ -96,14 +96,14 @@ namespace CC_StationService
         /// <returns>气象图类型</returns>
         public static PictureType CheckType(string filename)
         {
-            string fy2DPattern = @"FY2D_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.JPG";
-            string fy2EPattern = @"FY2E_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.JPG";
-            string fy2GPattern = @"FY2G_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.JPG";
-            string wdPlainGraphPattern = @"\d{8}AP\d+\.bmp"; ;
-            string wdVerticalSweepPattern = @"\d{8}AR\d+\.bmp";
-            string dslPlainGraphPattern = @"P\d{12}\.bmp"; ;
-            string dslVerticalSweepPattern = @"R\d{12}\.bmp";
-            string dslVelocitySpectrumPattern = @"S\d{12}\.bmp";
+            string fy2DPattern = @"FY2D_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.(JPG|bmp)";
+            string fy2EPattern = @"FY2E_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.(JPG|bmp)";
+            string fy2GPattern = @"FY2G_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.(JPG|bmp)";
+            string wdPlainGraphPattern = @"\d{8}AP\d+\.(jpg|bmp)"; 
+            string wdVerticalSweepPattern = @"\d{8}AR\d+\.(jpg|bmp)";
+            string dslPlainGraphPattern = @"P\d{12}\.(jpg|bmp)"; 
+            string dslVerticalSweepPattern = @"R\d{12}\.(jpg|bmp)";
+            string dslVelocitySpectrumPattern = @"S\d{12}\.(jpg|bmp)";
             if (Regex.IsMatch(filename, fy2DPattern, RegexOptions.IgnoreCase))
                 return PictureType.FY2D;
             if (Regex.IsMatch(filename, fy2EPattern, RegexOptions.IgnoreCase))
@@ -132,7 +132,7 @@ namespace CC_StationService
         /// <returns>风云2卫星图时间</returns>
         public static DateTime GetFy2CloudPictureDateTime(string filename)
         {
-            string pattern = @"FY2[DEG]_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.JPG";
+            string pattern = @"FY2[DEG]_(?<year>20\d{2})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<min>\d{2})(_.+)*\.(jpg|bmp)";
 
             Match match = Regex.Match(filename, pattern, RegexOptions.IgnoreCase);
             if (match.Success)
@@ -157,7 +157,7 @@ namespace CC_StationService
         public static DateTime GetWDRadarPictureDateTime(string filename)
         {
             // 07021555AP6.bmp
-            string pattern = @"(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<min>\d{2})(.)*\.bmp";
+            string pattern = @"(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<min>\d{2})(.)*\.(jpg|bmp)";
             Match match = Regex.Match(filename, pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
@@ -184,7 +184,7 @@ namespace CC_StationService
         public static DateTime GetDSLRadarPictureDateTime(string filename)
         {
             // R160624162132.bmp P160624162132.bmp S160624162132.bmp
-            string pattern = @"[RPS](?<year>\d{2})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<min>\d{2})(?<second>\d{2})\.bmp";
+            string pattern = @"[RPS](?<year>\d{2})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<min>\d{2})(?<second>\d{2})\.(jpg|bmp)";
             Match match = Regex.Match(filename, pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
@@ -198,6 +198,65 @@ namespace CC_StationService
             }
 
             return new DateTime();
+        }
+
+        /// <summary>
+        /// 根据原始文件名，文件时间，文件图片类型生成本地文件名
+        /// </summary>
+        /// <param name="orgName">原始文件名</param>
+        /// <param name="fileTime">文件代表的气象时间</param>
+        /// <param name="type">图片类型</param>
+        /// <returns>本地文件名</returns>
+        public static string GetLocalFileName(string orgName, DateTime fileTime, PictureType type)
+        {
+            int index = orgName.LastIndexOf('.');
+            if (index != -1 && orgName.Length > index)
+            {
+                string name = orgName.Substring(0, index);
+                string ext = orgName.Substring(index + 1);
+                return string.Format("{0}-{1}{2:yyyyMMdd-HHmmss}.{3}", name, PictureType2String(type), fileTime, ext);
+            }
+
+            return string.Format("{0}-{1}{2:yyyymmdd-hhMMss}.jpg", orgName, PictureType2String(type), fileTime);
+        }
+
+        /// <summary>
+        /// 生成代表图片类型的字符串
+        /// </summary>
+        /// <param name="type">图片类型</param>
+        /// <returns>代表图片类型的字符串</returns>
+        private static string PictureType2String(PictureType type)
+        {
+            string s = "";
+            switch (type)
+            {
+                case PictureType.FY2D:
+                    s = "FY2D";
+                    break;
+                case PictureType.FY2E:
+                    s = "FY2E";
+                    break;
+                case PictureType.FY2G:
+                    s = "FY2G";
+                    break;
+                case PictureType.WDRadarPlainGraph:
+                    s = "WDPG";
+                    break;
+                case PictureType.WDRadarVerticalSweep:
+                    s = "WDVS";
+                    break;
+                case PictureType.DSLRadarPlainGraph:
+                    s = "DSLPG";
+                    break;
+                case PictureType.DSLRadarVerticalSweep:
+                    s = "DSLVS";
+                    break;
+                case PictureType.DSLRadarVelocitySpectrum:
+                    s = "DSLST";
+                    break;
+            }
+
+            return s;
         }
 
 

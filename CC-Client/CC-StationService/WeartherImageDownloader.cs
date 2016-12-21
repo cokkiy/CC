@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -53,6 +54,116 @@ namespace CC_StationService
         //最后一次下载时间
         private DateTime lastDownloadTime = new DateTime();
 
+        //列出并下载指定url下符合条件的所有文件
+        private void ListAndDownloadFile(string url)
+        {
+            List<string> files = WeatherImageHelper.ListFile(url, Option.UserName, Option.Password);
+
+            foreach (var file in files)
+            {
+                PictureType type = WeatherImageHelper.CheckType(file);
+                DateTime time = new DateTime();
+                switch (type)
+                {
+                    case PictureType.FY2D:
+                    case PictureType.FY2E:
+                    case PictureType.FY2G:
+                        time = WeatherImageHelper.GetFy2CloudPictureDateTime(file);
+                        break;
+                    case PictureType.DSLRadarPlainGraph:
+                    case PictureType.DSLRadarVerticalSweep:
+                    case PictureType.DSLRadarVelocitySpectrum:
+                        time = WeatherImageHelper.GetDSLRadarPictureDateTime(file);
+                        break;
+                    case PictureType.WDRadarPlainGraph:
+                    case PictureType.WDRadarVerticalSweep:
+                        time = WeatherImageHelper.GetWDRadarPictureDateTime(file);
+                        break;
+                }
+
+                if ((DateTime.Now - time).TotalHours < Option.LastHours)
+                {
+                    string fileUrl = url + "/" + file;
+                    string localFile = "";
+                    string localName = WeatherImageHelper.GetLocalFileName(file, time, type);
+                    if (Environment.OSVersion.Platform == PlatformID.Unix
+                        || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                    {
+                        if (!Directory.Exists(Option.SavePathForLinux))
+                        {
+                            Directory.CreateDirectory(Option.SavePathForLinux);
+                        }
+                        localFile = Option.SavePathForLinux + "/" + localName;
+                    }
+                    else
+                    {
+                        if (!Directory.Exists(Option.SavePathForWindows))
+                        {
+                            Directory.CreateDirectory(Option.SavePathForWindows);
+                        }
+                        localFile = Option.SavePathForWindows + "/" + localName;
+                    }
+                    if (!File.Exists(localFile))
+                    {
+                        WeatherImageHelper.DownloadFile(fileUrl, localFile, Option.UserName, Option.Password);
+                    }
+                }
+            }
+        }
+
+        //删除旧文件
+        private void DeleteOldFiles()
+        {
+            if (Option.DeletePreviousFiles)
+            {
+                Regex regex = new Regex("\\w{4,5}(?<year>\\d{4})(?<month>\\d{2})(?<day>\\d{2})-(?<hour>\\d{2})(?<min>\\d{2})(?<second>\\d{2})\\.(jpg|bmp)");
+
+                string localDir = Option.SavePathForWindows;
+                if (Environment.OSVersion.Platform == PlatformID.Unix
+                || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                {
+                    localDir = Option.SavePathForLinux;
+                }
+
+                if (Directory.Exists(localDir))
+                {
+                    try
+                    {
+                        foreach (var file in Directory.EnumerateFiles(localDir))
+                        {
+                            string fileName = file.Substring(localDir.Length + 1);
+                            Match match = regex.Match(fileName);
+                            if (match.Success)
+                            {
+                                int year = int.Parse(match.Groups["year"].Value);
+                                int month = int.Parse(match.Groups["month"].Value);
+                                int day = int.Parse(match.Groups["day"].Value);
+                                int hour = int.Parse(match.Groups["hour"].Value);
+                                int min = int.Parse(match.Groups["min"].Value);
+                                int second = int.Parse(match.Groups["second"].Value);
+                                DateTime fileTime = new DateTime(year, month, day, hour, min, second);
+                                if ((DateTime.Now - fileTime).TotalHours > Option.DeleteHowHoursAgo)
+                                {
+                                    try
+                                    {
+                                        File.Delete(file);
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// 下载图片函数
         /// </summary>
@@ -62,54 +173,26 @@ namespace CC_StationService
             {
                 if ((DateTime.Now - lastDownloadTime).TotalMinutes > Option.Interval)
                 {
-                    List<string> files = WeatherImageHelper.ListFile(Option.Url, Option.UserName, Option.Password);
+                    //首先下载根目录下的所有文件
+                    ListAndDownloadFile(Option.Url);
 
-                    foreach (var file in files)
+                    //下载子目录下的所有文件
+                    string[] subDirs = Option.SubDirectory.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var dir in subDirs)
                     {
-                        PictureType type = WeatherImageHelper.CheckType(file);
-                        DateTime time = new DateTime();
-                        switch (type)
+                        string url = "";
+                        if (Option.Url.EndsWith("/"))
                         {
-                            case PictureType.FY2D:
-                            case PictureType.FY2E:
-                            case PictureType.FY2G:
-                                time = WeatherImageHelper.GetFy2CloudPictureDateTime(file);
-                                break;
-                            case PictureType.DSLRadarPlainGraph:
-                            case PictureType.DSLRadarVerticalSweep:
-                            case PictureType.DSLRadarVelocitySpectrum:
-                                time = WeatherImageHelper.GetDSLRadarPictureDateTime(file);
-                                break;
-                            case PictureType.WDRadarPlainGraph:
-                            case PictureType.WDRadarVerticalSweep:
-                                time = WeatherImageHelper.GetWDRadarPictureDateTime(file);
-                                break;
+                            url = Option.Url.TrimEnd('/');
                         }
-
-                        if ((DateTime.Now - time).TotalHours < Option.LastHours)
-                        {
-                            string url = Option.Url + "/" + file;
-                            string localFile = "";
-                            if (Environment.OSVersion.Platform == PlatformID.Unix
-                                || Environment.OSVersion.Platform == PlatformID.MacOSX)
-                            {
-                                if (!Directory.Exists(Option.SavePathForLinux))
-                                {
-                                    Directory.CreateDirectory(Option.SavePathForLinux);
-                                }
-                                localFile = Option.SavePathForLinux + "/" + file;
-                            }
-                            else
-                            {
-                                if (!Directory.Exists(Option.SavePathForWindows))
-                                {
-                                    Directory.CreateDirectory(Option.SavePathForWindows);
-                                }
-                                localFile = Option.SavePathForWindows + "/" + file;
-                            }
-                            WeatherImageHelper.DownloadFile(url, localFile, Option.UserName, Option.Password);
-                        }
+                        url += "/" + dir;
+                        ListAndDownloadFile(url);
                     }
+
+                    //删除过期文件
+                    DeleteOldFiles();
+
+
                     //更新最后下载时间
                     lastDownloadTime = DateTime.Now;
                 }
@@ -148,8 +231,7 @@ namespace CC_StationService
                 }
             }
 
-            return _Instance;
-                
+            return _Instance;                
         }
     }
 }

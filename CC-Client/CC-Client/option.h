@@ -21,6 +21,9 @@ public:
 		QString Password;
 		int LastHours;
 		int Interval;
+		bool DeletePreviousFiles;
+		int DeleteHowHoursAgo;
+		QString SubDirectory;
 		QString SavePathForLinux;
 		QString SavePathForWindows;
 	} weatherImageDownloadOption;

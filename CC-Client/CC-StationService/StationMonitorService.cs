@@ -90,6 +90,9 @@ namespace CC_StationService
             option.Password = Properties.Settings.Default.Password;
             option.LastHours = Properties.Settings.Default.LastHours;
             option.Interval = Properties.Settings.Default.Interval;
+            option.DeletePreviousFiles = Properties.Settings.Default.DeletePreviousFiles;
+            option.DeleteHowHoursAgo = Properties.Settings.Default.DeleteHowHoursAgo;
+            option.SubDirectory = Properties.Settings.Default.SubDirectory;
             option.SavePathForLinux = Properties.Settings.Default.SavePathForLinux;
             option.SavePathForWindows = Properties.Settings.Default.SavePathForWindows;
             return option;

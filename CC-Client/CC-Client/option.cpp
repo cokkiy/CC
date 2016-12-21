@@ -53,6 +53,9 @@ void Option::Save()
 	settings.setValue("WeatherImageDownloadOption/Password", this->weatherImageDownloadOption.Password);
 	settings.setValue("WeatherImageDownloadOption/LastHours", this->weatherImageDownloadOption.LastHours);
 	settings.setValue("WeatherImageDownloadOption/Interval", this->weatherImageDownloadOption.Interval);
+	settings.setValue("WeatherImageDownloadOption/DeletePreviousFiles", this->weatherImageDownloadOption.DeletePreviousFiles);
+	settings.setValue("WeatherImageDownloadOption/DeleteHowHoursAgo", this->weatherImageDownloadOption.DeleteHowHoursAgo);
+	settings.setValue("WeatherImageDownloadOption/SubDirectory", this->weatherImageDownloadOption.SubDirectory);
 	settings.setValue("WeatherImageDownloadOption/SavePathForLinux", this->weatherImageDownloadOption.SavePathForLinux);
 	settings.setValue("WeatherImageDownloadOption/SavePathForWindows", this->weatherImageDownloadOption.SavePathForWindows);
 }
@@ -94,6 +97,9 @@ void Option::Load()
 	this->weatherImageDownloadOption.Password = settings.value("WeatherImageDownloadOption/Password").toString();
 	this->weatherImageDownloadOption.LastHours = settings.value("WeatherImageDownloadOption/LastHours").toInt();
 	this->weatherImageDownloadOption.Interval = settings.value("WeatherImageDownloadOption/Interval").toInt();
+	this->weatherImageDownloadOption.DeletePreviousFiles = settings.value("WeatherImageDownloadOption/DeletePreviousFiles").toBool();
+	this->weatherImageDownloadOption.DeleteHowHoursAgo = settings.value("WeatherImageDownloadOption/DeleteHowHoursAgo").toInt();
+	this->weatherImageDownloadOption.SubDirectory = settings.value("WeatherImageDownloadOption/SubDirectory").toString();
 	this->weatherImageDownloadOption.SavePathForLinux = settings.value("WeatherImageDownloadOption/SavePathForLinux").toString();
 	this->weatherImageDownloadOption.SavePathForWindows = settings.value("WeatherImageDownloadOption/SavePathForWindows").toString();
 }

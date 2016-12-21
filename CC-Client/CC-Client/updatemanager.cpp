@@ -25,78 +25,78 @@ UpdateManager::~UpdateManager()
 void UpdateManager::run()
 {
 	//开始升级
-	if (highestVersionedStation != NULL && !toBeUpdatingStations.empty())
-	{
-		for (auto& ss : toBeUpdatingStations)
-		{
-
-			if (ss.Station->controlProxy != NULL)
-			{
-				try
-				{
-					ss.servicePath = ss.Station->controlProxy->getServicePath();
-					ss.proxyPath = ss.Station->controlProxy->getLuncherProxyPath();
-				}
-				catch (...)
-				{
-
-				}
-			}
-		}
-
-		if (highestVersionedStation->controlProxy != NULL)
-		{
-			emit UpdatingProgressReport(0, QStringLiteral("开始准备升级..."));
-			try
-			{
-				wstring servicePath = highestVersionedStation->controlProxy->getServicePath();
-				wstring proxyPath = highestVersionedStation->controlProxy->getLuncherProxyPath();
-				if (highestVersionedStation->fileProxy != NULL)
-				{
-					QString tempPath = QDir::tempPath();
-					QString localServiceFile = tempPath + "/" + "~CC-StationService.exe";
-					getNewVersionFile(localServiceFile, servicePath);
-					emit UpdatingProgressReport(1 /(float)newVersionDownloaded * 100, QStringLiteral("新版中控服务已准备好"));
-					UpdateFile(localServiceFile, Service);
-
-					QString localProxyFile = tempPath + "/" + "~AppLuncher.exe";
-					if (proxyPath != L"")
-					{
-						getNewVersionFile(localProxyFile, proxyPath);
-						UpdateFile(localProxyFile, Proxy);
-					}
-
-					for_each(toBeUpdatingStations.begin(), toBeUpdatingStations.end(),
-						[](const StationUpdateState& ss)
-					{
-						if (ss.serviceUpdated)
-						{
-							ss.Station->setState(StationInfo::Rebooting);
-							ss.Station->controlProxy->reboot(true);
-						}
-					});
-				}
-			}
-			catch (CC::FileTransException)
-			{
-
-			}
-			catch (Ice::Exception)
-			{
-			}
-			catch (...)
-			{
-			}
-		}
-		else
-		{
-			emit UpdatingProgressReport(0, QStringLiteral("无法获取最新版文件"));
-		}
-	}
-	else
-	{
-		emit UpdatingProgressReport(0, QStringLiteral("没有需要升级的工作站"));
-	}
+// 	if (highestVersionedStation != NULL && !toBeUpdatingStations.empty())
+// 	{
+// 		for (auto& ss : toBeUpdatingStations)
+// 		{
+// 
+// 			if (ss.Station->controlProxy != NULL)
+// 			{
+// 				try
+// 				{
+// 					ss.servicePath = ss.Station->controlProxy->getServicePath();
+// 					ss.proxyPath = ss.Station->controlProxy->getLuncherProxyPath();
+// 				}
+// 				catch (...)
+// 				{
+// 
+// 				}
+// 			}
+// 		}
+// 
+// 		if (highestVersionedStation->controlProxy != NULL)
+// 		{
+// 			emit UpdatingProgressReport(0, QStringLiteral("开始准备升级..."));
+// 			try
+// 			{
+// 				wstring servicePath = highestVersionedStation->controlProxy->getServicePath();
+// 				wstring proxyPath = highestVersionedStation->controlProxy->getLuncherProxyPath();
+// 				if (highestVersionedStation->fileProxy != NULL)
+// 				{
+// 					QString tempPath = QDir::tempPath();
+// 					QString localServiceFile = tempPath + "/" + "~CC-StationService.exe";
+// 					getNewVersionFile(localServiceFile, servicePath);
+// 					emit UpdatingProgressReport(1 /(float)newVersionDownloaded * 100, QStringLiteral("新版中控服务已准备好"));
+// 					UpdateFile(localServiceFile, Service);
+// 
+// 					QString localProxyFile = tempPath + "/" + "~AppLuncher.exe";
+// 					if (proxyPath != L"")
+// 					{
+// 						getNewVersionFile(localProxyFile, proxyPath);
+// 						UpdateFile(localProxyFile, Proxy);
+// 					}
+// 
+// 					for_each(toBeUpdatingStations.begin(), toBeUpdatingStations.end(),
+// 						[](const StationUpdateState& ss)
+// 					{
+// 						if (ss.serviceUpdated)
+// 						{
+// 							ss.Station->setState(StationInfo::Rebooting);
+// 							ss.Station->controlProxy->reboot(true);
+// 						}
+// 					});
+// 				}
+// 			}
+// 			catch (CC::FileTransException)
+// 			{
+// 
+// 			}
+// 			catch (Ice::Exception)
+// 			{
+// 			}
+// 			catch (...)
+// 			{
+// 			}
+// 		}
+// 		else
+// 		{
+// 			emit UpdatingProgressReport(0, QStringLiteral("无法获取最新版文件"));
+// 		}
+// 	}
+// 	else
+// 	{
+// 		emit UpdatingProgressReport(0, QStringLiteral("没有需要升级的工作站"));
+// 	}
 }
 
 void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy)

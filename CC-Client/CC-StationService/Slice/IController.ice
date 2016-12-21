@@ -83,6 +83,13 @@ module CC
 		int Interval;
 		// 下载最近几小时的图片
 		int LastHours;
+		//删除以前的文件
+		bool DeletePreviousFiles;
+		//删除多少小时前的
+		int DeleteHowHoursAgo;
+		//子文件夹
+		["cpp:type:wstring"]
+		string SubDirectory;
 		// 保存位置(Linux)
 		["cpp:type:wstring"]
 		string SavePathForLinux;

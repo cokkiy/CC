@@ -550,7 +550,7 @@ void MainWindow::currentStationChanged(const QModelIndex & current)
 //工作站更新状态发生变化
 void MainWindow::on_UpdatingProgressReported(int percent, QString message)
 {
-	QString text = QStringLiteral("已完成%1\%，%2").arg(percent).arg(message);
+	QString text = QStringLiteral("已完成%1\\%，%2").arg(percent).arg(message);
 	QListWidgetItem* item = new QListWidgetItem(text);
 	ui->msgListWidget->addItem(item);
 	ui->msgListWidget->setCurrentItem(ui->msgListWidget->item(ui->msgListWidget->count() - 1));

@@ -111,6 +111,9 @@ void StationManager::setWeatherImageDownloadOption(const Option::WeatherImageDow
 	ccOption.Password = weatherImageDownloadOption.Password.toStdString();
 	ccOption.LastHours = weatherImageDownloadOption.LastHours;
 	ccOption.Interval = weatherImageDownloadOption.Interval;
+	ccOption.DeletePreviousFiles = weatherImageDownloadOption.DeletePreviousFiles;
+	ccOption.DeleteHowHoursAgo = weatherImageDownloadOption.DeleteHowHoursAgo;
+	ccOption.SubDirectory = weatherImageDownloadOption.SubDirectory.toStdWString();
 	ccOption.SavePathForWindows = weatherImageDownloadOption.SavePathForWindows.toStdWString();
 	ccOption.SavePathForLinux = weatherImageDownloadOption.SavePathForLinux.toStdWString();
 	
