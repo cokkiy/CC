@@ -89,6 +89,9 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 					ccOption.Interval = option->weatherImageDownloadOption.Interval;
 					ccOption.SavePathForWindows = option->weatherImageDownloadOption.SavePathForWindows.toStdWString();
 					ccOption.SavePathForLinux = option->weatherImageDownloadOption.SavePathForLinux.toStdWString();
+					ccOption.SubDirectory = option->weatherImageDownloadOption.SubDirectory.toStdWString();
+					ccOption.DeleteHowHoursAgo = option->weatherImageDownloadOption.DeleteHowHoursAgo;
+					ccOption.DeletePreviousFiles = option->weatherImageDownloadOption.DeletePreviousFiles;
 					controlPrx->begin_setWeatherPictureDownloadOption(ccOption, []() {});
 				}
             },

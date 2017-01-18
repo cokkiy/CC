@@ -20,6 +20,11 @@ namespace CC_StationService
         /// </summary>
         public WeatherPictureDowlnloadOption Option { get; set; }
 
+        /// <summary>
+        /// 获取或设置日志记录器
+        /// </summary>
+        public Ice.Logger Logger { get; set; }
+
         public bool IsRunning { get; private set; }
 
         //是否停止运行
@@ -47,7 +52,10 @@ namespace CC_StationService
             }
             catch(Exception ex)
             {
-                PlatformMethodFactory.GetLogger().error(ex.Message);
+                if (Logger != null)
+                {
+                    Logger.error(ex.Message);
+                }
             }
         }
 
@@ -58,6 +66,10 @@ namespace CC_StationService
         private void ListAndDownloadFile(string url)
         {
             List<string> files = WeatherImageHelper.ListFile(url, Option.UserName, Option.Password);
+            if(Logger!=null)
+            {
+                Logger.print(string.Format("文件总数: {0}", files.Count));
+            }
 
             foreach (var file in files)
             {
@@ -116,7 +128,7 @@ namespace CC_StationService
         {
             if (Option.DeletePreviousFiles)
             {
-                Regex regex = new Regex("\\w{4,5}(?<year>\\d{4})(?<month>\\d{2})(?<day>\\d{2})-(?<hour>\\d{2})(?<min>\\d{2})(?<second>\\d{2})\\.(jpg|bmp)");
+                Regex regex = new Regex("\\w{4,5}(?<year>\\d{4})(?<month>\\d{2})(?<day>\\d{2})-(?<hour>\\d{2})(?<min>\\d{2})(?<second>\\d{2})\\.(jpg|bmp)", RegexOptions.IgnoreCase);
 
                 string localDir = Option.SavePathForWindows;
                 if (Environment.OSVersion.Platform == PlatformID.Unix
@@ -148,9 +160,10 @@ namespace CC_StationService
                                     {
                                         File.Delete(file);
                                     }
-                                    catch
+                                    catch(System.Exception ex)
                                     {
-
+                                        PlatformMethodFactory.GetLogger().error(ex.Message);
+                                        PlatformMethodFactory.GetLogger().error(ex.ToString());
                                     }
                                 }
                             }
@@ -173,19 +186,29 @@ namespace CC_StationService
             {
                 if ((DateTime.Now - lastDownloadTime).TotalMinutes > Option.Interval)
                 {
+                    if(Logger!=null)
+                        Logger.print(string.Format("开始下载 {0} 下气象云图...",Option.Url));
                     //首先下载根目录下的所有文件
                     ListAndDownloadFile(Option.Url);
+
+                    Logger.print(Option.SubDirectory);
 
                     //下载子目录下的所有文件
                     string[] subDirs = Option.SubDirectory.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var dir in subDirs)
                     {
-                        string url = "";
-                        if (Option.Url.EndsWith("/"))
+                        string url = Option.Url;
+                        if (url.EndsWith("/"))
                         {
-                            url = Option.Url.TrimEnd('/');
+                            url = url.TrimEnd('/');
                         }
                         url += "/" + dir;
+                        if(!url.EndsWith("/"))
+                        {
+                            url += "/";
+                        }
+                        if (Logger != null)
+                            Logger.print(string.Format("开始下载 {0} 下气象云图...", url));
                         ListAndDownloadFile(url);
                     }
 

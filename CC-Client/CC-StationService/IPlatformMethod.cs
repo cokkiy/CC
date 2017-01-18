@@ -64,6 +64,9 @@ namespace CC_StationService
             return platformMethod;
         }
 
+        // tmp object for lock
+        private static object lockObj = new object();
+
         /// <summary>
         /// 获取日志记录工具的唯一对象
         /// </summary>
@@ -72,16 +75,22 @@ namespace CC_StationService
         {
             if (logger == null)
             {
-                if (Environment.OSVersion.Platform == PlatformID.Unix
-                    || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                lock(lockObj)
                 {
-                    // linux,unix,macos
-                    logger = new LinuxLogger();
-                }
-                else
-                {
-                    // windows 
-                    logger = new WindowsLogger();
+                    if (logger == null)
+                    {
+                        if (Environment.OSVersion.Platform == PlatformID.Unix
+                            || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                        {
+                            // linux,unix,macos
+                            logger = new LinuxLogger();
+                        }
+                        else
+                        {
+                            // windows 
+                            logger = new WindowsLogger();
+                        }
+                    }
                 }
             }
             return logger;

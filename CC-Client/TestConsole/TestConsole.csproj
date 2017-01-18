@@ -53,6 +53,11 @@
     <Compile Include="PictureType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="SysConfEnum.cs" />
     <Compile Include="WeartherImageDownloader.cs" />
     <Compile Include="WeatherImageHelper.cs" />
@@ -61,6 +66,10 @@
     <None Include="App.config" />
     <None Include="Config.Server">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Slice\AppControlParameter.ice" />
     <None Include="Slice\IAppLuncher.ice" />

@@ -29,8 +29,8 @@ namespace CC_StationService
             }
             catch (Exception ex)
             {
-                //PlatformMethodFactory.GetLogger().error(ex.Message);
-                //PlatformMethodFactory.GetLogger().error(ex.ToString());
+                PlatformMethodFactory.GetLogger().error(ex.Message);
+                PlatformMethodFactory.GetLogger().error(ex.ToString());
                 return new List<string>();
             }
         }
@@ -70,8 +70,8 @@ namespace CC_StationService
                 }
                 catch(Exception ex)
                 {
-                    //PlatformMethodFactory.GetLogger().error(ex.Message);
-                    //PlatformMethodFactory.GetLogger().error(ex.ToString());
+                    PlatformMethodFactory.GetLogger().error(ex.Message);
+                    PlatformMethodFactory.GetLogger().error(ex.ToString());
                 }
                 finally
                 {
@@ -305,8 +305,8 @@ namespace CC_StationService
             }
             catch(Exception ex)
             {
-                //PlatformMethodFactory.GetLogger().error(ex.Message);
-                //PlatformMethodFactory.GetLogger().error(ex.ToString());
+                PlatformMethodFactory.GetLogger().error(ex.Message);
+                PlatformMethodFactory.GetLogger().error(ex.ToString());
             }
             finally
             {

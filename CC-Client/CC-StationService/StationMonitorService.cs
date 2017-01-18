@@ -67,8 +67,9 @@ namespace CC_StationService
 
                 //启动气象云图下载线程
                 WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
+                downloader.Logger = logger;
                 downloader.Option = LoadFromSetting();
-
+                               
                 if (!downloader.IsRunning)
                 {
                     downloader.Start();
@@ -85,6 +86,7 @@ namespace CC_StationService
         private WeatherPictureDowlnloadOption LoadFromSetting()
         {
             WeatherPictureDowlnloadOption option = new WeatherPictureDowlnloadOption();
+            Properties.Settings.Default.Load();
             option.Url = Properties.Settings.Default.FtpUrl;
             option.UserName = Properties.Settings.Default.UserName;
             option.Password = Properties.Settings.Default.Password;

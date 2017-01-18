@@ -8,11 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
-using System.IO;
-using System.Reflection;
-
-namespace CC_StationService.Properties {
+namespace TestConsole.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -26,203 +22,156 @@ namespace CC_StationService.Properties {
                 return defaultInstance;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
         [global::System.Configuration.DefaultSettingValueAttribute("ftp://192.168.0.163")]
-        public string FtpUrl {
-            get {
+        public string FtpUrl
+        {
+            get
+            {
                 return ((string)(this["FtpUrl"]));
             }
-            set {
+            set
+            {
                 this["FtpUrl"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("anonymous")]
-        public string UserName {
-            get {
+        public string UserName
+        {
+            get
+            {
                 return ((string)(this["UserName"]));
             }
-            set {
+            set
+            {
                 this["UserName"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Password {
-            get {
+        public string Password
+        {
+            get
+            {
                 return ((string)(this["Password"]));
             }
-            set {
+            set
+            {
                 this["Password"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public int LastHours {
-            get {
+        public int LastHours
+        {
+            get
+            {
                 return ((int)(this["LastHours"]));
             }
-            set {
+            set
+            {
                 this["LastHours"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("20")]
-        public int Interval {
-            get {
+        public int Interval
+        {
+            get
+            {
                 return ((int)(this["Interval"]));
             }
-            set {
+            set
+            {
                 this["Interval"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("/home/WeatherImages")]
-        public string SavePathForLinux {
-            get {
+        public string SavePathForLinux
+        {
+            get
+            {
                 return ((string)(this["SavePathForLinux"]));
             }
-            set {
+            set
+            {
                 this["SavePathForLinux"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("d:\\WeatherImages")]
-        public string SavePathForWindows {
-            get {
+        public string SavePathForWindows
+        {
+            get
+            {
                 return ((string)(this["SavePathForWindows"]));
             }
-            set {
+            set
+            {
                 this["SavePathForWindows"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool DeletePreviousFiles {
-            get {
+        public bool DeletePreviousFiles
+        {
+            get
+            {
                 return ((bool)(this["DeletePreviousFiles"]));
             }
-            set {
+            set
+            {
                 this["DeletePreviousFiles"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int DeleteHowHoursAgo {
-            get {
+        public int DeleteHowHoursAgo
+        {
+            get
+            {
                 return ((int)(this["DeleteHowHoursAgo"]));
             }
-            set {
+            set
+            {
                 this["DeleteHowHoursAgo"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SubDirectory {
-            get {
+        public string SubDirectory
+        {
+            get
+            {
                 return ((string)(this["SubDirectory"]));
             }
-            set {
+            set
+            {
                 this["SubDirectory"] = value;
             }
         }
-
-        /// <summary>
-        /// 加载保存的配置信息
-        /// </summary>
-        public void Load()
-        {
-            if (Environment.OSVersion.Platform == PlatformID.Unix
-                    || Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                try
-                {
-                    // linux,unix,macos，保存到文件中
-                    using (TextReader reader = new StreamReader("/etc/ccservice.conf"))
-                    {
-                        string line = reader.ReadLine();
-                        while (line != null)
-                        {
-                            int pos = line.IndexOf('=');
-                            if (pos != -1)
-                            {
-                                string name = line.Substring(0, pos);
-                                string value = line.Substring(pos + 1);
-                                Type t = this.GetType();
-                                PropertyInfo property = t.GetProperty(name);
-                                if (property != null)
-                                {
-                                    object v = Convert.ChangeType(value, property.PropertyType);
-                                    property.SetValue(this, v);
-                                }
-                            }
-                            line = reader.ReadLine();
-                        }
-                                        
-                        
-                        reader.Close();
-                    }
-                }
-                catch
-                {
-
-                }
-            }
-        }
-
-        public override void Save()
-        {
-            if (Environment.OSVersion.Platform == PlatformID.Unix
-                    || Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                base.Save();
-                try
-                {
-                    // linux,unix,macos，保存到文件中
-                    using (TextWriter writer = new StreamWriter("/etc/ccservice.conf"))
-                    {
-                        Type t = this.GetType();
-                        PropertyInfo[] properties = t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-                        foreach (var property in properties)
-                        {                            
-                            writer.WriteLine("{0}={1}",property.Name,property.GetValue(this));
-                        }
-                        writer.Close();
-                    }
-                }
-                catch
-                {
-
-                }
-            }
-            else
-            {
-                // windows 
-                base.Save();
-            }            
-        }
-        
-
     }
 }

@@ -18,6 +18,9 @@ namespace CC_StationService
         /// </summary>
         string logFileName = string.Empty;
 
+        //temp obj for lock
+        object lockObj = new object();
+
         /// <summary>
         /// Create a logger object by specified log file name
         /// </summary>
@@ -39,10 +42,13 @@ namespace CC_StationService
         {
             try
             {
-                using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                lock(lockObj)
                 {
-                    writer.WriteLine("{0} Error:{1}", DateTime.Now, message);
-                    writer.Close();
+                    using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                    {
+                        writer.WriteLine("{0} Error:{1}", DateTime.Now, message);
+                        writer.Close();
+                    }
                 }
             }
             catch (System.Exception ex)
@@ -63,10 +69,13 @@ namespace CC_StationService
         {
             try
             {
-                using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                lock(lockObj)
                 {
-                    writer.WriteLine("{0} {1}", DateTime.Now, message);
-                    writer.Close();
+                    using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                    {
+                        writer.WriteLine("{0} {1}", DateTime.Now, message);
+                        writer.Close();
+                    }
                 }
             }
             catch (System.Exception ex)
@@ -81,10 +90,13 @@ namespace CC_StationService
         {
             try
             {
-                using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                lock(lockObj)
                 {
-                    writer.WriteLine("{0} Trace Category:{1} Message:{2}", DateTime.Now, category, message);
-                    writer.Close();
+                    using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                    {
+                        writer.WriteLine("{0} Trace Category:{1} Message:{2}", DateTime.Now, category, message);
+                        writer.Close();
+                    }
                 }
             }
             catch (System.Exception ex)
@@ -97,10 +109,13 @@ namespace CC_StationService
         {
             try
             {
-                using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                lock(lockObj)
                 {
-                    writer.WriteLine("{0} Warning:{1}", DateTime.Now, message);
-                    writer.Close();
+                    using (var writer = new StreamWriter(logFileName, true, Encoding.UTF8))
+                    {
+                        writer.WriteLine("{0} Warning:{1}", DateTime.Now, message);
+                        writer.Close();
+                    }
                 }
             }
             catch(System.Exception ex)
