@@ -236,7 +236,6 @@ qttools.pro.user.*
 **/generated/*.cs
 **/generated/*.cpp
 **/generated/*.h
-**/Icons
 *.amplxeproj
 *.d
 *.opendb
