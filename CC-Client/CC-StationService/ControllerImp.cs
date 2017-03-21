@@ -447,11 +447,10 @@ namespace CC_StationService
         {
             if (string.IsNullOrWhiteSpace(option.Url) || option.Interval <= 0 || option.LastHours <= 0)
                 return;
-
+            DnsFix.AddHostToConfig(option.Url); // fix NeoLinux dns lookup bug
             WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
             downloader.Option = option;
-            SaveToSetting(option);           
-            
+            SaveToSetting(option);  
         }
 
         //把气象云图下载设置保存到系统设置

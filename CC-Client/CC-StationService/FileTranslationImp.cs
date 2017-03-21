@@ -53,7 +53,8 @@ namespace CC_StationService
                     if(!string.IsNullOrWhiteSpace(userName))
                     {
                         chown(dir, userName);
-                    }
+                    }                    
+                    chmod2Exe(dir);
                 }
                 writeStream = File.Create(fileName);
                 logger.print("成功创建文件:"+fileName);
@@ -186,6 +187,7 @@ namespace CC_StationService
             {
                 string fileName = writeStream.Name;
                 writeStream.Close();
+                chmod2LowPriority(fileName);
                 if(isExecutable(fileName))
                 {
                     chmod2Exe(fileName);
@@ -355,6 +357,28 @@ namespace CC_StationService
                 }
             }
             return false;
+        }
+
+        //设置文件权限，是任何人都可以读取删除
+        private void chmod2LowPriority(string fileName)
+        {
+            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                try
+                {
+                    System.Diagnostics.Process chmodProcess = new System.Diagnostics.Process();
+                    chmodProcess.StartInfo.FileName = "chmod";
+                    chmodProcess.StartInfo.UseShellExecute = true;
+                    chmodProcess.StartInfo.Arguments = "666 " + fileName;
+                    chmodProcess.Start();
+                    Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                }
+                catch (System.Exception ex)
+                {
+                    Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                    logger.error(string.Format("chmod2LowPriority Error. fileName:{0} {1}", fileName, ex.ToString()));
+                }
+            }
         }
 
         //设置文件为可执行模式

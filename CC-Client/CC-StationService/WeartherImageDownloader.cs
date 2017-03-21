@@ -191,8 +191,6 @@ namespace CC_StationService
                     //首先下载根目录下的所有文件
                     ListAndDownloadFile(Option.Url);
 
-                    Logger.print(Option.SubDirectory);
-
                     //下载子目录下的所有文件
                     string[] subDirs = Option.SubDirectory.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var dir in subDirs)

@@ -115,4 +115,71 @@ namespace CC_StationService
 
         }
     }
+
+    /// <summary>
+    /// 解决中标麒麟DNS bug，把IP地址加入到/etc/hosts文件中
+    /// </summary>
+    static class DnsFix
+    {
+        /// <summary>
+        /// 把url字符串中的IP地址加入到/etc/hosts文件中
+        /// </summary>
+        /// <param name="url">ftp或http url</param>
+        public static void AddHostToConfig(string url)
+        {
+            if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
+            {
+                Uri uri = new Uri(url);
+                if (Environment.OSVersion.Platform == PlatformID.Unix
+                     || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                {
+                    bool alreadyAdded = false;
+                    try
+                    {
+                        using (TextReader reader = new StreamReader("/etc/hosts"))
+                        {
+                            string entry = reader.ReadLine();
+                            while (entry != null)
+                            {
+                                Console.WriteLine(entry);
+                                int pos = entry.IndexOf(' ');
+                                if (pos != -1)
+                                {
+                                    string host = entry.Substring(0, pos);
+                                    if (uri.DnsSafeHost == host)
+                                    {
+                                        alreadyAdded = true;
+                                        break;
+                                    }
+                                }
+                                entry = reader.ReadLine();
+                            }
+                            reader.Close();
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    if (!alreadyAdded)
+                    {
+                        try
+                        {
+                            using (TextWriter writer = new StreamWriter("/etc/hosts", true))
+                            {
+                                writer.WriteLine("{0} {0}", uri.DnsSafeHost);
+                                writer.Close();
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 }

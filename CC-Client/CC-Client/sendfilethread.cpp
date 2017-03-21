@@ -130,8 +130,8 @@ void SendFileThread::sendFile(StationInfo* s, const QString& file, const QString
 		if (s->fileProxy->createFile(destFile.toStdWString(),userName.toStdWString()))
 		{
 			sendFileContents(file, s);
-			//			s->fileProxy->closeFile();
-						//文件发送完毕
+			s->fileProxy->closeFile(destFile.toStdWString());
+			//文件发送完毕
 			emit sendFileCompleted(s, file);
 			//qDebug() << QStringLiteral("文件%1发送完毕").arg(file);
 			//qDebug() << QStringLiteral("%1").arg(file);
