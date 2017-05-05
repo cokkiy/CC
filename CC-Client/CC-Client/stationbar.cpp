@@ -1,8 +1,10 @@
 #include "stationbar.h"
+#include "StationInfo.h"
 #include <QFrame>
 #include <QBoxLayout>
 #include <QLabel>
 #include <QProgressBar>
+#include <QPushButton>
 
 bool StationBar::IsOnline()
 {
@@ -64,17 +66,43 @@ QString StationBar::TipText()
 	return m_TipText;
 }
 
-void StationBar::setTipText(QString value)
+void StationBar::setTipText(QString value, bool error/* = false*/, bool showLogButton/*=false*/)
 {
 	if (m_TipText != value)
 	{
 		m_TipText = value;
 		infoLabel->setText(value);
+		if (error)
+		{
+			infoLabel->setStyleSheet(QStringLiteral("color: rgb(255, 0, 0);"));
+		}
+		else
+		{
+			infoLabel->setStyleSheet("");
+		}
+
+		if (showLogButton)
+		{
+			if (error)
+			{
+				logButton->setText(QStringLiteral("发生错误，查看日志"));
+				logButton->setStyleSheet(QStringLiteral("color: rgb(255, 0, 0);"));
+			}
+			else
+			{
+				logButton->setText(QStringLiteral("查看发送日志"));
+				logButton->setStyleSheet(QStringLiteral(""));
+			}
+		}
+		else
+		{
+			logButton->setText("");
+		}
 	}
 }
 
-StationBar::StationBar(QWidget *parent)
-	: QWidget(parent), maxPercent(100)
+StationBar::StationBar(StationInfo* station, QWidget *parent)
+	: QWidget(parent), maxPercent(100), station(station)
 {
 	QHBoxLayout* horizontalLayout = new QHBoxLayout(this);
 	horizontalLayout->setSpacing(6);
@@ -95,9 +123,22 @@ StationBar::StationBar(QWidget *parent)
 	QVBoxLayout* verticalLayout = new QVBoxLayout();
 	verticalLayout->setSpacing(6);
 	//verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-	infoLabel = new QLabel(this);
 
-	verticalLayout->addWidget(infoLabel);
+	QHBoxLayout* innerHLayout = new QHBoxLayout();
+	infoLabel = new QLabel(this);
+	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(infoLabel->sizePolicy().hasHeightForWidth());
+	infoLabel->setSizePolicy(sizePolicy);
+	innerHLayout->addWidget(infoLabel);
+
+	logButton = new QPushButton(this);
+	logButton->setFlat(true);
+	logButton->setToolTip(QStringLiteral("查看文件发送日志信息"));
+	connect(logButton, &QPushButton::clicked, this, &StationBar::on_logButtonClicked);
+	innerHLayout->addWidget(logButton);
+	verticalLayout->addLayout(innerHLayout);
 
 	progressBar = new QProgressBar(this);
 	progressBar->setMinimum(0);
@@ -119,4 +160,9 @@ StationBar::~StationBar()
 void StationBar::setMaxPercent(size_t size)
 {
 	maxPercent = size;
+}
+
+void StationBar::on_logButtonClicked(bool checked)
+{
+	emit ViewLog(station);
 }

@@ -594,6 +594,60 @@ list<int> StationInfo::getStartedAppProcessIds()
 }
 
 /*!
+判断指定名称和修改时间的文件是否已经发送
+@param QString fileName 文件名
+@param time_t lastModify 最后修改时间
+@return bool
+作者：cokkiy（张立民）
+创建时间:2017/5/3 11:18:03
+*/
+bool StationInfo::isSended(const QString& fileName, const QDateTime& lastModify)
+{
+	return std::any_of(sendedFiles.begin(), sendedFiles.end(),
+		[&](std::pair<QString, QDateTime> sendedFile) {
+		return sendedFile.first == fileName && sendedFile.second == lastModify;});
+}
+
+/*!
+添加指定文件名和最后修改时间到已发送文件列表
+@param QString fileName 文件名
+@param time_t lastModify 最后修改时间
+@return void
+作者：cokkiy（张立民）
+创建时间:2017/5/3 11:19:18
+*/
+void StationInfo::addToSendedFileList(const QString& fileName, const QDateTime& lastModify)
+{
+	sendedFiles[fileName] = lastModify;
+}
+
+void StationInfo::addSendFileLog(const QString& log, bool isError /*= false*/)
+{
+	if (!log.isEmpty() && !log.isNull())
+	{
+		sendFileLogs.push_back(log);
+		if(isError)
+			hasErrorWhenSendFile = isError;
+	}
+}
+
+bool StationInfo::getHasErrorWhenSendFile()
+{
+	return hasErrorWhenSendFile;
+}
+
+void StationInfo::clearSendFileLog()
+{
+	hasErrorWhenSendFile = false;
+	sendFileLogs.clear();
+}
+
+std::list<QString> StationInfo::getSendFileLog()
+{
+	return sendFileLogs;
+}
+
+/*!
 获取工作站监视进程运行状态
 @return ::CC::AppsRunningState
 作者：cokkiy（张立民）

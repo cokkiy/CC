@@ -71,7 +71,8 @@ SOURCES += main.cpp\
     aboutdialog.cpp \
     updatemanager.cpp \
     qpagenumdialog.cpp \
-    weatherimageoptiondlg.cpp
+    weatherimageoptiondlg.cpp \
+	viewlogdialog.cpp
 
 HEADERS  += mainwindow.h \
     cpuplot/counterpiemarker.h \
@@ -116,7 +117,8 @@ HEADERS  += mainwindow.h \
     aboutdialog.h \
     updatemanager.h \
     qpagenumdialog.h \
-    weatherimageoptiondlg.h
+    weatherimageoptiondlg.h \
+	viewlogdialog.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -134,7 +136,8 @@ FORMS    += mainwindow.ui \
     batchcapturedialog.ui \
     aboutdialog.ui \
     qpagenumdialog.ui \
-    weatherimageoptiondlg.ui
+    weatherimageoptiondlg.ui \
+	viewlogdialog.ui
 
 RESOURCES += \
     cc-client.qrc

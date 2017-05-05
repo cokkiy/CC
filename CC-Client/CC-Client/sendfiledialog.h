@@ -46,7 +46,12 @@ private:
 	void on_newFileSize(StationInfo* station, QString fileName, size_t size);
 	void on_sendFileCompleted(StationInfo* station, QString fileName);
 	void on_fileSended(StationInfo* station, QString fileName, size_t size);
-	void on_allCompleted(StationInfo* station, int total);
+	void on_allCompleted(StationInfo* station, int total, int skip);
+	void on_skipFile(StationInfo* station, QString file);
+	void on_ViewLog(StationInfo* station);
+
+	//添加日志信息到工作站日志中
+	void addToLog(StationInfo* station, QString message, bool isError = false);
 
 	//槽函数
 	private slots:
@@ -56,6 +61,8 @@ private:
 	void on_sendPushButton_clicked();
 	//选择目标文件夹
 	void on_selectDestPushButton_clicked();	
+
+	
 	
 };
 

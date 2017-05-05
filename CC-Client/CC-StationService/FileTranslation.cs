@@ -7,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace CC_StationService
 {
+    /// <summary>
+    /// 文件传输
+    /// </summary>
     public class FileTranslation : Ice.Blobject
     {
-        /// <summary>
-        /// 文件传输方法实现类对象
-        /// </summary>
-        FileTranslationImp imp = new FileTranslationImp();
+        private readonly FileTranslationImp imp;
+        public FileTranslation(Ice.Communicator ic)
+        {
+            imp = new FileTranslationImp(ic);
+        }
+
 
         /// <summary>
         /// 实现ice_invoke方法，实现文件传输

@@ -16,10 +16,10 @@ using namespace std;
 作者：cokkiy（张立民）
 创建时间:2016/3/24 9:31:41
 */
-SendFileThread::SendFileThread(QStringList fileNames, QString userName, QString dest, std::list<StationInfo*> stations,
-	Ice::CommunicatorPtr communicator, QObject *parent)
-	: QThread(parent), stations(stations), fileNames(fileNames), userName(userName),
-	communicator(communicator)
+SendFileThread::SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
+	Ice::CommunicatorPtr communicator, bool skipUnchanged, QObject *parent)
+	: QThread(parent), stations(stations), fileNames(fileNames),
+	communicator(communicator), skipUnchanged(skipUnchanged)
 {
 	this->dest = dest.replace("\\", "/");
 }
@@ -59,7 +59,7 @@ void SendFileThread::run()
 					//如果是文件夹，则保持文件夹结构
 					keepDirStructure = true;					
 				}
-				SendFilesInDir(s, file, userName, fileInfo);
+				SendFilesInDir(s, file, fileInfo);
 			}
 		}
 		else
@@ -73,14 +73,14 @@ void SendFileThread::run()
 	{
 		if (s->fileProxy != NULL)
 		{
-			emit allCompleted(s, total);
+			emit allCompleted(s, total, skip);
 		}
 	}
     //qDebug() << QStringLiteral("共发送%1个文件").arg(total);
 }
 
 //发送文件夹中的所有文件
-void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName,const QString& userName, QFileInfo &fileInfo)
+void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName, QFileInfo &fileInfo)
 {
 	if (fileInfo.isDir())
 	{
@@ -92,13 +92,13 @@ void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName,cons
 			if (entry.isDir())
 			{
 				//目录
-				SendFilesInDir(s, entry.filePath(), userName, entry);
+				SendFilesInDir(s, entry.filePath(), entry);
                 //qDebug() << QStringLiteral("进入文件夹%1").arg(entry.absolutePath());
 			}
 			else
 			{
 				//文件
-				sendFile(s, entry.filePath(), userName, entry);
+				sendFile(s, entry.filePath(), entry);
 			}
 		}
 
@@ -106,13 +106,19 @@ void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName,cons
 	else
 	{
 		//文件
-		sendFile(s, fileName, userName, fileInfo);
+		sendFile(s, fileName, fileInfo);
 	}
 }
 
 //发送文件
-void SendFileThread::sendFile(StationInfo* s, const QString& file, const QString& userName, QFileInfo &fileInfo)
+void SendFileThread::sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo)
 {
+	if (skipUnchanged && s->isSended(file, fileInfo.lastModified()))
+	{
+		emit fileNoChange(s, file);
+		skip++;
+		return;
+	}
 	//通知文件大小
 	emit newFileSize(s, file, fileInfo.size());
 
@@ -127,10 +133,11 @@ void SendFileThread::sendFile(StationInfo* s, const QString& file, const QString
 	}
 	try
 	{
-		if (s->fileProxy->createFile(destFile.toStdWString(),userName.toStdWString()))
+		if (s->fileProxy->createFile(destFile.toStdWString()))
 		{
 			sendFileContents(file, s);
-			s->fileProxy->closeFile(destFile.toStdWString());
+			s->fileProxy->closeFile();			
+			s->addToSendedFileList(file, fileInfo.lastModified());
 			//文件发送完毕
 			emit sendFileCompleted(s, file);
 			//qDebug() << QStringLiteral("文件%1发送完毕").arg(file);

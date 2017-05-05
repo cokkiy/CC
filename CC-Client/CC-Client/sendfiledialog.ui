@@ -69,6 +69,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="onlySendChangedFileCheckBox">
+       <property name="toolTip">
+        <string>是否只发送上次发送后修改过的文件</string>
+       </property>
+       <property name="text">
+        <string>只发送修改过的文件</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="browserPushButton">
        <property name="text">
         <string>选择文件...</string>
@@ -76,20 +89,6 @@
        <property name="icon">
         <iconset resource="cc-client.qrc">
          <normaloff>:/Icons/search.ico</normaloff>:/Icons/search.ico</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="sendPushButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>发送</string>
-       </property>
-       <property name="icon">
-        <iconset resource="cc-client.qrc">
-         <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
        </property>
       </widget>
      </item>
@@ -134,25 +133,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>文件所有者：</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="userNameLineEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>目的机上的用户名</string>
+      <widget class="QPushButton" name="sendPushButton">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
        <property name="text">
-        <string>root</string>
+        <string>开始发送</string>
+       </property>
+       <property name="icon">
+        <iconset resource="cc-client.qrc">
+         <normaloff>:/Icons/52design.com_jingying_059.png</normaloff>:/Icons/52design.com_jingying_059.png</iconset>
        </property>
       </widget>
      </item>
@@ -169,7 +159,7 @@
         <x>0</x>
         <y>0</y>
         <width>712</width>
-        <height>385</height>
+        <height>384</height>
        </rect>
       </property>
      </widget>

@@ -117,7 +117,7 @@ void RecvFileDialog::createLayout(StationList* pStations, const QModelIndexList&
 	{
 		for (auto iter = pStations->begin();iter != pStations->end();iter++)
 		{
-			StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
+			StationBar* stationBar = new StationBar(&*iter,ui->scrollAreaWidgetContents);
 			stationBar->setTipText(QStringLiteral("准备接收文件..."));
 			stationBar->setIsOnline(iter->IsRunning());
 			stationBar->setStationName(iter->Name());
@@ -137,7 +137,7 @@ void RecvFileDialog::createLayout(StationList* pStations, const QModelIndexList&
 			});
 			if (finded == stations.end())
 			{
-				StationBar* stationBar = new StationBar(ui->scrollAreaWidgetContents);
+				StationBar* stationBar = new StationBar(s, ui->scrollAreaWidgetContents);
 				stationBar->setTipText(QStringLiteral("准备发送文件..."));
 				stationBar->setIsOnline(s->IsRunning());
 				stationBar->setStationName(s->Name());

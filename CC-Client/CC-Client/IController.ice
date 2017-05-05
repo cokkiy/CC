@@ -163,11 +163,11 @@ module CC
 	interface IFileTranslation
 	{
 		///创建文件		
-		bool createFile(string fileName,string userName) throws FileTransException;
+		bool createFile(string fileName) throws FileTransException;
 		///传送数据
 		bool transData(long position,int length, ByteArray data) throws FileTransException;
 		///关闭文件
-		bool closeFile(string userName) throws FileTransException;
+		bool closeFile() throws FileTransException;
 
 		///获取文件大小
 		long getSize(string fileName) throws FileTransException;

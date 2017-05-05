@@ -4,6 +4,8 @@
 #include <QWidget>
 class QProgressBar;
 class QLabel;
+class QPushButton;
+class StationInfo;
 
 /************************************************************************/
 /* 工作站图标条控件
@@ -12,10 +14,10 @@ class QLabel;
 class StationBar : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY(QString TipText READ TipText WRITE setTipText)
-	Q_PROPERTY(size_t Percent READ Percent WRITE setPercent)
-	Q_PROPERTY(QString StationName READ StationName WRITE setStationName)
-	Q_PROPERTY(bool IsOnline READ IsOnline WRITE setIsOnline)
+		Q_PROPERTY(QString TipText READ TipText WRITE setTipText)
+		Q_PROPERTY(size_t Percent READ Percent WRITE setPercent)
+		Q_PROPERTY(QString StationName READ StationName WRITE setStationName)
+		Q_PROPERTY(bool IsOnline READ IsOnline WRITE setIsOnline)
 
 private:
 	//带图标的工作站名称--在线
@@ -45,7 +47,7 @@ public:
 private:
 	QString m_StationName;
 public:
-	
+
 	/*!
 	获取工作站名称
 	@return QString 工作站名称
@@ -102,17 +104,25 @@ public:
 	作者：cokkiy（张立民）
 	创建时间:2016/3/23 15:35:46
 	*/
-	void setTipText(QString value);
+	void setTipText(QString value, bool isError = false, bool showLogButton = false);
 
 public:
-	StationBar(QWidget *parent);
+	StationBar(StationInfo* station, QWidget *parent);
 	~StationBar();
 	void setMaxPercent(size_t size);
 private:
 	QLabel* iconLabel;
 	QLabel* infoLabel;
+	QPushButton* logButton;
 	QProgressBar* progressBar;
 	size_t maxPercent;
+	StationInfo* station;
+
+private slots:
+	void on_logButtonClicked(bool checked);
+
+signals:
+	void ViewLog(StationInfo*);
 };
 
 #endif // STATIONBAR_H

@@ -28,8 +28,8 @@ public:
 	作者：cokkiy（张立民）
 	创建时间:2016/3/24 9:31:41
 	*/
-	SendFileThread(QStringList fileNames,QString userName, QString dest, std::list<StationInfo*> stations,
-		Ice::CommunicatorPtr communicator, QObject *parent = NULL);
+	SendFileThread(QStringList fileNames,QString dest, std::list<StationInfo*> stations,
+		Ice::CommunicatorPtr communicator, bool skipUnChanged, QObject *parent = NULL);
 	~SendFileThread();
 	virtual void run() override;
 
@@ -39,19 +39,20 @@ private:
 	Ice::CommunicatorPtr communicator;
 	QString dest;
 	QString soureDir;
-	QString userName;
 	//保持文件夹结构
 	bool keepDirStructure = false;
     int total=0;
+	int skip = 0;
+	bool skipUnchanged = false;
 
 	//向指定工作站发送文件内容
 	void sendFileContents(const QString &file, StationInfo* s);
 	//完成发送方法
 	void waitComplete(std::list <ResultTuple>& asyncResults, StationInfo* s, std::vector< Ice::Byte > resultParams);
 	//发送文件夹中的所有文件
-	void SendFilesInDir(StationInfo* s, const QString& fileName,const QString& userName, QFileInfo &fileInfo);
+	void SendFilesInDir(StationInfo* s, const QString& fileName, QFileInfo &fileInfo);
 	//发送文件
-	void sendFile(StationInfo* s, const QString& file, const QString& userName, QFileInfo &fileInfo);
+	void sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo);
 
 signals:
 	//信号
@@ -104,7 +105,17 @@ signals:
 	作者：cokkiy（张立民）
 	创建时间:2016/6/3 17:04:03
 	*/
-	void allCompleted(StationInfo* station, int total);
+	void allCompleted(StationInfo* station, int total, int skip);
+
+	/*!
+	文件未变化事件
+	@param StationInfo * station
+	@param QString fileName 文件名
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2017/5/3 12:07:00
+	*/
+	void fileNoChange(StationInfo* station, QString fileName);
 };
 
 #endif // SENDFILETHREAD_H

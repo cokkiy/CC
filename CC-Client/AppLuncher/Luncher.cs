@@ -369,5 +369,15 @@ namespace AppLuncher
             string path = System.AppDomain.CurrentDomain.BaseDirectory;
             return Path.Combine(path, "AppLuncher.exe");
         }
+
+        /// <summary>
+        /// 获取当前登录系统的用户名
+        /// </summary>
+        /// <param name="current__"></param>
+        /// <returns>当前登录系统的用户名</returns>
+        public override string getCurrentUser(Current current__)
+        {
+            return System.Environment.UserName;
+        }
     }
 }

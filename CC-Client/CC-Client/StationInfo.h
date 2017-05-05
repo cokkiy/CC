@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <QString>
+#include <QDateTime>
 #include <QMetaType>
 #include <QObject>
 #include <QVariant>
@@ -368,6 +369,19 @@ private:
 	*/
 	time_t lastErrorTime = 0;
 
+	/*
+	已发送文件及其最后修改时间列表
+	*/
+	std::map<QString, QDateTime> sendedFiles;
+
+	/*
+	发送文件日志
+	*/
+	std::list<QString> sendFileLogs;
+
+	//发送文件过程中是否有错误
+	bool hasErrorWhenSendFile = false;
+
 public:
 
     /*
@@ -668,6 +682,59 @@ public:
     创建时间：2015/12/03 16:02:23
     */
     bool operator ==(const StationInfo& ref);	
+
+	
+	/*!
+	判断指定名称和修改时间的文件是否已经发送
+	@param QString fileName 文件名
+	@param time_t lastModify 最后修改时间
+	@return bool
+	作者：cokkiy（张立民）
+	创建时间:2017/5/3 11:18:03
+	*/
+	bool isSended(const QString& fileName,const QDateTime& lastModify);
+	/*!
+	添加指定文件名和最后修改时间到已发送文件列表
+	@param QString fileName 文件名
+	@param time_t lastModify 最后修改时间
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2017/5/3 11:19:18
+	*/
+	void addToSendedFileList(const QString& fileName, const QDateTime& lastModify);
+
+	/*!
+	添加发送文件日志
+	@param QString log 日志消息
+	@param bool isError 是否是错误消息
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2017/5/5 8:54:07
+	*/
+	void addSendFileLog(const QString& log, bool isError = false);
+	/*!
+	获取在发送文件过程中是否发生错误
+	@return bool 
+	作者：cokkiy（张立民）
+	创建时间:2017/5/5 8:55:19
+	*/
+	bool getHasErrorWhenSendFile();
+
+	/*!
+	清除所有日志信息
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2017/5/5 8:56:27
+	*/
+	void clearSendFileLog();
+
+	/*!
+	获取所有日志信息
+	@return std::list<QString>
+	作者：cokkiy（张立民）
+	创建时间:2017/5/5 8:56:37
+	*/
+	std::list<QString> getSendFileLog();
 
 signals:
     /*!

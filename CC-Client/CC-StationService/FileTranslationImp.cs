@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ice;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,13 @@ namespace CC_StationService
         //读缓冲区大小
         private const int readBufferSize = 1024 * 10;
 
+        private readonly Ice.Communicator ic;
+
+        public FileTranslationImp(Ice.Communicator ic)
+        {
+            this.ic = ic;
+        }
+
         /// <summary>
         /// 创建文件
         /// </summary>
@@ -31,10 +39,9 @@ namespace CC_StationService
             Ice.Communicator communicator = current.adapter.getCommunicator();
             Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
             inStream.startEncapsulation();
-            string fileName = inStream.readString();
-            string userName = inStream.readString();
+            string fileName = inStream.readString();            
             inStream.endEncapsulation();
-            inStream.destroy();
+            inStream.destroy();            
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
             Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
             try
@@ -50,10 +57,7 @@ namespace CC_StationService
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
-                    if(!string.IsNullOrWhiteSpace(userName))
-                    {
-                        chown(dir, userName);
-                    }                    
+                    chown(dir);
                     chmod2Exe(dir);
                 }
                 writeStream = File.Create(fileName);
@@ -164,12 +168,7 @@ namespace CC_StationService
         {
             bool result = false;
             // closeFile
-            Ice.Communicator communicator = current.adapter.getCommunicator();
-            Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
-            inStream.startEncapsulation();
-            string userName = inStream.readString();
-            inStream.endEncapsulation();
-            inStream.destroy();
+            Ice.Communicator communicator = current.adapter.getCommunicator();           
             Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
             if (writeStream == null)
@@ -192,7 +191,7 @@ namespace CC_StationService
                 {
                     chmod2Exe(fileName);
                 }
-                chown(fileName, userName);
+                chown(fileName);
                 logger.print("文件已成功关闭。");
                 outStream.startEncapsulation();
                 outStream.writeBool(true);
@@ -406,23 +405,66 @@ namespace CC_StationService
         /// </summary>
         /// <param name="fileName">文件名或文件夹名称</param>
         /// <param name="user">新的所有者</param>
-        private void chown(string fileName,string user)
+        private void chown(string fileName)
         {
             if (System.Environment.OSVersion.Platform == PlatformID.Unix)
             {
+                string userName = GetCurrentUserName();
+                Ice.Logger logger = PlatformMethodFactory.GetLogger();
                 try
                 {
+                    //change user
                     System.Diagnostics.Process chownProcess = new System.Diagnostics.Process();
-                    chownProcess.StartInfo.FileName = "chown";
+                    chownProcess.StartInfo.FileName = "/bin/chown";
                     chownProcess.StartInfo.UseShellExecute = true;
-                    chownProcess.StartInfo.Arguments = string.Format("{0} {1}", user, fileName);
-                    chownProcess.Start();
+                    chownProcess.StartInfo.Arguments = string.Format("{0} {1}", userName, fileName);
+                    if (!chownProcess.Start())
+                    {
+                        logger.warning(string.Format("Chown fail. fileName:{0}, new owner:{1}.", fileName, userName));
+                    }
+
+                    // change group
+                    System.Diagnostics.Process chgrpProcess = new System.Diagnostics.Process();
+                    chgrpProcess.StartInfo.FileName = "/bin/chgrp";
+                    chgrpProcess.StartInfo.UseShellExecute = true;
+                    chgrpProcess.StartInfo.Arguments = string.Format("{0} {1}", userName, fileName);
+                    if (!chgrpProcess.Start())
+                    {
+                        logger.warning(string.Format("Chgrp fail. fileName:{0}, new owner:{1}.", fileName, userName));
+                    }
                 }
                 catch (System.Exception ex)
                 {
-                    Ice.Logger logger = PlatformMethodFactory.GetLogger();
-                    logger.error(string.Format("chown Error. fileName:{0}, new owner:{1}. {2}", fileName, user, ex.ToString()));
+                    //Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                    logger.error(string.Format("chown Error. fileName:{0}, new owner:{1}. {2}", fileName, userName, ex.ToString()));
                 }
+            }
+        }
+
+
+        private string currentUserName;
+        private bool userNameGetted = false;
+        private string GetCurrentUserName()
+        {
+            if (userNameGetted)
+            {
+                return currentUserName;
+            }
+            else
+            {
+                currentUserName = "root";
+                ObjectPrx proxy = ic.propertyToProxy("AppLuncher.Proxy");
+                try
+                {
+                    AppController.ILuncherPrx luncherPrx = AppController.ILuncherPrxHelper.checkedCast(proxy);
+                    currentUserName = luncherPrx.getCurrentUser();
+                    userNameGetted = true;
+                }
+                catch
+                {
+                }
+
+                return currentUserName;
             }
         }
     }

@@ -1158,6 +1158,9 @@
    </property>
   </action>
   <action name="actionUpdateStation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>升级工作站</string>
    </property>

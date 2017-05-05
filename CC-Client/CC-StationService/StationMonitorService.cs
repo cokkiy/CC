@@ -48,7 +48,7 @@ namespace CC_StationService
                 IControllerPrx controlPrx = IControllerPrxHelper.uncheckedCast(objectPrx);
 
                 //创建文件传输服务
-                FileTranslation fileTrans = new FileTranslation();
+                FileTranslation fileTrans = new FileTranslation(ic);
                 objectPrx = controlAdapter.add(fileTrans, ic.stringToIdentity("FileTranslation"));
                 IFileTranslationPrx filePrx = IFileTranslationPrxHelper.uncheckedCast(objectPrx);
 
