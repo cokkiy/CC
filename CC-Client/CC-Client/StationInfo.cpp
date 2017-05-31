@@ -647,6 +647,19 @@ std::list<QString> StationInfo::getSendFileLog()
 	return sendFileLogs;
 }
 
+void StationInfo::setNetStatistics(const ::CC::Statistics& statistics)
+{
+	this->currentStatistics = statistics;
+	for (auto& ifData : statistics.IfStatistics)
+	{
+		for (int i = CounterHistoryDataSize - 1; i > 0; i--)
+		{
+			netStatisticsData[ifData.IfName][i] = netStatisticsData[ifData.IfName][i - 1];
+		}
+		netStatisticsData[ifData.IfName][0] = ifData.TotalBytesPerSec / 1024;
+	}	
+}
+
 /*!
 获取工作站监视进程运行状态
 @return ::CC::AppsRunningState
@@ -669,6 +682,11 @@ int StationInfo::getShouldMonitoredProcessesCount()
     return standAloneMonitorProcessList.size() + startAppList.size();
 }
 
+
+CC::Statistics StationInfo::getCurrentStatistics()
+{
+	return currentStatistics;
+}
 
 /*!
 设置应用程序运行状态

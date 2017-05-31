@@ -1,4 +1,4 @@
-#include "viewlogdialog.h"
+ï»¿#include "viewlogdialog.h"
 #include "ui_viewlogdialog.h"
 #include <QPushButton>
 #include <QFileDialog>
@@ -21,8 +21,8 @@ ViewLogDialog::~ViewLogDialog()
 
 void ViewLogDialog::saveLog(bool checked)
 {
-	QString fileName = QFileDialog::getSaveFileName(this, QStringLiteral("±£´æÈÕÖ¾"),
-		QDir::home().absolutePath(), QStringLiteral("ÎÄ±¾ÎÄ¼ş(*.txt)"));
+	QString fileName = QFileDialog::getSaveFileName(this, QStringLiteral("ä¿å­˜æ—¥å¿—"),
+		QDir::home().absolutePath(), QStringLiteral("æ–‡æœ¬æ–‡ä»¶(*.txt)"));
 	QFile data(fileName);
 	if (data.open(QFile::WriteOnly | QFile::Truncate|QFile::Text)) {
 		QTextStream out(&data);

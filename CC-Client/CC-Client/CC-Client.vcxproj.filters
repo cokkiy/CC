@@ -393,6 +393,9 @@
     <ClCompile Include="Release\moc_viewlogdialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="generated\Network.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.h">
@@ -767,6 +770,9 @@
     <ClInclude Include="GeneratedFiles\ui_viewlogdialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\Network.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <IceBuilder Include="IStationStateReceiver.ice">
@@ -779,6 +785,9 @@
       <Filter>Slice Files</Filter>
     </IceBuilder>
     <IceBuilder Include="Version.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="Network.ice">
       <Filter>Slice Files</Filter>
     </IceBuilder>
   </ItemGroup>

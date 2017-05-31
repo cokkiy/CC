@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1021</width>
-    <height>768</height>
+    <width>1235</width>
+    <height>883</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -157,6 +157,9 @@
                </property>
                <property name="statusTip">
                 <string>选择显示方式</string>
+               </property>
+               <property name="currentIndex">
+                <number>3</number>
                </property>
                <item>
                 <property name="text">
@@ -462,11 +465,9 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="opaqueResize">
-           <bool>true</bool>
-          </property>
           <widget class="QwtPlot" name="qwtPlotCPU"/>
           <widget class="QwtPlot" name="qwtPlotMemory"/>
+          <widget class="QwtPlot" name="qwtPlotNetStat"/>
           <widget class="QFrame" name="detailFrame">
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
@@ -509,7 +510,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1021</width>
+     <width>1235</width>
      <height>23</height>
     </rect>
    </property>

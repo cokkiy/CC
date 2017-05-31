@@ -87,7 +87,10 @@ public:
     void on_sortComboBox_currentIndexChanged(int index);
     //显示方式发生变化
     void on_displayModeComboBox_currentIndexChanged(QString index);
-    //点击过滤按钮
+
+	void DetailMode();
+
+	//点击过滤按钮
     void on_filterToolButton_clicked();
     //查看CPU占用率
     void on_actionViewCPU_triggered(bool checked);
@@ -198,6 +201,9 @@ private:
     //性能曲线数组
     PerfCurves perfCurves[MaxCountOfCounter];
 
+	//网络流量曲线
+	std::map<std::string, CounterCurve*> netStatCurvs;
+
 	//CPU和内存图
 	CounterPieMarker* cpuPie = nullptr;
 	CounterPieMarker* memoryPie = nullptr;
@@ -232,6 +238,7 @@ private slots:
     void stationChanged(const QObject*);
     //当前选择的工作站发生变化
     void currentStationChanged(const QModelIndex &);
+
 	//更新状态发生变化
 	void on_UpdatingProgressReported(int percent, QString message);
 private:
@@ -243,8 +250,14 @@ private:
     bool selectedJustOne(QModelIndexList selectedIndexs);
     //设置QwtPlot样式
     void setPlotStyle(QwtPlot* plot, QString title);
+
+	//创建网络流量曲线
+	void CreateNetCurver();
+	double findMax(double datas[]);
+
 protected:
     void timerEvent(QTimerEvent *e);
+	
 };
 
 //Class for station loading thread
@@ -252,8 +265,8 @@ class StationsLoader : public QObject
 {
     Q_OBJECT
 public:
-    StationsLoader() {};
-    ~StationsLoader() {};
+    StationsLoader() {}
+    ~StationsLoader() {}
     public slots:
     //加载工作站信息
     void load(const QString filename, StationList* pStations);

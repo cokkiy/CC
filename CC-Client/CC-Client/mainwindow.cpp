@@ -38,6 +38,7 @@
 #include "weatherimageoptiondlg.h"
 
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -49,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setPlotStyle(cpuPlot, QStringLiteral("CPU使用情况 [%]"));
     QwtPlot* memPlot = ui->qwtPlotMemory;
     setPlotStyle(memPlot, QStringLiteral("内存使用情况 [%]"));
+	QwtPlot* netPlot = ui->qwtPlotNetStat;
+	setPlotStyle(netPlot, QStringLiteral("网络流量 [KB/s]"));
 
     //绑定菜单显示事件
     connect(ui->menuOperation, SIGNAL(aboutToShow()), this, SLOT(operationMenuToShow()));
@@ -95,108 +98,166 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionPowerOn_triggered()
 {
-    //打开指定计算机电源
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	manager->powerOn();
+	if (QMessageBox::warning(this, QStringLiteral("启动工作站确认"),
+		QStringLiteral("确实要启动选定的工作站吗？已经启动的不受影响。"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		//打开指定计算机电源
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->powerOn();
+	}
 
 }
 
 void MainWindow::on_actionPoweroff_triggered()
 {	
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	//关机
-	manager->shutdown();
+	if (QMessageBox::warning(this, QStringLiteral("关闭工作站确认"),
+		QStringLiteral("确实要关闭选定的工作站吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		//关机
+		manager->shutdown();
+	}
 }
 
 void MainWindow::on_actionReboot_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	//重启
-	manager->reboot();
+	if (QMessageBox::warning(this, QStringLiteral("重启工作站确认"),
+		QStringLiteral("确实要重启选定的工作站吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		//重启
+		manager->reboot();
+	}
 }
 
 void MainWindow::on_actionStartApp_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	//启动程序
-	manager->startApp();
+	if (QMessageBox::warning(this, QStringLiteral("启动程序确认"),
+		QStringLiteral("确实要启动选定工作站上的程序吗？程序已经运行的工作站不受影响。"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		//启动程序
+		manager->startApp();
+	}
 }
 
 void MainWindow::on_actionRestartApp_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	//启动程序
-	manager->restartApp();
+	if (QMessageBox::warning(this, QStringLiteral("重启工作站程序确认"),
+		QStringLiteral("确实要重启选定工作站的程序吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		//启动程序
+		manager->restartApp();
+	}
 }
 
 void MainWindow::on_actionExitApp_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	//退出程序
-	manager->exitApp();
+	if (QMessageBox::warning(this, QStringLiteral("退出工作站程序确认"),
+		QStringLiteral("确实要退出选定工作站的程序吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		//退出程序
+		manager->exitApp();
+	}
 }
 
 void MainWindow::on_actionAllPower_On_triggered()
 {    
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	//打开全部计算机
-	manager->powerOnAll();
+	if (QMessageBox::warning(this, QStringLiteral("工作站启动确认"),
+		QStringLiteral("确实要启动所有工作站吗？已经启动工作站不受影响。"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		//打开全部计算机
+		manager->powerOnAll();
+	}
 }
 //启动全部工作站程序
 void MainWindow::on_actionStartAllApp_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	manager->startAllApp();
+	if (QMessageBox::warning(this, QStringLiteral("启动程序确认"),
+		QStringLiteral("确实要启动所有工作站上的程序吗？程序已经运行的工作站不受影响。"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->startAllApp();
+	}
 }
 
 //全部重启
 void MainWindow::on_actionRebootAll_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	manager->rebootAll();
+	if (QMessageBox::warning(this, QStringLiteral("重启工作站确认"), 
+		QStringLiteral("确实要重启所有工作站吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->rebootAll();
+	}
 }
 //全部重启应用
 void MainWindow::on_actionRestartAll_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	manager->restartAllApp();
+	if (QMessageBox::warning(this, QStringLiteral("重启程序确认"), QStringLiteral("确实要重启所有工作站上的软件吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->restartAllApp();
+	}
 }
 
 //全部退出程序
 void MainWindow::on_actionExitAllZXApp_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	manager->exitAllApp();
+	if (QMessageBox::warning(this, QStringLiteral("退出程序确认"), QStringLiteral("确实要关闭所有工作站上的软件吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->exitAllApp();
+	}
 }
 //全部关机
 void MainWindow::on_actionAll_Shutdown_triggered()
 {
-	QModelIndexList selectedIndexs = getSelectedIndexs();
-	//创建工作站管理类
-	StationManager* manager = new StationManager(pStationList, selectedIndexs);
-	manager->shutdownAll();
+	if (QMessageBox::warning(this, QStringLiteral("关闭工作站确认"),
+		QStringLiteral("确实要关闭所有工作站吗？"),
+		QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+	{
+		QModelIndexList selectedIndexs = getSelectedIndexs();
+		//创建工作站管理类
+		StationManager* manager = new StationManager(pStationList, selectedIndexs);
+		manager->shutdownAll();
+	}
 }
 
 //工作站信息加载完毕
@@ -227,8 +288,8 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
     connect(ui->tableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(currentStationChanged(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(currentStationChanged(const QModelIndex &)));
 
-    //默认小图标模式
-    smallIcomMode();
+    //默认列表模式
+	DetailMode();
     //启动状态监视
     monitor = new Monitor(option.Interval);
     monitor->setStationList(pStations);
@@ -237,7 +298,7 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
     {
 		updateManager = new UpdateManager(communicator, this);
 		connect(updateManager, &UpdateManager::UpdatingProgressReport, this, &MainWindow::on_UpdatingProgressReported);
-		StationStateReceiverPtr = new StationStateReceiver(updateManager, pStations);
+		StationStateReceiverPtr = new StationStateReceiver(updateManager, communicator, pStations);
         adapter->add(StationStateReceiverPtr, communicator->stringToIdentity("stateReceiver"));
         adapter->activate();
     }
@@ -366,7 +427,12 @@ void MainWindow::fileTransMenuToShow()
 void MainWindow::stationStateChanged(const QObject* pObject)
 {
     StationInfo* pStation = (StationInfo*)pObject;
-    QListWidgetItem* item = new QListWidgetItem(QStringLiteral("%1  %2").arg(pStation->toString()).arg(pStation->state().toString()));
+	QTime now = QTime::currentTime();
+    QListWidgetItem* item = new QListWidgetItem(QStringLiteral("%1:%2:%3 %4 %5")
+		.arg(now.hour(), 2, 10, QLatin1Char('0'))
+		.arg(now.minute(), 2, 10, QLatin1Char('0'))
+		.arg(now.second(), 2, 10, QLatin1Char('0'))
+		.arg(pStation->toString()).arg(pStation->state().toString()));
     if (pStation->state() == StationInfo::Normal)
     {
         item->setForeground(Qt::black);
@@ -462,11 +528,20 @@ void MainWindow::currentStationChanged(const QModelIndex & current)
             delete pc.memory_curve;
             pc.memory_curve = NULL;
         }
-    }
+    }	
+
+	for (auto& netCurve : netStatCurvs)
+	{
+		netCurve.second->detach();
+		delete netCurve.second;
+	}
+	netStatCurvs.clear();
+
     currentStation = pStationList->atCurrent(current.row());
-    //显示CPU和内存占用率
+    //显示CPU和内存占用率，网络流量
     QwtPlot* cpuPlot = ui->qwtPlotCPU;
     QwtPlot* memoryPlot = ui->qwtPlotMemory;
+
     CounterCurve *curve;
 
     //CPU total
@@ -545,6 +620,33 @@ void MainWindow::currentStationChanged(const QModelIndex & current)
 
 	ui->qwtPlotCPU->updateLayout();
 	ui->qwtPlotMemory->updateLayout();
+	
+	//网络流量图
+	CreateNetCurver();
+}
+
+void MainWindow::CreateNetCurver()
+{
+	int zOrder = 0;
+	QwtPlot* netPlot = ui->qwtPlotNetStat;
+	zOrder = 0;
+	Qt::GlobalColor colors[]{ Qt::green,Qt::darkBlue, Qt::lightGray,Qt::yellow,Qt::darkGreen };
+	for (auto netDtat : currentStation->netStatisticsData)
+	{
+		if (netStatCurvs.count(netDtat.first) == 0)
+		{
+			// 网卡名称-total per second
+			CounterCurve *curve = new CounterCurve(QString::fromStdString(netDtat.first));
+			curve->setColor(colors[zOrder]);
+			curve->setZ(zOrder);
+			curve->attach(netPlot);
+			curve->setVisible(true);
+			netStatCurvs[netDtat.first] = curve;
+			zOrder++;
+		}
+	}
+
+	ui->qwtPlotNetStat->updateLayout();
 }
 
 //工作站更新状态发生变化
@@ -664,9 +766,7 @@ void MainWindow::on_displayModeComboBox_currentIndexChanged(QString index)
     if (index.compare(tr("Detail")) == 0)
     {
         //表格模式
-        pTableModel->setDisplayMode(StationTableModel::Details);
-        ui->listView->setVisible(false);
-        ui->tableView->setVisible(true);
+		DetailMode();
     }
     else
     {
@@ -697,7 +797,14 @@ void MainWindow::on_displayModeComboBox_currentIndexChanged(QString index)
     }
 }
 
-//小图标模式（默认模式)
+void MainWindow::DetailMode()
+{
+	pTableModel->setDisplayMode(StationTableModel::Details);
+	ui->listView->setVisible(false);
+	ui->tableView->setVisible(true);
+}
+
+//小图标模式
 void MainWindow::smallIcomMode()
 {
     pTableModel->setDisplayMode(StationTableModel::SmallIcons);
@@ -853,8 +960,15 @@ void MainWindow::on_actionRemove_triggered()
     {
         for (auto index : selectedIndexs)
         {
-            StationInfo* s = pStationList->atCurrent(index.row());
-            pStationList->remove(s);
+			if (index.column() == 0)
+			{
+				StationInfo* s = pStationList->atCurrent(index.row());
+				if (currentStation == s)
+				{
+					currentStation = nullptr;
+				}
+				pStationList->remove(s);
+			}
         }
     }
 }
@@ -1057,18 +1171,18 @@ void MainWindow::addButtons(FloatingMenu* menu)
 {
     QModelIndexList selectedIndexs = getSelectedIndexs();
     //创建工作站管理类
-    StationManager* manager = new StationManager(pStationList, selectedIndexs);
+	StationManager* manager = new StationManager(pStationList, selectedIndexs, this);
     if (!selectedJustOne(selectedIndexs))
     {
 		//扩大menu大小
 		menu->setSize(220);
         //选择了多个
-        menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+        menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), this, SLOT(on_actionPowerOn_triggered()));
         //menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
-        menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
-        menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
+        menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), this, SLOT(on_actionPoweroff_triggered()));
+        menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), this, SLOT(on_actionStartApp_triggered()));
         //menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
-        menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("关闭程序"), manager, SLOT(exitApp()));
+        menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("关闭程序"), this, SLOT(on_actionExitApp_triggered()));
         menu->addButton(":/Icons/receiveFile.png", QStringLiteral("接收文件"), this, SLOT(on_actionReceiveSelection_triggered()));
 		menu->addButton(":/Icons/sendFile.png", QStringLiteral("发送文件"), this, SLOT(on_actionSendSelection_triggered()));
 		menu->addButton(":/Icons/capture.png", QStringLiteral("批量截屏"), this, SLOT(on_actionBatchScreenCapture_triggered()));
@@ -1080,26 +1194,26 @@ void MainWindow::addButtons(FloatingMenu* menu)
         if (!station->IsRunning())
         {
             //未开机
-            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), manager, SLOT(powerOn()));
+            menu->addButton(":/Icons/52design.com_jingying_108.png", QStringLiteral("开机"), this, SLOT(on_actionPowerOn_triggered()));
 			menu->addButton(":/Icons/52design.com_2006ball_74.png", QStringLiteral("编辑"), this, SLOT(on_actionEdit_triggered()));
 			menu->addButton(":/Icons/png-0652.png", QStringLiteral("删除"), this, SLOT(on_actionRemove_triggered()));
         }
         else
         {
             //已开机
-            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), manager, SLOT(reboot()));
-            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), manager, SLOT(shutdown()));
+            menu->addButton(":/Icons/200969173136504.png", QStringLiteral("重启"), this, SLOT(on_actionReboot_triggered()));
+            menu->addButton(":/Icons/52design.com_jingying_098.png", QStringLiteral("关机"), this, SLOT(on_actionPoweroff_triggered()));
             if (station->state() == StationInfo::AppStarted || station->state() == StationInfo::SomeAppNotRunning)
             {
 				//扩大menu大小
 				menu->setSize(250);
-                menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), manager, SLOT(restartApp()));
-                menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出程序"), manager, SLOT(exitApp()));
+                menu->addButton(":/Icons/2009724113238761.png", QStringLiteral("重启程序"), this, SLOT(on_actionRestartApp_triggered()));
+                menu->addButton(":/Icons/52design.com_alth_171.png", QStringLiteral("退出程序"), this, SLOT(on_actionExitApp_triggered()));
                
                 if (station->state() == StationInfo::SomeAppNotRunning)
                 {
                     //有些程序没有启动
-                    menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
+                    menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), this, SLOT(on_actionStartApp_triggered()));
                     //扩大menu
                     menu->setSize(250);
                 }
@@ -1109,7 +1223,7 @@ void MainWindow::addButtons(FloatingMenu* menu)
 				//扩大menu大小
 				menu->setSize(220);
                 //应用程序没有运行
-                menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), manager, SLOT(startApp()));
+                menu->addButton(":/Icons/52design.com_jingying_059.png", QStringLiteral("启动程序"), this, SLOT(on_actionStartApp_triggered()));
             }
 
 			menu->addButton(":/Icons/receiveFile.png", QStringLiteral("接收文件"), this, SLOT(on_actionReceiveSelection_triggered()));
@@ -1211,12 +1325,38 @@ void MainWindow::timerEvent(QTimerEvent *e)
                 }
             }
         }     
+
+		//绘制网络流量
+		double allNetMax = 0;
+		for (auto& ifData:currentStation->netStatisticsData)
+		{
+			if (netStatCurvs.count(ifData.first) == 0)
+			{
+				CreateNetCurver();
+			}
+			double max = findMax(ifData.second);
+			allNetMax = max > allNetMax ? max : allNetMax;
+			ui->qwtPlotNetStat->setAxisScale(QwtPlot::yLeft, 0, allNetMax + 5);
+			netStatCurvs[ifData.first]->setRawSamples(timeData, ifData.second, CounterHistoryDataSize);
+		}
+		ui->qwtPlotNetStat->replot();
         ui->qwtPlotCPU->replot();
         ui->qwtPlotMemory->replot();
 
         //显示线程数和进程数
         ui->procCountlineEdit->setText(QStringLiteral("%1").arg(currentStation->ProcCount()));
     }
+}
+
+double MainWindow::findMax(double datas[])
+{
+	double max = 0;
+	for (size_t i = 0; i < CounterHistoryDataSize; i++)
+	{
+		max = max >= datas[i] ? max : datas[i];
+	}
+
+	return max;
 }
 
 //加载工作站信息

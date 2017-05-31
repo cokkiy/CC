@@ -62,11 +62,13 @@
     <Compile Include="generated\IAppLuncher.cs" />
     <Compile Include="generated\IController.cs" />
     <Compile Include="generated\IStationStateReceiver.cs" />
+    <Compile Include="generated\Network.cs" />
     <Compile Include="generated\Version.cs" />
     <Compile Include="IPlatformMethod.cs" />
     <Compile Include="LinuxMethod.cs" />
     <Compile Include="LinuxLogger.cs" />
     <Compile Include="MemoryInfo.cs" />
+    <Compile Include="NetworkHelper.cs" />
     <Compile Include="PictureType.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -105,6 +107,7 @@
     <None Include="Slice\IAppLuncher.ice" />
     <None Include="Slice\IController.ice" />
     <None Include="Slice\IStationStateReceiver.ice" />
+    <None Include="Slice\Network.ice" />
     <None Include="Slice\Version.ice" />
   </ItemGroup>
   <ItemGroup>

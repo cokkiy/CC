@@ -382,6 +382,9 @@ private:
 	//发送文件过程中是否有错误
 	bool hasErrorWhenSendFile = false;
 
+	//当前网络统计信息
+	CC::Statistics currentStatistics;
+
 public:
 
     /*
@@ -389,6 +392,11 @@ public:
     **/
 
     std::map<std::string, PerfCounterData> counterData;
+
+	/*
+	网络统计数据, 网卡名称-总流量
+	**/
+	std::map<std::string, double[CounterHistoryDataSize]> netStatisticsData;
 
     /*!
     获取所有应该监视进程数量
@@ -398,6 +406,14 @@ public:
     */
     int getShouldMonitoredProcessesCount();
 
+	/*!
+	获取网络统计信息当前值
+	@return CC::Statistics 网络统计信息
+	作者：cokkiy（张立民）
+	创建时间:2017/5/26 9:00:37
+	*/
+	CC::Statistics getCurrentStatistics();
+
     /*!
     设置应用程序运行状态
     @param const ::CC::AppsRunningState & appsRunningState 应用程序运行状态
@@ -406,6 +422,15 @@ public:
     创建时间：2015/12/11 16:58:29
     */
     void setAppsRunningState(const ::CC::AppsRunningState& appsRunningState);
+
+	/*!
+	设置网络流量数据
+	@param const ::CC::Statistics & statistics
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2017/5/10 9:49:08
+	*/
+	void setNetStatistics(const ::CC::Statistics& statistics);
 
 	/*!
 	获取工作站监视进程运行状态
@@ -759,6 +784,7 @@ signals:
     */
     void stationChanged(const QObject* owner);
 	
+
 private:
     /*
      \class StationHelper 是friend class

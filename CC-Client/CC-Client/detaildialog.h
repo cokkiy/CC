@@ -23,6 +23,7 @@ public:
 
 	void setupPlot();
 
+
 	~DetailDialog();
 
 	protected slots:
@@ -46,16 +47,31 @@ private:
 	void setPlotStyle(QwtPlot* plot, QString title);
 	void timerEvent(QTimerEvent * e);
 
+	void SetNetData();
+
+	int CreateNetCurvs();
+
+
+	double findMax(double datas[]);
 	//重置进程表格内容
 	void resetTableWidget(int columnCount);
 	//更新进程信息
 	void UpdateMonitoredProcessInfo();
 
+	//添加网卡统计信息面板
+	void addEthGroup(int index, QString ifName);
+
+	//网络统计信息显示框
+	std::vector<QLineEdit*> ethDataLineEdits;
+
 	//性能曲线数组
 	PerfCurves perfCurves[MaxCountOfCounter];
+	//网络流量曲线
+	std::map<std::string, CounterCurve*> netStatCurvs;
 	CounterPieMarker *cpuPie, *memoryPie;
 	QwtPlot* cpuPlot;
 	QwtPlot* memoryPlot;
+	QwtPlot* netPlot;
 	double timeData[100];
 	//工作站管理类
 	StationManager* manager;

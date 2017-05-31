@@ -54,13 +54,23 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
 
     if (role == Qt::DisplayRole)
     {
-        if (displayMode==List)
-        {
-            QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存(%)：%4\tCPU：%5");
-            StationInfo* s = pStations->atCurrent(index.row());
-            QString memory = QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory() / pStations->atCurrent(index.row())->TotalMemory() * 100, 0, 'f', 2);
-            return str.arg(s->Name()).arg(s->IP()).arg(s->state().toString()).arg(memory).arg(s->CPU());
-        }
+		if (displayMode == List)
+		{
+			QString str = QStringLiteral("名称：%1\tIP：%2\t状态：%3\t内存(%)：%4\tCPU：%5");
+			StationInfo* s = pStations->atCurrent(index.row());
+			QString memory = QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory() / pStations->atCurrent(index.row())->TotalMemory() * 100, 0, 'f', 2);
+			str = str.arg(s->Name()).arg(s->IP()).arg(s->state().toString()).arg(memory).arg(s->CPU(), 0, 'f', 1);
+			CC::Statistics stat = s->getCurrentStatistics();
+			for (CC::InterfaceStatistics& ifData : stat.IfStatistics)
+			{
+				QString netTip = QStringLiteral("\t%0 接收(KB/s):%1 发送(KB/s):%2")
+					.arg(QString::fromStdString(ifData.IfName))
+					.arg(ifData.BytesReceivedPerSec / 1024, 0, 'f', 3)
+					.arg(ifData.BytesSentedPerSec / 1024, 0, 'f', 3);
+				str = str.append(netTip);
+			}
+			return str;
+		}
         else if(displayMode==Details)
         {
             return getColumnValue(index);
@@ -83,12 +93,26 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         }
     }
 
-    if (role == Qt::ToolTipRole)
-    {
-        QString tip = QStringLiteral("%1\r\nIP：%2\r\n%3");
-        auto s = pStations->atCurrent(index.row());
-        return tip.arg(s->Name()).arg(s->IP()).arg(s->state().toString());
-    }
+	if (role == Qt::ToolTipRole)
+	{
+		QString tip = QStringLiteral("%1\r\nIP：%2\r\n%3\r\nCPU:%4% 内存:%5%");
+		auto s = pStations->atCurrent(index.row());
+		tip= tip.arg(s->Name()).arg(s->IP()).arg(s->state().toString())
+			.arg(s->CPU(), 0, 'f', 0)
+			.arg(s->Memory() / s->TotalMemory() * 100, 0, 'f', 0)
+			.arg(11).arg(22);
+		CC::Statistics stat = s->getCurrentStatistics();
+		for (CC::InterfaceStatistics& ifData : stat.IfStatistics)
+		{
+			QString netTip = QStringLiteral("\r\n%0 接收(KB/s):%1 发送(KB/s):%2")
+				.arg(QString::fromStdString(ifData.IfName))
+				.arg(ifData.BytesReceivedPerSec / 1024, 0, 'f', 3)
+				.arg(ifData.BytesSentedPerSec / 1024, 0, 'f', 3);
+			tip = tip.append(netTip);
+		}
+
+		return tip;
+	}
     if (role == Qt::ForegroundRole)
     {
         QVariant v;
@@ -163,11 +187,17 @@ QVariant StationTableModel::headerData(int section, Qt::Orientation orientation,
             return QStringLiteral("总CPU占用率(%)");
         case 4:
             return QStringLiteral("总内存占用率(%)");
-        case 5:
+		case 5:
+			return QStringLiteral("接收(KB/s)");
+		case 6:
+			return QStringLiteral("发送(KB/s)");
+		case 7:
+			return QStringLiteral("总流量(KB/s)");
+        case 8:
             return QStringLiteral("总内存");
-        case 6:
+        case 9:
             return QStringLiteral("总进程数");
-        case 7:
+        case 10:
             return QStringLiteral("MAC地址");
         default:
             break;
@@ -295,25 +325,60 @@ QVariant StationTableModel::getIcon(const QModelIndex &index) const
 
 QVariant StationTableModel::getColumnValue(const QModelIndex &index) const
 {
+	StationInfo* s = pStations->atCurrent(index.row());
+	CC::InterfacesStatistics ifDatas = s->getCurrentStatistics().IfStatistics;
     switch (index.column())
     {
     case 0:
-        return pStations->atCurrent(index.row())->Name();
+        return s->Name();
         break;
     case 1:
-        return pStations->atCurrent(index.row())->IP();
+        return s->IP();
     case 2:
-        return pStations->atCurrent(index.row())->state().toString();
+        return s->state().toString();
     case 3:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->CPU(), 0, 'f', 0);
+        return QStringLiteral("%1").arg(s->CPU(), 0, 'f', 1);
     case 4:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->Memory() / pStations->atCurrent(index.row())->TotalMemory() * 100, 0, 'f', 2);
-    case 5:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->TotalMemory());
-    case 6:
-        return QStringLiteral("%1").arg(pStations->atCurrent(index.row())->ProcCount());
-    case 7:
-        return pStations->atCurrent(index.row())->MAC();
+        return QStringLiteral("%1").arg(s->Memory() / s->TotalMemory() * 100, 0, 'f', 2);
+	case 5:
+	{
+		QString receive = QStringLiteral("");
+		for (auto& data : ifDatas)
+		{
+			QString r = QStringLiteral("%0: %1 ").arg(QString::fromStdString(data.IfName))
+				.arg(data.BytesReceivedPerSec / 1024, 0, 'f', 3);
+			receive.append(r);
+		}
+		return receive;
+	}
+	case 6:
+	{
+		QString send = QStringLiteral("");
+		for (auto& data : ifDatas)
+		{
+			QString r = QStringLiteral("%0: %1 ").arg(QString::fromStdString(data.IfName))
+				.arg(data.BytesSentedPerSec / 1024, 0, 'f', 3);
+			send.append(r);
+		}
+		return send;
+	}
+	case 7:
+	{
+		QString total = QStringLiteral("");
+		for (auto& data : ifDatas)
+		{
+			QString r = QStringLiteral("%0: %1 ").arg(QString::fromStdString(data.IfName))
+				.arg(data.TotalBytesPerSec / 1024, 0, 'f', 3);
+			total.append(r);
+		}
+		return total;
+	}
+    case 8:
+        return QStringLiteral("%1").arg(s->TotalMemory());
+    case 9:
+        return QStringLiteral("%1").arg(s->ProcCount());
+    case 10:
+        return s->MAC();
     default:
         break;
     }    

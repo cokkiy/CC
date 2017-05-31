@@ -102,6 +102,7 @@ namespace CC_StationService
         {
             stop = true;
         }
+        
 
         /// <summary>
         /// 系统状态监视函数
@@ -167,6 +168,10 @@ namespace CC_StationService
                             }
 
                             receiverProxy.receiveAppRunningState(appsRunningState);
+
+                            var netStatistics = StateGatherer.GatherNetworkStatistics();
+                            string data = netStatistics.GetString();
+                            receiverProxy.receiveNetStatistics(data);
                         }
                     }
                     catch (Ice.Exception ex)

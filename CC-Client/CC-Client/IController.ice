@@ -118,7 +118,7 @@ module CC
 		idempotent StationSystemState  getSystemState(); 
 
 		///设置要监视的进程（名称)列表
-		idempotent void setWatchingApp(stringList procNames);
+		idempotent void setWatchingApp(StringList procNames);
 
 		///设置状态收集间隔（秒)
 		idempotent void setStateGatheringInterval(int interval);
@@ -155,6 +155,14 @@ module CC
 
 		//重命名文件
 		bool renameFile(string oldName,string newName);
+
+
+		
+		//网卡信息
+		NetworkInterfaceInfos GetNetworkInterfaces();
+		ConnectionInformations GetConnectionInformations();
+		ListenerInfos GetTCPListenerInfos();	
+		ListenerInfos GetUDPListenerInfos();
 	};	
 	
 

@@ -10,6 +10,7 @@
 #include <QtNetwork>
 #include <QHostAddress>
 #include <QByteArray>
+#include <QMessageBox>
 using namespace std;
 using namespace CC;
 
@@ -58,11 +59,11 @@ void StationManager::powerOnAll()
 */
 void StationManager::powerOn()
 {
-    for (auto index : stationIndexs)
-    {
-        StationInfo* s = pStations->atCurrent(index.row());
+	for (auto index : stationIndexs)
+	{
+		StationInfo* s = pStations->atCurrent(index.row());
 		powerOn(s);
-    }
+	}
 }
 
 /*!

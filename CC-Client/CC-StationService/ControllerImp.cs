@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
+using System.Net.NetworkInformation;
+using System.Linq;
 
 namespace CC_StationService
 {
@@ -467,6 +469,71 @@ namespace CC_StationService
             Properties.Settings.Default.SavePathForLinux = option.SavePathForLinux;
             Properties.Settings.Default.SavePathForWindows = option.SavePathForWindows;
             Properties.Settings.Default.Save();
+        }
+
+        public override List<NetworkInterfaceInfo> GetNetworkInterfaces(Current current__)
+        {
+            List<NetworkInterfaceInfo> infos = new List<NetworkInterfaceInfo>();
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface adapter in adapters)
+            {
+                if (adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet
+                    || adapter.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT)
+                {
+                    var info = new NetworkInterfaceInfo();
+                    info.Id = adapter.Id;
+                    info.Name = adapter.Name;
+                    info.Description = adapter.Description;
+                    info.IsUp = adapter.OperationalStatus == OperationalStatus.Up;
+
+                    IPInterfaceProperties properties = adapter.GetIPProperties();
+                    info.DNSSuffix = properties.DnsSuffix;
+                    info.DNSEnbled = properties.IsDnsEnabled;
+                    info.DynamicDNS = properties.IsDynamicDnsEnabled;
+                    info.DhcpServers = properties.DhcpServerAddresses.Select(s => s.ToString()).ToList();
+                    info.IPAddresses = properties.UnicastAddresses.Select(a => a.Address.ToString()).ToList();
+                    info.MulticastAddresses = properties.MulticastAddresses.Select(a => a.Address.ToString()).ToList();
+
+                    infos.Add(info);
+                }
+            }
+
+            return infos;
+        }
+
+        public override List<ConnectionInformation> GetConnectionInformations(Current current__)
+        {
+            IPGlobalProperties IPProperties = IPGlobalProperties.GetIPGlobalProperties();             
+            TcpConnectionInformation[] connections = IPProperties.GetActiveTcpConnections();
+            return connections.Select(c => new ConnectionInformation {
+                LocalAddress =c.LocalEndPoint.Address.ToString(),
+                LocalPort=c.LocalEndPoint.Port,
+                Remote=c.RemoteEndPoint.Address.ToString(),
+                RemotePort=c.RemoteEndPoint.Port,
+                State=c.State.ToString()
+            }).ToList();       
+           
+        }
+
+        public override List<ListenerInfo> GetTCPListenerInfos(Current current__)
+        {
+            IPGlobalProperties IPProperties = IPGlobalProperties.GetIPGlobalProperties();
+            IPEndPoint[] endPoints = IPProperties.GetActiveTcpListeners();
+            return endPoints.Select(e => new ListenerInfo {
+                Address=e.Address.ToString(),
+                Port=e.Port
+            }).ToList();            
+        }
+
+        public override List<ListenerInfo> GetUDPListenerInfos(Current current__)
+        {
+            IPGlobalProperties IPProperties = IPGlobalProperties.GetIPGlobalProperties();            
+            IPEndPoint[] endPoints = IPProperties.GetActiveUdpListeners();
+            return endPoints.Select(e => new ListenerInfo
+            {
+                Address = e.Address.ToString(),
+                Port = e.Port
+            }).ToList();
         }
     }
 }

@@ -18,6 +18,9 @@ private:
     bool autoRefreshStationList;
 	//更新管理器
 	UpdateManager* updateManager;
+
+	//通信框架
+	Ice::CommunicatorPtr communicator;
 private:
     //查找并更新工作站信息
     StationInfo* findAndSetStationSystemState(const ::CC::StationSystemState& pStationSystemState);
@@ -31,7 +34,8 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/11/23 21:16:50
     */
-    StationStateReceiver(UpdateManager* updateManager, StationList* pStations, bool autoRefreshStationList = true);
+    StationStateReceiver(UpdateManager* updateManager,const Ice::CommunicatorPtr& communicator, 
+		StationList* pStations, bool autoRefreshStationList = true);
     /*释放资源*/
     ~StationStateReceiver() = default;
 
@@ -64,6 +68,16 @@ public:
     创建时间：2015/11/24 9:39:34
     */
     virtual void receiveAppRunningState(const ::CC::AppsRunningState&, const ::Ice::Current& = ::Ice::Current()) override;
+
+	/*!
+	接收工作站网络信息
+	@param const ::CC::Statistics & 网络统计信息
+	@param const ::Ice::Current &
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2017/5/9 11:30:16
+	*/
+	virtual void receiveNetStatistics(const ::std::string&, const ::Ice::Current& = ::Ice::Current()) override;
 
     /*!
     设置工作站列表

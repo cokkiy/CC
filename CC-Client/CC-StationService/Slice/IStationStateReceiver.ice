@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Version.ice"
+#include "Network.ice"
 [["cpp:include:list"]]
 [["cpp:include:string"]]
 
@@ -13,12 +14,12 @@ module CC
 
 	// string list, can't defines sequence<string> direct in struct
 	//["cpp:type:std::list<std::string>"]
-	["clr:generic:List"]	
-	sequence<string> stringList;
+	//["clr:generic:List"]	
+	// sequence<string> stringList;
 
 	///定义了Network Interface information结构
 	["cpp:type:std::map<std::string,std::list<std::string>>"]
-	dictionary<string,stringList> NIInfo;
+	dictionary<string,StringList> NIInfo;
 
 	///工作站基本信息
 	struct StationSystemState
@@ -96,6 +97,7 @@ module CC
 	//运行程序状态列表
 	["clr:generic:List"]	
 	sequence<AppRunningState> AppsRunningState;
+	
 
 	//工作站状态接收接口
 	interface IStationStateReceiver
@@ -106,5 +108,7 @@ module CC
 		idempotent void  receiveStationRunningState(StationRunningState stationRunningState, IController* controller, IFileTranslation* fileProxy );
 		///收集程序运行状态
 		idempotent void receiveAppRunningState(AppsRunningState appRunningState);
+		//收集网络状态
+		idempotent void receiveNetStatistics(string data);	
 	};
 };

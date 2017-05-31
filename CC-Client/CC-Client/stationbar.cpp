@@ -1,4 +1,4 @@
-#include "stationbar.h"
+ï»¿#include "stationbar.h"
 #include "StationInfo.h"
 #include <QFrame>
 #include <QBoxLayout>
@@ -85,12 +85,12 @@ void StationBar::setTipText(QString value, bool error/* = false*/, bool showLogB
 		{
 			if (error)
 			{
-				logButton->setText(QStringLiteral("·¢Éú´íÎó£¬²é¿´ÈÕÖ¾"));
+				logButton->setText(QStringLiteral("å‘ç”Ÿé”™è¯¯ï¼ŒæŸ¥çœ‹æ—¥å¿—"));
 				logButton->setStyleSheet(QStringLiteral("color: rgb(255, 0, 0);"));
 			}
 			else
 			{
-				logButton->setText(QStringLiteral("²é¿´·¢ËÍÈÕÖ¾"));
+				logButton->setText(QStringLiteral("æŸ¥çœ‹å‘é€æ—¥å¿—"));
 				logButton->setStyleSheet(QStringLiteral(""));
 			}
 		}
@@ -135,7 +135,7 @@ StationBar::StationBar(StationInfo* station, QWidget *parent)
 
 	logButton = new QPushButton(this);
 	logButton->setFlat(true);
-	logButton->setToolTip(QStringLiteral("²é¿´ÎÄ¼þ·¢ËÍÈÕÖ¾ÐÅÏ¢"));
+	logButton->setToolTip(QStringLiteral("æŸ¥çœ‹æ–‡ä»¶å‘é€æ—¥å¿—ä¿¡æ¯"));
 	connect(logButton, &QPushButton::clicked, this, &StationBar::on_logButtonClicked);
 	innerHLayout->addWidget(logButton);
 	verticalLayout->addLayout(innerHLayout);

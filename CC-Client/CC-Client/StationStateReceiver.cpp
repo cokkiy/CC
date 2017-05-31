@@ -13,11 +13,13 @@ using namespace std;
 作者：cokkiy（张立民)
 创建时间：2015/11/23 21:16:50
 */
-StationStateReceiver::StationStateReceiver(UpdateManager* updateManager, StationList* pStations, bool autoRefreshStationList)
+StationStateReceiver::StationStateReceiver(UpdateManager* updateManager, 
+	const Ice::CommunicatorPtr& communicator, StationList* pStations, bool autoRefreshStationList)
 {
     this->pStations = pStations;
     this->autoRefreshStationList = autoRefreshStationList;
 	this->updateManager = updateManager;
+	this->communicator = communicator;
 }
 
 
@@ -186,4 +188,65 @@ StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::Stat
 void StationStateReceiver::setAutoRefreshStationList(bool autoRefresh)
 {
     this->autoRefreshStationList = autoRefresh;
+}
+
+
+/*
+接收工作站网络流量信息
+*/
+void StationStateReceiver::receiveNetStatistics(const ::std::string& data, const ::Ice::Current& current/*= ::Ice::Current()*/)
+{
+	const int Statistics_Size = 11;
+	const int InterfaceStatistics_Size = 11;
+	istringstream iss(data);
+	vector<string> segments;
+	string segment;
+	while (std::getline(iss, segment, ':'))
+	{
+		segments.push_back(segment);
+	}
+	if (segments.size() >= Statistics_Size
+		&& (segments.size() - Statistics_Size) % InterfaceStatistics_Size == 0)
+	{
+		CC::Statistics statistics;
+		statistics.StationId = segments[0];
+		statistics.DatagramsReceived = atoll(segments[1].c_str());
+		statistics.DatagramsSent = atoll(segments[2].c_str());
+		statistics.DatagramsDiscarded = atoll(segments[3].c_str());
+		statistics.DatagramsWithErrors = atoll(segments[4].c_str());
+		statistics.UDPListeners = atoi(segments[5].c_str());
+		statistics.SegmentsReceived = atoll(segments[6].c_str());
+		statistics.SegmentsSent = atoll(segments[7].c_str());
+		statistics.ErrorsReceived = atoll(segments[8].c_str());
+		statistics.CurrentConnections = atoi(segments[9].c_str());
+		statistics.ResetConnections = atoi(segments[10].c_str());
+		int count = (segments.size() - Statistics_Size) / InterfaceStatistics_Size;
+		for (int i = 0; i < count; i++)
+		{
+			int index = Statistics_Size + i * InterfaceStatistics_Size;
+			CC::InterfaceStatistics ifData;
+			ifData.IfName = segments[index + 0];
+			ifData.BytesReceivedPerSec = atof(segments[index + 1].c_str());
+			ifData.BytesSentedPerSec = atof(segments[index + 2].c_str());
+			ifData.TotalBytesPerSec = atof(segments[index + 3].c_str());
+			ifData.BytesReceived = atoll(segments[index + 4].c_str());
+			ifData.BytesSented = atoll(segments[index + 5].c_str());
+			ifData.BytesTotal = atoll(segments[index + 6].c_str());
+			ifData.UnicastPacketReceived = atoll(segments[index + 7].c_str());
+			ifData.UnicastPacketSented = atoll(segments[index + 8].c_str());
+			ifData.MulticastPacketReceived = atoll(segments[index + 9].c_str());
+			ifData.MulticastPacketSented = atoll(segments[index + 10].c_str());
+			statistics.IfStatistics.push_back(ifData);
+		}
+
+
+		if (pStations != nullptr)
+		{
+			StationInfo* pStation = pStations->findById(statistics.StationId);
+			if (pStation != NULL)
+			{
+				pStation->setNetStatistics(statistics);
+			}
+		}
+	}
 }

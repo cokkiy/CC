@@ -28,7 +28,13 @@ namespace CC_StationService
         /// <summary>
         /// CPU性能计数器
         /// </summary>
-        private static PerformanceCounter cpuCounter = null;
+        private static PerformanceCounter cpuCounter = null;        
+
+        //网路性能计数器，网卡名称-性能技术器词典
+        private static Dictionary<string, PerformanceCounter> bytesReceivedPerSecondCounters = new Dictionary<string, PerformanceCounter>();
+        private static Dictionary<string, PerformanceCounter> bytesSentPerSecondCounters = new Dictionary<string, PerformanceCounter>();
+        private static Dictionary<string, PerformanceCounter> bytesTotalPerSecondCounters = new Dictionary<string, PerformanceCounter>();
+
 
         /// <summary>
         /// 进程性能计数器
@@ -161,6 +167,107 @@ namespace CC_StationService
                 }
             }
              return runningState;
+        }
+
+
+        private static InterfaceStatistics GatherIfStatistics(NetworkInterface adapter)
+        {
+            InterfaceStatistics ifStatistics = new InterfaceStatistics();
+            //ifStatistics.HasValue = true;
+            ifStatistics.IfName = adapter.Name;
+            if (!bytesReceivedPerSecondCounters.ContainsKey(adapter.Description))
+            {
+                PerformanceCounter bytesReceivedPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", adapter.Description);
+                bytesReceivedPerSecondCounters.Add(adapter.Description, bytesReceivedPerSecondCounter);
+            }
+            if (!bytesSentPerSecondCounters.ContainsKey(adapter.Description))
+            {
+                PerformanceCounter bytesSentPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", adapter.Description);
+                bytesSentPerSecondCounters.Add(adapter.Description, bytesSentPerSecondCounter);
+            }
+
+            if (!bytesTotalPerSecondCounters.ContainsKey(adapter.Description))
+            {
+                PerformanceCounter totalPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Total/sec", adapter.Description);
+                bytesTotalPerSecondCounters.Add(adapter.Description, totalPerSecondCounter);
+            }
+
+            var counter1 = bytesReceivedPerSecondCounters[adapter.Description];
+            var counter2 = bytesSentPerSecondCounters[adapter.Description];
+            var counter3 = bytesTotalPerSecondCounters[adapter.Description];
+
+            ifStatistics.BytesReceivedPerSec = counter1.NextValue();
+            ifStatistics.BytesSentedPerSec = counter2.NextValue();
+            ifStatistics.TotalBytesPerSec = counter3.NextValue();
+            ifStatistics.BytesReceived = counter1.RawValue;
+            ifStatistics.BytesSented = counter2.RawValue;
+            ifStatistics.BytesTotal = counter3.RawValue;
+
+            var ipv4Statistics = adapter.GetIPv4Statistics();
+
+            ifStatistics.UnicastPacketReceived = ipv4Statistics.UnicastPacketsReceived;
+            ifStatistics.UnicastPacketSented = ipv4Statistics.UnicastPacketsSent;
+            ifStatistics.MulticastPacketReceived = ipv4Statistics.NonUnicastPacketsReceived;
+            ifStatistics.MulticastPacketSented = ipv4Statistics.NonUnicastPacketsSent;
+
+            return ifStatistics;
+        }
+
+        /// <summary>
+        /// 获取网络流量统计信息
+        /// </summary>
+        /// <returns>网络流量统计信息</returns>
+        public static Statistics GatherNetworkStatistics()
+        {
+            Statistics statistics = new Statistics();
+            statistics.StationId = stationId;
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            IPGlobalProperties IPProperties = IPGlobalProperties.GetIPGlobalProperties();
+            PerformanceCounterCategory counterCategory = new PerformanceCounterCategory("Network Interface");
+           
+            UdpStatistics udpStat = IPProperties.GetUdpIPv4Statistics();
+            TcpStatistics tcpStat = IPProperties.GetTcpIPv4Statistics();
+
+            statistics.DatagramsReceived = udpStat.DatagramsReceived;
+            statistics.DatagramsSent = udpStat.DatagramsSent;
+            statistics.DatagramsDiscarded = udpStat.IncomingDatagramsDiscarded;
+            statistics.DatagramsWithErrors = udpStat.IncomingDatagramsWithErrors;
+            statistics.UDPListeners = udpStat.UdpListeners;
+
+            statistics.SegmentsReceived = tcpStat.SegmentsReceived;
+            statistics.SegmentsSent = tcpStat.SegmentsSent;
+            statistics.ErrorsReceived = tcpStat.ErrorsReceived;
+            statistics.CurrentConnections = tcpStat.CurrentConnections;
+            statistics.ResetConnections = tcpStat.ResetConnections;
+            statistics.IfStatistics = new List<InterfaceStatistics>();
+            foreach (NetworkInterface adapter in adapters)
+            {
+                if (adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet
+                    || adapter.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT)
+                {
+                    var ifStatistics = GatherIfStatistics(adapter);
+                    statistics.IfStatistics.Add(ifStatistics);
+                }
+            }
+            
+            return statistics;
+        }
+
+        public static List<InterfaceStatistics> GetInterfacesStatistics()
+        {
+            List<InterfaceStatistics> statistics = new List<InterfaceStatistics>();
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface adapter in adapters)
+            {
+                if (adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet
+                    || adapter.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT)
+                {
+                    var ifStatistics = GatherIfStatistics(adapter);
+                    statistics.Add(ifStatistics);
+                }
+            }
+
+            return statistics;
         }
 
         /// <summary>

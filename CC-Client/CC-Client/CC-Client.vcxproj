@@ -217,6 +217,7 @@
     <ClCompile Include="executcounting.cpp" />
     <ClCompile Include="filebrowserdialog.cpp" />
     <ClCompile Include="generated\AppControlParameter.cpp" />
+    <ClCompile Include="generated\Network.cpp" />
     <ClCompile Include="generated\Version.cpp" />
     <ClCompile Include="option.cpp" />
     <ClCompile Include="Debug\moc_defaultappprocdialog.cpp">
@@ -969,6 +970,7 @@ endlocal
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_OPENGL_ES_2 -DQT_OPENGL_ES_2_ANGLE -DNDEBUG -DQT_NETWORK_LIB  "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtANGLE" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(QTDIR)\include\QtNetwork"</Command>
     </CustomBuild>
+    <ClInclude Include="generated\Network.h" />
     <ClInclude Include="generated\Version.h" />
     <ClInclude Include="NetworkInterface.h" />
     <CustomBuild Include="qtdispatcher.h">
@@ -1112,6 +1114,7 @@ endlocal
     <IceBuilder Include="IStationStateReceiver.ice">
       <SubType>Code</SubType>
     </IceBuilder>
+    <IceBuilder Include="Network.ice" />
     <IceBuilder Include="Version.ice">
       <SubType>Code</SubType>
     </IceBuilder>
