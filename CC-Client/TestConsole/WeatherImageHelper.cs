@@ -48,9 +48,10 @@ namespace TestConsole
             if (uri.Scheme == Uri.UriSchemeFtp)
             {
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(uri);
-                request.Method = WebRequestMethods.Ftp.ListDirectory;
+                request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
                 request.Credentials = new NetworkCredential(userName, password);
-
+                request.UseBinary = true;
+                
                 // The following streams are used to read the data returned from the server.
                 FtpWebResponse response = null;
                 Stream responseStream = null;
@@ -59,14 +60,14 @@ namespace TestConsole
                 try
                 {
                     response = (FtpWebResponse)request.GetResponse();
-                    responseStream = response.GetResponseStream();
-                    readStream = new StreamReader(responseStream, System.Text.Encoding.UTF8);
+                    responseStream = response.GetResponseStream();                    
+                    readStream = new StreamReader(responseStream, System.Text.Encoding.GetEncoding("GBK"));
 
                     if (readStream != null)
                     {
                         files.AddRange(readStream.ReadToEnd().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
                     }
-                    //Console.WriteLine("List status: {0}", response.StatusDescription);
+                    Console.WriteLine("List status: {0}", response.StatusDescription);
                 }
                 catch(Exception ex)
                 {
