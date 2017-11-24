@@ -24,6 +24,11 @@ namespace AppLuncher
                 adapter.add(obj, ic.stringToIdentity("Luncher"));
                 adapter.activate();
                 Console.WriteLine("Started.");
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    var hWnd = HideMe.GetConsoleWindow();
+                    HideMe.ShowWindow(hWnd, HideMe.SW_HIDE);
+                }
                 ic.waitForShutdown();
                 Console.ReadKey();
             }

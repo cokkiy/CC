@@ -159,7 +159,10 @@ namespace config
                         if (item.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                             ipList.Add(item.Address.ToString());
                     }
-                    niInfo.Add(mac, ipList);
+                    if (!niInfo.ContainsKey(mac))
+                    {
+                        niInfo.Add(mac, ipList);
+                    }
                 }
             }
 

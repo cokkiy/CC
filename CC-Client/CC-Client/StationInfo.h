@@ -640,6 +640,16 @@ public:
     */
     QString MAC();
 
+
+    /*!
+    获取指定名称网卡的IP地址
+    @param QString niName 网卡名称
+    @return QString IP地址列表
+    作者：cokkiy（张立民）
+    创建时间:2017/11/21 15:52:34
+    */
+    QString IP(QString niName);
+
     /*!
     返回工作站所有配置信息的XML字符串
     @return QString 工作站所有配置信息的XML字符串

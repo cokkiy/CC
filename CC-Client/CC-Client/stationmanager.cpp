@@ -88,6 +88,9 @@ void StationManager::sendPowerOnPacket(StationInfo* s)
 	QStringList macs = s->MAC().split(",", QString::SkipEmptyParts);
 	for (QString& mac : macs)
 	{
+        int index = mac.indexOf(":");
+        if (index != -1)
+            mac = mac.mid(index + 1);
 		QByteArray powerOnData;
 		powerOnData.fill(0xFF, 6);
 		QByteArray macByte = MAC2Byte(mac);

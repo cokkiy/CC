@@ -205,7 +205,7 @@ namespace CC_StationService
 
         public override List<CC.FileInfo> getFileInfo(CC.Path path, Current current__)
         {
-            if(path.Name=="/" && Environment.OSVersion.Platform==PlatformID.Win32NT)
+            if((path.Name=="/" || path.Name=="/home") && Environment.OSVersion.Platform==PlatformID.Win32NT)
             {
                 try
                 {

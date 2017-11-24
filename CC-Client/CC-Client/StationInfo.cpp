@@ -377,6 +377,24 @@ QString StationInfo::IP()
     return allIP.left(allIP.length() - 1);
 }
 
+
+/*!
+获取指定名称网卡的IP地址
+@param QString niName 网卡名称
+@return QString IP地址列表
+作者：cokkiy（张立民）
+创建时间:2017/11/21 15:52:34
+*/
+QString StationInfo::IP(QString niName)
+{
+    auto iter = find_if(NetworkIntefaces.begin(), NetworkIntefaces.end(), [&](NetworkInterface ni) {
+        return ni.getMAC().startsWith(niName + ":");
+    });
+    if(iter!= NetworkIntefaces.end())
+        return iter->getAllIPString();
+    return QStringLiteral("请升级服务端版本");
+}
+
 /*!
 获取表示所有MAC地址的字符串,多个MAC地址用逗号分隔
 @return QString 表示所有MAC地址的字符串,多个MAC地址用逗号分隔

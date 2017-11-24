@@ -15,10 +15,22 @@ namespace CC_StationService
     /// </summary>
     public class WeartherImageDownloader
     {
+        WeatherPictureDowlnloadOption _option;
         /// <summary>
         /// 获取或设置气象云图下载选项
         /// </summary>
-        public WeatherPictureDowlnloadOption Option { get; set; }
+        public WeatherPictureDowlnloadOption Option
+        {
+            get
+            {
+                return _option;
+            }
+            set
+            {
+                _option = value;
+                lastDownloadTime = DateTime.Today.AddDays(-2);
+            }
+        }
 
         /// <summary>
         /// 获取或设置日志记录器
@@ -50,7 +62,7 @@ namespace CC_StationService
                 downloadThread.Start();
                 IsRunning = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (Logger != null)
                 {
@@ -66,9 +78,9 @@ namespace CC_StationService
         private void ListAndDownloadFile(string url)
         {
             List<string> files = WeatherImageHelper.ListFile(url, Option.UserName, Option.Password);
-            if(Logger!=null)
+            if (Logger != null)
             {
-                Logger.print(string.Format("文件总数: {0}", files.Count));
+                Logger.print(string.Format("共发现文件: {0}", files.Count));
             }
 
             foreach (var file in files)
@@ -109,9 +121,27 @@ namespace CC_StationService
                     }
                     else
                     {
+                        var rootPath = System.IO.Path.GetPathRoot(Option.SavePathForWindows);
+            
                         if (!Directory.Exists(Option.SavePathForWindows))
                         {
-                            Directory.CreateDirectory(Option.SavePathForWindows);
+                            try
+                            {
+                                Directory.CreateDirectory(Option.SavePathForWindows);
+                            }
+                            catch (Exception ex)
+                            {
+                                var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                                var systemRoot = System.IO.Path.GetPathRoot(systemPath);
+                                var newPath = System.IO.Path.Combine(systemRoot, "WeatherImages");
+                                if(!Directory.Exists(newPath))
+                                {
+                                    Directory.CreateDirectory(newPath);
+                                }
+                                Logger.warning(string.Format("不能创建文件夹{0}，因为{1}下载的云图将保存到{2}中。",
+                                    Option.SavePathForWindows, ex.Message, newPath));
+                                Option.SavePathForWindows = newPath;
+                            }
                         }
                         localFile = Option.SavePathForWindows + "/" + localName;
                     }
@@ -160,7 +190,7 @@ namespace CC_StationService
                                     {
                                         File.Delete(file);
                                     }
-                                    catch(System.Exception ex)
+                                    catch (System.Exception ex)
                                     {
                                         PlatformMethodFactory.GetLogger().error(ex.Message);
                                         PlatformMethodFactory.GetLogger().error(ex.ToString());
@@ -186,8 +216,8 @@ namespace CC_StationService
             {
                 if ((DateTime.Now - lastDownloadTime).TotalMinutes > Option.Interval)
                 {
-                    if(Logger!=null)
-                        Logger.print(string.Format("开始下载 {0} 下气象云图...",Option.Url));
+                    if (Logger != null)
+                        Logger.print(string.Format("开始下载 {0} 下气象云图...", Option.Url));
                     //首先下载根目录下的所有文件
                     ListAndDownloadFile(Option.Url);
 
@@ -201,7 +231,7 @@ namespace CC_StationService
                             url = url.TrimEnd('/');
                         }
                         url += "/" + dir;
-                        if(!url.EndsWith("/"))
+                        if (!url.EndsWith("/"))
                         {
                             url += "/";
                         }
@@ -245,14 +275,14 @@ namespace CC_StationService
         {
             if (_Instance == null)
             {
-                lock(lockObj)
+                lock (lockObj)
                 {
                     if (_Instance == null)
                         _Instance = new WeartherImageDownloader();
                 }
             }
 
-            return _Instance;                
+            return _Instance;
         }
     }
 }

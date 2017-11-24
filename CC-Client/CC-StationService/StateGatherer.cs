@@ -175,6 +175,7 @@ namespace CC_StationService
             InterfaceStatistics ifStatistics = new InterfaceStatistics();
             //ifStatistics.HasValue = true;
             ifStatistics.IfName = adapter.Name;
+            
             if (!bytesReceivedPerSecondCounters.ContainsKey(adapter.Description))
             {
                 PerformanceCounter bytesReceivedPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", adapter.Description);
@@ -242,8 +243,9 @@ namespace CC_StationService
             statistics.IfStatistics = new List<InterfaceStatistics>();
             foreach (NetworkInterface adapter in adapters)
             {
-                if (adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet
+                if ((adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet
                     || adapter.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT)
+                    && adapter.OperationalStatus == OperationalStatus.Up)
                 {
                     var ifStatistics = GatherIfStatistics(adapter);
                     statistics.IfStatistics.Add(ifStatistics);
@@ -343,7 +345,7 @@ namespace CC_StationService
                         if (item.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                             ipList.Add(item.Address.ToString());
                     }
-                    niInfo.Add(mac, ipList);
+                    niInfo.Add(string.Format("{0}:{1}", ni.Name, mac), ipList);
                 }
             }
 

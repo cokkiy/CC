@@ -64,7 +64,15 @@ namespace CC_StationService
 
                     if (readStream != null)
                     {
-                        files.AddRange(readStream.ReadToEnd().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+                        while (!readStream.EndOfStream)
+                        {
+                            var fileName = readStream.ReadLine();
+                            if (fileName != null)
+                            {
+                                files.Add(fileName);
+                            }
+                        }
+                        //files.AddRange(readStream.ReadToEnd().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
                     }
                     //Console.WriteLine("List status: {0}", response.StatusDescription);
                 }

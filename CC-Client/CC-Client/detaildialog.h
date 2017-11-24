@@ -41,9 +41,12 @@ public:
 	//工作站状态变化
 	void stationStateChanged(const QObject* obj);
 
+    virtual void closeEvent(QCloseEvent * event);
+
 private:
 	Ui::DetailDialog ui;
 	StationInfo* station;
+    bool isClosed;
 	void setPlotStyle(QwtPlot* plot, QString title);
 	void timerEvent(QTimerEvent * e);
 
