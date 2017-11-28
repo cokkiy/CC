@@ -204,7 +204,7 @@ void DetailDialog::setupPlot()
 int DetailDialog::CreateNetCurvs()
 {
     int zOrder = 0;
-    Qt::GlobalColor colors[]{ Qt::green,Qt::darkBlue, Qt::lightGray,Qt::yellow,Qt::darkGreen };
+    Qt::GlobalColor colors[]{ Qt::green,Qt::darkBlue, Qt::darkRed,Qt::yellow,Qt::darkGreen,Qt::darkYellow,Qt::darkMagenta,Qt::darkCyan };
     for (auto netDtat : station->netStatisticsData)
     {
         if (netStatCurvs.count(netDtat.first) == 0)

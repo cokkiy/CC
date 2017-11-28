@@ -630,7 +630,7 @@ void MainWindow::CreateNetCurver()
     int zOrder = 0;
     QwtPlot* netPlot = ui->qwtPlotNetStat;
     zOrder = 0;
-    Qt::GlobalColor colors[]{ Qt::green,Qt::darkBlue, Qt::lightGray,Qt::yellow,Qt::darkGreen };
+    Qt::GlobalColor colors[]{ Qt::green,Qt::darkBlue, Qt::darkRed,Qt::yellow,Qt::darkGreen,Qt::darkYellow,Qt::darkMagenta,Qt::darkCyan };
     for (auto netDtat : currentStation->netStatisticsData)
     {
         if (netStatCurvs.count(netDtat.first) == 0)
