@@ -15,7 +15,7 @@ class StationBar : public QWidget
 {
 	Q_OBJECT
 		Q_PROPERTY(QString TipText READ TipText WRITE setTipText)
-		Q_PROPERTY(size_t Percent READ Percent WRITE setPercent)
+		Q_PROPERTY(qint64 Percent READ Percent WRITE setPercent)
 		Q_PROPERTY(QString StationName READ StationName WRITE setStationName)
 		Q_PROPERTY(bool IsOnline READ IsOnline WRITE setIsOnline)
 
@@ -67,7 +67,7 @@ public:
 
 
 private:
-	size_t m_Percent;
+	qint64 m_Percent;
 public:
 	/*!
 	获取当前进度
@@ -75,7 +75,7 @@ public:
 	作者：cokkiy（张立民）
 	创建时间:2016/3/23 15:34:38
 	*/
-	size_t Percent();
+	qint64 Percent();
 
 	/*!
 	设置进度
@@ -84,7 +84,7 @@ public:
 	作者：cokkiy（张立民）
 	创建时间:2016/3/23 15:34:58
 	*/
-	void setPercent(size_t value);
+	void setPercent(qint64 value);
 
 
 private:
@@ -109,13 +109,13 @@ public:
 public:
 	StationBar(StationInfo* station, QWidget *parent);
 	~StationBar();
-	void setMaxPercent(size_t size);
+	void setMaxPercent(qint64 size);
 private:
 	QLabel* iconLabel;
 	QLabel* infoLabel;
 	QPushButton* logButton;
 	QProgressBar* progressBar;
-	size_t maxPercent;
+	qint64 maxPercent;
 	StationInfo* station;
 
 private slots:

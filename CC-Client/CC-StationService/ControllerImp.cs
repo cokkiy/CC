@@ -452,6 +452,14 @@ namespace CC_StationService
             DnsFix.AddHostToConfig(option.Url); // fix NeoLinux dns lookup bug
             WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
             downloader.Option = option;
+            if (downloader.Option.Download && !downloader.IsRunning)
+            {
+                downloader.Start();
+            }
+            else if (!downloader.Option.Download && downloader.IsRunning)
+            {
+                downloader.Stop();
+            }
             SaveToSetting(option);  
         }
 
@@ -468,6 +476,7 @@ namespace CC_StationService
             Properties.Settings.Default.SubDirectory = option.SubDirectory;
             Properties.Settings.Default.SavePathForLinux = option.SavePathForLinux;
             Properties.Settings.Default.SavePathForWindows = option.SavePathForWindows;
+            Properties.Settings.Default.Download = option.Download;
             Properties.Settings.Default.Save();
         }
 

@@ -131,10 +131,10 @@ void UpdateManager::UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy
 // 		{
 // 			if (serviceorProxy == Service ? ss.serviceNeedUpdate : ss.proxyNeedUpdate)
 // 			{
-// 				size_t pos = remotePath.find_last_of('/');
+// 				qint64 pos = remotePath.find_last_of('/');
 // 				if (pos == wstring::npos)
 // 					pos = remotePath.find_last_of('\\');
-// 				size_t number = remotePath.length() - pos - 1;
+// 				qint64 number = remotePath.length() - pos - 1;
 // 				wstring newServicePath = remotePath;
 // 				newServicePath = newServicePath.replace(pos + 1, number, tmpName);
 // 				try

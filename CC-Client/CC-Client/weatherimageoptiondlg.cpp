@@ -5,8 +5,15 @@
 WeatherImageOptionDlg::WeatherImageOptionDlg(Option::WeatherImageDownloadOption* option, QWidget *parent)
 	: QDialog(parent), option(option)
 {
-	ui = new Ui::WeatherImageOptionDlg();
+	ui = new Ui::WeatherImageOptionDlg();	
 	ui->setupUi(this);
+	this->ui->buttonGroup->setId(this->ui->radioButtonAllDownload, 0);
+	this->ui->buttonGroup->setId(this->ui->radioButtonAllNoDownload, 1);
+	this->ui->buttonGroup->setId(this->ui->radioButtonSelfSetDownload, 2);
+	if (option->Download > 2 || option->Download < 0)
+		option->Download = 2;
+
+	this->ui->buttonGroup->button(option->Download)->setChecked(true);
 	this->ui->ftpAddressLineEdit->setText(option->Url);
 	this->ui->userNameLineEdit->setText(option->UserName);
 	this->ui->passwordLineEdit->setText(option->Password);
@@ -48,7 +55,7 @@ void WeatherImageOptionDlg::on_okPushButton_clicked()
 		this->ui->userNameLineEdit->setText("anonymous");
 	}
 
-
+	option->Download = this->ui->buttonGroup->checkedId();
 	option->Url = this->ui->ftpAddressLineEdit->text();
 	option->UserName = this->ui->userNameLineEdit->text();
 	option->Password = this->ui->passwordLineEdit->text();

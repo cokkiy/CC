@@ -16,8 +16,8 @@ ExecutCounting::~ExecutCounting()
 //执行计数工作
 void ExecutCounting::run()
 {
-    bool quit = false;
-    while (!quit)
+    stop = false;
+    while (!stop)
     {
 //         unique_lock<mutex> lock(cvMutex);
 //         while (inExecutingStateStations.empty())

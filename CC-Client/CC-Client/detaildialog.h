@@ -36,6 +36,9 @@ public:
 	//查看全部进程信息
 	void on_viewALlPushButton_clicked();
 
+	//下载气象云图选择框状态变化
+	void on_weatherImageDownloadCheckBox_clicked(bool checked);
+
 	//屏幕快照
 	void on_screenCapturePushButton_clicked();
 	//工作站状态变化
@@ -53,7 +56,6 @@ private:
 	void SetNetData();
 
 	int CreateNetCurvs();
-
 
 	double findMax(double datas[]);
 	//重置进程表格内容

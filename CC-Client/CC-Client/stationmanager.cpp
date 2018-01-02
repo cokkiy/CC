@@ -126,7 +126,22 @@ void StationManager::setWeatherImageDownloadOption(const Option::WeatherImageDow
 		IControllerPrx prx = station.controlProxy;
 		if (prx != NULL)
 		{
-			prx->begin_setWeatherPictureDownloadOption(ccOption);
+			bool download = station.getDownloadOption();
+			if (weatherImageDownloadOption.Download == 2)
+			{
+				ccOption.Download = download;
+			}
+			else if (weatherImageDownloadOption.Download == 0)
+			{
+				ccOption.Download = true;
+			}
+			else
+			{
+				ccOption.Download = false;
+			}
+			prx->begin_setWeatherPictureDownloadOption(ccOption, [&station,&ccOption]() {
+				station.setDownloadOption(ccOption.Download);
+			});
 		}
 	}
 }

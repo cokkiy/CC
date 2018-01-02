@@ -14,11 +14,6 @@ Monitor::Monitor(int interval, QObject *parent)
     this->interval = interval; //默认1秒
 }
 
-Monitor::~Monitor()
-{
-
-}
-
 //线程执行函数
 //执行监视工作站状态任务
 void Monitor::run()
@@ -38,15 +33,15 @@ void Monitor::run()
             int stationInterval = station.inRebootingOrShutdown() ? 1 : interval;
             if (station.IsRunning())
             {
-                if (now - station.lastTick >= 5 * stationInterval)
+                if (now - station.lastTick >= 10 * stationInterval)
                 {
                     //如果大于5 * interval秒仍然没有收到新的状态,则设置为离线
                     station.setState(StationInfo::PowerOffOrNetworkFailure);
                 }
-                else if (now - station.lastTick >= 3 * stationInterval && !station.inRebootingOrShutdown())
+                else if (now - station.lastTick >= 5 * stationInterval && !station.inRebootingOrShutdown())
                 {
                     //如果大于3*监视间隔秒仍然没有收到新的状态,则报警
-                    station.setState(StationInfo::NoHeartbeat, QStringLiteral("%1秒内没有收到该工作站状态,请检查").arg(3 * interval));
+                    station.setState(StationInfo::NoHeartbeat, QStringLiteral("%1秒内没有收到该工作站状态,请检查").arg(5 * interval));
                 }
             }
         }

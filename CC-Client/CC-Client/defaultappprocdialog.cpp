@@ -4,11 +4,12 @@
 #include <tuple>
 using namespace std;
 
-DefaultAppProcDialog::DefaultAppProcDialog(Option& option, QWidget *parent)
+DefaultAppProcDialog::DefaultAppProcDialog(Option& option, QString& title, QWidget *parent)
     : QDialog(parent)
 {
     ui = new Ui::DefaultAppProcDialog();
     ui->setupUi(this);
+	this->setWindowTitle(title);
     this->option = &option;
     ui->appTableWidget->setRowCount(this->option->StartApps.size());
     int row = 0;

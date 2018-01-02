@@ -43,9 +43,9 @@ private:
 
 	//信号处理函数
 	void on_failToSendFile(StationInfo* station, QString fileName, QString message);
-	void on_newFileSize(StationInfo* station, QString fileName, size_t size);
+	void on_newFileSize(StationInfo* station, QString fileName, qint64 size);
 	void on_sendFileCompleted(StationInfo* station, QString fileName);
-	void on_fileSended(StationInfo* station, QString fileName, size_t size);
+	void on_fileSended(StationInfo* station, QString fileName, qint64 size);
 	void on_allCompleted(StationInfo* station, int total, int skip);
 	void on_skipFile(StationInfo* station, QString file);
 	void on_ViewLog(StationInfo* station);

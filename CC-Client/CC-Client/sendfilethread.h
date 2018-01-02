@@ -11,7 +11,7 @@ class StationInfo;
 /************************************************************************/
 /* 文件发送线程，实现独立线程发送文件                                         */
 /************************************************************************/
-using ResultTuple = std::tuple<Ice::AsyncResultPtr, const QString&, size_t>;
+using ResultTuple = std::tuple<Ice::AsyncResultPtr, const QString&, qint64>;
 
 class SendFileThread : public QThread
 {
@@ -80,7 +80,7 @@ signals:
 	新文件大小事件，通知文件大小
 	@param StationInfo * station 工作站
 	@param QString fileName 文件名
-	@param size_t size 文件大小
+	@param qint64 size 文件大小
 	@return void
 	作者：cokkiy（张立民）
 	创建时间:2016/3/25 16:00:41
@@ -91,7 +91,7 @@ signals:
 	文件已发送size字节内容通知事件
 	@param StationInfo * station 工作站
 	@param QString fileName 文件名
-	@param size_t size 发送大小
+	@param qint64 size 发送大小
 	@return void
 	作者：cokkiy（张立民）
 	创建时间:2016/3/25 16:21:28

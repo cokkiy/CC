@@ -110,6 +110,8 @@ public:
     void on_actionNewStation_triggered();
     //编辑工作站
     void on_actionEdit_triggered();
+	//添加控制的程序和监视的进程
+	void on_actionAddCtrlProgram_triggered();
     //删除工作站
     void on_actionRemove_triggered();
     //设置新建工作站默认监视进程和启动程序
@@ -186,7 +188,7 @@ private:
     // Ice communicator for receiving station state
     Ice::CommunicatorPtr communicator;
     // Adapter for communicator 
-    Ice::ObjectAdapterPtr adapter;
+    Ice::ObjectAdapterPtr adapter;	
 
 	//更新管理器
 	UpdateManager* updateManager = NULL;
@@ -254,6 +256,8 @@ private:
 	//创建网络流量曲线
 	void CreateNetCurver();
 	double findMax(double datas[]);
+	// 定时器Id
+	int  timerId = 0;
 
 protected:
     void timerEvent(QTimerEvent *e);

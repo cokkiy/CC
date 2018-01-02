@@ -16,6 +16,7 @@ public:
 	//气象图片下载选项
 	struct WeatherImageDownloadOption
 	{
+		int Download;
 		QString Url;
 		QString UserName;
 		QString Password;

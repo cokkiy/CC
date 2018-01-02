@@ -86,17 +86,26 @@ namespace CC_StationService
         private WeatherPictureDowlnloadOption LoadFromSetting()
         {
             WeatherPictureDowlnloadOption option = new WeatherPictureDowlnloadOption();
-            Properties.Settings.Default.Load();
-            option.Url = Properties.Settings.Default.FtpUrl;
-            option.UserName = Properties.Settings.Default.UserName;
-            option.Password = Properties.Settings.Default.Password;
-            option.LastHours = Properties.Settings.Default.LastHours;
-            option.Interval = Properties.Settings.Default.Interval;
-            option.DeletePreviousFiles = Properties.Settings.Default.DeletePreviousFiles;
-            option.DeleteHowHoursAgo = Properties.Settings.Default.DeleteHowHoursAgo;
-            option.SubDirectory = Properties.Settings.Default.SubDirectory;
-            option.SavePathForLinux = Properties.Settings.Default.SavePathForLinux;
-            option.SavePathForWindows = Properties.Settings.Default.SavePathForWindows;
+            try
+            {
+                Properties.Settings.Default.Load();
+                option.Url = Properties.Settings.Default.FtpUrl;
+                option.UserName = Properties.Settings.Default.UserName;
+                option.Password = Properties.Settings.Default.Password;
+                option.LastHours = Properties.Settings.Default.LastHours;
+                option.Interval = Properties.Settings.Default.Interval;
+                option.DeletePreviousFiles = Properties.Settings.Default.DeletePreviousFiles;
+                option.DeleteHowHoursAgo = Properties.Settings.Default.DeleteHowHoursAgo;
+                option.SubDirectory = Properties.Settings.Default.SubDirectory;
+                option.SavePathForLinux = Properties.Settings.Default.SavePathForLinux;
+                option.SavePathForWindows = Properties.Settings.Default.SavePathForWindows;
+                option.Download = Properties.Settings.Default.Download;
+            }
+            catch
+            {
+                option.Interval = 2;
+                option.Download = false;
+            }
             return option;
         }
 

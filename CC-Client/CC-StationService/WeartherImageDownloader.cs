@@ -58,9 +58,12 @@ namespace CC_StationService
             bStop = false;
             try
             {
-                Thread downloadThread = new Thread(DownloadProc);
-                downloadThread.Start();
-                IsRunning = true;
+                if (_option.Download)
+                {
+                    Thread downloadThread = new Thread(DownloadProc);
+                    downloadThread.Start();
+                    IsRunning = true;
+                }
             }
             catch (Exception ex)
             {
@@ -78,6 +81,7 @@ namespace CC_StationService
         private void ListAndDownloadFile(string url)
         {
             List<string> files = WeatherImageHelper.ListFile(url, Option.UserName, Option.Password);
+
             if (Logger != null)
             {
                 Logger.print(string.Format("共发现文件: {0}", files.Count));
@@ -218,34 +222,42 @@ namespace CC_StationService
                 {
                     if (Logger != null)
                         Logger.print(string.Format("开始下载 {0} 下气象云图...", Option.Url));
-                    //首先下载根目录下的所有文件
-                    ListAndDownloadFile(Option.Url);
-
-                    //下载子目录下的所有文件
-                    string[] subDirs = Option.SubDirectory.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var dir in subDirs)
+                    try
                     {
-                        string url = Option.Url;
-                        if (url.EndsWith("/"))
+                        //首先下载根目录下的所有文件
+                        ListAndDownloadFile(Option.Url);
+
+                        //下载子目录下的所有文件
+                        string[] subDirs = Option.SubDirectory.Split(new char[] { ';', '；' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var dir in subDirs)
                         {
-                            url = url.TrimEnd('/');
+                            string url = Option.Url;
+                            if (url.EndsWith("/"))
+                            {
+                                url = url.TrimEnd('/');
+                            }
+                            url += "/" + dir;
+                            if (!url.EndsWith("/"))
+                            {
+                                url += "/";
+                            }
+                            if (Logger != null)
+                                Logger.print(string.Format("开始下载 {0} 下气象云图...", url));
+                            ListAndDownloadFile(url);
                         }
-                        url += "/" + dir;
-                        if (!url.EndsWith("/"))
-                        {
-                            url += "/";
-                        }
-                        if (Logger != null)
-                            Logger.print(string.Format("开始下载 {0} 下气象云图...", url));
-                        ListAndDownloadFile(url);
+
+                        //删除过期文件
+                        DeleteOldFiles();
+
+                        //更新最后下载时间
+                        lastDownloadTime = DateTime.Now;
                     }
-
-                    //删除过期文件
-                    DeleteOldFiles();
-
-
-                    //更新最后下载时间
-                    lastDownloadTime = DateTime.Now;
+                    catch(Exception ex)
+                    {
+                        if (Logger != null)
+                            Logger.print(string.Format("下载气象云图发生异常，{0}", ex.ToString()));
+                    }
+                   
                 }
                 Thread.Sleep(1000);//休眠1秒
                 if (bStop)

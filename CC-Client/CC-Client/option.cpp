@@ -32,6 +32,7 @@ void Option::Save()
     QString  fileName = filePath + QStringLiteral("CC-Client.ini");
     QSettings  settings(fileName, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
+
     settings.setValue("Interval", this->Interval);
     settings.setValue("IsFirstTimeRun", false);
     QString appPath = QStringLiteral("");
@@ -48,6 +49,7 @@ void Option::Save()
         procs += QStringLiteral("%1|").arg(proc);
     }
     settings.setValue("ControlAndMonitor/MonitorProc", procs);
+	settings.setValue("WeatherImageDownloadOption/Download", weatherImageDownloadOption.Download);
 	settings.setValue("WeatherImageDownloadOption/Url", this->weatherImageDownloadOption.Url);
 	settings.setValue("WeatherImageDownloadOption/UserName", this->weatherImageDownloadOption.UserName);
 	settings.setValue("WeatherImageDownloadOption/Password", this->weatherImageDownloadOption.Password);
@@ -71,7 +73,7 @@ void Option::Load()
     QString  fileName = QDir::homePath() + QStringLiteral("/.CC-Client/CC-Client.ini");
     QSettings  settings(fileName, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
-    this->Interval = settings.value("Interval", 1).toInt();
+    this->Interval = settings.value("Interval", 2).toInt();
     this->IsFirstTimeRun = settings.value("IsFirstTimeRun", true).toBool();
     QString startApp = settings.value("ControlAndMonitor/StartApps", "").toString();
     QStringList appList = startApp.split("|", QString::SkipEmptyParts);
@@ -92,6 +94,7 @@ void Option::Load()
     QStringList procList = proc.split("|", QString::SkipEmptyParts);
     this->MonitorProcesses = procList.toStdList();
 
+	this->weatherImageDownloadOption.Download = settings.value("WeatherImageDownloadOption/Download", 2).toInt();
 	this->weatherImageDownloadOption.Url = settings.value("WeatherImageDownloadOption/Url").toString();
 	this->weatherImageDownloadOption.UserName = settings.value("WeatherImageDownloadOption/UserName").toString();
 	this->weatherImageDownloadOption.Password = settings.value("WeatherImageDownloadOption/Password").toString();

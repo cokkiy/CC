@@ -72,7 +72,8 @@ SOURCES += main.cpp\
     updatemanager.cpp \
     qpagenumdialog.cpp \
     weatherimageoptiondlg.cpp \
-	viewlogdialog.cpp
+	viewlogdialog.cpp\
+	ProgressBarDelegate.cpp
 
 HEADERS  += mainwindow.h \
     cpuplot/counterpiemarker.h \
@@ -118,7 +119,8 @@ HEADERS  += mainwindow.h \
     updatemanager.h \
     qpagenumdialog.h \
     weatherimageoptiondlg.h \
-	viewlogdialog.h
+	viewlogdialog.h \
+	ProgressBarDelegate.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \

@@ -527,7 +527,8 @@
     <addaction name="actionExitAllZXApp"/>
     <addaction name="actionAll_Shutdown"/>
     <addaction name="separator"/>
-    <addaction name="actionUpdateStation"/>
+    <addaction name="actionUpdateStationService"/>
+    <addaction name="actionUpgradeAppProxy"/>
     <addaction name="actionAbout"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -549,10 +550,12 @@
     <addaction name="actionScreenCapture"/>
     <addaction name="actionViewStationDetail"/>
     <addaction name="separator"/>
+    <addaction name="actionAddCtrlProgram"/>
     <addaction name="actionEdit"/>
     <addaction name="actionNewStation"/>
     <addaction name="separator"/>
     <addaction name="actionRemove"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -1158,15 +1161,19 @@
     <string>关于...</string>
    </property>
   </action>
-  <action name="actionUpdateStation">
+  <action name="actionUpdateStationService">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/sendFile.png</normaloff>:/Icons/sendFile.png</iconset>
    </property>
    <property name="text">
-    <string>升级工作站</string>
+    <string>升级工作站中控服务</string>
    </property>
    <property name="statusTip">
-    <string>升级工作站中控服务和应用代理</string>
+    <string>升级工作站中控服务</string>
    </property>
   </action>
   <action name="actionSetWeatherDownloadOption">
@@ -1176,6 +1183,30 @@
    </property>
    <property name="text">
     <string>设置气象云图下载选项...</string>
+   </property>
+  </action>
+  <action name="actionAddCtrlProgram">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/sign017.ico</normaloff>:/Icons/sign017.ico</iconset>
+   </property>
+   <property name="text">
+    <string>添加程序和进程</string>
+   </property>
+   <property name="toolTip">
+    <string>添加要控制的程序和监视的进程</string>
+   </property>
+   <property name="statusTip">
+    <string>添加要控制的程序和监视的进程</string>
+   </property>
+  </action>
+  <action name="actionUpgradeAppProxy">
+   <property name="icon">
+    <iconset resource="cc-client.qrc">
+     <normaloff>:/Icons/52design.com_chunjie_45.png</normaloff>:/Icons/52design.com_chunjie_45.png</iconset>
+   </property>
+   <property name="text">
+    <string>升级工作站中控应用代理</string>
    </property>
   </action>
  </widget>

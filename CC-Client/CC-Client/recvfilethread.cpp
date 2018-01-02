@@ -43,7 +43,7 @@ void RecvFileThread::run()
 #endif
 				if (pf != NULL)
 				{
-					size_t size = s->fileProxy->getSize(srcFile.toStdWString());
+					qint64 size = s->fileProxy->getSize(srcFile.toStdWString());
 					emit notifyFileSize(s, size);
 					getData(s, 0, pf);					
 				}
@@ -74,7 +74,7 @@ void RecvFileThread::run()
 }
 
 //获取数据
-void RecvFileThread::getData(StationInfo* s, size_t position, FILE* pf)
+void RecvFileThread::getData(StationInfo* s, qint64 position, FILE* pf)
 {
 	std::vector< Ice::Byte > inParams;
 

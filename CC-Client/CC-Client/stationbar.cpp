@@ -46,12 +46,12 @@ void StationBar::setStationName(QString value)
 	}
 }
 
-size_t StationBar::Percent()
+qint64 StationBar::Percent()
 {
 	return m_Percent;
 }
 
-void StationBar::setPercent(size_t value)
+void StationBar::setPercent(qint64 value)
 {
 	if (m_Percent != value)
 	{
@@ -157,7 +157,7 @@ StationBar::~StationBar()
 	delete progressBar;
 }
 
-void StationBar::setMaxPercent(size_t size)
+void StationBar::setMaxPercent(qint64 size)
 {
 	maxPercent = size;
 }

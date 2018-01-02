@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>521</width>
-    <height>303</height>
+    <width>533</width>
+    <height>328</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -232,6 +232,57 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>是否下载</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QRadioButton" name="radioButtonAllDownload">
+        <property name="toolTip">
+         <string>所有工作站都下载气象云图</string>
+        </property>
+        <property name="text">
+         <string>全部下载</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButtonAllNoDownload">
+        <property name="toolTip">
+         <string>所有工作站都不下载气象云图</string>
+        </property>
+        <property name="text">
+         <string>全部不下载</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButtonSelfSetDownload">
+        <property name="toolTip">
+         <string>每个工作站独立（通过详细页面）设置是否下载</string>
+        </property>
+        <property name="text">
+         <string>独立设置</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <spacer name="horizontalSpacer_2">
@@ -302,4 +353,7 @@
   <include location="cc-client.qrc"/>
  </resources>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

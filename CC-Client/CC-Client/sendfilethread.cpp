@@ -169,9 +169,9 @@ void SendFileThread::sendFileContents(const QString &file, StationInfo* s)
 {
 	//创建文件成功，开始发送文件内容.													 
 	std::vector< Ice::Byte > inParams, resultParams;
-	size_t position = 0; //文件起始位置
+	qint64 position = 0; //文件起始位置
 	int packetLength = 100 * 1024;//10K Bytes
-	int maxPackets = 100;
+	uint maxPackets = 100;
 	char* buf = new char[packetLength];
 	//以binary模式打开文件
 #ifdef Q_OS_WIN
@@ -227,7 +227,7 @@ void SendFileThread::waitComplete(list <ResultTuple>& asyncResults, StationInfo*
 	auto ar = asyncResults.front();
 	Ice::AsyncResultPtr r = get<0>(ar);
 	QString fileName = get<1>(ar);
-	size_t position = get<2>(ar);
+	qint64 position = get<2>(ar);
 	asyncResults.pop_front();
 	r->waitForCompleted();
 	try

@@ -26,7 +26,7 @@ class StationInfo : public QObject
         Q_PROPERTY(float AppCPU READ AppCPU WRITE setAppCPU)
         Q_PROPERTY(int ProcCount READ ProcCount WRITE setProcCount)
         Q_PROPERTY(int AppThreadCount READ AppThreadCount WRITE setAppThreadCount)
-        Q_PROPERTY(size_t TotalMemory READ TotalMemory WRITE setTotalMemory)
+        Q_PROPERTY(qint64 TotalMemory READ TotalMemory WRITE setTotalMemory)
         Q_PROPERTY(float AppMemory READ AppMemory WRITE setAppMemory)
         Q_PROPERTY(int ExecuteCounting READ ExecuteCounting WRITE setExecuteCounting)
         Q_PROPERTY(QString Name READ Name WRITE setName)
@@ -152,7 +152,10 @@ public:
         创建时间：2015/12/04 9:24:41
         */
         OperatingStatus getOperatingStatus();
+		
+		
     private:
+		
         /*
          工作站运行状态
          **/
@@ -254,12 +257,12 @@ public:
 
 
 private:
-    size_t m_TotalMemory = 0;
+	qint64 m_TotalMemory = 0;
 public:
     //获取总内存
-    size_t TotalMemory();
+	qint64 TotalMemory();
     //设置总内存
-    void setTotalMemory(size_t value);
+    void setTotalMemory(qint64 value);
 
 
 private:
@@ -342,7 +345,22 @@ public:
     最后一次收到工作站状态时间
      **/
     time_t lastTick;
+
+	/*
+	获取是否该工作站是否下载气象云图
+	*/
+	bool getDownloadOption();
+
+	/*
+	设置是否该工作站是否下载气象云图
+	*/
+	void setDownloadOption(bool download);
 private:
+
+	/*
+	是否下载气象云图
+	*/
+	bool downloadWeatherImage;
 
     /*
     应用程序运行状态

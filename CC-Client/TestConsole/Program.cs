@@ -9,103 +9,108 @@ using System.Net.NetworkInformation;
 using System.Linq;
 using Ice;
 using CC;
+using System.Net;
+using System.Text;
+using System.Reflection;
+using System.Security.Principal;
+using System.Security.AccessControl;
+using System.Xml.Serialization;
+using System.Xml.Linq;
+using System.Xml;
+using System.Management;
 
 namespace TestConsole
 {
+    
     class Program
     {
+
         static void Main(string[] args)
         {
-            //             try
-            //             {
-            // 
-            //                 Ice.InitializationData initData = new InitializationData();
-            //                 initData.properties = Ice.Util.createProperties();
-            //                 initData.properties.load("Config.Server");
-            //                 Ice.Communicator ic = Ice.Util.initialize(initData);
-            //                 ObjectAdapter adapter = ic.createObjectAdapter("StateReceiver");
-            //                 receiver r = new receiver();
-            //                 adapter.add(r, ic.stringToIdentity("stateReceiver"));
-            //                 adapter.activate();
-            //                 Thread sap = new Thread(startApp);
-            //                 sap.Start(r);
-            //                 ic.waitForShutdown();
-            //                 Console.WriteLine("Press any key to start app...");
-            //                 Console.ReadKey();
-            // 
-            //             }
-            //             catch
-            //             {
-            // 
-            //             }
-            Type myType = typeof(my);
-            my m = new my();
-            var method = myType.GetMethod("doSth",
-                new Type[] { typeof(int).MakeArrayType(), typeof(int).MakeArrayType().MakeByRefType(), typeof(int) });
-            //_MethodInfo method = methods.FirstOrDefault(mt => mt.Name == "doSth");
-            if (method != null)
+            Console.WriteLine(Environment.OSVersion.VersionString);
+            Console.WriteLine(Environment.Version);
+            Console.WriteLine(Environment.MachineName);
+
+            Console.WriteLine(Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"));
+
+            DriveInfo[] drivers = DriveInfo.GetDrives();
+            foreach (var driver in drivers)
             {
-                object[] paras = { 2, null, 3 };
-                method.Invoke(m, paras);
-                Console.WriteLine(paras[1]);
+                Console.WriteLine(driver.Name);
+                Console.WriteLine(driver.DriveType);
+                if (driver.IsReady)
+                {
+                    Console.WriteLine(driver.DriveFormat);
+                    Console.WriteLine(driver.TotalFreeSpace);
+                    Console.WriteLine(driver.TotalSize);
+                    Console.WriteLine(driver.VolumeLabel);
+                }
             }
 
+            ManagementClass mc = new ManagementClass("win32_processor");
+            ManagementObjectCollection moc = mc.GetInstances();
+            string id = string.Empty;
+            foreach (ManagementObject mo in moc)
+            {
+                id = mo.Properties["processorID"].Value.ToString();
+                break;
+            }
+
+            Console.WriteLine(id);
+
+            Console.WriteLine("Press any key to exits");
             Console.ReadKey();
         }
 
-        static void startApp(object r)
+
+        /// <summary>
+        /// 获取本机所有网卡配置信息
+        /// </summary>
+        /// <returns>Mac Address->IP Address 列表</returns>
+        private static Dictionary<string, List<string>> getAllNIInfo()
         {
-            receiver recv = r as receiver;
-            while (recv.prx == null)
+            Dictionary<string, List<string>> niInfo = new Dictionary<string, List<string>>();
+            NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (var ni in nis)
             {
-                Thread.Sleep(100);
-            }
-            List<AppStartParameter> param = new List<AppStartParameter>();
-            param.Add(new AppStartParameter { AppPath = "/home/cokkiy/Projects/build-qttools-gcc-5.2/bin/designer", Arguments = "" });
-            for (int i = 0; i < 100; i++)
-            {
-                Console.WriteLine("Starting {0} times", i);
-                if (recv.prx != null)
+                if (ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
                 {
-                    var result = recv.prx.startApp(param);
-                    foreach (var item in result)
+                    string mac = string.Join("-", ni.GetPhysicalAddress().GetAddressBytes()
+                        .Select((byte b) => { return b.ToString("X2"); }));
+                    IPInterfaceProperties ipProperties = ni.GetIPProperties();
+                    List<string> ipList = new List<string>(); ;
+                    foreach (var item in ipProperties.UnicastAddresses)
                     {
-                        Console.WriteLine("{0}", item.Result);
+                        //只添加IPV4地址
+                        if (item.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                            ipList.Add(item.Address.ToString());
                     }
-
+                    niInfo.Add(ni.Name, ipList);
                 }
-                Thread.Sleep(1000);
             }
+
+            return niInfo;
         }
 
-        class my
+        private static void chown(string fileName, string user)
         {
-            public void doSth(int[] i, out int[] p, int d)
+            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                Console.WriteLine(i);
-                p = new int[1];
-                p[0] = 100;
+                try
+                {
+                    System.Diagnostics.Process chownProcess = new System.Diagnostics.Process();
+                    chownProcess.StartInfo.FileName = "chown";
+                    chownProcess.StartInfo.UseShellExecute = true;
+                    chownProcess.StartInfo.Arguments = string.Format("{0} {1}", user, fileName);
+                    chownProcess.Start();
+                }
+                catch (System.Exception ex)
+                {
+                    //Ice.Logger logger = PlatformMethodFactory.GetLogger();
+                    Console.WriteLine(string.Format("chown Error. fileName:{0}, new owner:{1}. {2}", fileName, user, ex.ToString()));
+                }
             }
         }
 
-
-        class receiver : CC.IStationStateReceiverDisp_
-        {
-            public IControllerPrx prx = null;
-
-            public override void receiveAppRunningState(List<AppRunningState> appRunningState, Current current__)
-            {
-            }
-
-            public override void receiveStationRunningState(StationRunningState stationRunningState, IControllerPrx controller, Current current__)
-            {
-                Console.WriteLine("cpu:{0}", stationRunningState.cpu);
-                prx = controller;
-            }
-
-            public override void receiveSystemState(StationSystemState systemState, Current current__)
-            {
-            }
-        }
     }
 }

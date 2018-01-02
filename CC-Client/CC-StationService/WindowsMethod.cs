@@ -30,12 +30,12 @@ namespace CC_StationService
 
         public void Reboot()
         {
-            System.Diagnostics.Process.Start("shutdown"," -r -f");
+            System.Diagnostics.Process.Start("shutdown"," -r -f -t 0");
         }
 
         public void Shutdown()
         {
-            System.Diagnostics.Process.Start("shutdown"," -s -f");
+            System.Diagnostics.Process.Start("shutdown"," -s -f -t 0");
         }
 
         /// <summary>

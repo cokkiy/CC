@@ -36,6 +36,7 @@
 #include "updatemanager.h"
 #include "qpagenumdialog.h"
 #include "weatherimageoptiondlg.h"
+#include "ProgressBarDelegate.h"
 
 
 
@@ -77,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     // 初始化加载线程
-    StationsLoader* loader = new StationsLoader();
+	StationsLoader* loader = new StationsLoader();
     loader->moveToThread(&ldstation_thread);
     connect(&ldstation_thread, &QThread::finished, loader, &QObject::deleteLater);
     connect(this, &MainWindow::load, loader, &StationsLoader::load);
@@ -85,15 +86,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ldstation_thread.start();
 }
 
+
+
 MainWindow::~MainWindow()
 {
-    delete ui;
-    if (pStationList != nullptr)
-        delete pStationList;
-    if (pTableModel != nullptr)
-        delete pTableModel;
-    if (monitor != nullptr)
-        delete monitor;
+	delete ui;
+	if (pStationList != nullptr)
+		delete pStationList;
+	if (pTableModel != nullptr)
+		delete pTableModel;
+	if (monitor != nullptr)
+		delete monitor;
 }
 
 void MainWindow::on_actionPowerOn_triggered()
@@ -265,7 +268,7 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
 {
     if (success)
     {
-        ui->statusBar->showMessage(QString::fromLocal8Bit("工作站信息加载完毕。"), 5000);
+        ui->statusBar->showMessage(QStringLiteral("工作站信息加载完毕。"), 5000);
     }
     else
     {
@@ -280,6 +283,11 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
     pStations->subscribeStationAddedEvent(this, SLOT(onStationAdded(StationInfo*)));
     pStations->subscribeListChangedEvent(this, SLOT(onStationListChanged()));
     ui->tableView->setModel(pTableModel);
+	//设置显示代理
+	ProgressBarDelegate *barDelegate = new ProgressBarDelegate(this);
+	ui->tableView->setItemDelegateForColumn(3, barDelegate);
+	ui->tableView->setItemDelegateForColumn(4, barDelegate);
+
     ui->listView->setModel(pTableModel);
     //绑定鼠标右键事件,显示悬浮式菜单
     connect(ui->tableView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showFloatingMenu(const QPoint &)));
@@ -299,10 +307,14 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
         updateManager = new UpdateManager(communicator, this);
         connect(updateManager, &UpdateManager::UpdatingProgressReport, this, &MainWindow::on_UpdatingProgressReported);
         StationStateReceiverPtr = new StationStateReceiver(updateManager, communicator, pStations);
-        adapter->add(StationStateReceiverPtr, communicator->stringToIdentity("stateReceiver"));
+		Ice::Identity stateReceiver;// = communicator->stringToIdentity("stateReceiver");
+		stateReceiver.name = "stateReceiver";
+        adapter->add(StationStateReceiverPtr, stateReceiver);
         adapter->activate();
     }
 }
+
+
 
 //点击标题栏排序
 void MainWindow::sortByColumn(int cloumnIndex)
@@ -386,7 +398,7 @@ void MainWindow::operationMenuToShow()
         //编辑按钮起作用
         ui->actionEdit->setEnabled(true);
         //删除按钮起作用
-        ui->actionRemove->setEnabled(true);
+        ui->actionRemove->setEnabled(true);		
     }
     else
     {
@@ -404,6 +416,8 @@ void MainWindow::operationMenuToShow()
     }
     //新增按钮总是起作用
     ui->actionNewStation->setEnabled(true);
+	//添加程序和进程按钮总是起作用
+	ui->actionAddCtrlProgram->setEnabled(true);
 }
 
 //文件传输菜单即将显示
@@ -666,47 +680,47 @@ void MainWindow::on_UpdatingProgressReported(int percent, QString message)
 */
 void MainWindow::show()
 {
-    QMainWindow::show();
-    ui->statusBar->showMessage(QStringLiteral("开始加载工作站信息..."), 0);
-    QString dir = QApplication::applicationDirPath();
-    //初始化ICE框架,创建监听通道
-    try
-    {
-        int argc = 0;
-        Ice::InitializationData initData;
-        initData.properties = Ice::createProperties();
-        //加载配置文件
-        initData.properties->load("Config.Server");
-        //装载Qt版本Dispatcher
-        initData.dispatcher = new QtDispatcher(false);
-        communicator = Ice::initialize(argc, 0, initData);
-        adapter = communicator->createObjectAdapter("StateReceiver");
-        //初始化成功
-        iceInitSuccess = true;
-    }
-    catch (const IceUtil::Exception& ex)
-    {
-        iceInitSuccess = false;
-        ostringstream ostr;
-        ostr << ex;
-        QString s = ostr.str().c_str();
-        QMessageBox::information(NULL, QStringLiteral("警告"), QStringLiteral("创建工作站状态监视通道失败：%1").arg(s));
-    }
+	QMainWindow::show();
+	ui->statusBar->showMessage(QStringLiteral("开始加载工作站信息..."), 0);
+	QString dir = QApplication::applicationDirPath();
+	//初始化ICE框架,创建监听通道
+	try
+	{
+		int argc = 0;
+		Ice::InitializationData initData;
+		initData.properties = Ice::createProperties();
+		//加载配置文件
+		initData.properties->load("Config.Server");
+		//装载Qt版本Dispatcher
+		initData.dispatcher = new QtDispatcher(false);
+		communicator = Ice::initialize(argc, 0, initData);
+		adapter = communicator->createObjectAdapter("StateReceiver");
+		//初始化成功
+		iceInitSuccess = true;
+	}
+	catch (const IceUtil::Exception& ex)
+	{
+		iceInitSuccess = false;
+		ostringstream ostr;
+		ostr << ex;
+		QString s = ostr.str().c_str();
+		QMessageBox::information(NULL, QStringLiteral("警告"), QStringLiteral("创建工作站状态监视通道失败：%1").arg(s));
+	}
 
-    //开始加载工作站配置文件
-    emit load(fileName, pStationList);
+	//开始加载工作站配置文件
+	emit load(fileName, pStationList);
 
-    if (option.IsFirstTimeRun)
-    {
-        DefaultAppProcDialog dlg(option);
-        if (dlg.exec() == QDialog::Accepted)
-        {
-            option.Save();
-        }
-    }
+	if (option.IsFirstTimeRun)
+	{
+		DefaultAppProcDialog dlg(option);
+		if (dlg.exec() == QDialog::Accepted)
+		{
+			option.Save();
+		}
+	}
 
-    //启动定时器
-    startTimer(1000);  // 1 second
+	//启动定时器
+	timerId = startTimer(1000);  // 1 second
 }
 
 //关闭程序前提示确认
@@ -717,14 +731,22 @@ void MainWindow::closeEvent(QCloseEvent * event)
         QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
     {
         try
-        {
+        {			
             monitor->Stop();
-            //adapter->destroy();
-            //communicator->destroy();
+
+			if (timerId != 0)
+			{
+				killTimer(timerId);
+			}
+
+            adapter->destroy();
+			communicator -> destroy();
         }
         catch (const IceUtil::Exception&)
         {
         }
+
+		QThread::sleep(1);
         event->accept();
     }
     else
@@ -904,10 +926,14 @@ void MainWindow::on_actionSetInterval_triggered()
         if (dlg->exec() == QDialog::Accepted)
         {
             option.Interval = dlg->Interval();
+            if (monitor != nullptr)
+            {
+                monitor->setInterval(option.Interval);
+            }
             option.Save();
             //设置监视间隔
             StationManager* manager = new StationManager(pStationList);
-            manager->setWeatherImageDownloadOption(option.weatherImageDownloadOption);
+            manager->setInterval(option.Interval);            
         }
         delete dlg;
     }
@@ -949,6 +975,46 @@ void MainWindow::on_actionEdit_triggered()
         EditStationDialog dlg(station, EditStationDialog::Edit);
         dlg.exec();
     }
+}
+
+//添加控制的程序和监视的进程
+void MainWindow::on_actionAddCtrlProgram_triggered()
+{
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+	{
+		if (QMessageBox::question(NULL, QStringLiteral("编辑确认"),
+			QStringLiteral("要向所有工作站添加控制的程序和监视的进程吗?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
+		{
+			return;
+		}
+	}
+
+	DefaultAppProcDialog dlg(option,QStringLiteral("添加要控制的程序和监视的进程"));
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		if (selectedIndexs.isEmpty())
+		{
+			for (auto iter = pStationList->begin(); iter != pStationList->end(); iter++)
+			{
+				iter->addStandAloneMonitorProcesses(option.MonitorProcesses);
+				iter->addStartApps(option.StartApps);
+			}
+		}
+		else
+		{
+			for (auto index : selectedIndexs)
+			{
+				if (index.column() == 0)
+				{
+					StationInfo* s = pStationList->atCurrent(index.row());
+					s->addStandAloneMonitorProcesses(option.MonitorProcesses);
+					s->addStartApps(option.StartApps);
+				}
+			}
+		}
+	}
+
 }
 
 //删除工作站
@@ -1352,7 +1418,7 @@ void MainWindow::timerEvent(QTimerEvent *e)
 double MainWindow::findMax(double datas[])
 {
     double max = 0;
-    for (size_t i = 0; i < CounterHistoryDataSize; i++)
+    for (qint64 i = 0; i < CounterHistoryDataSize; i++)
     {
         max = max >= datas[i] ? max : datas[i];
     }

@@ -25,7 +25,7 @@ private:
 	std::list<StationInfo*> stations;
 
 	//获取数据
-	void getData(StationInfo* s, size_t position, FILE* pf);
+	void getData(StationInfo* s, qint64 position, FILE* pf);
 
 signals:
 	/*!

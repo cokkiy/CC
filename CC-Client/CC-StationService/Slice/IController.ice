@@ -73,6 +73,8 @@ module CC
 	//气象云图下载选项
 	struct WeatherPictureDowlnloadOption
 	{
+	    //是否下载气象云图
+	    bool Download;
 		// ftp 服务器地址
 		string Url;
 		// 用户名

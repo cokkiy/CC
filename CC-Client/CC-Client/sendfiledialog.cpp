@@ -173,7 +173,7 @@ void SendFileDialog::on_failToSendFile(StationInfo* station, QString fileName, Q
 	addToLog(station, msg, true);
 }
 
-void SendFileDialog::on_newFileSize(StationInfo* station, QString fileName, size_t size)
+void SendFileDialog::on_newFileSize(StationInfo* station, QString fileName, qint64 size)
 {
 	StationBar* bar = station_bar[station];
 	QString msg = QStringLiteral("准备发送文件%1").arg(fileName);
@@ -190,7 +190,7 @@ void SendFileDialog::on_sendFileCompleted(StationInfo* station, QString fileName
 	addToLog(station, msg);
 }
 
-void SendFileDialog::on_fileSended(StationInfo* station, QString fileName, size_t size)
+void SendFileDialog::on_fileSended(StationInfo* station, QString fileName, qint64 size)
 {
 	StationBar* bar = station_bar[station];
 	QString msg = QStringLiteral("正在发送文件%1...").arg(fileName);

@@ -35,6 +35,9 @@ module CC
 		string osName;
 		///操作系统版本
 		string osVersion;
+
+		//是否下载气象云图
+		bool downloadWeatherImage;
 	};
 	///工作站运行动态
 	struct StationRunningState

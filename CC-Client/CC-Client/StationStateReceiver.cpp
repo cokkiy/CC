@@ -65,7 +65,7 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
         {
             //没有收到工作站基本信息,请求发送基本信息
             controlPrx->begin_getSystemState(
-				[this,controlPrx,fileProxy,&stationRunningState](const CC::StationSystemState& systemState) 
+				[=,&stationRunningState](const CC::StationSystemState& systemState) 
 			{
                 StationInfo* pStation = findAndSetStationSystemState(systemState);
 				if (pStation != NULL)
@@ -84,6 +84,21 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 					controlPrx->begin_setWatchingApp(pStation->getAllShouldMonitoredProcessesName(), []() {});
 					CC::WeatherPictureDowlnloadOption ccOption;
 					Option* option = Option::getInstance();
+					if (option->weatherImageDownloadOption.Download == 0)
+					{
+						//全部下载
+						ccOption.Download = true;
+					}
+					else if (option->weatherImageDownloadOption.Download == 1)
+					{
+						//全部不下载
+						ccOption.Download = false;
+					}
+					else
+					{
+						//独立设置
+						ccOption.Download = systemState.downloadWeatherImage;
+					}
 					ccOption.Url = option->weatherImageDownloadOption.Url.toStdString();
 					ccOption.UserName = option->weatherImageDownloadOption.UserName.toStdString();
 					ccOption.Password = option->weatherImageDownloadOption.Password.toStdString();
@@ -94,7 +109,9 @@ void StationStateReceiver::receiveStationRunningState(const ::CC::StationRunning
 					ccOption.SubDirectory = option->weatherImageDownloadOption.SubDirectory.toStdWString();
 					ccOption.DeleteHowHoursAgo = option->weatherImageDownloadOption.DeleteHowHoursAgo;
 					ccOption.DeletePreviousFiles = option->weatherImageDownloadOption.DeletePreviousFiles;
-					controlPrx->begin_setWeatherPictureDownloadOption(ccOption, []() {});
+					controlPrx->begin_setWeatherPictureDownloadOption(ccOption, [ccOption, pStation]() {
+						pStation->setDownloadOption(ccOption.Download);
+					});
 				}
             },
 				[](const Ice::Exception& ex)
@@ -172,6 +189,7 @@ StationInfo* StationStateReceiver::findAndSetStationSystemState(const ::CC::Stat
             pStation->setTotalMemory(stationSystemState.totalMemory);
             pStation->setOSName(stationSystemState.osName);
             pStation->setOSVersion(stationSystemState.osVersion);
+			pStation->setDownloadOption(stationSystemState.downloadWeatherImage);
             pStation->setLastTick();
         }
     }

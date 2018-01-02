@@ -64,6 +64,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="weatherImageDownloadCheckBox">
+       <property name="text">
+        <string>是否下载气象云图</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="powerOnPushButton">
        <property name="text">
         <string>开机</string>

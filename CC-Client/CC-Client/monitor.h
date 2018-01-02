@@ -32,7 +32,7 @@ public:
     创建时间：2015/12/04 11:04:04
     */
     Monitor(int interval = 1, QObject *parent = NULL);
-    ~Monitor();
+    //~Monitor();
 
     //线程核心函数
     virtual void run() override;

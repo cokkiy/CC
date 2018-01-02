@@ -97,10 +97,15 @@ void QtDispatcher::customEvent(QEvent * event)
 
     try
     {
-        e->dispatcherCall->run(); //Dose not throw, blocks until op completes
+		if(e)
+			e->dispatcherCall->run(); //Dose not throw, blocks until op completes
     }
     catch (const Ice::Exception& e)
     {
         qDebug() << "QtDispatcher::customEvent(): caught ex: " << e.what() << endl;
     }
+	catch(...)
+	{
+
+	}
 }

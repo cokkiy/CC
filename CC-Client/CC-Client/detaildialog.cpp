@@ -2,6 +2,8 @@
 #include "StationInfo.h"
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
+#include "IController.h"
+#include <Ice/Ice.h>
 #include <qwt_legend.h>
 #include <qwt_plot_grid.h>
 #include "cpuplot/plotpart.h"
@@ -13,12 +15,14 @@
 #include "screenimagedialog.h"
 #include "processdialog.h"
 using namespace std;
+using namespace CC;
 
 DetailDialog::DetailDialog(StationInfo* station, QWidget *parent)
     : QDialog(parent), station(station)
 {
     ui.setupUi(this);
     isClosed = false;
+	ui.weatherImageDownloadCheckBox->setChecked(station->getDownloadOption());
     ui.NameLineEdit->setText(station->Name());
     ui.IPLineEdit->setText(station->IP());
     ui.MACLineEdit->setText(station->MAC());
@@ -250,6 +254,41 @@ void DetailDialog::on_viewALlPushButton_clicked()
     dlg.exec();
 }
 
+
+void DetailDialog::on_weatherImageDownloadCheckBox_clicked(bool checked)
+{
+	IControllerPrx prx = station->controlProxy;
+	if (prx != NULL)
+	{
+		Option::WeatherImageDownloadOption weatherImageDownloadOption = Option::getInstance()->weatherImageDownloadOption;
+		CC::WeatherPictureDowlnloadOption ccOption;
+		ccOption.Url = weatherImageDownloadOption.Url.toStdString();
+		ccOption.UserName = weatherImageDownloadOption.UserName.toStdString();
+		ccOption.Password = weatherImageDownloadOption.Password.toStdString();
+		ccOption.LastHours = weatherImageDownloadOption.LastHours;
+		ccOption.Interval = weatherImageDownloadOption.Interval;
+		ccOption.DeletePreviousFiles = weatherImageDownloadOption.DeletePreviousFiles;
+		ccOption.DeleteHowHoursAgo = weatherImageDownloadOption.DeleteHowHoursAgo;
+		ccOption.SubDirectory = weatherImageDownloadOption.SubDirectory.toStdWString();
+		ccOption.SavePathForWindows = weatherImageDownloadOption.SavePathForWindows.toStdWString();
+		ccOption.SavePathForLinux = weatherImageDownloadOption.SavePathForLinux.toStdWString();
+		if (checked)
+		{
+			//下载气象云图
+			ccOption.Download = true;
+		}
+		else
+		{
+			//不下载气象云图
+			ccOption.Download = false;
+		}
+
+		prx->begin_setWeatherPictureDownloadOption(ccOption, [=, &ccOption]() {
+			station->setDownloadOption(ccOption.Download);
+		});
+	}
+}
+
 void DetailDialog::on_screenCapturePushButton_clicked()
 {
     if (station != NULL&&station->controlProxy != NULL)
@@ -391,7 +430,7 @@ void DetailDialog::SetNetData()
 double DetailDialog::findMax(double datas[])
 {
     double max = 0;
-    for (size_t i = 0; i < CounterHistoryDataSize; i++)
+    for (qint64 i = 0; i < CounterHistoryDataSize; i++)
     {
         max = max >= datas[i] ? max : datas[i];
     }

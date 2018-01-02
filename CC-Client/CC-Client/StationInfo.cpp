@@ -70,12 +70,12 @@ void StationInfo::setAppMemory(float value)
     }
 }
 
-size_t StationInfo::TotalMemory()
+qint64 StationInfo::TotalMemory()
 {
     return m_TotalMemory;
 }
 
-void StationInfo::setTotalMemory(size_t value)
+void StationInfo::setTotalMemory(qint64 value)
 {
     if (m_TotalMemory != value)
     {
@@ -464,12 +464,22 @@ void StationInfo::clearStandAloneMonitorProc()
 
 void StationInfo::addStandAloneMonitorProcess(const QString& procName)
 {
-    this->standAloneMonitorProcessList.push_back(procName);
+	if (!standAloneMonitorProcessList.contains(procName))
+	{
+		this->standAloneMonitorProcessList.push_back(procName);
+	}
 }
 
 void StationInfo::addStandAloneMonitorProcesses(const std::list<QString>& processes)
 {
-    this->standAloneMonitorProcessList.append(QStringList::fromStdList(processes));
+	for (const QString& p : processes)
+	{
+		if (!standAloneMonitorProcessList.contains(p))
+		{
+			this->standAloneMonitorProcessList.push_back(p);
+		}
+	}
+   // this->standAloneMonitorProcessList.append(QStringList::fromStdList(processes));
 }
 
 void StationInfo::clearOperatingHistoryMessages()
@@ -501,7 +511,17 @@ void StationInfo::addStartApp(const QString& path, const QString& arguments, con
 
 void StationInfo::addStartApps(const std::list<CC::AppStartParameter>& apps)
 {
-    startAppList.insert(startAppList.end(), apps.begin(), apps.end());
+	for (auto& app : apps)
+	{
+		auto iter = find_if(startAppList.begin(), startAppList.end(), [&app](CC::AppStartParameter& para) {
+			return 	para.AppPath == app.AppPath &&para.Arguments == app.Arguments && para.ProcessName == app.ProcessName;
+		});
+		if (iter == startAppList.end())
+		{
+			startAppList.push_back(app);
+		}
+	}
+    //startAppList.insert(startAppList.end(), apps.begin(), apps.end());
 }
 
 void StationInfo::clearStartApp()
@@ -915,6 +935,16 @@ StationInfo::RunningState StationInfo::State::getRunningState()
 StationInfo::OperatingStatus StationInfo::State::getOperatingStatus()
 {
     return operatingStatus;
+}
+
+bool StationInfo::getDownloadOption()
+{
+	return downloadWeatherImage;
+}
+
+void StationInfo::setDownloadOption(bool download)
+{
+	downloadWeatherImage = download;
 }
 
 /*!
