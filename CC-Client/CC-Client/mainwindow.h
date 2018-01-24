@@ -136,6 +136,12 @@ public:
 	void on_actionBatchScreenCapture_triggered();
 	//显示关于对话框
 	void on_actionAbout_triggered();
+
+	//升级中控服务
+	void on_actionUpdateStationService_triggered();
+	//升级中控应用代理
+	void on_actionUpgradeAppProxy_triggered();
+
 	//清屏
 	void on_clearPagePushButton_clicked();
 	//全屏

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration.Install;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.ServiceProcess;
@@ -26,6 +27,20 @@ namespace CC_StationService
                     case "-u":
                     case "-uninstall":
                         ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
+                        break;
+                    case "-v":
+                        {
+                            string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                            var serviceVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "CC-StationService.exe"));
+                            Console.WriteLine(serviceVersion.FileVersion.ToString());
+                        }
+                        break;
+                    case "-version":
+                        {
+                            string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                            var serviceVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "CC-StationService.exe"));
+                            Console.WriteLine(serviceVersion.ToString());
+                        }
                         break;
                     default:
                         Console.WriteLine("Usage: CC-StationService.exe -i or -install to install this service.");

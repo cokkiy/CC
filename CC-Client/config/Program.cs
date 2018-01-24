@@ -91,6 +91,10 @@ namespace config
 
         static void Main(string[] args)
         {
+            if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                ServerConfig = @"C:\CC\Server\Config.Client";
+            }
             Dictionary<string, List<string>> niInfos = getAllNIInfo();
 
             if(args.Length!=1)

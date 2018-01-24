@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,24 @@ namespace AppLuncher
     {
         static void Main(string[] args)
         {
+            string parameter = string.Concat(args);
+            switch (parameter)
+            {
+                case "-v":
+                    {
+                        string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                        var serviceVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "AppLuncher.exe"));
+                        Console.WriteLine(serviceVersion.FileVersion.ToString());
+                    }
+                    return;
+                case "-version":
+                    {
+                        string path = System.AppDomain.CurrentDomain.BaseDirectory;
+                        var serviceVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "AppLuncher.exe"));
+                        Console.WriteLine(serviceVersion.ToString());
+                    }
+                    return;
+            }
             Console.WriteLine("Starting...");
             Ice.Communicator ic = null;
             try
@@ -24,7 +43,7 @@ namespace AppLuncher
                 adapter.add(obj, ic.stringToIdentity("Luncher"));
                 adapter.activate();
                 Console.WriteLine("Started.");
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT && parameter != "-debug")
                 {
                     var hWnd = HideMe.GetConsoleWindow();
                     HideMe.ShowWindow(hWnd, HideMe.SW_HIDE);

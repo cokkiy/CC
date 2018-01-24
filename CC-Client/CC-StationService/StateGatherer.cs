@@ -176,41 +176,51 @@ namespace CC_StationService
             InterfaceStatistics ifStatistics = new InterfaceStatistics();
             //ifStatistics.HasValue = true;
             ifStatistics.IfName = adapter.Name;
-            
-            if (!bytesReceivedPerSecondCounters.ContainsKey(adapter.Description))
+
+            string description = adapter.Description.Replace('(', '[').Replace(')', ']').Replace('/', '_');
+
+            try
             {
-                PerformanceCounter bytesReceivedPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", adapter.Description);
-                bytesReceivedPerSecondCounters.Add(adapter.Description, bytesReceivedPerSecondCounter);
+
+                if (!bytesReceivedPerSecondCounters.ContainsKey(description))
+                {
+                    PerformanceCounter bytesReceivedPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", description);
+                    bytesReceivedPerSecondCounters.Add(description, bytesReceivedPerSecondCounter);
+                }
+                if (!bytesSentPerSecondCounters.ContainsKey(description))
+                {
+                    PerformanceCounter bytesSentPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", description);
+                    bytesSentPerSecondCounters.Add(description, bytesSentPerSecondCounter);
+                }
+
+                if (!bytesTotalPerSecondCounters.ContainsKey(description))
+                {
+                    PerformanceCounter totalPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Total/sec", description);
+                    bytesTotalPerSecondCounters.Add(description, totalPerSecondCounter);
+                }
+
+                var counter1 = bytesReceivedPerSecondCounters[description];
+                var counter2 = bytesSentPerSecondCounters[description];
+                var counter3 = bytesTotalPerSecondCounters[description];
+
+                ifStatistics.BytesReceivedPerSec = counter1.NextValue();
+                ifStatistics.BytesSentedPerSec = counter2.NextValue();
+                ifStatistics.TotalBytesPerSec = counter3.NextValue();
+                ifStatistics.BytesReceived = counter1.RawValue;
+                ifStatistics.BytesSented = counter2.RawValue;
+                ifStatistics.BytesTotal = counter3.RawValue;
+
+                var ipv4Statistics = adapter.GetIPv4Statistics();
+
+                ifStatistics.UnicastPacketReceived = ipv4Statistics.UnicastPacketsReceived;
+                ifStatistics.UnicastPacketSented = ipv4Statistics.UnicastPacketsSent;
+                ifStatistics.MulticastPacketReceived = ipv4Statistics.NonUnicastPacketsReceived;
+                ifStatistics.MulticastPacketSented = ipv4Statistics.NonUnicastPacketsSent;
             }
-            if (!bytesSentPerSecondCounters.ContainsKey(adapter.Description))
+            catch(Exception ex)
             {
-                PerformanceCounter bytesSentPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", adapter.Description);
-                bytesSentPerSecondCounters.Add(adapter.Description, bytesSentPerSecondCounter);
+                PlatformMethodFactory.GetLogger().error(ex.ToString());
             }
-
-            if (!bytesTotalPerSecondCounters.ContainsKey(adapter.Description))
-            {
-                PerformanceCounter totalPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Total/sec", adapter.Description);
-                bytesTotalPerSecondCounters.Add(adapter.Description, totalPerSecondCounter);
-            }
-
-            var counter1 = bytesReceivedPerSecondCounters[adapter.Description];
-            var counter2 = bytesSentPerSecondCounters[adapter.Description];
-            var counter3 = bytesTotalPerSecondCounters[adapter.Description];
-
-            ifStatistics.BytesReceivedPerSec = counter1.NextValue();
-            ifStatistics.BytesSentedPerSec = counter2.NextValue();
-            ifStatistics.TotalBytesPerSec = counter3.NextValue();
-            ifStatistics.BytesReceived = counter1.RawValue;
-            ifStatistics.BytesSented = counter2.RawValue;
-            ifStatistics.BytesTotal = counter3.RawValue;
-
-            var ipv4Statistics = adapter.GetIPv4Statistics();
-
-            ifStatistics.UnicastPacketReceived = ipv4Statistics.UnicastPacketsReceived;
-            ifStatistics.UnicastPacketSented = ipv4Statistics.UnicastPacketsSent;
-            ifStatistics.MulticastPacketReceived = ipv4Statistics.NonUnicastPacketsReceived;
-            ifStatistics.MulticastPacketSented = ipv4Statistics.NonUnicastPacketsSent;
 
             return ifStatistics;
         }

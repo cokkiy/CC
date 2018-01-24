@@ -15,7 +15,7 @@
       <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="Interval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">20</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="SavePathForLinux" Type="System.String" Scope="User">
       <Value Profile="(Default)">/home/WeatherImages</Value>

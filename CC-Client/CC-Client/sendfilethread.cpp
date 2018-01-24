@@ -17,9 +17,11 @@ using namespace std;
 创建时间:2016/3/24 9:31:41
 */
 SendFileThread::SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
-	Ice::CommunicatorPtr communicator, bool skipUnchanged, QObject *parent)
+	Ice::CommunicatorPtr communicator, bool skipUnchanged, bool renameBeforeSend,
+	bool isUpgrading, QObject *parent)
 	: QThread(parent), stations(stations), fileNames(fileNames),
-	communicator(communicator), skipUnchanged(skipUnchanged)
+	communicator(communicator), skipUnchanged(skipUnchanged),
+	renameBeforeSend(renameBeforeSend), isUpgrading(isUpgrading)
 {
 	this->dest = dest.replace("\\", "/");
 }
@@ -98,7 +100,15 @@ void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName, QFi
 			else
 			{
 				//文件
-				sendFile(s, entry.filePath(), entry);
+				if (rename(s, entry))
+				{				
+					sendFile(s, entry.filePath(), entry);
+				}	
+				else
+				{
+					emit failToSendFile(s, entry.fileName(), QStringLiteral("文件重命名失败。"));
+				}
+				
 			}
 		}
 
@@ -106,13 +116,50 @@ void SendFileThread::SendFilesInDir(StationInfo* s, const QString& fileName, QFi
 	else
 	{
 		//文件
-		sendFile(s, fileName, fileInfo);
+		if (rename(s, fileInfo))
+		{
+			sendFile(s, fileName, fileInfo);
+		}
+		else
+		{
+			emit failToSendFile(s, fileName, QStringLiteral("文件重命名失败。"));
+		}
 	}
+}
+
+bool SendFileThread::rename(StationInfo * s, QFileInfo &entry)
+{
+	bool retflag = true;
+	QString name = entry.fileName();
+	QString destFile = QStringLiteral("%1/%2").arg(dest).arg(name);
+	if (renameBeforeSend
+		&& (name.endsWith(".dll") || name.endsWith(".exe") || name.endsWith(".pdb")))
+	{
+		retflag = false;
+		QString suffex = QStringLiteral(".%1").arg(QDateTime::currentDateTime().toString("yyMMddHHmmsszzz"));
+		wstring newName = destFile.toStdWString().append(suffex.toStdWString());
+
+		try {
+			if (s->controlProxy->renameFile(destFile.toStdWString(), newName))
+			{
+				retflag = true;
+			}
+		}
+		catch (...)
+		{
+		}
+	}
+	return retflag;
 }
 
 //发送文件
 void SendFileThread::sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo)
 {
+	if (isUpgrading && (fileInfo.fileName() == "Config.Client" || fileInfo.fileName() == "Config.Server"))
+	{
+		//不发送配置文件
+		return;
+	}
 	if (skipUnchanged && s->isSended(file, fileInfo.lastModified()))
 	{
 		emit fileNoChange(s, file);

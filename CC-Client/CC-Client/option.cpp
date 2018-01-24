@@ -99,7 +99,7 @@ void Option::Load()
 	this->weatherImageDownloadOption.UserName = settings.value("WeatherImageDownloadOption/UserName").toString();
 	this->weatherImageDownloadOption.Password = settings.value("WeatherImageDownloadOption/Password").toString();
 	this->weatherImageDownloadOption.LastHours = settings.value("WeatherImageDownloadOption/LastHours").toInt();
-	this->weatherImageDownloadOption.Interval = settings.value("WeatherImageDownloadOption/Interval").toInt();
+	this->weatherImageDownloadOption.Interval = settings.value("WeatherImageDownloadOption/Interval", 2).toInt();
 	this->weatherImageDownloadOption.DeletePreviousFiles = settings.value("WeatherImageDownloadOption/DeletePreviousFiles").toBool();
 	this->weatherImageDownloadOption.DeleteHowHoursAgo = settings.value("WeatherImageDownloadOption/DeleteHowHoursAgo").toInt();
 	this->weatherImageDownloadOption.SubDirectory = settings.value("WeatherImageDownloadOption/SubDirectory").toString();

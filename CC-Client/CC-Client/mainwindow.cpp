@@ -37,6 +37,7 @@
 #include "qpagenumdialog.h"
 #include "weatherimageoptiondlg.h"
 #include "ProgressBarDelegate.h"
+#include "upgradestationservicedlg.h"
 
 
 
@@ -304,9 +305,9 @@ void MainWindow::stationsLoaded(StationList* pStations, bool success)
     monitor->start(QThread::NormalPriority);
     if (iceInitSuccess)
     {
-        updateManager = new UpdateManager(communicator, this);
-        connect(updateManager, &UpdateManager::UpdatingProgressReport, this, &MainWindow::on_UpdatingProgressReported);
-        StationStateReceiverPtr = new StationStateReceiver(updateManager, communicator, pStations);
+        //updateManager = new UpdateManager(communicator, this);
+        //connect(updateManager, &UpdateManager::UpdatingProgressReport, this, &MainWindow::on_UpdatingProgressReported);
+        StationStateReceiverPtr = new StationStateReceiver(NULL, communicator, pStations);
 		Ice::Identity stateReceiver;// = communicator->stringToIdentity("stateReceiver");
 		stateReceiver.name = "stateReceiver";
         adapter->add(StationStateReceiverPtr, stateReceiver);
@@ -739,7 +740,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
 				killTimer(timerId);
 			}
 
-            adapter->destroy();
+            //adapter->destroy();
 			communicator -> destroy();
         }
         catch (const IceUtil::Exception&)
@@ -1152,6 +1153,35 @@ void MainWindow::on_actionAbout_triggered()
 {
     AboutDialog dlg;
     dlg.exec();
+}
+
+//升级中控服务
+void MainWindow::on_actionUpdateStationService_triggered()
+{
+	bool allStations = false;
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+	{
+		allStations = true;
+	}
+	UpgradeStationServiceDlg* dlg = new UpgradeStationServiceDlg(pStationList, selectedIndexs, allStations, communicator);
+	dlg->exec();
+	delete dlg;
+}
+
+//升级中控代理
+void MainWindow::on_actionUpgradeAppProxy_triggered()
+{
+	bool allStations = false;
+	QModelIndexList selectedIndexs = getSelectedIndexs();
+	if (selectedIndexs.isEmpty())
+	{
+		allStations = true;
+	}
+
+	UpgradeStationServiceDlg* dlg = new UpgradeStationServiceDlg(pStationList, selectedIndexs, allStations, communicator, false);
+	dlg->exec();
+	delete dlg;
 }
 
 //清屏

@@ -28,8 +28,10 @@ public:
 	作者：cokkiy（张立民）
 	创建时间:2016/3/24 9:31:41
 	*/
-	SendFileThread(QStringList fileNames,QString dest, std::list<StationInfo*> stations,
-		Ice::CommunicatorPtr communicator, bool skipUnChanged, QObject *parent = NULL);
+	SendFileThread(QStringList fileNames, QString dest, std::list<StationInfo*> stations,
+		Ice::CommunicatorPtr communicator, bool skipUnChanged,
+		bool renameBeforeSend = false, bool isUpgrading = false,
+		QObject *parent = NULL);
 	~SendFileThread();
 	virtual void run() override;
 
@@ -44,16 +46,20 @@ private:
     int total=0;
 	int skip = 0;
 	bool skipUnchanged = false;
-
+	bool renameBeforeSend;
+	bool isUpgrading;
 	//向指定工作站发送文件内容
 	void sendFileContents(const QString &file, StationInfo* s);
 	//完成发送方法
 	void waitComplete(std::list <ResultTuple>& asyncResults, StationInfo* s, std::vector< Ice::Byte > resultParams);
 	//发送文件夹中的所有文件
 	void SendFilesInDir(StationInfo* s, const QString& fileName, QFileInfo &fileInfo);
+
+	//重命名文件
+	bool rename(StationInfo * s, QFileInfo &entry);
 	//发送文件
 	void sendFile(StationInfo* s, const QString& file, QFileInfo &fileInfo);
-
+	
 signals:
 	//信号
 	/*!

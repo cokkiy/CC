@@ -74,7 +74,7 @@ namespace CC_StationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int Interval {
             get {
                 return ((int)(this["Interval"]));

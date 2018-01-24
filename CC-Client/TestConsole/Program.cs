@@ -24,43 +24,83 @@ namespace TestConsole
     
     class Program
     {
+        private static Dictionary<string, PerformanceCounter> bytesReceivedPerSecondCounters = new Dictionary<string, PerformanceCounter>();
+        private static Dictionary<string, PerformanceCounter> bytesSentPerSecondCounters = new Dictionary<string, PerformanceCounter>();
+        private static Dictionary<string, PerformanceCounter> bytesTotalPerSecondCounters = new Dictionary<string, PerformanceCounter>();
+
 
         static void Main(string[] args)
         {
-            Console.WriteLine(Environment.OSVersion.VersionString);
-            Console.WriteLine(Environment.Version);
-            Console.WriteLine(Environment.MachineName);
-
-            Console.WriteLine(Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"));
-
-            DriveInfo[] drivers = DriveInfo.GetDrives();
-            foreach (var driver in drivers)
+            GetPerInstance("Network Interface");
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            //foreach (var adapter in adapters)
+            //{
+            //    //Console.WriteLine("ID:....{0}",adapter.Id);
+            //    //Console.WriteLine("Name:....{0}", adapter.Name);
+            //    Console.WriteLine("Description:....{0}", adapter.Description);
+            //}
+            foreach (NetworkInterface adapter in adapters)
             {
-                Console.WriteLine(driver.Name);
-                Console.WriteLine(driver.DriveType);
-                if (driver.IsReady)
+                if ((adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet
+                    || adapter.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT)
+                    && adapter.OperationalStatus == OperationalStatus.Up)
                 {
-                    Console.WriteLine(driver.DriveFormat);
-                    Console.WriteLine(driver.TotalFreeSpace);
-                    Console.WriteLine(driver.TotalSize);
-                    Console.WriteLine(driver.VolumeLabel);
+                    try
+                    {
+                        Console.WriteLine("Description:....{0}", adapter.Description);
+                        string description = adapter.Description.Replace('(', '[').Replace(')', ']').Replace('/','_');
+                        if (!bytesReceivedPerSecondCounters.ContainsKey(description))
+                        {
+                            PerformanceCounter bytesReceivedPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", description);
+                            bytesReceivedPerSecondCounters.Add(description, bytesReceivedPerSecondCounter);
+                        }
+                        if (!bytesSentPerSecondCounters.ContainsKey(description))
+                        {
+                            PerformanceCounter bytesSentPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", description);
+                            bytesSentPerSecondCounters.Add(description, bytesSentPerSecondCounter);
+                        }
+
+                        if (!bytesTotalPerSecondCounters.ContainsKey(description))
+                        {
+                            PerformanceCounter totalPerSecondCounter = new PerformanceCounter("Network Interface", "Bytes Total/sec", description);
+                            bytesTotalPerSecondCounters.Add(description, totalPerSecondCounter);
+                        }
+
+                        var counter1 = bytesReceivedPerSecondCounters[description];
+                        var counter2 = bytesSentPerSecondCounters[description];
+                        var counter3 = bytesTotalPerSecondCounters[description];
+
+                        Console.WriteLine("", counter1.NextValue());
+                        Console.WriteLine("", counter1.NextValue());
+                        Console.WriteLine("", counter1.NextValue());
+
+                        //ifStatistics.BytesReceivedPerSec = counter1.NextValue();
+                        //ifStatistics.BytesSentedPerSec = counter2.NextValue();
+                        //ifStatistics.TotalBytesPerSec = counter3.NextValue();
+                        //ifStatistics.BytesReceived = counter1.RawValue;
+                        //ifStatistics.BytesSented = counter2.RawValue;
+                        //ifStatistics.BytesTotal = counter3.RawValue;
+
+                        var ipv4Statistics = adapter.GetIPv4Statistics();
+
+                        //ifStatistics.UnicastPacketReceived = ipv4Statistics.UnicastPacketsReceived;
+                        //ifStatistics.UnicastPacketSented = ipv4Statistics.UnicastPacketsSent;
+                        //ifStatistics.MulticastPacketReceived = ipv4Statistics.NonUnicastPacketsReceived;
+                        //ifStatistics.MulticastPacketSented = ipv4Statistics.NonUnicastPacketsSent;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
                 }
             }
 
-            ManagementClass mc = new ManagementClass("win32_processor");
-            ManagementObjectCollection moc = mc.GetInstances();
-            string id = string.Empty;
-            foreach (ManagementObject mo in moc)
-            {
-                id = mo.Properties["processorID"].Value.ToString();
-                break;
-            }
-
-            Console.WriteLine(id);
 
             Console.WriteLine("Press any key to exits");
             Console.ReadKey();
         }
+
+        
 
 
         /// <summary>
@@ -109,6 +149,16 @@ namespace TestConsole
                     //Ice.Logger logger = PlatformMethodFactory.GetLogger();
                     Console.WriteLine(string.Format("chown Error. fileName:{0}, new owner:{1}. {2}", fileName, user, ex.ToString()));
                 }
+            }
+        }
+
+        private static void GetPerInstance(string categoryName)
+        {
+            PerformanceCounterCategory performanceCounterCategory = new PerformanceCounterCategory(categoryName);
+            var instances = performanceCounterCategory.GetInstanceNames();
+            foreach (var instance in instances)
+            {
+                Console.WriteLine(instance);
             }
         }
 

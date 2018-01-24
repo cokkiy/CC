@@ -2,7 +2,7 @@
 # The server creates a multi-cast object adapter with the name
 # "StateReceiver". The following line sets the endpoints for this adapter.
 # Multicast address between 233.0.0.0 to 239.255.255.255
-StateReceiver.Endpoints=udp -h 239.100.1.1 -p 10000 --interface 192.168.0.103
+StateReceiver.Endpoints=udp -h 239.100.1.1 -p 10000 --interface 192.168.0.104
 
 #
 # The client station create a controller endpoint
