@@ -21,6 +21,7 @@
 #include "cpuplot/counterpiemarker.h"
 
 class UpdateManager;
+class QtDispatcher;
 
 //性能计数器最多个数
 #define  MaxCountOfCounter 20
@@ -195,6 +196,9 @@ private:
     Ice::CommunicatorPtr communicator;
     // Adapter for communicator 
     Ice::ObjectAdapterPtr adapter;	
+
+    //Dispatcher 
+    QtDispatcher* dispatcher;
 
 	//更新管理器
 	UpdateManager* updateManager = NULL;
