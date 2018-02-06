@@ -35,6 +35,10 @@ public:
     */
     virtual void dispatch(const Ice::DispatcherCallPtr& d, const Ice::ConnectionPtr& c) override;
    
+    /*!
+    Stop dispatcher before exit!
+    */
+    void stop();
 
 private:
     /*
@@ -47,6 +51,11 @@ private:
      debug mode or not
      **/
     bool _debug;
+
+    /*
+    is stop?
+    **/
+    bool isStop = false;
 
 };
 

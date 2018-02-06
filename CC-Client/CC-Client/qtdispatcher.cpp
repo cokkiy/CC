@@ -64,7 +64,7 @@ void QtDispatcher::dispatch(const Ice::DispatcherCallPtr& d, const Ice::Connecti
             qDebug() << "QtDispatcher::" << __func__ << "() : AMI call" << endl;
         }
     }
-    if (qApp)
+    if (qApp && !isStop)
     {
         if (_debug)
         {
@@ -108,4 +108,9 @@ void QtDispatcher::customEvent(QEvent * event)
 	{
 
 	}
+}
+
+void QtDispatcher::stop()
+{
+    isStop = true;
 }
