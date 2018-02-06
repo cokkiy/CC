@@ -1,0 +1,1195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{402eaefc-763b-414d-996b-3414fa7acc86}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{7b434279-18b9-40e1-974b-116af065e4f5}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Slice Files">
+      <UniqueIdentifier>{e5a25725-6770-4dd6-ad10-5f2258986be2}</UniqueIdentifier>
+      <Extensions>ice</Extensions>
+    </Filter>
+    <Filter Include="Plot">
+      <UniqueIdentifier>{e3a91f65-e139-4aa2-9911-70eb7c6e02b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plot\Header">
+      <UniqueIdentifier>{6773bb61-e15a-403b-b97f-e9e785ac87ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plot\Source">
+      <UniqueIdentifier>{43f82dc8-8a67-4242-9ff0-04e07c07c619}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xelement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xattribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xdocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StationList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StationInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filterbuilddialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareOperation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stationtablemodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="floatingmenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stationmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="monitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StationStateReceiver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setintervaldialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="editstationdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="defaultappprocdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="option.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\IController.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\IStationStateReceiver.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\AppControlParameter.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="executcounting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qtdispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stationdetaildialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpuplot\counterpiemarker.cpp">
+      <Filter>Plot\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="sendfiledialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stationbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sendfilethread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="recvfiledialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="recvfilethread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detaildialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="screenimagedialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filebrowserdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="processdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="batchcapturedialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="batchcaputrethread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aboutdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\Version.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="updatemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qpagenumdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="weatherimageoptiondlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="viewlogdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generated\Network.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_aboutdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_aboutdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_batchcaputrethread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_batchcaputrethread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_batchcapturedialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_batchcapturedialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_executcounting.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_executcounting.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_stationtablemodel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_stationtablemodel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_StationList.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_StationList.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_setintervaldialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_setintervaldialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_monitor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_monitor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_StationInfo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_StationInfo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_floatingmenu.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_floatingmenu.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_filebrowserdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_filebrowserdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_detaildialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_detaildialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_option.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_option.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_defaultappprocdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_defaultappprocdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_filterbuilddialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_filterbuilddialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_mainwindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_mainwindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_viewlogdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_viewlogdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_weatherimageoptiondlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_weatherimageoptiondlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_updatemanager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_updatemanager.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_screenimagedialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_screenimagedialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_qpagenumdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_qpagenumdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_processdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_processdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_recvfilethread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_recvfilethread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_recvfiledialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_recvfiledialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_sendfilethread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_sendfilethread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_stationbar.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_stationbar.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_sendfiledialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_sendfiledialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_stationdetaildialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_stationdetaildialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_qtdispatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_qtdispatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_editstationdialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_editstationdialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_stationmanager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_stationmanager.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_cc-client.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBarDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ProgressBarDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ProgressBarDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_upgradestationservicedlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_upgradestationservicedlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="upgradestationservicedlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_upgradepreparethread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_upgradepreparethread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="upgradepreparethread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileVersion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="mainwindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="filterbuilddialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="filterbuilddialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationtablemodel.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="floatingmenu.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="floatingmenu.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationmanager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StationInfo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="monitor.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="setintervaldialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="setintervaldialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StationList.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="editstationdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="editstationdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="defaultappprocdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="defaultappprocdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="option.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="executcounting.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qtdispatcher.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationdetaildialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationdetaildialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cpuplot\plotpart.h">
+      <Filter>Plot\Header</Filter>
+    </CustomBuild>
+    <CustomBuild Include="sendfiledialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="sendfiledialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="stationbar.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="sendfilethread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="recvfiledialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="recvfiledialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="recvfilethread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="detaildialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="detaildialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="screenimagedialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="screenimagedialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="filebrowserdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="filebrowserdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="processdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="processdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="batchcapturedialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="batchcapturedialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="batchcaputrethread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="aboutdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="aboutdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="version.txt" />
+    <CustomBuild Include="updatemanager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qpagenumdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qpagenumdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="weatherimageoptiondlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="weatherimageoptiondlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="viewlogdialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="viewlogdialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ProgressBarDelegate.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upgradestationservicedlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upgradestationservicedlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upgradepreparethread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="mainwindow.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\200969173136504.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\2009724113238761.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\2009724113240483.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_3d_08.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_alth_107.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_chunjie_45.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_chunjie_55.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_jdxt_119.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_jdxt_136.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_jingying_059.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_jingying_095.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_jingying_098.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_jingying_108.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_mv_003.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_mv_009.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_mv_010.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_shuijing_116.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_shuijing_15.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\52design.com_shuijing_66.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\App12.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\App5.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\Xbutton24.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\Xbutton25.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\Xbutton26.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\Xbutton30.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\Xbutton32.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\Xbutton35.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\cc-client.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <CustomBuild Include="cc-client.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <None Include="Icons\ncom001.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom002.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom003.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom004.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom005.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom006.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom007.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\ncom008.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\png-0044.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Icons\png-0100.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="cc-client_zh.ts">
+      <Filter>Translation Files</Filter>
+    </None>
+    <None Include="Config.Server" />
+    <None Include="CC-Client.pro" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="xattribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xdocument.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xelement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareOperation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterOperations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\AppControlParameter.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\IController.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\IStationStateReceiver.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpuplot\cpustat.h">
+      <Filter>Plot\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="cpuplot\counterpiemarker.h">
+      <Filter>Plot\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\Version.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\Network.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mainwindow.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_filterbuilddialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_batchcapturedialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_aboutdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_floatingmenu.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_defaultappprocdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_detaildialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_filebrowserdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_setintervaldialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_editstationdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_stationdetaildialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_sendfiledialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_recvfiledialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_screenimagedialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_processdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_qpagenumdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_weatherimageoptiondlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_viewlogdialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_upgradestationservicedlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileVersion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <IceBuilder Include="IStationStateReceiver.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="IController.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="AppControlParameter.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="Version.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+    <IceBuilder Include="Network.ice">
+      <Filter>Slice Files</Filter>
+    </IceBuilder>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icons\0-9.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_3.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_4.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_5.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_6.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_7.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_8.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_9.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_10.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_11.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_12.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_13.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_14.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_15.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_16.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_17.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_18.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\0-9_19.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\AUDIO.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\AUDIO_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\AUDIO_2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\AUDIO_3.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books_2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books_3.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books_4.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books_5.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\books_6.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_3.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_4.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_5.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_6.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_7.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_8.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_9.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_10.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_11.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_12.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_13.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_14.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_15.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_16.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_17.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_18.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_19.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_20.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_21.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_22.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_23.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_24.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTS_25.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTSARTS.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTSfa.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTSfa_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\CHARTSfa_2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\MAGNIFY.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\people_office.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\people_office_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\people_officee_o.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_3.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_4.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_5.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_6.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_7.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_8.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\SCI_MATHfa_9.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\search.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sign017.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sign046.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\TOOLS.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\TOOLS_1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_alth_109.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\App1.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\App8.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_alth_171.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_apple_016.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\powerOn-0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\powerOn-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\powerOn-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\powerOn-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\PowerOnFailure.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\PP15.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_jdxt_045.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_alth_023.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_2006ball_74.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\png-0652.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\52design.com_file_036.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\shutdown0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\shutdown1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\shutdown2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\shutdown3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\shutdown4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\startApp0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\startApp1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\receiveFile.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sendFile.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\download.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\detail.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\screencapture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\bk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\capture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\dir.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\file.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\ncom003-up.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\ncom008-up.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\weather.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

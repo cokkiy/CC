@@ -1,0 +1,42 @@
+#Application luncher listening in local loop back 100001
+AppLuncher.Endpoints=tcp -h 127.0.0.1 -p 10001
+
+
+
+#
+# Alternative IPv6 configuration
+#
+#Ice.IPv6=1
+#StateReceiver.Endpoints=udp -h "ff15::1:1" -p 10000
+
+
+#
+# Warn about connection exceptions
+#
+Ice.Warn.Connections=1
+
+#
+# Network Tracing
+#
+# 0 = no network tracing
+# 1 = trace connection establishment and closure
+# 2 = like 1, but more detailed
+# 3 = like 2, but also trace data transfer
+#
+#Ice.Trace.Network=1
+
+#
+# Protocol Tracing
+#
+# 0 = no protocol tracing
+# 1 = trace protocol messages
+#
+#Ice.Trace.Protocol=1
+
+# App luncher server ACM 
+#Don't Close connection 
+Ice.ACM.Close=0
+# No heat beat ping
+Ice.ACM.Heartbeat=0
+# time out 30
+Ice.ACM.Timeout=30
