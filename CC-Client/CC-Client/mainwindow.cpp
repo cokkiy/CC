@@ -693,7 +693,8 @@ void MainWindow::show()
 		//加载配置文件
 		initData.properties->load("Config.Server");
 		//装载Qt版本Dispatcher
-		initData.dispatcher = new QtDispatcher(false);
+        dispatcher = new QtDispatcher(false);
+        initData.dispatcher = dispatcher;
 		communicator = Ice::initialize(argc, 0, initData);
 		adapter = communicator->createObjectAdapter("StateReceiver");
 		//初始化成功
@@ -740,7 +741,10 @@ void MainWindow::closeEvent(QCloseEvent * event)
 				killTimer(timerId);
 			}
 
-            //adapter->destroy();
+            if (dispatcher != NULL)
+            {
+                dispatcher->stop();
+            }
 			communicator -> destroy();
         }
         catch (const IceUtil::Exception&)
