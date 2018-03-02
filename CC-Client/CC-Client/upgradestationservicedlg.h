@@ -26,21 +26,21 @@ private:
 	QStringList fileNames;
 	std::list<StationInfo*> stations;
 	std::map<StationInfo*, StationBar*> station_bar;
-	//ÒªÉı¼¶ÎÄ¼şµÄ°æ±¾
+	//è¦å‡çº§æ–‡ä»¶çš„ç‰ˆæœ¬
 	FileVersion upgradingFileVersion;
 	bool isUpgradeService;
 	bool allStations;
-	//´´½¨²¼¾Ö
+	//åˆ›å»ºå¸ƒå±€
 	void createLayout(StationList* pStations, const QModelIndexList& selectedIndexs, bool allStations);
 
 	/// <summary>
-	/// °Ñ×Ö½ÚĞòÁĞ×ª»¯ÎªVersion½á¹¹
+	/// æŠŠå­—èŠ‚åºåˆ—è½¬åŒ–ä¸ºVersionç»“æ„
 	/// </summary>
 	/// <param name="versionArray"></param>
 	/// <returns></returns>
 	FileVersion toVersion(const QByteArray& versionArray);
 
-	//ĞÅºÅ´¦Àíº¯Êı
+	//ä¿¡å·å¤„ç†å‡½æ•°
 	void on_failToSendFile(StationInfo* station, QString fileName, QString message);
 	void on_newFileSize(StationInfo* station, QString fileName, qint64 size);
 	void on_sendFileCompleted(StationInfo* station, QString fileName);
@@ -50,13 +50,13 @@ private:
 	void on_ViewLog(StationInfo* station);
 	void on_upgradePrepared(StationInfo* station, const std::wstring& path, const FileVersion& v);
 	void on_prepareFailed(StationInfo* station, const QString& msg);
-	//Ìí¼ÓÈÕÖ¾ĞÅÏ¢µ½¹¤×÷Õ¾ÈÕÖ¾ÖĞ
+	//æ·»åŠ æ—¥å¿—ä¿¡æ¯åˆ°å·¥ä½œç«™æ—¥å¿—ä¸­
 	void addToLog(StationInfo* station, QString message, bool isError = false);
 
-	//²Ûº¯Êı
+	//æ§½å‡½æ•°
 	private slots:
-	//ä¯ÀÀÒª·¢ËÍµÄÎÄ¼ş
+	//æµè§ˆè¦å‘é€çš„æ–‡ä»¶
 	void on_browserPushButton_clicked();
-	//·¢ËÍ°´Å¥°´ÏÂ
+	//å‘é€æŒ‰é’®æŒ‰ä¸‹
 	void on_upgradePushButton_clicked();
 };
