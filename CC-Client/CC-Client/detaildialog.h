@@ -9,7 +9,7 @@ class QwtPlot;
 class CounterPieMarker;
 class QTimerEvent;
 class StationManager;
-//ĞÔÄÜ¼ÆÊıÆ÷×î¶à¸öÊı
+//æ€§èƒ½è®¡æ•°å™¨æœ€å¤šä¸ªæ•°
 #define  MaxCountOfCounter 20
 
 class DetailDialog : public QDialog
@@ -27,21 +27,21 @@ public:
 	~DetailDialog();
 
 	protected slots:
-	//¿ª»ú
+	//å¼€æœº
 	void on_powerOnPushButton_clicked();
-	//¹Ø»ú
+	//å…³æœº
 	void on_powerOffPushButton_clicked();
-	//ÖØÆô
+	//é‡å¯
 	void on_rebootPushButton_clicked();
-	//²é¿´È«²¿½ø³ÌĞÅÏ¢
+	//æŸ¥çœ‹å…¨éƒ¨è¿›ç¨‹ä¿¡æ¯
 	void on_viewALlPushButton_clicked();
 
-	//ÏÂÔØÆøÏóÔÆÍ¼Ñ¡Ôñ¿ò×´Ì¬±ä»¯
+	//ä¸‹è½½æ°”è±¡äº‘å›¾é€‰æ‹©æ¡†çŠ¶æ€å˜åŒ–
 	void on_weatherImageDownloadCheckBox_clicked(bool checked);
 
-	//ÆÁÄ»¿ìÕÕ
+	//å±å¹•å¿«ç…§
 	void on_screenCapturePushButton_clicked();
-	//¹¤×÷Õ¾×´Ì¬±ä»¯
+	//å·¥ä½œç«™çŠ¶æ€å˜åŒ–
 	void stationStateChanged(const QObject* obj);
 
     virtual void closeEvent(QCloseEvent * event);
@@ -58,27 +58,27 @@ private:
 	int CreateNetCurvs();
 
 	double findMax(double datas[]);
-	//ÖØÖÃ½ø³Ì±í¸ñÄÚÈİ
+	//é‡ç½®è¿›ç¨‹è¡¨æ ¼å†…å®¹
 	void resetTableWidget(int columnCount);
-	//¸üĞÂ½ø³ÌĞÅÏ¢
+	//æ›´æ–°è¿›ç¨‹ä¿¡æ¯
 	void UpdateMonitoredProcessInfo();
 
-	//Ìí¼ÓÍø¿¨Í³¼ÆĞÅÏ¢Ãæ°å
+	//æ·»åŠ ç½‘å¡ç»Ÿè®¡ä¿¡æ¯é¢æ¿
 	void addEthGroup(int index, QString ifName);
 
-	//ÍøÂçÍ³¼ÆĞÅÏ¢ÏÔÊ¾¿ò
+	//ç½‘ç»œç»Ÿè®¡ä¿¡æ¯æ˜¾ç¤ºæ¡†
 	std::vector<QLineEdit*> ethDataLineEdits;
 
-	//ĞÔÄÜÇúÏßÊı×é
+	//æ€§èƒ½æ›²çº¿æ•°ç»„
 	PerfCurves perfCurves[MaxCountOfCounter];
-	//ÍøÂçÁ÷Á¿ÇúÏß
+	//ç½‘ç»œæµé‡æ›²çº¿
 	std::map<std::string, CounterCurve*> netStatCurvs;
 	CounterPieMarker *cpuPie, *memoryPie;
 	QwtPlot* cpuPlot;
 	QwtPlot* memoryPlot;
 	QwtPlot* netPlot;
 	double timeData[100];
-	//¹¤×÷Õ¾¹ÜÀíÀà
+	//å·¥ä½œç«™ç®¡ç†ç±»
 	StationManager* manager;
 };
 
