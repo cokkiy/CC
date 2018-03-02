@@ -6,21 +6,21 @@
 namespace Ui {class FileBrowserDialog;};
 class StationInfo;
 
-//Ô¶³ÌÎÄ¼şä¯ÀÀ¶Ô»°¿ò
+//è¿œç¨‹æ–‡ä»¶æµè§ˆå¯¹è¯æ¡†
 class FileBrowserDialog : public QDialog
 {
 	Q_OBJECT
 
 public:
 	/*!
-	´´½¨Ô¶³ÌÎÄ¼şä¯ÀÀ¶Ô»°¿ò
-	@param StationInfo * station ¹¤×÷Õ¾
-	@param bool Directory Ñ¡ÔñÄ¿Â¼»¹ÊÇÎÄ¼ş
-	@param QString dir µ±Ç°Ä¿Â¼
+	åˆ›å»ºè¿œç¨‹æ–‡ä»¶æµè§ˆå¯¹è¯æ¡†
+	@param StationInfo * station å·¥ä½œç«™
+	@param bool Directory é€‰æ‹©ç›®å½•è¿˜æ˜¯æ–‡ä»¶
+	@param QString dir å½“å‰ç›®å½•
 	@param QWidget * parent
 	@return 
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/4/14 8:40:05
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/4/14 8:40:05
 	*/
 	FileBrowserDialog(StationInfo* station, bool Directory = true,
 		QString dir = QStringLiteral(""), QWidget *parent = 0);
@@ -28,10 +28,10 @@ public:
 
 
 	/*!
-	»ñÈ¡Ñ¡ÔñµÄÎÄ¼ş»òÄ¿Â¼Â·¾¶
-	@return QString µ±Ç°Ñ¡ÔñµÄÎÄ¼ş»òÄ¿Â¼Â·¾¶
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/4/14 8:38:52
+	è·å–é€‰æ‹©çš„æ–‡ä»¶æˆ–ç›®å½•è·¯å¾„
+	@return QString å½“å‰é€‰æ‹©çš„æ–‡ä»¶æˆ–ç›®å½•è·¯å¾„
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/4/14 8:38:52
 	*/
 	QString SelectedPath();
 
@@ -39,16 +39,16 @@ private:
 	Ui::FileBrowserDialog *ui;
 	bool Directory;
 	StationInfo* station;
-	//µ±Ç°Ä¿Â¼
+	//å½“å‰ç›®å½•
 	QString currentDir;
-	//×îºóÑ¡ÔñµÄÄ¿Â¼»òÎÄ¼şÂ·¾¶
+	//æœ€åé€‰æ‹©çš„ç›®å½•æˆ–æ–‡ä»¶è·¯å¾„
 	QString selectedPath;
 
-	//Í¼±ê
+	//å›¾æ ‡
 	QIcon dirIcon, fileIcon;
-	//»ñÈ¡ÎÄ¼şĞÅÏ¢
+	//è·å–æ–‡ä»¶ä¿¡æ¯
 	void getFileInfo(QString path);
-	//Êó±êË«»÷
+	//é¼ æ ‡åŒå‡»
 	void on_cellDoubleClicked(int row,int column);
 
 	protected slots:

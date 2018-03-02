@@ -9,11 +9,11 @@
 class StationInfo;
 
 //////////////////////////////////////////////////////////////////////////
-//¹¤×÷Õ¾¸üĞÂ×´Ì¬
+//å·¥ä½œç«™æ›´æ–°çŠ¶æ€
 //////////////////////////////////////////////////////////////////////////
 struct StationUpdateState
 {
-	/* ¹¤×÷Õ¾ */
+	/* å·¥ä½œç«™ */
 	StationInfo* Station = NULL;
 	std::wstring servicePath;
 	std::wstring proxyPath;
@@ -23,8 +23,8 @@ struct StationUpdateState
 	bool proxyUpdated = false;
 };
 //////////////////////////////////////////////////////////////////////////
-//×Ô¶¯¸üĞÂ¹ÜÀíÀà
-//¹ÜÀí¹¤×÷Õ¾ÖĞ¿Ø·şÎñºÍÓ¦ÓÃ´úÀíµÄ×Ô¶¯Éı¼¶¸üĞÂ¹¤×÷
+//è‡ªåŠ¨æ›´æ–°ç®¡ç†ç±»
+//ç®¡ç†å·¥ä½œç«™ä¸­æ§æœåŠ¡å’Œåº”ç”¨ä»£ç†çš„è‡ªåŠ¨å‡çº§æ›´æ–°å·¥ä½œ
 //////////////////////////////////////////////////////////////////////////
 class UpdateManager : public QThread
 {
@@ -34,10 +34,10 @@ public:
 	UpdateManager(Ice::CommunicatorPtr communicator, QObject *parent = NULL);
 	~UpdateManager();
 
-	//Ïß³Ìº¯Êı
+	//çº¿ç¨‹å‡½æ•°
 	virtual void run() override;
 
-	//·şÎñ»òÕßÊÇ´úÀí
+	//æœåŠ¡æˆ–è€…æ˜¯ä»£ç†
 	enum ServiceOrProxy
 	{
 		Service,
@@ -45,48 +45,48 @@ public:
 	};
 
 	/*!
-	Ìí¼Ó¹¤×÷Õ¾µÄ°æ±¾ĞÅÏ¢µ½¹ÜÀíÆ÷
-	@param StationInfo * s ¹¤×÷Õ¾
-	@param const CC::ServerVersion & v °æ±¾ĞÅÏ¢
+	æ·»åŠ å·¥ä½œç«™çš„ç‰ˆæœ¬ä¿¡æ¯åˆ°ç®¡ç†å™¨
+	@param StationInfo * s å·¥ä½œç«™
+	@param const CC::ServerVersion & v ç‰ˆæœ¬ä¿¡æ¯
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/5/11 9:07:44
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/5/11 9:07:44
 	*/
 	void addStationVersion(StationInfo* s,const CC::ServerVersion& v);
 private:
-	//Ice communicator¶ÔÏó
+	//Ice communicatorå¯¹è±¡
 	Ice::CommunicatorPtr communicator;
-	//¹¤×÷Õ¾°æ±¾ĞÅÏ¢
+	//å·¥ä½œç«™ç‰ˆæœ¬ä¿¡æ¯
 	std::map<StationInfo*, CC::ServerVersion> stationsVersion;	
-	//¼´½«¸üĞÂµÄ¹¤×÷Õ¾ÁĞ±í
+	//å³å°†æ›´æ–°çš„å·¥ä½œç«™åˆ—è¡¨
 	std::list<StationUpdateState> toBeUpdatingStations;
-	//°æ±¾×î¸ßµÄ¹¤×÷Õ¾
+	//ç‰ˆæœ¬æœ€é«˜çš„å·¥ä½œç«™
 	StationInfo* highestVersionedStation = NULL;
 
-	//ĞèÒª¸üĞÂµÄÊıÁ¿
+	//éœ€è¦æ›´æ–°çš„æ•°é‡
 	int needUpdateCount = 2;
 
-	//ĞÂ°æ±¾ÎÄ¼şÒÑ¾­±»ÏÂÔØ
+	//æ–°ç‰ˆæœ¬æ–‡ä»¶å·²ç»è¢«ä¸‹è½½
 	bool newVersionDownloaded = false;
-	//·şÎñÊÇ·ñÒÑ±»ÏÂÔØ
+	//æœåŠ¡æ˜¯å¦å·²è¢«ä¸‹è½½
 	bool serviceDownloaded = false;
-	//´úÀíÊÇ·ñÒÑ±»ÏÂÔØ
+	//ä»£ç†æ˜¯å¦å·²è¢«ä¸‹è½½
 	bool proxyDownloaded = false;
 
-	//»ñÈ¡ĞÂ°æÎÄ¼ş localFile£º±¾µØÎÄ¼ş remotePath£ºÔ¶³ÌÎÄ¼ş
+	//è·å–æ–°ç‰ˆæ–‡ä»¶ localFileï¼šæœ¬åœ°æ–‡ä»¶ remotePathï¼šè¿œç¨‹æ–‡ä»¶
 	void getNewVersionFile(QString &localFile, std::wstring remotePath);
-	//¸üĞÂÎÄ¼ş
+	//æ›´æ–°æ–‡ä»¶
 	void UpdateFile(QString &localFile, ServiceOrProxy serviceorProxy);
 
 
 signals:
 	/*!
-	¸üĞÂ½ø¶È±¨¸æÊÂ¼ş
-	@param int percent Íê³É¶È£¨0-100£©
-	@param QString message ÏûÏ¢
+	æ›´æ–°è¿›åº¦æŠ¥å‘Šäº‹ä»¶
+	@param int percent å®Œæˆåº¦ï¼ˆ0-100ï¼‰
+	@param QString message æ¶ˆæ¯
 	@return void
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/5/12 16:08:05
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/5/12 16:08:05
 	*/
 	void UpdatingProgressReport(int percent, QString message);
 };
