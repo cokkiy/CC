@@ -15,14 +15,14 @@ class SendFileDialog : public QDialog
 
 public:	
 	/*!
-	´´½¨·¢ËÍÎÄ¼ş¶Ô»°¿ò
-	@param StationList * pStations È«²¿¹¤×÷Õ¾ÁĞ±í
-	@param const QModelIndexList & selectedIndexs Ñ¡¶¨µÄ¹¤×÷ÔúË÷Òı
-	@param bool allStations ÊÇ·ñÊÇÈ«²¿¹¤×÷Õ¾
+	åˆ›å»ºå‘é€æ–‡ä»¶å¯¹è¯æ¡†
+	@param StationList * pStations å…¨éƒ¨å·¥ä½œç«™åˆ—è¡¨
+	@param const QModelIndexList & selectedIndexs é€‰å®šçš„å·¥ä½œæ‰ç´¢å¼•
+	@param bool allStations æ˜¯å¦æ˜¯å…¨éƒ¨å·¥ä½œç«™
 	@param QWidget * parent
 	@return 
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/3/23 10:59:55
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/3/23 10:59:55
 	*/
 	SendFileDialog(StationList* pStations,const QModelIndexList& selectedIndexs,
 		bool allStations, Ice::CommunicatorPtr communicator, QWidget *parent = 0);
@@ -38,10 +38,10 @@ private:
 	std::list<StationInfo*> stations;
 	std::map<StationInfo*, StationBar*> station_bar;
 	
-	//´´½¨²¼¾Ö
+	//åˆ›å»ºå¸ƒå±€
 	void createLayout(StationList* pStations, const QModelIndexList& selectedIndexs, bool allStations);
 
-	//ĞÅºÅ´¦Àíº¯Êı
+	//ä¿¡å·å¤„ç†å‡½æ•°
 	void on_failToSendFile(StationInfo* station, QString fileName, QString message);
 	void on_newFileSize(StationInfo* station, QString fileName, qint64 size);
 	void on_sendFileCompleted(StationInfo* station, QString fileName);
@@ -50,16 +50,16 @@ private:
 	void on_skipFile(StationInfo* station, QString file);
 	void on_ViewLog(StationInfo* station);
 
-	//Ìí¼ÓÈÕÖ¾ĞÅÏ¢µ½¹¤×÷Õ¾ÈÕÖ¾ÖĞ
+	//æ·»åŠ æ—¥å¿—ä¿¡æ¯åˆ°å·¥ä½œç«™æ—¥å¿—ä¸­
 	void addToLog(StationInfo* station, QString message, bool isError = false);
 
-	//²Ûº¯Êı
+	//æ§½å‡½æ•°
 	private slots:
-	//ä¯ÀÀÒª·¢ËÍµÄÎÄ¼ş
+	//æµè§ˆè¦å‘é€çš„æ–‡ä»¶
 	void on_browserPushButton_clicked();
-	//·¢ËÍ°´Å¥°´ÏÂ
+	//å‘é€æŒ‰é’®æŒ‰ä¸‹
 	void on_sendPushButton_clicked();
-	//Ñ¡ÔñÄ¿±êÎÄ¼ş¼Ğ
+	//é€‰æ‹©ç›®æ ‡æ–‡ä»¶å¤¹
 	void on_selectDestPushButton_clicked();	
 
 	
