@@ -24,13 +24,13 @@ UpgradeStationServiceDlg::UpgradeStationServiceDlg(StationList* pStations, const
 
 	if (isService)
 	{
-		ui->label->setText(QStringLiteral("Ñ¡ÔñÖĞ¿Ø·şÎñËùÔÚÎÄ¼ş¼Ğ£º"));
-		this->setWindowTitle(QStringLiteral("Éı¼¶ÖĞ¿Ø·şÎñ"));
+		ui->label->setText(QStringLiteral("é€‰æ‹©ä¸­æ§æœåŠ¡æ‰€åœ¨æ–‡ä»¶å¤¹ï¼š"));
+		this->setWindowTitle(QStringLiteral("å‡çº§ä¸­æ§æœåŠ¡"));
 	}
 	else
 	{
-		ui->label->setText(QStringLiteral("Ñ¡ÔñÖĞ¿ØÓ¦ÓÃ´úÀíËùÔÚÎÄ¼ş¼Ğ£º"));
-		this->setWindowTitle(QStringLiteral("Éı¼¶ÖĞ¿ØÓ¦ÓÃ´úÀí"));
+		ui->label->setText(QStringLiteral("é€‰æ‹©ä¸­æ§åº”ç”¨ä»£ç†æ‰€åœ¨æ–‡ä»¶å¤¹ï¼š"));
+		this->setWindowTitle(QStringLiteral("å‡çº§ä¸­æ§åº”ç”¨ä»£ç†"));
 	}
 
 	createLayout(pStations, selectedIndexs, allStations);
@@ -52,7 +52,7 @@ void UpgradeStationServiceDlg::createLayout(StationList * pStations, const QMode
 		for (auto iter = pStations->begin(); iter != pStations->end(); iter++)
 		{
 			StationBar* stationBar = new StationBar(&*iter, ui->scrollAreaWidgetContents);
-			stationBar->setTipText(QStringLiteral("×¼±¸Éı¼¶..."));
+			stationBar->setTipText(QStringLiteral("å‡†å¤‡å‡çº§..."));
 			stationBar->setIsOnline(iter->IsRunning());
 			stationBar->setStationName(iter->Name());
 			verticalLayout->addWidget(stationBar);
@@ -73,7 +73,7 @@ void UpgradeStationServiceDlg::createLayout(StationList * pStations, const QMode
 			if (finded == stations.end())
 			{
 				StationBar* stationBar = new StationBar(s, ui->scrollAreaWidgetContents);
-				stationBar->setTipText(QStringLiteral("×¼±¸Éı¼¶..."));
+				stationBar->setTipText(QStringLiteral("å‡†å¤‡å‡çº§..."));
 				stationBar->setIsOnline(s->IsRunning());
 				stationBar->setStationName(s->Name());
 				verticalLayout->addWidget(stationBar);
@@ -110,7 +110,7 @@ void UpgradeStationServiceDlg::on_browserPushButton_clicked()
 		auto result = find_if(entries.begin(), entries.end(), [&findFile](QFileInfo f) { return f.fileName() == findFile; });
 		if (result == entries.end())
 		{
-			QMessageBox::warning(this, QStringLiteral("¾¯¸æ"), QStringLiteral("Ñ¡ÔñµÄÎÄ¼ş¼Ğ²»ÕıÈ·£¬²»°üº¬ÒªÉı¼¶µÄÎÄ¼ş¡£"));
+			QMessageBox::warning(this, QStringLiteral("è­¦å‘Š"), QStringLiteral("é€‰æ‹©çš„æ–‡ä»¶å¤¹ä¸æ­£ç¡®ï¼Œä¸åŒ…å«è¦å‡çº§çš„æ–‡ä»¶ã€‚"));
 		}
 		else
 		{
@@ -133,7 +133,7 @@ void UpgradeStationServiceDlg::on_browserPushButton_clicked()
 			{
 				QByteArray output = process->readLine();
 				upgradingFileVersion = toVersion(output);
-				ui->versionLabel->setText(QStringLiteral("µ±Ç°×¼±¸Éı¼¶µÄ°æ±¾£º") + output);
+				ui->versionLabel->setText(QStringLiteral("å½“å‰å‡†å¤‡å‡çº§çš„ç‰ˆæœ¬ï¼š") + output);
 			}
 
 			QString name = "";
@@ -151,7 +151,7 @@ void UpgradeStationServiceDlg::on_upgradePushButton_clicked()
 {
 	if (fileNames.empty())
 	{
-		QMessageBox::warning(this, QStringLiteral("¾¯¸æ"), QStringLiteral("Ã»ÓĞÑ¡ÔñÉı¼¶ÎÄ¼ş¡£"));
+		QMessageBox::warning(this, QStringLiteral("è­¦å‘Š"), QStringLiteral("æ²¡æœ‰é€‰æ‹©å‡çº§æ–‡ä»¶ã€‚"));
 		return;
 	}
 
@@ -189,7 +189,7 @@ void UpgradeStationServiceDlg::on_failToSendFile(StationInfo * station, QString 
 void UpgradeStationServiceDlg::on_newFileSize(StationInfo * station, QString fileName, qint64 size)
 {
 	StationBar* bar = station_bar[station];
-	QString msg = QStringLiteral("×¼±¸·¢ËÍÎÄ¼ş%1").arg(fileName);
+	QString msg = QStringLiteral("å‡†å¤‡å‘é€æ–‡ä»¶%1").arg(fileName);
 	bar->setTipText(msg);
 	bar->setMaxPercent(size);
 	addToLog(station, msg);
@@ -198,7 +198,7 @@ void UpgradeStationServiceDlg::on_newFileSize(StationInfo * station, QString fil
 void UpgradeStationServiceDlg::on_sendFileCompleted(StationInfo * station, QString fileName)
 {
 	StationBar* bar = station_bar[station];
-	QString msg = QStringLiteral("ÎÄ¼ş%1·¢ËÍÍê±Ï¡£").arg(fileName);
+	QString msg = QStringLiteral("æ–‡ä»¶%1å‘é€å®Œæ¯•ã€‚").arg(fileName);
 	bar->setTipText(msg);
 	addToLog(station, msg);
 }
@@ -206,7 +206,7 @@ void UpgradeStationServiceDlg::on_sendFileCompleted(StationInfo * station, QStri
 void UpgradeStationServiceDlg::on_fileSended(StationInfo * station, QString fileName, qint64 size)
 {
 	StationBar* bar = station_bar[station];
-	QString msg = QStringLiteral("ÕıÔÚÉı¼¶ÎÄ¼ş%1...").arg(fileName);
+	QString msg = QStringLiteral("æ­£åœ¨å‡çº§æ–‡ä»¶%1...").arg(fileName);
 	bar->setTipText(msg);
 	bar->setPercent(size);
 	update();
@@ -219,11 +219,11 @@ void UpgradeStationServiceDlg::on_allCompleted(StationInfo * station, int total,
 
 	if (station->getHasErrorWhenSendFile())
 	{
-		msg = QStringLiteral("Éı¼¶Ê§°Ü¡£");
+		msg = QStringLiteral("å‡çº§å¤±è´¥ã€‚");
 	}
 	else
 	{
-		msg = QStringLiteral("Éı¼¶³É¹¦¡£¹²Éı¼¶%1¸öÎÄ¼ş¡£ÖØÆô¹¤×÷Õ¾Ê¹ÆäÉúĞ§¡£").arg(total);
+		msg = QStringLiteral("å‡çº§æˆåŠŸã€‚å…±å‡çº§%1ä¸ªæ–‡ä»¶ã€‚é‡å¯å·¥ä½œç«™ä½¿å…¶ç”Ÿæ•ˆã€‚").arg(total);
 	}
 	
 	bar->setTipText(msg, station->getHasErrorWhenSendFile(), true);
@@ -247,14 +247,14 @@ void UpgradeStationServiceDlg::on_upgradePrepared(StationInfo * station, const s
 	StationBar* bar = station_bar[station];	
 	QString strPath = QString::fromStdWString(path);
 	QString strVersion = QStringLiteral("%1.%2.%3.%4").arg(v.Major).arg(v.Minor).arg(v.Build).arg(v.Private);
-	QString msg = QStringLiteral("×¼±¸Íê±Ï£¬¹¤×÷Õ¾µ±Ç°°æ±¾£º%1¡£").arg(strVersion);
+	QString msg = QStringLiteral("å‡†å¤‡å®Œæ¯•ï¼Œå·¥ä½œç«™å½“å‰ç‰ˆæœ¬ï¼š%1ã€‚").arg(strVersion);
 	bar->setTipText(msg, false, false);
 	addToLog(station, msg);
 
 
 	if (upgradingFileVersion > v)
 	{
-		//Èç¹ûµ±Ç°°æ±¾Ô­Ê¼°æ±¾
+		//å¦‚æœå½“å‰ç‰ˆæœ¬åŸå§‹ç‰ˆæœ¬
 		QString dst = QString::fromStdWString(path).replace("\\", "/");
 		int index = dst.lastIndexOf("/");
 		if (index != -1)
@@ -262,7 +262,7 @@ void UpgradeStationServiceDlg::on_upgradePrepared(StationInfo * station, const s
 			dst = dst.left(index);
 		}	
 
-		//Æô¶¯·¢ËÍÏß³Ì
+		//å¯åŠ¨å‘é€çº¿ç¨‹
 		std::list<StationInfo*> tmpList;
 		tmpList.push_back(station);
 		SendFileThread* sendThread = new SendFileThread(fileNames, dst, tmpList, communicator, false, true, true);
@@ -276,7 +276,7 @@ void UpgradeStationServiceDlg::on_upgradePrepared(StationInfo * station, const s
 	}
 	else
 	{
-		QString msg = QStringLiteral("¹¤×÷Õ¾µ±Ç°°æ±¾£º%1±ÈÒªÉı¼¶ÎÄ¼ş°æ±¾£º%2¸ß»òÒ»ÖÂ£¬²»ĞèÒªÉı¼¶¡£").arg(strVersion).arg(upgradingFileVersion.ProductVersion);
+		QString msg = QStringLiteral("å·¥ä½œç«™å½“å‰ç‰ˆæœ¬ï¼š%1æ¯”è¦å‡çº§æ–‡ä»¶ç‰ˆæœ¬ï¼š%2é«˜æˆ–ä¸€è‡´ï¼Œä¸éœ€è¦å‡çº§ã€‚").arg(strVersion).arg(upgradingFileVersion.ProductVersion);
 		bar->setTipText(msg, false, true);
 		addToLog(station, msg);
 	}

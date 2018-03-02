@@ -6,7 +6,7 @@
 namespace Ui {class ProcessDialog;};
 class StationInfo;
 
-//²é¿´/Ñ¡ÔñÔ¶³Ì¹¤×÷Õ¾½ø³ÌĞÅÏ¢¶Ô»°¿ò
+//æŸ¥çœ‹/é€‰æ‹©è¿œç¨‹å·¥ä½œç«™è¿›ç¨‹ä¿¡æ¯å¯¹è¯æ¡†
 class ProcessDialog : public QDialog
 {
 	Q_OBJECT
@@ -16,18 +16,18 @@ public:
 	~ProcessDialog();
 
 	/*!
-	»ñÈ¡Ñ¡ÔñµÄ½ø³ÌId
-	@return int ½ø³ÌId
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/4/14 11:14:31
+	è·å–é€‰æ‹©çš„è¿›ç¨‹Id
+	@return int è¿›ç¨‹Id
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/4/14 11:14:31
 	*/
 	int ProcessId();
 
 	/*!
-	»ñÈ¡Ñ¡ÔñµÄÔ¶³Ì½ø³ÌÃû³Æ
-	@return QString Ô¶³Ì½ø³ÌÃû³Æ
-	×÷Õß£ºcokkiy£¨ÕÅÁ¢Ãñ£©
-	´´½¨Ê±¼ä:2016/4/14 11:15:03
+	è·å–é€‰æ‹©çš„è¿œç¨‹è¿›ç¨‹åç§°
+	@return QString è¿œç¨‹è¿›ç¨‹åç§°
+	ä½œè€…ï¼šcokkiyï¼ˆå¼ ç«‹æ°‘ï¼‰
+	åˆ›å»ºæ—¶é—´:2016/4/14 11:15:03
 	*/
 	QString ProcessName();
 
