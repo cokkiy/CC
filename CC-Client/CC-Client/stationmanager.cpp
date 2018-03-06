@@ -784,6 +784,29 @@ void StationManager::forceExitApp()
 
 }
 
+/// <summary>
+/// 关闭指显软件
+/// </summary>
+void StationManager::closeComDisplay()
+{
+    for (auto index : stationIndexs)
+    {
+        if (index.column() == 0)
+        {
+            StationInfo* s = pStations->atCurrent(index.row());
+            if (s->controlProxy != NULL)
+            {
+                s->controlProxy->begin_switchDisplayPageAndMode(Exit,
+                    []() {},
+                    [s](const Ice::Exception& ex)
+                {
+                    s->setState(StationInfo::AppCloseFailure, ex.what());
+                });
+            }
+        }
+    }
+}
+
 
 /*!
 设置监视间隔
