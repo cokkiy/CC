@@ -417,6 +417,26 @@
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="closeComDisplayPushButton">
+                <property name="toolTip">
+                 <string>关闭选定工作站的指显软件</string>
+                </property>
+                <property name="statusTip">
+                 <string>关闭选定工作站上的指显软件</string>
+                </property>
+                <property name="text">
+                 <string>关闭指显</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="cc-client.qrc">
+                  <normaloff>:/Icons/52design.com_alth_171.png</normaloff>:/Icons/52design.com_alth_171.png</iconset>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+Shift+X</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>

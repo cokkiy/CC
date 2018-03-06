@@ -132,6 +132,13 @@ public:
     */
     void forceExitApp();  
 
+
+    /// <summary>
+    /// 关闭指显软件
+    /// </summary>
+    void closeComDisplay();
+
+
     /*!
     设置监视间隔
     @param int interval 监视间隔
