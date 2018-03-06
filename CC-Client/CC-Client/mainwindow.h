@@ -156,9 +156,14 @@ public:
 	
 	//打开指定画面
 	void on_openSpecPagePushButton_clicked();
+
+    //关闭指显软件（通过发送命令的方式）
+    void on_closeComDisplayPushButton_clicked();
 	
 	//升级工作站
 	void on_actionUpdateStation_triggered();
+
+    
 
 private:
     Ui::MainWindow *ui;

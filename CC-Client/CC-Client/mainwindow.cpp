@@ -1252,6 +1252,26 @@ void MainWindow::on_openSpecPagePushButton_clicked()
     }
 }
 
+// 关闭工作站上的指显软件（通过发送关闭命令实现）
+void MainWindow::on_closeComDisplayPushButton_clicked()
+{
+    QModelIndexList selectedIndexs = getSelectedIndexs();
+    if (!selectedIndexs.empty())
+    {
+        if (QMessageBox::question(this, QStringLiteral("关闭确认"),
+            QStringLiteral("确实要选定工作站上的关闭指显软件吗？"),
+            QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+        {
+            StationManager* manager = new StationManager(pStationList, selectedIndexs);
+            manager->closeComDisplay();
+        }        
+    }
+    else
+    {
+        QMessageBox::warning(this, QStringLiteral("警告"), QStringLiteral("必须至少选择一个工作站。"));
+    }
+}
+
 
 //升级工作站
 void MainWindow::on_actionUpdateStation_triggered()

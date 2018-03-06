@@ -243,3 +243,6 @@ qttools.pro.user.*
 /CC-Client/CC-Client/RCc03668
 /CC-Client/CC-Client/RCb03668
 /CC-Client/CC-Client/RCa03668
+
+# VSCode
+.vscode/
