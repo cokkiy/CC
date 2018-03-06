@@ -67,7 +67,8 @@ module CC
 		RealtimeMode,
 		ClearPage,
 		NextPage,
-		PrevPage,		
+		PrevPage,	
+		Exit = 9	
 	};
 
 	//气象云图下载选项
