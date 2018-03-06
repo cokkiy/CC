@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="5.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props" Condition="Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props')" />
   <PropertyGroup Label="Globals">
-    <IceBuilderInstallDir>$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder', 'InstallDir.$(VisualStudioVersion)'))</IceBuilderInstallDir>
-    <IceBuilderCsharpProps>$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.props</IceBuilderCsharpProps>
-    <IceBuilderCsharpTargets>$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.targets</IceBuilderCsharpTargets>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <ProjectTypeGuids>{3C53C28F-DC44-46B0-8B85-0C96B85B2042};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{28993779-3132-408A-BCB0-1D78225F4824};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,9 +39,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ice, Version=3.6.1.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
-      <HintPath>$(IceAssembliesDir)\Ice.dll</HintPath>
-    </Reference>
+    <Reference Include="Ice, Version=3.6.1.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -75,27 +73,25 @@
     <None Include="Config.Server">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Slice\AppControlParameter.ice" />
-    <None Include="Slice\IAppLuncher.ice" />
-    <None Include="Slice\IController.ice" />
-    <None Include="Slice\IStationStateReceiver.ice" />
+    <SliceCompile Include="Slice\AppControlParameter.ice" />
+    <SliceCompile Include="Slice\IAppLuncher.ice" />
+    <SliceCompile Include="Slice\IController.ice" />
+    <SliceCompile Include="Slice\IStationStateReceiver.ice" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(IceBuilderCSharpProps)" Condition="Exists('$(IceBuilderCSharpProps)')" />
-  <PropertyGroup Label="IceBuilder">
-    <IceBuilderIncludeDirectories>$(IceHome)\slice</IceBuilderIncludeDirectories>
-  </PropertyGroup>
-  <Import Project="$(IceBuilderCSharpTargets)" Condition="Exists('$(IceBuilderCSharpTargets)')" />
-  <Target Name="EnsureIceBuilderImports" BeforeTargets="PrepareForBuild">
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project requires the Ice Builder for Visual Studio extension. Use "Tools &amp;gt; Extensions and Updates" to install it. For more information, see https://visualstudiogallery.msdn.microsoft.com/1a64e701-63f2-4740-8004-290e6c682ce0.</ErrorText>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(IceBuilderCSharpProps)')" Text="$(ErrorText)" />
+    <Error Condition="!Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props'))" />
+    <Error Condition="!Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets'))" />
   </Target>
+  <Import Project="..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets" Condition="Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
