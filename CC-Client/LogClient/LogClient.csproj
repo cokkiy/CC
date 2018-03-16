@@ -35,6 +35,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>logclient.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
@@ -112,6 +115,30 @@
     <Compile Include="Migrations\201803130834082_UpdateStationState.Designer.cs">
       <DependentUpon>201803130834082_UpdateStationState.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803140133234_AddRunningStates.cs" />
+    <Compile Include="Migrations\201803140133234_AddRunningStates.Designer.cs">
+      <DependentUpon>201803140133234_AddRunningStates.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803140145068_AddMemPercentInRunningStates.cs" />
+    <Compile Include="Migrations\201803140145068_AddMemPercentInRunningStates.Designer.cs">
+      <DependentUpon>201803140145068_AddMemPercentInRunningStates.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803140340002_AddProcessInfos.cs" />
+    <Compile Include="Migrations\201803140340002_AddProcessInfos.Designer.cs">
+      <DependentUpon>201803140340002_AddProcessInfos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803140806045_AddIsRunningToStations.cs" />
+    <Compile Include="Migrations\201803140806045_AddIsRunningToStations.Designer.cs">
+      <DependentUpon>201803140806045_AddIsRunningToStations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803160045348_AddNetStatisticAndIndex.cs" />
+    <Compile Include="Migrations\201803160045348_AddNetStatisticAndIndex.Designer.cs">
+      <DependentUpon>201803160045348_AddNetStatisticAndIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803160117300_AddUpdateToStationNI.cs" />
+    <Compile Include="Migrations\201803160117300_AddUpdateToStationNI.Designer.cs">
+      <DependentUpon>201803160117300_AddUpdateToStationNI.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -152,10 +179,29 @@
     <Content Include="docs\MySqlParameter.xml" />
     <Content Include="docs\MySqlParameterCollection.xml" />
     <Content Include="docs\MySqlTransaction.xml" />
+    <Content Include="logclient.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201803130834082_UpdateStationState.resx">
       <DependentUpon>201803130834082_UpdateStationState.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803140133234_AddRunningStates.resx">
+      <DependentUpon>201803140133234_AddRunningStates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803140145068_AddMemPercentInRunningStates.resx">
+      <DependentUpon>201803140145068_AddMemPercentInRunningStates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803140340002_AddProcessInfos.resx">
+      <DependentUpon>201803140340002_AddProcessInfos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803140806045_AddIsRunningToStations.resx">
+      <DependentUpon>201803140806045_AddIsRunningToStations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803160045348_AddNetStatisticAndIndex.resx">
+      <DependentUpon>201803160045348_AddNetStatisticAndIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803160117300_AddUpdateToStationNI.resx">
+      <DependentUpon>201803160117300_AddUpdateToStationNI.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

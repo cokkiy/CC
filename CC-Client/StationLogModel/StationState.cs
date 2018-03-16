@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,9 +22,9 @@ namespace StationLogModels
 
         public long TotalMemory { get; set; }
 
+        [MaxLength(50)]
         public string ComputerName { get; set; }
 
-        public DateTime UpdateTime { get; set; }
-
+        public DateTime UpdateTime { get; set; }        
     }
 }

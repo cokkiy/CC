@@ -45,9 +45,176 @@ namespace LogClient
             }
         }
 
-        internal static void WriteRunningState(string computerName, StationRunningState stationRunningState)
+        internal static void WriteRunningState(ManageState manageState, StationRunningState stationRunningState)
         {
-            throw new NotImplementedException();
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                var id = logContext.Stations.FirstOrDefault(s => s.ComputerName == manageState.ComputerName)?.Id;
+                if(id.HasValue)
+                {
+                    logContext.RunningStates.Add(new RunningState {
+                        ComputerName = manageState.ComputerName,
+                        CPU = stationRunningState.cpu,
+                        CurrentMemory = stationRunningState.currentMemory,
+                        MemoryPercent = ((float)stationRunningState.currentMemory) / manageState.TotalMemory,
+                        ProcessCount=stationRunningState.procCount,
+                        RecordTime=DateTime.Now,
+                    });
+                    logContext.SaveChanges();
+                }
+            }
+        }
+
+        internal static void SaveNetStatistic(NetStatistic statistic, List<IFStatistic> ifStatistics)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                logContext.NetStatistics.Add(statistic);
+                logContext.IFStatistics.AddRange(ifStatistics);
+                logContext.SaveChangesAsync().Wait();
+            }
+        }
+
+        internal static void WriteProcessInfo(ManageState manageState,List<string> startOrExitsProcNames, bool start)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+
+                if (start)
+                {
+                    List<StationLogModels.ProcessInfo> infos = new List<StationLogModels.ProcessInfo>();
+                    foreach (var proc in startOrExitsProcNames)
+                    {
+                        var info = new StationLogModels.ProcessInfo
+                        {
+                            ComputerName = manageState.ComputerName,
+                            ProcessName = proc,
+                            StartTime = DateTime.Now,
+                        };
+                        infos.Add(info);
+                    }
+                    logContext.ProcessInfos.AddRange(infos);
+                    logContext.SaveChanges();
+
+                    infos.ForEach(p => manageState.RunningProcId.Add(p.ProcessName, p.Id));
+                }
+                else
+                {
+                    List<StationLogModels.ProcessInfo> infos = new List<StationLogModels.ProcessInfo>();
+
+                    foreach (var proc in startOrExitsProcNames)
+                    {
+                        if (manageState.RunningProcId.ContainsKey(proc))
+                        {
+                            var id = manageState.RunningProcId[proc];
+                            var info = logContext.ProcessInfos.FirstOrDefault(p => p.Id == id);
+                            info.ExitTime = DateTime.Now;
+                            manageState.RunningProcId.Remove(proc);
+                        }
+                        else
+                        {
+                            var info = new StationLogModels.ProcessInfo
+                            {
+                                ComputerName = manageState.ComputerName,
+                                ProcessName = proc,
+                                StartTime = manageState.StartTime,
+                                ExitTime = DateTime.Now
+                            };
+                            infos.Add(info);
+                        }
+                    }
+
+                    if (infos.Count > 0)
+                    {
+                        logContext.ProcessInfos.AddRange(infos);
+                    }
+
+                    logContext.SaveChanges();
+                }
+            }
+        }
+
+        internal static void SetMachineStoped(string computerName)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                var station = logContext.Stations.FirstOrDefault(s => s.ComputerName == computerName);
+                if(station!=null)
+                {
+                    station.IsRunning = false;
+                    logContext.SaveChanges();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 更新网卡信息
+        /// </summary>
+        /// <param name="state"></param>
+        internal static void UpdateNI(StationSystemState state)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                List<(string IfName, string Mac, string IP)> noSaved = new List<(string, string, string)>();
+                var allNIs = logContext.StationNIs.Where(n => n.ComputerName == state.computerName).ToList();
+                foreach (var item in state.NetworkInterfaces)
+                {
+                    var IfNameAndMac = item.Key.Split(':');
+                    if (IfNameAndMac.Length < 2)
+                        continue;
+                    var IfName = IfNameAndMac[0];
+                    var MAC = IfNameAndMac[1];
+                    var IPs = item.Value;
+                    var noSavedIPs = IPs.FindAll(ip => { return !allNIs.Any(ni => ni.IfName == IfName && ni.MAC == MAC && ni.IP == ip); });
+                    noSavedIPs.ForEach(ip => { noSaved.Add((IfName, MAC, ip)); });
+                }
+
+                if(noSaved.Count>0)
+                {
+                    foreach (var item in noSaved)
+                    {
+                        StationNI ni = new StationNI
+                        {
+                            ComputerName=state.computerName,
+                            IfName=item.IfName,
+                            MAC=item.Mac,
+                            IP=item.IP,
+                            Update=DateTime.Now,
+                        };
+
+                        logContext.StationNIs.Add(ni);                        
+                    }
+
+                    logContext.SaveChanges();
+                }
+            }
+        }
+
+        internal static void SetMachineRunning(string computerName)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                var station = logContext.Stations.FirstOrDefault(s => s.ComputerName == computerName);
+                if (station != null)
+                {
+                    station.IsRunning = true;
+                    logContext.SaveChanges();
+                }
+            }
+        }
+
+        internal static void WriteStopProcessInfo(ManageState stopedState)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                foreach (var proc in stopedState.RunningProcId)
+                {
+                    var info = logContext.ProcessInfos.FirstOrDefault(p => p.Id == proc.Value);
+                    info.ExitTime = DateTime.Now;                    
+                }
+
+                logContext.SaveChanges();
+            }
         }
     }
 }
