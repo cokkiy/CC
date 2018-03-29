@@ -45,15 +45,36 @@ namespace LogClient
         /// </summary>
         public List<string> RunningProcesses { get; set; }
 
+        /// <summary>
+        /// 最后一次检查进程信息时间
+        /// </summary>
+        public DateTime LastCheckProcessTime { get; set; }
+
+
         public int ProcessCount
         {
             get
             {
-                return RunningProcesses.Count;
+                return IsLinux ? RunningProcesses.Count : RunningProcesses.Count + 1;
             }
         }
 
+        /// <summary>
+        /// 开关机记录Id
+        /// </summary>
+        public long PowerOnLogId { get; set; }
+
+        /// <summary>
+        /// 是否是Linux/unix系统
+        /// </summary>
+        public bool IsLinux { get; internal set; }
+
         //运行进程数据库Id
         public Dictionary<string, long> RunningProcId = new Dictionary<string, long>();
+
+        public ManageState()
+        {
+            PowerOnLogId = -1;
+        }
     }
 }

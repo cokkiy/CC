@@ -12,7 +12,7 @@ namespace LogClient
             this.prefix = prefix;
             logger = new Serilog.LoggerConfiguration()
                 .WriteTo.Console(restrictedToMinimumLevel:Serilog.Events.LogEventLevel.Verbose)
-                .WriteTo.File("log/log.txt",restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning)
+                .WriteTo.RollingFile("log/log.log")
                 .CreateLogger();
         }
 

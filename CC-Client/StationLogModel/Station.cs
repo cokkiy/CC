@@ -18,5 +18,15 @@ namespace StationLogModels
         /// </summary>
         public string NetworkName { get; set; }
         public bool IsRunning { get; set; }
+
+        /// <summary>
+        /// 开机时间
+        /// </summary>
+        public DateTime? PowerOnTime { get; set; }
+
+        /// <summary>
+        /// 关机时间
+        /// </summary>
+        public DateTime? ShutdownTime { get; set; }
     }
 }

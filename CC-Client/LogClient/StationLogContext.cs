@@ -31,6 +31,8 @@ namespace LogClient
             modelBuilder.Entity<ProcessInfo>().HasIndex(p => p.StartTime);
             modelBuilder.Entity<NetStatistic>().HasIndex(n => n.RecordTime);
             modelBuilder.Entity<IFStatistic>().HasIndex(s => s.RecordTime);
+            modelBuilder.Entity<PowerOnOffLog>().HasIndex(s => s.ComputerName);
+            modelBuilder.Entity<PowerOnOffLog>().HasIndex(s => s.PowerOn);
             
         }
 
@@ -48,6 +50,7 @@ namespace LogClient
 
         public DbSet<IFStatistic> IFStatistics { get; set; }
 
-
+        public DbSet<PowerOnOffLog> PowerOnOffLogs { get; set; }
+        
     }
 }

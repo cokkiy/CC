@@ -134,16 +134,27 @@ namespace LogClient
             }
         }
 
-        internal static void SetMachineStoped(string computerName)
+        internal static void SetMachineStoped(ManageState manageState)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
             {
-                var station = logContext.Stations.FirstOrDefault(s => s.ComputerName == computerName);
-                if(station!=null)
+                var station = logContext.Stations.FirstOrDefault(s => s.ComputerName == manageState.ComputerName);
+                if (station != null)
                 {
                     station.IsRunning = false;
-                    logContext.SaveChanges();
+                    station.ShutdownTime = manageState.LastTick;
                 }
+
+                if (manageState.PowerOnLogId != -1)
+                {
+                    var powerOnLog = logContext.PowerOnOffLogs.SingleOrDefault(l => l.Id == manageState.PowerOnLogId);
+                    if (powerOnLog != null)
+                    {
+                        powerOnLog.PowerOff = manageState.LastTick;
+                    }
+                }
+
+                logContext.SaveChanges();
             }
         }
 
@@ -190,7 +201,7 @@ namespace LogClient
             }
         }
 
-        internal static void SetMachineRunning(string computerName)
+        internal static long SetMachineRunning(string computerName)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
             {
@@ -198,8 +209,26 @@ namespace LogClient
                 if (station != null)
                 {
                     station.IsRunning = true;
-                    logContext.SaveChanges();
+                    station.PowerOnTime = DateTime.Now;
+                    station.ShutdownTime = null;
                 }
+
+                var powerOnLog = logContext.PowerOnOffLogs.FirstOrDefault(s => s.ComputerName == computerName
+                  && s.PowerOff == null);
+
+                if (powerOnLog == null || (DateTime.Now - powerOnLog.PowerOn) > TimeSpan.FromHours(4))
+                {
+                    powerOnLog = new PowerOnOffLog
+                    {
+                        ComputerName = computerName,
+                        PowerOn = DateTime.Now,
+                    };
+                    logContext.PowerOnOffLogs.Add(powerOnLog);
+                }
+
+                logContext.SaveChanges();
+
+                return powerOnLog.Id;
             }
         }
 

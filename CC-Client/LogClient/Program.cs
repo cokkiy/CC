@@ -19,6 +19,8 @@ namespace LogClient
         private static bool quit = false;
         private static Communicator communicator;
 
+        private static ReaderWriterLockSlim readerWriterLockSlim = new ReaderWriterLockSlim();
+
         static void Main(string[] args)
         {
             Console.Title = "工作站状态记录程序";
@@ -68,7 +70,7 @@ namespace LogClient
             initData.logger = logger;
             communicator = Ice.Util.initialize(initData);
             var adapter = communicator.createObjectAdapter("StateReceiver");
-            var stateReceiver = new StationStateReceiver(communicator, stations);
+            var stateReceiver = new StationStateReceiver(communicator, stations, readerWriterLockSlim);
             var identity = Ice.Util.stringToIdentity("stateReceiver");
             adapter.add(stateReceiver, identity);
             adapter.activate();
@@ -82,13 +84,15 @@ namespace LogClient
             List<KeyValuePair<string, ManageState>> stopedMachines = new List<KeyValuePair<string, ManageState>>();
             while (!quit)
             {
+                readerWriterLockSlim.EnterWriteLock();
                 foreach (var station in stations)
                 {
-                    if (DateTime.Now - station.Value.LastTick > TimeSpan.FromMinutes(1))
+                    if (DateTime.Now - station.Value.LastTick > TimeSpan.FromMinutes(2))
                     {
                         stopedMachines.Add(station);
                     }
                 }
+                readerWriterLockSlim.ExitWriteLock();
 
                 foreach (var stoped in stopedMachines)
                 {
@@ -98,8 +102,15 @@ namespace LogClient
                         DbWriter.WriteStopProcessInfo(stopedState);
                     }
 
-                    DbWriter.SetMachineStoped(stopedState.ComputerName);
+                    DbWriter.SetMachineStoped(stopedState);
+
+                    stations.Remove(stoped.Key);
+
+                    logger.warning(string.Format("{0}于{1}关闭，StationID-{2}被回收,主机状态已设置为未运行。", 
+                        stoped.Value.ComputerName, stoped.Value.LastTick, stoped.Key));
                 }
+
+                stopedMachines.Clear();
 
                 Thread.Sleep(1000);
             }

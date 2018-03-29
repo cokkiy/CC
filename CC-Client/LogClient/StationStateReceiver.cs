@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CC;
 using Ice;
@@ -15,13 +16,16 @@ namespace LogClient
         private Ice.Logger logger;
         //记录StationId和工作站基本信息
         private Dictionary<string, ManageState> stations;
+        private ReaderWriterLockSlim readerWriterLockSlim;
 
 
-        public StationStateReceiver(Communicator communicator, Dictionary<string, ManageState> stations)
+        public StationStateReceiver(Communicator communicator, 
+            Dictionary<string, ManageState> stations, ReaderWriterLockSlim readerWriterLockSlim)
         {
             this.communicator = communicator;
             this.stations = stations;
             logger = this.communicator.getLogger();
+            this.readerWriterLockSlim = readerWriterLockSlim;
         }
 
         public override void receiveAppRunningState(List<AppRunningState> appRunningState, Current current__)
@@ -31,11 +35,6 @@ namespace LogClient
 
         public override void receiveNetStatistics(string data, Current current__)
         {
-            if (logger != null)
-            {
-                logger.print(data);
-            }
-
             var datas = data.Split(':');
             if(datas.Length<11)
             {
@@ -67,7 +66,12 @@ namespace LogClient
                     }
 
                     DbWriter.SaveNetStatistic(statistic, ifStatistics);
+                    logger.print(string.Format("{0}网络数据已记录。", computerName));
                 }
+            }
+            else
+            {
+                logger.warning(string.Format("收到网络数据，但主机不能确认：{0}.", datas[0]));
             }
 
         }
@@ -77,15 +81,19 @@ namespace LogClient
         private List<string> getingSystemStateStations = new List<string>();
         private List<string> getingProcessInfoStations = new List<string>();
         public override void receiveStationRunningState(StationRunningState stationRunningState, IControllerPrx controller, IFileTranslationPrx fileProxy, Current current__)
-        {
+        {            
             if (!stations.ContainsKey(stationRunningState.stationId))
             {
+                logger.warning(string.Format("主机{0}未在已知主机词典中，准备查询...", stationRunningState.stationId));
                 if (getingSystemStateStations.Contains(stationRunningState.stationId))
                 {
+                    logger.warning(string.Format("主机{0}未在已知主机词典中，并且已经在查询中，本次数据被忽略。", stationRunningState.stationId));
+
                     return;
                 }
 
                 getingSystemStateStations.Add(stationRunningState.stationId);
+                logger.warning(string.Format("{0}进入主机基本状态查询锁，并开始查询。", stationRunningState.stationId));
 
                 GetSystemState(stationRunningState, controller);
             }
@@ -100,17 +108,30 @@ namespace LogClient
                     // 1分钟记录一次
                     DbWriter.WriteRunningState(manageState, stationRunningState);
                     manageState.LastWriteTime = DateTime.Now;
+
+                    logger.print(string.Format("{0}运行状态被记录。", manageState.ComputerName));
                 }
 
                 // 判断进程信息是否发生了变化
                 if (manageState.ProcessCount != stationRunningState.procCount)
                 {
-                    if (getingProcessInfoStations.Contains(stationRunningState.stationId))
+                    if(DateTime.Now-manageState.LastCheckProcessTime<TimeSpan.FromSeconds(30))
                     {
+                        logger.warning(string.Format("{0}进程数量发生变化，但与上次查询间隔不足30秒，本次变化被忽略。", manageState.ComputerName));
                         return;
                     }
 
+                    if (getingProcessInfoStations.Contains(stationRunningState.stationId))
+                    {
+                        logger.warning(string.Format("{0}进程数量发生变化，但上次查询尚未结束，本次数据被忽略。", manageState.ComputerName));
+                        return;
+                    }
+
+                    manageState.LastCheckProcessTime = DateTime.Now;
+
                     getingProcessInfoStations.Add(stationRunningState.stationId);
+                    logger.warning(string.Format("{0}进程数量发生变化{1}->{2}，进入进程查询锁并开始查询。", manageState.ComputerName, manageState.ProcessCount, stationRunningState.procCount));
+
                     controller.begin_getAllProcessInfo((AsyncResult ar) => {
                         if(ar.IsCompleted)
                         {
@@ -118,21 +139,15 @@ namespace LogClient
                         }
 
                         getingProcessInfoStations.Remove(stationRunningState.stationId);
+                        logger.warning(string.Format("{0}进程查询结束，退出进程查询锁。", manageState.ComputerName));
 
                     }, null);
                 }
 
             }
-
-            // 显示日志
-            if (logger != null)
-            {
-                logger.print(stationRunningState.ToString());
-            }
-
         }
 
-        private static void SaveProcessInfo(IControllerPrx controller, AsyncResult ar, ManageState manageState)
+        private void SaveProcessInfo(IControllerPrx controller, AsyncResult ar, ManageState manageState)
         {
             var processes = controller.end_getAllProcessInfo(ar);
 
@@ -152,11 +167,17 @@ namespace LogClient
             if (exits.Count > 0)
             {
                 DbWriter.WriteProcessInfo(manageState, exits, false);
+                string exitProc=string.Empty;
+                exits.ForEach((e) => string.Format("{0} {1}", exitProc, e));
+                logger.print(string.Format("{0}的{1}个进程{2}退出。", manageState.ComputerName, exits.Count, exitProc));
             }
 
             if (starts.Count > 0)
             {
                 DbWriter.WriteProcessInfo(manageState, starts, true);
+                string startProc = string.Empty;
+                starts.ForEach((e) => string.Format("{0} {1}", startProc, e));
+                logger.print(string.Format("{0}的{1}个进程{2}启动。", manageState.ComputerName, starts.Count, startProc));
             }
         }
 
@@ -175,7 +196,7 @@ namespace LogClient
                     var state = controller.end_getSystemState(result);
                     if (logger != null)
                     {
-                        logger.print(state.ToString());
+                        logger.warning(string.Format("主机查询结果：{0}", state));
                     }
                     lock (lockObj)
                     {
@@ -185,14 +206,20 @@ namespace LogClient
                             {
                                 ComputerName = state.computerName,
                                 TotalMemory = state.totalMemory,
+                                IsLinux = state.osName == "Unix",
                                 StartTime = DateTime.Now,
-                                LastTick=DateTime.Now
+                                LastTick = DateTime.Now
                             };
 
+                            readerWriterLockSlim.EnterReadLock();
                             stations.Add(state.stationId, manageState);
+                            readerWriterLockSlim.ExitReadLock();
+
+                            logger.warning(string.Format("添加主机Id:{0},名称{1}到已知主机词典中。", stationRunningState.stationId, state.computerName));
                             DbWriter.WriteStation(state);
                             DbWriter.UpdateNI(state);
-                            DbWriter.SetMachineRunning(state.computerName);
+                            manageState.PowerOnLogId = DbWriter.SetMachineRunning(state.computerName);
+                            logger.warning(string.Format("主机{0}状态已设置为运行。", state.computerName));
 
                             //获取初始进程信息
                             controller.begin_getAllProcessInfo((AsyncResult aResult) =>
@@ -207,7 +234,10 @@ namespace LogClient
                         }
                     }
                 }
+                
                 getingSystemStateStations.Remove(stationRunningState.stationId);
+                logger.warning(string.Format("{0}主机基本状态查询锁已移除。", stationRunningState.stationId));
+
             }, null);
         }
 

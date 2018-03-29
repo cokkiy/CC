@@ -246,4 +246,5 @@ qttools.pro.user.*
 
 # VSCode
 .vscode/
+
 /CC-Client/LogViewerWeb

@@ -64,6 +64,9 @@
     <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.File.3.2.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
     </Reference>
+    <Reference Include="Serilog.Sinks.RollingFile, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.RollingFile.3.3.0\lib\net45\Serilog.Sinks.RollingFile.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -139,6 +142,14 @@
     <Compile Include="Migrations\201803160117300_AddUpdateToStationNI.Designer.cs">
       <DependentUpon>201803160117300_AddUpdateToStationNI.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803190040050_AddPowerOnAndShutdownTimeToStation.cs" />
+    <Compile Include="Migrations\201803190040050_AddPowerOnAndShutdownTimeToStation.Designer.cs">
+      <DependentUpon>201803190040050_AddPowerOnAndShutdownTimeToStation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803220809329_AddPowerOnOffLog.cs" />
+    <Compile Include="Migrations\201803220809329_AddPowerOnOffLog.Designer.cs">
+      <DependentUpon>201803220809329_AddPowerOnOffLog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -202,6 +213,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803160117300_AddUpdateToStationNI.resx">
       <DependentUpon>201803160117300_AddUpdateToStationNI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803190040050_AddPowerOnAndShutdownTimeToStation.resx">
+      <DependentUpon>201803190040050_AddPowerOnAndShutdownTimeToStation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803220809329_AddPowerOnOffLog.resx">
+      <DependentUpon>201803220809329_AddPowerOnOffLog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
