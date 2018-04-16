@@ -1,0 +1,5 @@
+// ngx popup calendar should set z-index, 
+// otherwise will be hide by other div
+.ngx-datepicker-calendar-container {
+    z-index: 10;
+}

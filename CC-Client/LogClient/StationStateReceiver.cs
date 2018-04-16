@@ -17,15 +17,18 @@ namespace LogClient
         //记录StationId和工作站基本信息
         private Dictionary<string, ManageState> stations;
         private ReaderWriterLockSlim readerWriterLockSlim;
+        private List<Station> alreadyRunningStations;
 
 
         public StationStateReceiver(Communicator communicator, 
-            Dictionary<string, ManageState> stations, ReaderWriterLockSlim readerWriterLockSlim)
+            Dictionary<string, ManageState> stations, ReaderWriterLockSlim readerWriterLockSlim,
+            List<Station> alreadyRunningStations)
         {
             this.communicator = communicator;
             this.stations = stations;
             logger = this.communicator.getLogger();
             this.readerWriterLockSlim = readerWriterLockSlim;
+            this.alreadyRunningStations = alreadyRunningStations;
         }
 
         public override void receiveAppRunningState(List<AppRunningState> appRunningState, Current current__)
@@ -65,7 +68,7 @@ namespace LogClient
                         ifStatistics.Add(ifStatistic);
                     }
 
-                    DbWriter.SaveNetStatistic(statistic, ifStatistics);
+                    DbReaderWriter.SaveNetStatistic(statistic, ifStatistics);
                     logger.print(string.Format("{0}网络数据已记录。", computerName));
                 }
             }
@@ -106,78 +109,11 @@ namespace LogClient
                 if (DateTime.Now - manageState.LastWriteTime > TimeSpan.FromMinutes(1))
                 {
                     // 1分钟记录一次
-                    DbWriter.WriteRunningState(manageState, stationRunningState);
+                    DbReaderWriter.WriteRunningState(manageState, stationRunningState);
                     manageState.LastWriteTime = DateTime.Now;
 
                     logger.print(string.Format("{0}运行状态被记录。", manageState.ComputerName));
-                }
-
-                // 判断进程信息是否发生了变化
-                if (manageState.ProcessCount != stationRunningState.procCount)
-                {
-                    if(DateTime.Now-manageState.LastCheckProcessTime<TimeSpan.FromSeconds(30))
-                    {
-                        logger.warning(string.Format("{0}进程数量发生变化，但与上次查询间隔不足30秒，本次变化被忽略。", manageState.ComputerName));
-                        return;
-                    }
-
-                    if (getingProcessInfoStations.Contains(stationRunningState.stationId))
-                    {
-                        logger.warning(string.Format("{0}进程数量发生变化，但上次查询尚未结束，本次数据被忽略。", manageState.ComputerName));
-                        return;
-                    }
-
-                    manageState.LastCheckProcessTime = DateTime.Now;
-
-                    getingProcessInfoStations.Add(stationRunningState.stationId);
-                    logger.warning(string.Format("{0}进程数量发生变化{1}->{2}，进入进程查询锁并开始查询。", manageState.ComputerName, manageState.ProcessCount, stationRunningState.procCount));
-
-                    controller.begin_getAllProcessInfo((AsyncResult ar) => {
-                        if(ar.IsCompleted)
-                        {
-                            SaveProcessInfo(controller, ar, manageState);
-                        }
-
-                        getingProcessInfoStations.Remove(stationRunningState.stationId);
-                        logger.warning(string.Format("{0}进程查询结束，退出进程查询锁。", manageState.ComputerName));
-
-                    }, null);
-                }
-
-            }
-        }
-
-        private void SaveProcessInfo(IControllerPrx controller, AsyncResult ar, ManageState manageState)
-        {
-            var processes = controller.end_getAllProcessInfo(ar);
-
-            var exits = manageState.RunningProcesses.FindAll((p) =>
-            {
-                return !processes.Any(proc => proc.Name == p);
-            }).Distinct().ToList();
-
-            var starts = processes.FindAll((p) =>
-            {
-                return !manageState.RunningProcesses.Any(run => run == p.Name);
-            }).Select(p => p.Name).Distinct().ToList();
-
-            manageState.RunningProcesses = processes.Select(p => p.Name).ToList();
-
-
-            if (exits.Count > 0)
-            {
-                DbWriter.WriteProcessInfo(manageState, exits, false);
-                string exitProc=string.Empty;
-                exits.ForEach((e) => string.Format("{0} {1}", exitProc, e));
-                logger.print(string.Format("{0}的{1}个进程{2}退出。", manageState.ComputerName, exits.Count, exitProc));
-            }
-
-            if (starts.Count > 0)
-            {
-                DbWriter.WriteProcessInfo(manageState, starts, true);
-                string startProc = string.Empty;
-                starts.ForEach((e) => string.Format("{0} {1}", startProc, e));
-                logger.print(string.Format("{0}的{1}个进程{2}启动。", manageState.ComputerName, starts.Count, startProc));
+                }                
             }
         }
 
@@ -208,29 +144,46 @@ namespace LogClient
                                 TotalMemory = state.totalMemory,
                                 IsLinux = state.osName == "Unix",
                                 StartTime = DateTime.Now,
-                                LastTick = DateTime.Now
+                                LastTick = DateTime.Now,
+                                Controller = controller,
                             };
 
-                            readerWriterLockSlim.EnterReadLock();
+                            bool isAlreadyRunning = false;
+
+                            readerWriterLockSlim.EnterWriteLock();
+                            var alreadRunning = alreadyRunningStations.Find(s => s.ComputerName == state.computerName
+                            && DateTime.Now - s.PowerOnTime < TimeSpan.FromHours(4));
+                            if(alreadRunning!=null)
+                            {
+                                isAlreadyRunning = true;
+                                manageState.StartTime = alreadRunning.PowerOnTime.Value;
+                            }
                             stations.Add(state.stationId, manageState);
-                            readerWriterLockSlim.ExitReadLock();
+                            readerWriterLockSlim.ExitWriteLock();
 
                             logger.warning(string.Format("添加主机Id:{0},名称{1}到已知主机词典中。", stationRunningState.stationId, state.computerName));
-                            DbWriter.WriteStation(state);
-                            DbWriter.UpdateNI(state);
-                            manageState.PowerOnLogId = DbWriter.SetMachineRunning(state.computerName);
-                            logger.warning(string.Format("主机{0}状态已设置为运行。", state.computerName));
+                            if (!isAlreadyRunning)
+                            {
+                                DbReaderWriter.WriteStation(state);
+                                DbReaderWriter.UpdateNI(state);
+                                manageState.PowerOnLogId = DbReaderWriter.SetMachineRunning(state.computerName);
+                                logger.warning(string.Format("主机{0}状态已设置为运行。", state.computerName));
+                            }
+                            else
+                            {
+                                manageState.PowerOnLogId = DbReaderWriter.GetPowerOnLogId(manageState.ComputerName, manageState.StartTime);
+                            }
 
                             //获取初始进程信息
-                            controller.begin_getAllProcessInfo((AsyncResult aResult) =>
-                            {
-                                if (aResult.IsCompleted)
-                                {
-                                    var processes = controller.end_getAllProcessInfo(aResult);
-                                    manageState.RunningProcesses = processes.Select(p => p.Name).ToList();
-                                }
+                            //controller.begin_getAllProcessInfo((AsyncResult aResult) =>
+                            //{
+                            //    if (aResult.IsCompleted)
+                            //    {
+                            //        var processes = controller.end_getAllProcessInfo(aResult);
+                            //        manageState.InitRunningProcesses = processes.GroupBy(p => p.Name).Select(g => g.First().Name).ToList();
+                            //    }
 
-                            }, null);
+                            //}, null);
                         }
                     }
                 }

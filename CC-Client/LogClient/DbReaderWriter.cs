@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using StationLogModels;
+using System.Data.Entity;
 
 namespace LogClient
 {
-    static class DbWriter
-    {
+    static class DbReaderWriter
+    {       
         public static void WriteStation(StationSystemState state)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
@@ -45,6 +44,44 @@ namespace LogClient
             }
         }
 
+        internal static void SetStationAlreadyShutDown(List<Station> notRunningStations)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                foreach (var station in notRunningStations)
+                {
+                    station.IsRunning = false;
+                    //只设置开机时间小于4小时的,大于4小时的不设置
+                    if (DateTime.Now - station.PowerOnTime < TimeSpan.FromHours(4))
+                    {
+                        station.ShutdownTime = DateTime.Now - TimeSpan.FromMinutes(1.5);
+                    }
+
+                    logContext.Stations.Attach(station);
+                    logContext.Entry(station).State = EntityState.Modified;
+
+                    var log = logContext.PowerOnOffLogs
+                        .OrderByDescending(s => s.PowerOn).FirstOrDefault(l => l.ComputerName == station.ComputerName && l.PowerOff == null);
+                    if (log != null && station.PowerOnTime - log.PowerOn < TimeSpan.FromMinutes(5))
+                    {
+                        log.PowerOff = station.ShutdownTime;
+                    }
+
+                    var startTime = DateTime.Now - TimeSpan.FromHours(4);
+                    var process = logContext.ProcessInfos.Where(p =>p.StartTime>=startTime 
+                    && p.ComputerName == station.ComputerName
+                    && p.ExitTime == null).ToList();
+                    process.ForEach(p => p.ExitTime = DateTime.Now - TimeSpan.FromMinutes(2));
+
+                    var shouldDelete = logContext.ProcessInfos.Where(p => p.StartTime < startTime && p.ExitTime == null
+                    && p.ComputerName == station.ComputerName).ToList();
+                    logContext.ProcessInfos.RemoveRange(shouldDelete);
+                }
+
+                logContext.SaveChanges();
+            }
+        }
+
         internal static void WriteRunningState(ManageState manageState, StationRunningState stationRunningState)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
@@ -75,62 +112,25 @@ namespace LogClient
             }
         }
 
-        internal static void WriteProcessInfo(ManageState manageState,List<string> startOrExitsProcNames, bool start)
+
+        internal static void WriteProcessExitInfo(ManageState station, IEnumerable<string> exits)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
             {
-
-                if (start)
+                var exitlist = exits.ToList();
+                foreach (var exit in exitlist)
                 {
-                    List<StationLogModels.ProcessInfo> infos = new List<StationLogModels.ProcessInfo>();
-                    foreach (var proc in startOrExitsProcNames)
+                    if (station.RunningProcId.ContainsKey(exit))
                     {
-                        var info = new StationLogModels.ProcessInfo
-                        {
-                            ComputerName = manageState.ComputerName,
-                            ProcessName = proc,
-                            StartTime = DateTime.Now,
-                        };
-                        infos.Add(info);
+                        var id = station.RunningProcId[exit];
+                        var process = logContext.ProcessInfos.SingleOrDefault(p => p.Id == id);
+                        process.ExitTime = DateTime.Now;
+                        station.RunningProcId.Remove(exit);
+                        station.LoggedProcess.Remove(exit);
                     }
-                    logContext.ProcessInfos.AddRange(infos);
-                    logContext.SaveChanges();
-
-                    infos.ForEach(p => manageState.RunningProcId.Add(p.ProcessName, p.Id));
                 }
-                else
-                {
-                    List<StationLogModels.ProcessInfo> infos = new List<StationLogModels.ProcessInfo>();
-
-                    foreach (var proc in startOrExitsProcNames)
-                    {
-                        if (manageState.RunningProcId.ContainsKey(proc))
-                        {
-                            var id = manageState.RunningProcId[proc];
-                            var info = logContext.ProcessInfos.FirstOrDefault(p => p.Id == id);
-                            info.ExitTime = DateTime.Now;
-                            manageState.RunningProcId.Remove(proc);
-                        }
-                        else
-                        {
-                            var info = new StationLogModels.ProcessInfo
-                            {
-                                ComputerName = manageState.ComputerName,
-                                ProcessName = proc,
-                                StartTime = manageState.StartTime,
-                                ExitTime = DateTime.Now
-                            };
-                            infos.Add(info);
-                        }
-                    }
-
-                    if (infos.Count > 0)
-                    {
-                        logContext.ProcessInfos.AddRange(infos);
-                    }
-
-                    logContext.SaveChanges();
-                }
+                logContext.SaveChanges();
+                
             }
         }
 
@@ -155,6 +155,35 @@ namespace LogClient
                 }
 
                 logContext.SaveChanges();
+            }
+        }
+
+        internal static void WriteProcessStartInfo(ManageState station, IEnumerable<string> starts)
+        {
+            List<StationLogModels.ProcessInfo> infos = new List<StationLogModels.ProcessInfo>();
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                foreach (var start in starts)
+                {
+                    var startTime = DateTime.Now - TimeSpan.FromHours(4);
+                    var info = logContext.ProcessInfos.Where(p => p.ComputerName == station.ComputerName
+                      && p.ProcessName == start && p.ExitTime == null && p.StartTime >= startTime)
+                    .FirstOrDefault();
+                    if (info == null)
+                    {
+                        info = new StationLogModels.ProcessInfo
+                        {
+                            ComputerName = station.ComputerName,
+                            ProcessName = start,
+                            StartTime = DateTime.Now,
+                        };
+                    }
+                    infos.Add(info);
+                }
+                logContext.ProcessInfos.AddRange(infos);
+                logContext.SaveChanges();
+                station.LoggedProcess.AddRange(starts);
+                infos.ForEach(i => station.RunningProcId.Add(i.ProcessName, i.Id));
             }
         }
 
@@ -201,6 +230,32 @@ namespace LogClient
             }
         }
 
+        /// <summary>
+        /// 获取已经运行主机的运行记录Id
+        /// </summary>
+        /// <param name="computerName">主机名称</param>
+        /// <returns></returns>
+        internal static long GetPowerOnLogId(string computerName, DateTime startTime)
+        {
+            using (StationLogContext logContext = new StationLogContext("stationLogContext"))
+            {
+                var log = logContext.PowerOnOffLogs.OrderByDescending(s => s.PowerOn)
+                    .FirstOrDefault(s => s.ComputerName == computerName && s.PowerOff == null);
+                if (log == null || startTime - log.PowerOn < TimeSpan.FromMinutes(1))
+                {
+                    log = new PowerOnOffLog
+                    {
+                        ComputerName = computerName,
+                        PowerOn = startTime,
+                    };
+                    logContext.PowerOnOffLogs.Add(log);
+                    logContext.SaveChanges();
+                }
+
+                return log.Id;
+            }
+        }
+
         internal static long SetMachineRunning(string computerName)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
@@ -221,7 +276,7 @@ namespace LogClient
                     powerOnLog = new PowerOnOffLog
                     {
                         ComputerName = computerName,
-                        PowerOn = DateTime.Now,
+                        PowerOn = station.PowerOnTime.Value,
                     };
                     logContext.PowerOnOffLogs.Add(powerOnLog);
                 }
@@ -232,14 +287,14 @@ namespace LogClient
             }
         }
 
-        internal static void WriteStopProcessInfo(ManageState stopedState)
+        internal static void WriteStopProcessInfo(ManageState stopedState, DateTime stopTime)
         {
             using (StationLogContext logContext = new StationLogContext("stationLogContext"))
             {
                 foreach (var proc in stopedState.RunningProcId)
                 {
                     var info = logContext.ProcessInfos.FirstOrDefault(p => p.Id == proc.Value);
-                    info.ExitTime = DateTime.Now;                    
+                    info.ExitTime = stopTime;
                 }
 
                 logContext.SaveChanges();

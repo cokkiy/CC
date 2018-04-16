@@ -87,7 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbWriter.cs" />
+    <Compile Include="DbReaderWriter.cs" />
     <Compile Include="generated\AppControlParameter.cs">
       <SliceCompileSource>SliceFiles\AppControlParameter.ice</SliceCompileSource>
     </Compile>
@@ -150,6 +150,10 @@
     <Compile Include="Migrations\201803220809329_AddPowerOnOffLog.Designer.cs">
       <DependentUpon>201803220809329_AddPowerOnOffLog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803301020519_AddIndextToProcessInfo.cs" />
+    <Compile Include="Migrations\201803301020519_AddIndextToProcessInfo.Designer.cs">
+      <DependentUpon>201803301020519_AddIndextToProcessInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -157,6 +161,7 @@
     <Compile Include="StationRunningState.cs" />
     <Compile Include="StationStateReceiver.cs" />
     <Compile Include="StationSystemState.cs" />
+    <Compile Include="SystemProcessChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -191,6 +196,9 @@
     <Content Include="docs\MySqlParameterCollection.xml" />
     <Content Include="docs\MySqlTransaction.xml" />
     <Content Include="logclient.ico" />
+    <Content Include="SysProcess.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201803130834082_UpdateStationState.resx">
@@ -219,6 +227,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803220809329_AddPowerOnOffLog.resx">
       <DependentUpon>201803220809329_AddPowerOnOffLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803301020519_AddIndextToProcessInfo.resx">
+      <DependentUpon>201803301020519_AddIndextToProcessInfo.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

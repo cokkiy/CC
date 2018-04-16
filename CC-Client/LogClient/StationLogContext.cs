@@ -29,6 +29,7 @@ namespace LogClient
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<RunningState>().HasIndex(r => r.RecordTime);
             modelBuilder.Entity<ProcessInfo>().HasIndex(p => p.StartTime);
+            modelBuilder.Entity<ProcessInfo>().HasIndex(p => new { p.ComputerName, p.ProcessName });
             modelBuilder.Entity<NetStatistic>().HasIndex(n => n.RecordTime);
             modelBuilder.Entity<IFStatistic>().HasIndex(s => s.RecordTime);
             modelBuilder.Entity<PowerOnOffLog>().HasIndex(s => s.ComputerName);

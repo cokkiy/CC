@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CC;
 
 namespace LogClient
 {
@@ -41,23 +42,19 @@ namespace LogClient
         public DateTime StartTime { get; set; }
 
         /// <summary>
-        /// 运行的进程
+        /// 初始运行的进程
         /// </summary>
-        public List<string> RunningProcesses { get; set; }
+        public List<string> InitRunningProcesses { get; set; }
+
+        /// <summary>
+        /// 记录的已开始运行进程
+        /// </summary>
+        public List<string> LoggedProcess { get; set; }
 
         /// <summary>
         /// 最后一次检查进程信息时间
         /// </summary>
         public DateTime LastCheckProcessTime { get; set; }
-
-
-        public int ProcessCount
-        {
-            get
-            {
-                return IsLinux ? RunningProcesses.Count : RunningProcesses.Count + 1;
-            }
-        }
 
         /// <summary>
         /// 开关机记录Id
@@ -69,12 +66,15 @@ namespace LogClient
         /// </summary>
         public bool IsLinux { get; internal set; }
 
+        public IControllerPrx Controller { get; internal set; }
+
         //运行进程数据库Id
         public Dictionary<string, long> RunningProcId = new Dictionary<string, long>();
 
         public ManageState()
         {
             PowerOnLogId = -1;
+            LoggedProcess = new List<string>();
         }
     }
 }
