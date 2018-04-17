@@ -246,3 +246,10 @@ qttools.pro.user.*
 
 # VSCode
 .vscode/
+
+# LogViewerWeb
+
+/CC-Client/LogViewerWeb/client-src/app/**/*.js
+/CC-Client/LogViewerWeb/client-src/app/**/*.js.map
+/CC-Client/LogViewerWeb/log
+/CC-Client/LogViewerWeb/wwwroot

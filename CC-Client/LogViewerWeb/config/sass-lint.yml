@@ -1,0 +1,7 @@
+options:
+    merge-default-rules:true
+rules:
+    indentation:
+      - 4
+      -
+        size: 4

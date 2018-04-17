@@ -1,0 +1,34 @@
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a routerLink="/">仪表盘</a>
+    </li>
+    <li class="breadcrumb-item active">运行统计</li>
+</ol>
+
+<div class="card mb-3">
+    <div class="card-header d-flex">
+        <div>
+            <i class="fa fa-area-chart"></i> 工作站运行统计 </div>
+    </div>
+    <div class="card-body">
+            <StationRunningStatistic [showCtrl]="true"></StationRunningStatistic>
+    </div>
+    <div class="card-footer small text-muted">
+        <i class="fa fa-refresh refresh-app-bar" id="refreshAppTimeBarChart" aria-hidden="true" (click)="refreshAppTimeBarChart()"></i>
+        <label for="refreshAppTimeBarChart">手动更新</label>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex">
+        <div>
+            <i class="fa fa-area-chart"></i> 工作站运行统计</div>
+    </div>
+    <div class="card-body">
+            <StationRunningStatistic [showCtrl]="true" [dinstict]="false"></StationRunningStatistic>
+    </div>
+    <div class="card-footer small text-muted">
+        <i class="fa fa-refresh refresh-app-bar" id="refreshAppTimeBarChart" aria-hidden="true" (click)="refreshAppTimeBarChart()"></i>
+        <label for="refreshAppTimeBarChart">手动更新</label>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+﻿#
+# The server creates a multi-cast object adapter with the name
+# "StateReceiver". The following line sets the endpoints for this adapter.
+# Multicast address between 233.0.0.0 to 239.255.255.255
+StateReceiver.Endpoints=udp -h 224.100.0.1 -p 12345 --interface 11.98.3.193
+
+#
+# The client station create a controller endpoint
+# We use this endpoints to control it
+#Controller.Port=10000
+
+#
+# Alternative IPv6 configuration
+#
+#Ice.IPv6=1
+#StateReceiver.Endpoints=udp -h "ff15::1:1" -p 10000
+
+
+#
+# Warn about connection exceptions
+#
+Ice.Warn.Connections=1
+
+#
+# Network Tracing
+#
+# 0 = no network tracing
+# 1 = trace connection establishment and closure
+# 2 = like 1, but more detailed
+# 3 = like 2, but also trace data transfer
+#
+#Ice.Trace.Network=1
+
+#
+# Protocol Tracing
+#
+# 0 = no protocol tracing
+# 1 = trace protocol messages
+#
+#Ice.Trace.Protocol=1
+
+# Control Client
+#Close connection 
+Ice.ACM.Client.Close=1 # CloseOnIdle
+Ice.ACM.Server.Close=0
+# No heat beat ping
+Ice.ACM.Heartbeat=0
+# time out 30
+Ice.ACM.Client.Timeout=30

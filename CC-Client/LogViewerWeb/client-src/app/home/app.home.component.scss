@@ -1,0 +1,25 @@
+﻿$green: #28a745 !default;
+div {
+    .runningStationPieChart {
+        height: 300px;
+        width: 100%;
+    }
+    
+    .appRunningTimeBarChart {
+        // height:250px;
+        widows: 100%;
+    }
+}
+
+i {
+    .refresh-app-bar {
+        cursor: pointer;
+    }
+}
+
+
+td {
+    .green {
+        color: $green;
+    }
+}

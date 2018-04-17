@@ -5,7 +5,7 @@ module CC
 	["cpp:type:std::list<std::string>"]	
     sequence<string> StringList;
 
-	///Íø¿¨ĞÅÏ¢
+	///ç½‘å¡ä¿¡æ¯
 	struct NetworkInterfaceInfo
 	{
 		string Id;
@@ -17,12 +17,12 @@ module CC
 		string DNSSuffix;
 		bool DNSEnbled;
 		bool DynamicDNS;
-		//IP µØÖ·
+		//IP åœ°å€
 		StringList IPAddresses;	
-		// ×é²¥µØÖ·
+		// ç»„æ’­åœ°å€
 		StringList MulticastAddresses;
 
-		//DHCP ·şÎñÆ÷
+		//DHCP æœåŠ¡å™¨
 		StringList DhcpServers;
 	};
 
@@ -41,13 +41,13 @@ module CC
 		int Port;
 	};
 
-	//Íø¿¨Á÷Á¿Í³¼ÆĞÅÏ¢
+	//ç½‘å¡æµé‡ç»Ÿè®¡ä¿¡æ¯
 	struct InterfaceStatistics
 	{
 		//bool HasValue;
-		//Íø¿¨Ãû³Æ
+		//ç½‘å¡åç§°
 		string IfName;
-		// ½ÓÊÕ·¢ËÍÁ÷Á¿ĞÅÏ¢
+		// æ¥æ”¶å‘é€æµé‡ä¿¡æ¯
 		float BytesReceivedPerSec;
 		float BytesSentedPerSec;
 		float TotalBytesPerSec;
@@ -56,7 +56,7 @@ module CC
 		long BytesSented;
 		long BytesTotal;
 
-		// ½ÓÊÕ·¢ËÍ°üĞÅÏ¢
+		// æ¥æ”¶å‘é€åŒ…ä¿¡æ¯
 		long UnicastPacketReceived;
 		long UnicastPacketSented;
 		long MulticastPacketReceived;
@@ -66,18 +66,18 @@ module CC
 	["cpp:type:std::list<CC::InterfaceStatistics>"]
 	sequence<CC::InterfaceStatistics> InterfacesStatistics;
 
-	//Í³¼ÆĞÅÏ¢
+	//ç»Ÿè®¡ä¿¡æ¯
 	struct Statistics
 	{
 	    string StationId;
-		// UDPĞÅÏ¢
+		// UDPä¿¡æ¯
 		long DatagramsReceived;
 		long DatagramsSent;
 		long DatagramsDiscarded;
 		long DatagramsWithErrors;
 		int UDPListeners;
 
-		//TCPĞÅÏ¢
+		//TCPä¿¡æ¯
 		long SegmentsReceived;
 		long SegmentsSent;
 		long ErrorsReceived;

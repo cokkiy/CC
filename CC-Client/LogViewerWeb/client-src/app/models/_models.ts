@@ -1,0 +1,15 @@
+﻿///<reference path='./AppRunningStatistic.ts'/>
+///<reference path='./AppRunningTime.ts'/>
+///<reference path='./IFStatistic.ts'/>
+///<reference path='./NetStatistic.ts'/>
+///<reference path='./PowerOnOffLog.ts'/>
+///<reference path='./ProcessInfo.ts'/>
+///<reference path='./ProcessStartAndExitMessage.ts'/>
+///<reference path='./RunningAndTotalCount.ts'/>
+///<reference path='./RunningState.ts'/>
+///<reference path='./Station.ts'/>
+///<reference path='./StationNI.ts'/>
+///<reference path='./StationRunningStatistic.ts'/>
+///<reference path='./StationState.ts'/>
+///<reference path='./StationViewModel.ts'/>
+///<reference path='./TextValuePair.ts'/>

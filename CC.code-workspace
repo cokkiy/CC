@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "CC-Client\\LogViewerWeb",				
+		},		
+	],
+	
+	
+	"settings": {
+		"files.exclude":{
+			
+			"**/*.js":{"when":"$(basename).ts"},
+			"**/*.js.map":true,
+			"bin":true,
+			"obj":true,
+			"*.csproj.user":true
+		}	
+	}
+}

@@ -1,0 +1,28 @@
+<div echarts [options]="defaultOption" (chartInit)="onStationChartInit($event)" (chartClick)="onChartClick($event)" class="StationChart"
+    id="StationChart">
+</div>
+<div class="inline center" *ngIf="showCtrl">
+    <label for="begin-picker">开始时间：</label>
+    <div>
+        <ng-datepicker [(ngModel)]="begin" id="begin-picker" [options]="datapicker_options"></ng-datepicker>
+    </div>
+    <label for="end-picker">结束时间：</label>
+    <div>
+        <ng-datepicker [(ngModel)]="end" id="end-picker" [options]="datapicker_options"></ng-datepicker>
+    </div>
+    <label for="type-select">统计时间：</label>
+    <div>
+        <select id="type-select" [(ngModel)]="type">
+            <option *ngFor="let option of typeOptions" value="{{option.value}}">{{option.text}}</option>
+        </select>
+    </div>
+
+    <div>
+        <input id="distinct-checkout" type="checkbox" [(ngModel)]="dinstict">
+
+        <label for="distinct-checkout">重复开关机只统计一次</label>
+    </div>
+    <div>
+        <a name="" id="" class="btn btn-sm btn-light" (click)="update()" role="button">更新</a>
+    </div>
+</div>
