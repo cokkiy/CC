@@ -38,7 +38,8 @@
 #include "weatherimageoptiondlg.h"
 #include "ProgressBarDelegate.h"
 #include "upgradestationservicedlg.h"
-
+#include <QMenu>
+#include <QSignalMapper>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -47,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_NoMousePropagation);
+
+	createClearPageSubSystemSelectMenu();
+
     //设置CPU和内存使用记录样式
     QwtPlot* cpuPlot = ui->qwtPlotCPU;
     setPlotStyle(cpuPlot, QStringLiteral("CPU使用情况 [%]"));
@@ -1192,9 +1196,18 @@ void MainWindow::on_actionUpgradeAppProxy_triggered()
 void MainWindow::on_clearPagePushButton_clicked()
 {
     QModelIndexList selectedIndexs = getSelectedIndexs();
+	int subSystem = ui->clearPagePushButton->property("SubSystem").toInt();
     //创建工作站管理类
     StationManager* manager = new StationManager(pStationList, selectedIndexs);
-    manager->clearPage();
+    manager->clearPage(subSystem);
+}
+
+void MainWindow::changeClearPageSubSystem(QAction* action)
+{
+	ui->clearPagePushButton->setText(QStringLiteral("清\"%1\"").arg(action->text()));
+	ui->clearPagePushButton->setToolTip(QStringLiteral("清除选定工作站\"%1\"").arg(action->text()));
+	ui->clearPagePushButton->setStatusTip(QStringLiteral("清除选定工作站\"%1\"").arg(action->text()));
+	ui->clearPagePushButton->setProperty("SubSystem", action->property("SubSystem"));
 }
 
 //全屏
@@ -1478,6 +1491,44 @@ double MainWindow::findMax(double datas[])
     }
 
     return max;
+}
+
+void MainWindow::createClearPageSubSystemSelectMenu()
+{
+	QMenu* clearPageSystemMenu = new QMenu(this);
+	QAction* f1Action = new QAction(clearPageSystemMenu);
+	f1Action->setText(QStringLiteral("所有画面"));
+	QAction* f2Action = new QAction(clearPageSystemMenu);
+	f2Action->setText(QStringLiteral("C3I画面"));
+	QAction* f3Action = new QAction(clearPageSystemMenu);
+	f3Action->setText(QStringLiteral("东风画面"));
+	QAction* f4Action = new QAction(clearPageSystemMenu);
+	f4Action->setText(QStringLiteral("库尔勒画面"));
+	QAction* f5Action = new QAction(clearPageSystemMenu);
+	f5Action->setText(QStringLiteral("自定义画面1（F5）"));
+	QAction* f6Action = new QAction(clearPageSystemMenu);
+	f6Action->setText(QStringLiteral("自定义画面2（F6）"));
+	QAction* f7Action = new QAction(clearPageSystemMenu);
+	f7Action->setText(QStringLiteral("自定义画面3（F7）"));
+	QAction* f8Action = new QAction(clearPageSystemMenu);
+	f8Action->setText(QStringLiteral("自定义画面4（F8）"));
+
+	QAction* actions[] = { f1Action, f2Action, f3Action, f4Action, f5Action, f6Action, f7Action, f8Action };
+	QActionGroup* actionGroup = new QActionGroup(this);
+	for (int i = 0; i < 8; i++)
+	{
+		actionGroup->addAction(actions[i]);
+		actions[i]->setCheckable(true);
+		actions[i]->setProperty("SubSystem", i);
+		clearPageSystemMenu->addAction(actions[i]);
+	}
+	connect(actionGroup, &QActionGroup::triggered, this, &MainWindow::changeClearPageSubSystem);
+	f1Action->setChecked(true);
+	ui->clearPagePushButton->setText(QStringLiteral("清\"所有画面\""));
+	ui->clearPagePushButton->setToolTip(QStringLiteral("清除选定工作站\"所有画面\""));
+	ui->clearPagePushButton->setStatusTip(QStringLiteral("清除选定工作站\"所有画面\""));
+	ui->clearPagePushButton->setProperty("SubSystem", f1Action->property("SubSystem"));
+	ui->clearPageSelectButton->setMenu(clearPageSystemMenu);
 }
 
 //加载工作站信息

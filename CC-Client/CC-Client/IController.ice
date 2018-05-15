@@ -67,8 +67,12 @@ module CC
 		RealtimeMode,
 		ClearPage,
 		NextPage,
-		PrevPage,	
-		Exit = 9	
+		PrevPage,
+		SpecfiedPage,
+		GetCurentPage,
+		ClearSubSysPage,
+		Exit = 9,
+		OpenSpecifiedPage
 	};
 
 	//气象云图下载选项
@@ -149,6 +153,9 @@ module CC
 
 		//打开指定画面
 		void openSpecPage(int pageNum);
+
+		//发送远程控制命令
+		void sendRemoteCtrlCommand(int cmdCode, ByteArray ctrlParams);
 
 		//获取中控服务安装绝对路径
 		string getServicePath();

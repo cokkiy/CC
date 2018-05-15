@@ -145,6 +145,8 @@ public:
 
 	//清屏
 	void on_clearPagePushButton_clicked();
+	//清屏选择菜单被点击
+	void changeClearPageSubSystem(QAction* action);
 	//全屏
 	void on_fullDcreenPushButton_clicked();
 	//实时模式
@@ -271,6 +273,10 @@ private:
 	//创建网络流量曲线
 	void CreateNetCurver();
 	double findMax(double datas[]);
+
+	//创建选择清屏分系统菜单
+	void createClearPageSubSystemSelectMenu();
+
 	// 定时器Id
 	int  timerId = 0;
 

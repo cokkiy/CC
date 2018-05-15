@@ -203,6 +203,15 @@ public:
 	创建时间:2016/5/6 8:38:22
 	*/
 	void clearPage();
+
+	/*!
+	选定工作站清指定系统屏
+	@return void
+	作者：cokkiy（张立民）
+	创建时间:2018/5/11 11：26 
+	*/
+	void clearPage(int subSystem);
+
 	/*!
 	选定工作站全屏
 	@return void

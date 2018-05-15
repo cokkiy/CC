@@ -544,5 +544,24 @@ namespace CC_StationService
                 Port = e.Port
             }).ToList();
         }
+
+        public override void sendRemoteCtrlCommand(int cmdCode, byte[] ctrlParams, Current current__)
+        {
+            UdpClient client = new UdpClient(AddressFamily.InterNetwork);
+            System.Net.IPEndPoint receiver = new System.Net.IPEndPoint(IPAddress.Loopback, 9008);
+            byte[] cmdData = new byte[512];
+            Array.Copy(BitConverter.GetBytes(cmdCode), cmdData, sizeof(int));
+            int remain = cmdData.Length - sizeof(int);
+            Array.Copy(ctrlParams, 0, cmdData, 4, ctrlParams.Length <= remain ? ctrlParams.Length : remain);
+            try
+            {
+                client.Send(cmdData, 512, receiver);
+                client.Close();
+            }
+            catch (System.Exception ex)
+            {
+                PlatformMethodFactory.GetLogger().error(string.Format("发送指显控制命令失败，命令{0},错误详细内容：{1}", cmdCode, ex.ToString()));
+            }
+        }
     }
 }
