@@ -49,12 +49,12 @@ void UpgradePrepareThread::run()
 			}
 			catch (...)
 			{
-				emit onFail(s, QStringLiteral("»ñÈ¡¶Ô·½ĞÅÏ¢Ê§°Ü£¬¼ì²éÍøÂçÁ¬½Ó²¢È·ÈÏÖĞ¿Ø·şÎñÕı³£ÔËĞĞ¡£"));
+				emit onFail(s, QStringLiteral("è·å–å¯¹æ–¹ä¿¡æ¯å¤±è´¥ï¼Œæ£€æŸ¥ç½‘ç»œè¿æ¥å¹¶ç¡®è®¤ä¸­æ§æœåŠ¡æ­£å¸¸è¿è¡Œã€‚"));
 			}
 		}
 		else
 		{
-			emit onFail(s, QStringLiteral("Î´Á¬½Ó£¬¶Ô·½Î´¿ª»ú»òÍøÂç²»Í¬¡£"));
+			emit onFail(s, QStringLiteral("æœªè¿æ¥ï¼Œå¯¹æ–¹æœªå¼€æœºæˆ–ç½‘ç»œä¸åŒã€‚"));
 		}
 	}
 }

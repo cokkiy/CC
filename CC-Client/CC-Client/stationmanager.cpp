@@ -195,6 +195,30 @@ void StationManager::clearPage()
 	}
 }
 
+void StationManager::clearPage(int subSystem)
+{
+	byte buf[512];
+	memset(buf, 0, 508);
+	memcpy(buf, &subSystem, sizeof(int));
+	std::vector<byte> params(buf, buf + 508);
+	for (auto index : stationIndexs)
+	{
+		if (index.column() == 0)
+		{
+			StationInfo* s = pStations->atCurrent(index.row());
+			if (s->controlProxy != NULL)
+			{
+				s->controlProxy->begin_sendRemoteCtrlCommand(ClearSubSysPage, params,
+					[]() {},
+					[](const Ice::Exception& ex)
+				{
+					auto w = ex.what();
+				});
+			}
+		}
+	}
+}
+
 void StationManager::fullScreen()
 {
 	for (auto index : stationIndexs)

@@ -67,8 +67,12 @@ module CC
 		RealtimeMode,
 		ClearPage,
 		NextPage,
-		PrevPage,	
-		Exit=9
+		PrevPage,
+		SpecfiedPage,
+		GetCurentPage,
+		ClearSubSysPage,
+		Exit = 9,
+		OpenSpecifiedPage
 	};
 
 	//气象云图下载选项
@@ -146,6 +150,9 @@ module CC
 
 		//切换指显显示模式
 		void switchDisplayPageAndMode(DisplayCommand cmd);
+
+		//发送远程控制命令
+		void sendRemoteCtrlCommand(int cmdCode, ByteArray ctrlParams);
 
 		//打开指定画面
 		void openSpecPage(int pageNum);

@@ -306,7 +306,7 @@
              <property name="styleSheet">
               <string notr="true"/>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
                <spacer name="horizontalSpacer_3">
                 <property name="orientation">
@@ -321,23 +321,52 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="clearPagePushButton">
-                <property name="toolTip">
-                 <string>清除选定工作站指显画面</string>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="spacing">
+                 <number>0</number>
                 </property>
-                <property name="statusTip">
-                 <string>清除选定工作站指显画面（Ctrl+Shift+C）</string>
-                </property>
-                <property name="whatsThis">
-                 <string>清除选定工作站指显画面</string>
-                </property>
-                <property name="text">
-                 <string>清屏(&amp;C)</string>
-                </property>
-                <property name="shortcut">
-                 <string>Ctrl+Shift+C</string>
-                </property>
-               </widget>
+                <item>
+                 <widget class="QPushButton" name="clearPagePushButton">
+                  <property name="toolTip">
+                   <string>清除选定工作站指显画面</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>清除选定工作站指显画面（Ctrl+Shift+C）</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string>清除选定工作站指显画面</string>
+                  </property>
+                  <property name="text">
+                   <string>清屏(&amp;C)</string>
+                  </property>
+                  <property name="shortcut">
+                   <string>Ctrl+Shift+C</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="clearPageSelectButton">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::NoContextMenu</enum>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QPushButton" name="fullDcreenPushButton">
