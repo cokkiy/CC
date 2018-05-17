@@ -1,4 +1,4 @@
-﻿#include "filebrowserdialog.h"
+#include "filebrowserdialog.h"
 #include "ui_filebrowserdialog.h"
 #include "StationInfo.h"
 #include <QDir>

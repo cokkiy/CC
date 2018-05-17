@@ -1,4 +1,4 @@
-﻿#include "editstationdialog.h"
+#include "editstationdialog.h"
 #include "ui_editstationdialog.h"
 #include <QMessageBox>
 #include "filebrowserdialog.h"

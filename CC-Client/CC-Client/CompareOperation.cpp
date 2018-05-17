@@ -1,4 +1,4 @@
-﻿#include "CompareOperation.h"
+#include "CompareOperation.h"
 #include <QObject>
 /*!
 创建一个比较操作CompareOperation的实例
