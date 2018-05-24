@@ -1,6 +1,8 @@
 ﻿using CC;
+using NIStatusDetectors;
 using System;
 using System.ServiceProcess;
+using System.Text.RegularExpressions;
 
 namespace CC_StationService
 {
@@ -11,16 +13,22 @@ namespace CC_StationService
     {
         //ice communicator
         private Ice.Communicator ic = null;
+        private Ice.ObjectAdapter controlAdapter;
+
         /// <summary>
         /// 系统监视
         /// </summary>
         private SystemWatcher watcher = null;
 
+        //是否已经启动
+        private bool isStarted = false;
+
         /// <summary>
         /// 日志记录器
         /// </summary>
         Ice.Logger logger = PlatformMethodFactory.GetLogger();
-
+        private NIStatusDetector detector;
+        private Ice.InitializationData initData;
 
         public StationMonitorService()
         {
@@ -32,16 +40,47 @@ namespace CC_StationService
             try
             {
                 //设置工作目录为程序所在目录
-                System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
-                //初始化ICE 通信对象
-                Ice.InitializationData initData = new Ice.InitializationData();
-                initData.properties = Ice.Util.createProperties();
-                initData.properties.load("Config.Client");
-                initData.logger = logger;
-                ic = Ice.Util.initialize(initData);
+                System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);                
+                
+                //开始监控
+                Start();
 
+            }
+            catch (System.Exception ex)
+            {
+                logger.error(ex.ToString());
+            }
+        }
+
+        internal void Start()
+        {
+            //初始化ICE 通信对象
+            initData = new Ice.InitializationData();
+            initData.properties = Ice.Util.createProperties();
+            initData.properties.load("Config.Client");
+            initData.logger = logger;
+            
+            string value=initData.properties.getProperty("StateReceiver.Proxy");
+            var match = Regex.Match(value, @"--sourceAddress\s(?<IP>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
+            if (match.Success)
+            {
+                var ip = match.Groups["IP"].Value;
+                detector = new NIStatusDetector(ip);
+                detector.NIStateChanged += Detector_NIStateChanged;
+                // 开始状态检测
+                detector.Start();
+
+                logger.print("监控服务启动...");
+            }                      
+        }
+
+        private void Detector_NIStateChanged(object sender, NIStateChangedEventArgs e)
+        {
+            if (e.IsUp && !isStarted)
+            {
+                ic = Ice.Util.initialize(initData);
                 //创建控制适配器和对象
-                Ice.ObjectAdapter controlAdapter = ic.createObjectAdapter("Controller");
+                controlAdapter = ic.createObjectAdapter("Controller");
                 ControllerImp controllerServant = new ControllerImp(ic);
                 //将控制服务加入适配器并创建控制服务的本地代理
                 Ice.ObjectPrx objectPrx = controlAdapter.add(controllerServant, ic.stringToIdentity("StationController"));
@@ -69,16 +108,50 @@ namespace CC_StationService
                 WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
                 downloader.Logger = logger;
                 downloader.Option = LoadFromSetting();
-                               
+
                 if (!downloader.IsRunning)
                 {
                     downloader.Start();
                 }
 
+                isStarted = true;
             }
-            catch (Exception ex)
+            else
             {
-                logger.error(ex.ToString());
+                StopMC();
+            }
+        }
+
+        //停止监控
+        private void StopMC()
+        {
+            if (isStarted)
+            {                
+                controlAdapter.destroy();
+                //停止监视系统
+                watcher.StopWatching();
+                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
+                if (downloader.IsRunning)
+                {
+                    downloader.Stop();
+                }
+
+                if (ic != null)
+                {
+                    //clean up
+                    try
+                    {
+                        ic.destroy();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                isStarted = false;
+
+                logger.print("监控已停止。");
             }
         }
 
@@ -111,8 +184,9 @@ namespace CC_StationService
 
         protected override void OnPause()
         {
-            //停止监视系统
-            watcher.StopWatching();
+            detector.NIStateChanged -= Detector_NIStateChanged;
+            detector.Stop();
+            StopMC();
             base.OnPause();
             logger.print("服务已暂停.");
         }
@@ -120,32 +194,15 @@ namespace CC_StationService
         protected override void OnContinue()
         {
             base.OnContinue();
-            //开始监视
-            watcher.StartWatching();
+            Start();
             logger.print("服务继续...");
         }
 
         protected override void OnStop()
         {
-            //停止下载气象云图
-            WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-            downloader.Stop();
-            //停止监视系统
-            watcher.StopWatching();
-            //释放通信资源
-            if (ic != null)
-            {
-                //clean up
-                try
-                {
-                    ic.destroy();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-
+            detector.NIStateChanged -= Detector_NIStateChanged;
+            detector.Stop();
+            StopMC();
             logger.print("服务已停止.");
         }
       
