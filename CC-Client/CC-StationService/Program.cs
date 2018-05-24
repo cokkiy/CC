@@ -42,6 +42,13 @@ namespace CC_StationService
                             Console.WriteLine(serviceVersion.ToString());
                         }
                         break;
+                    case "-d":
+                    case "-debug":
+                        {
+                            var debugService = new StationMonitorService();
+                            debugService.Start();
+                        }
+                        break;
                     default:
                         Console.WriteLine("Usage: CC-StationService.exe -i or -install to install this service.");
                         Console.WriteLine("            CC-StationService.exe -u or -uninstall to uninstall this service.");
@@ -50,14 +57,13 @@ namespace CC_StationService
             }
             else
             {
-                ServiceBase[] ServicesToRun;
-                ServicesToRun = new ServiceBase[]
+                ServiceBase[] ServicesToRun = new ServiceBase[]
                 {
-                new StationMonitorService()
+                    new StationMonitorService()
                 };
                 ServiceBase.Run(ServicesToRun);
             }
-            
+
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
