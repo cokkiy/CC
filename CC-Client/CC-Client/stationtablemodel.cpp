@@ -1,4 +1,4 @@
-﻿#include "stationtablemodel.h"
+#include "stationtablemodel.h"
 #include <QIcon>
 #include <QProgressBar>
 #include "QBrush"
@@ -90,7 +90,7 @@ QVariant StationTableModel::data(const QModelIndex &index, int role /*= Qt::Disp
         }
         else
         {
-            return Qt::AlignLeft | Qt::AlignBottom;
+            return 0x41; //Qt::AlignLeft | Qt::AlignBottom;
         }
     }
 

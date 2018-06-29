@@ -72,8 +72,11 @@ SOURCES += main.cpp\
     updatemanager.cpp \
     qpagenumdialog.cpp \
     weatherimageoptiondlg.cpp \
-	viewlogdialog.cpp\
-	ProgressBarDelegate.cpp
+    viewlogdialog.cpp\
+    ProgressBarDelegate.cpp \
+    upgradestationservicedlg.cpp \
+    FileVersion.cpp \
+    upgradepreparethread.cpp
 
 HEADERS  += mainwindow.h \
     cpuplot/counterpiemarker.h \
@@ -119,8 +122,11 @@ HEADERS  += mainwindow.h \
     updatemanager.h \
     qpagenumdialog.h \
     weatherimageoptiondlg.h \
-	viewlogdialog.h \
-	ProgressBarDelegate.h
+    viewlogdialog.h \
+    ProgressBarDelegate.h\
+    upgradestationservicedlg.h \
+    FileVersion.h \
+    upgradepreparethread.h
 
 FORMS    += mainwindow.ui \
     defaultappprocdialog.ui \
@@ -139,7 +145,8 @@ FORMS    += mainwindow.ui \
     aboutdialog.ui \
     qpagenumdialog.ui \
     weatherimageoptiondlg.ui \
-	viewlogdialog.ui
+    viewlogdialog.ui \
+    upgradestationservicedlg.ui
 
 RESOURCES += \
     cc-client.qrc

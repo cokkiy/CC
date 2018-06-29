@@ -1,4 +1,4 @@
-﻿#ifndef DEFAULTAPPPROCDIALOG_H
+#ifndef DEFAULTAPPPROCDIALOG_H
 #define DEFAULTAPPPROCDIALOG_H
 
 #include <QDialog>
@@ -18,7 +18,7 @@ public:
     作者：cokkiy（张立民)
     创建时间：2015/12/04 12:18:06
     */
-    DefaultAppProcDialog(Option& option,QString& title=QStringLiteral("设置新建工作站默认远程启动应用和监视进程"), QWidget *parent = 0);
+    DefaultAppProcDialog(Option& option,QString title=QStringLiteral("设置新建工作站默认远程启动应用和监视进程"), QWidget *parent = 0);
     ~DefaultAppProcDialog();
 
     private slots:
