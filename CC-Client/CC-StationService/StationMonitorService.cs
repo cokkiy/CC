@@ -118,6 +118,7 @@ namespace CC_StationService
             }
             else
             {
+                Console.WriteLine("检测到网卡停止工作,监控将停止。");
                 StopMC();
             }
         }

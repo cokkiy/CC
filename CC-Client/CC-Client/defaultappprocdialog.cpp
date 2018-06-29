@@ -1,10 +1,10 @@
-﻿#include "defaultappprocdialog.h"
+#include "defaultappprocdialog.h"
 #include "ui_defaultappprocdialog.h"
 #include <QMessageBox>
 #include <tuple>
 using namespace std;
 
-DefaultAppProcDialog::DefaultAppProcDialog(Option& option, QString& title, QWidget *parent)
+DefaultAppProcDialog::DefaultAppProcDialog(Option& option, QString title, QWidget *parent)
     : QDialog(parent)
 {
     ui = new Ui::DefaultAppProcDialog();
