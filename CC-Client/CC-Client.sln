@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogViewerWeb", "LogViewerWe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StationLogModel", "StationLogModel\StationLogModel.csproj", "{94737F04-0063-457D-8693-F77E21638C81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCMonitor", "CCMonitor\CCMonitor.csproj", "{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +144,18 @@ Global
 		{94737F04-0063-457D-8693-F77E21638C81}.Release|x64.Build.0 = Release|Any CPU
 		{94737F04-0063-457D-8693-F77E21638C81}.Release|x86.ActiveCfg = Release|Any CPU
 		{94737F04-0063-457D-8693-F77E21638C81}.Release|x86.Build.0 = Release|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Debug|x64.Build.0 = Debug|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Debug|x86.Build.0 = Debug|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Release|x64.ActiveCfg = Release|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Release|x64.Build.0 = Release|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Release|x86.ActiveCfg = Release|Any CPU
+		{6E532A6B-CB40-4C91-BCF0-CB6964518EB2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
