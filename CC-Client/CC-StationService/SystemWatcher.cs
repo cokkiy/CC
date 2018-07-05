@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -129,6 +131,18 @@ namespace CC_StationService
                 {
                     try
                     {
+                        try
+                        {
+                            UdpClient pingClient = new UdpClient(AddressFamily.InterNetwork);
+                            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, 54321);
+                            var content = BitConverter.GetBytes(DateTime.Now.ToBinary());
+                            pingClient.Send(content, content.Length, remoteEP);
+                        }
+                        catch(Exception ex)
+                        {
+                            logger.error(ex.ToString());
+                            Console.Error.WriteLine(ex);
+                        }
                         if (receiverProxy != null)
                         {
                             //收集工作站运行状态
