@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit, NgZone, OnDestroy } from "@angular/core";
 import { Router, ActivatedRoute, Params } from "@angular/router";
-import { CookieService } from "ngx-cookie";
+// import { CookieService } from "ngx-cookie";
 import { ECharts, EChartOption } from "echarts";
 import { StationCommonService } from "../common/station.common.service";
 import { Observable } from "rxjs/Observable";
@@ -91,7 +91,7 @@ export class AppHomeComponent implements OnInit, OnDestroy {
     private zone: NgZone,
     private route: ActivatedRoute,
     private router: Router,
-    private cookieService: CookieService,
+    // private cookieService: CookieService,
     private stationCommonService: StationCommonService
   ) {
     this.StationRunningStatisticBegin = moment()

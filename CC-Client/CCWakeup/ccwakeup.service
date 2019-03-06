@@ -1,0 +1,13 @@
+[Unit]
+Description = 中控服务（CC-StationService）守护服务
+Requires=sysinit.target
+Wants=network.target
+After=network.target sysinit.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/sbin/ccservice/CCWakeup.out
+
