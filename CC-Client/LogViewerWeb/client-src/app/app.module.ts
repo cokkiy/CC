@@ -17,7 +17,7 @@ import { PageNotFoundComponent } from "./common/pagenotfound.component";
 import { httpFactory } from "./common/http.factory";
 import { Router } from "@angular/router";
 import { AuthService } from "./security/auth.service";
-import { CookieModule } from "ngx-cookie";
+// import { CookieModule } from "ngx-cookie";
 import { NgxEchartsModule } from "ngx-echarts";
 import { MyCommonModule } from "./common/common.module";
 import { NgPipesModule } from "ngx-pipes";
@@ -34,7 +34,7 @@ import { StatModule } from "./stat/stat.module";
         JsonpModule,
         routing,
         NgxEchartsModule,
-        CookieModule.forRoot(),
+        // CookieModule.forRoot(),
         NgDatepickerModule,
         NgPipesModule,
         MyCommonModule,

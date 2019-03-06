@@ -749,6 +749,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
             {
                 dispatcher->stop();
             }
+			communicator->shutdown();
 			communicator -> destroy();
         }
         catch (const IceUtil::Exception&)
