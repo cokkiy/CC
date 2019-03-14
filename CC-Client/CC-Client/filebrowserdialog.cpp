@@ -131,7 +131,15 @@ void FileBrowserDialog::on_okPushButton_clicked()
 			{
 				if (!currentDir.endsWith("/") && !currentDir.endsWith("\\"))
 				{
-					currentDir = currentDir + "/";
+					int index = currentDir.indexOf(QRegExp("\\w:\\", Qt::CaseInsensitive));
+					if (index != -1)
+					{
+						currentDir = currentDir + "\\";
+					}
+					else
+					{
+						currentDir = currentDir + "/";
+					}
 				}
 				selectedPath = currentDir + items[0]->text();
 				
@@ -148,7 +156,16 @@ void FileBrowserDialog::on_okPushButton_clicked()
 			{
 				if (!currentDir.endsWith("/") && !currentDir.endsWith("\\"))
 				{
-					currentDir = currentDir + "/";
+					int index = currentDir.indexOf(QRegExp("\\w:\\\\", Qt::CaseInsensitive));
+					if (index != -1)
+					{
+						currentDir = currentDir + "\\";
+					}
+					else
+					{
+						currentDir = currentDir + "/";
+					}
+					
 				}
 				selectedPath = currentDir + items[0]->text();
 				this->accept();

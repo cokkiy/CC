@@ -434,12 +434,20 @@ QString StationInfo::toXmlString()
     xml += QStringLiteral("    <启动程序>\r\n");
     for (auto& app : getStartAppNames())
     {
+		QString appPath = QString::fromStdString(app.AppPath);
+		if (appPath.indexOf(QRegExp("\\w:\\\\", Qt::CaseInsensitive)) != -1)
+		{
+			// first replace double slash to signle slash
+			appPath = appPath.replace(QRegExp("\\\\\\\\"), "\\");
+			// then replace all the signle slash to double
+			appPath = appPath.replace(QRegExp("\\\\"), "\\\\");
+		}
         xml += QStringLiteral("      <程序>\r\n"
             "        <路径>%1</路径>\r\n"
             "        <参数>%2</参数>\r\n"
             "        <进程名>%3</进程名>\r\n"
             "        <允许多实例>%4</允许多实例>\r\n"
-            "     </程序>\r\n").arg(QString::fromStdString(app.AppPath))
+            "     </程序>\r\n").arg(appPath)
             .arg(QString::fromStdString(app.Arguments))
             .arg(QString::fromStdString(app.ProcessName))
             .arg(app.AllowMultiInstance);

@@ -108,7 +108,18 @@ namespace CC_StationService
                 runningState.process.Id = -1;
                 try
                 {
-                    System.Diagnostics.Process[] processes = System.Diagnostics.Process.GetProcessesByName(procName);
+                    List<System.Diagnostics.Process> processes = System.Diagnostics.Process.GetProcessesByName(procName).ToList();
+                    if(procName.EndsWith(".exe"))
+                    {
+                        procName = procName.Substring(0, procName.Length - 4);
+                        processes.AddRange(System.Diagnostics.Process.GetProcessesByName(procName));
+                    }
+                    else
+                    {
+                        procName = procName + ".exe";
+                        processes.AddRange(System.Diagnostics.Process.GetProcessesByName(procName));
+                    }
+                    
                     foreach (var process in processes)
                     {
                         runningState.process.Id = process.Id;
