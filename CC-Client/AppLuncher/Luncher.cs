@@ -101,7 +101,14 @@ namespace AppLuncher
                         //获取已经运行的进程信息
                         SysProcess[] running = SysProcess.GetProcessesByName(param.ProcessName);
                         //启动新的进程
-                        SysProcess process = SysProcess.Start(param.AppPath, param.Arguments);
+                        ProcessStartInfo processStart = new ProcessStartInfo
+                        {
+                            FileName = param.AppPath,
+                            Arguments = param.Arguments,
+                            WorkingDirectory = Path.GetDirectoryName(param.AppPath)
+                        };
+                        SysProcess process = SysProcess.Start(processStart);
+
                         System.Threading.Thread.Sleep(10);
                         //获取新的全部运行的进程信息
                         SysProcess[] newProcesses = SysProcess.GetProcessesByName(param.ProcessName);
@@ -190,7 +197,13 @@ namespace AppLuncher
                         try
                         {
                             //如果没有运行,则启动一个新的
-                            SysProcess process = SysProcess.Start(param.AppPath, param.Arguments);
+                            ProcessStartInfo processStart = new ProcessStartInfo
+                            {
+                                FileName=param.AppPath,
+                                Arguments=param.Arguments,
+                                WorkingDirectory=Path.GetDirectoryName(param.AppPath)
+                            };
+                            SysProcess process = SysProcess.Start(processStart);
                             System.Threading.Thread.Sleep(10);
                             SysProcess[] newProcesses = SysProcess.GetProcessesByName(param.ProcessName);
                             if (newProcesses.Length > 0)

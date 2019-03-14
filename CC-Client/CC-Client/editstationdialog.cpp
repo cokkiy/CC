@@ -122,7 +122,30 @@ void EditStationDialog::on_addStartAppPushButton_clicked()
     }
     if (ui->appProcNameLineEdit->text() == QStringLiteral(""))
     {
-        ui->appProcNameLineEdit->setText(ui->appNameLineEdit->text());
+		QString name = ui->appNameLineEdit->text();
+		int index = name.indexOf(QRegExp("\\w:\\\\", Qt::CaseInsensitive));
+		if (index != -1)
+		{
+			// win likes system
+			int pos = name.lastIndexOf(QRegExp("\\\\\\w+"));
+			if (pos != -1)
+			{
+				name = name.mid(pos + 1);
+				if (name.endsWith(".exe", Qt::CaseInsensitive))
+				{
+					name = name.mid(0, name.length() - 4);
+				}
+				ui->appProcNameLineEdit->setText(name);
+			}
+			else
+			{
+				ui->appProcNameLineEdit->setText(name);
+			}
+		}
+		else
+		{
+			ui->appProcNameLineEdit->setText(ui->appNameLineEdit->text());
+		}
     }
     int row = ui->startAppTableWidget->rowCount();
     ui->startAppTableWidget->setRowCount(row + 1);

@@ -1023,6 +1023,9 @@ void MainWindow::on_actionAddCtrlProgram_triggered()
 				}
 			}
 		}
+
+		//保存修改
+		pStationList->saveToFile(fileName);
 	}
 
 }
