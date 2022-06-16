@@ -448,37 +448,9 @@ namespace CC_StationService
         public override void setWeatherPictureDownloadOption(WeatherPictureDowlnloadOption option, Current current__)
         {
             if (string.IsNullOrWhiteSpace(option.Url) || option.Interval <= 0 || option.LastHours <= 0)
-                return;
-            DnsFix.AddHostToConfig(option.Url); // fix NeoLinux dns lookup bug
-            WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-            downloader.Option = option;
-            if (downloader.Option.Download && !downloader.IsRunning)
-            {
-                downloader.Start();
-            }
-            else if (!downloader.Option.Download && downloader.IsRunning)
-            {
-                downloader.Stop();
-            }
-            SaveToSetting(option);  
+                return;             
         }
 
-        //把气象云图下载设置保存到系统设置
-        private void SaveToSetting(WeatherPictureDowlnloadOption option)
-        {
-            Properties.Settings.Default.FtpUrl = option.Url;
-            Properties.Settings.Default.UserName = option.UserName;
-            Properties.Settings.Default.Password = option.Password;
-            Properties.Settings.Default.LastHours = option.LastHours;
-            Properties.Settings.Default.Interval = option.Interval;
-            Properties.Settings.Default.DeletePreviousFiles = option.DeletePreviousFiles;
-            Properties.Settings.Default.DeleteHowHoursAgo = option.DeleteHowHoursAgo;
-            Properties.Settings.Default.SubDirectory = option.SubDirectory;
-            Properties.Settings.Default.SavePathForLinux = option.SavePathForLinux;
-            Properties.Settings.Default.SavePathForWindows = option.SavePathForWindows;
-            Properties.Settings.Default.Download = option.Download;
-            Properties.Settings.Default.Save();
-        }
 
         public override List<NetworkInterfaceInfo> GetNetworkInterfaces(Current current__)
         {
@@ -547,8 +519,8 @@ namespace CC_StationService
 
         public override void sendRemoteCtrlCommand(int cmdCode, byte[] ctrlParams, Current current__)
         {
-            UdpClient client = new UdpClient(AddressFamily.InterNetwork);
-            System.Net.IPEndPoint receiver = new System.Net.IPEndPoint(IPAddress.Loopback, 9008);
+            UdpClient client = new(AddressFamily.InterNetwork);
+            IPEndPoint receiver = new(IPAddress.Loopback, 9008);
             byte[] cmdData = new byte[512];
             Array.Copy(BitConverter.GetBytes(cmdCode), cmdData, sizeof(int));
             int remain = cmdData.Length - sizeof(int);

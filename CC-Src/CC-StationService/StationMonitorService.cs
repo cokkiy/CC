@@ -102,17 +102,7 @@ namespace CC_StationService
 
                 //启动监视线程
                 watcher.StartWatching();
-                logger.print("开始系统资源监视...");
-
-                //启动气象云图下载线程
-                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-                downloader.Logger = logger;
-                downloader.Option = LoadFromSetting();
-
-                if (!downloader.IsRunning)
-                {
-                    downloader.Start();
-                }
+                logger.print("开始系统资源监视...");               
 
                 isStarted = true;
             }
@@ -130,12 +120,7 @@ namespace CC_StationService
             {                
                 controlAdapter.destroy();
                 //停止监视系统
-                watcher.StopWatching();
-                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-                if (downloader.IsRunning)
-                {
-                    downloader.Stop();
-                }
+                watcher.StopWatching();                
 
                 if (ic != null)
                 {
@@ -154,34 +139,7 @@ namespace CC_StationService
 
                 logger.print("监控已停止。");
             }
-        }
-
-        //从设置中加载气象云图下载选项
-        private WeatherPictureDowlnloadOption LoadFromSetting()
-        {
-            WeatherPictureDowlnloadOption option = new WeatherPictureDowlnloadOption();
-            try
-            {
-                Properties.Settings.Default.Load();
-                option.Url = Properties.Settings.Default.FtpUrl;
-                option.UserName = Properties.Settings.Default.UserName;
-                option.Password = Properties.Settings.Default.Password;
-                option.LastHours = Properties.Settings.Default.LastHours;
-                option.Interval = Properties.Settings.Default.Interval;
-                option.DeletePreviousFiles = Properties.Settings.Default.DeletePreviousFiles;
-                option.DeleteHowHoursAgo = Properties.Settings.Default.DeleteHowHoursAgo;
-                option.SubDirectory = Properties.Settings.Default.SubDirectory;
-                option.SavePathForLinux = Properties.Settings.Default.SavePathForLinux;
-                option.SavePathForWindows = Properties.Settings.Default.SavePathForWindows;
-                option.Download = Properties.Settings.Default.Download;
-            }
-            catch
-            {
-                option.Interval = 2;
-                option.Download = false;
-            }
-            return option;
-        }
+        }        
 
         protected override void OnPause()
         {

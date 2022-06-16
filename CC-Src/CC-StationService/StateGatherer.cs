@@ -62,7 +62,7 @@ namespace CC_StationService
             state.computerName = System.Environment.MachineName;
             state.osName = System.Environment.OSVersion.Platform.ToString();
             state.osVersion = System.Environment.OSVersion.Version.ToString();
-            state.downloadWeatherImage = WeartherImageDownloader.GetInstance().Option.Download;
+            state.downloadWeatherImage = false;
             state.stationId = stationId;
             return state;
         }
