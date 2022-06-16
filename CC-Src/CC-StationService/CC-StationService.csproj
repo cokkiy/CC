@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -10,11 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="core.system.configuration.install" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
     <PackageReference Include="serilog" Version="2.11.0" />
     <PackageReference Include="serilog.extensions.hosting" Version="4.2.0" />
     <PackageReference Include="serilog.sinks.console" Version="4.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="system.management" Version="6.0.0" />
+    <PackageReference Include="system.serviceprocess.servicecontroller" Version="6.0.0" />
     <PackageReference Include="zeroc.ice.net" Version="3.7.7" />
     <PackageReference Include="zeroc.icebuilder.msbuild" Version="5.0.9" />
   </ItemGroup>

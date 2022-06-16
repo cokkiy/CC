@@ -19,14 +19,6 @@ namespace CC_StationService
                 string parameter = string.Concat(args);
                 switch (parameter)
                 {
-                    case "-i":
-                    case "-install":
-                        ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
-                        break;
-                    case "-u":
-                    case "-uninstall":
-                        ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
-                        break;
                     case "-v":
                         {
                             string path = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -34,7 +26,7 @@ namespace CC_StationService
                             Console.WriteLine(serviceVersion.FileVersion.ToString());
                         }
                         break;
-                    case "-version":
+                    case "--version":
                         {
                             string path = System.AppDomain.CurrentDomain.BaseDirectory;
                             var serviceVersion = FileVersionInfo.GetVersionInfo(System.IO.Path.Combine(path, "CC-StationService.exe"));
@@ -42,14 +34,14 @@ namespace CC_StationService
                         }
                         break;
                     case "-d":
-                    case "-debug":
+                    case "--debug":
                         {
                             var debugService = new StationMonitorService();
                             debugService.Start();
                         }
                         break;
                     default:
-                        Console.WriteLine("Usage: CC-StationService.exe -i or -install to install this service.");
+                        Console.WriteLine("Usage: CC-StationService.exe -i or --install to install this service.");
                         Console.WriteLine("            CC-StationService.exe -u or -uninstall to uninstall this service.");
                         break;
                 }
