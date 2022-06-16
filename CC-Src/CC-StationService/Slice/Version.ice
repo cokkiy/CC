@@ -2,18 +2,18 @@
 //Center Control
 module CC
 {
-	///°æ±¾ĞÅÏ¢
+	///ç‰ˆæœ¬ä¿¡æ¯
 	struct Version
 	{
 		int Major;
 		int Minor;
 		int Build;
 		int Private;
-		//string±íÊ¾µÄ°æ±¾ºÅ£¬major number.minor number.build number.private part number
+		//stringè¡¨ç¤ºçš„ç‰ˆæœ¬å·ï¼Œmajor number.minor number.build number.private part number
 		string ProductVersion;
 	};
 
-	///·şÎñ¶Ë°æ±¾ĞÅÏ¢
+	///æœåŠ¡ç«¯ç‰ˆæœ¬ä¿¡æ¯
 	struct ServerVersion
 	{
 		Version ServicesVersion;

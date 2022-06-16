@@ -5,7 +5,7 @@ module CC
 	["clr:generic:List"]
     sequence<string> StringList;
 
-	///网卡信息
+	///???????
 	struct NetworkInterfaceInfo
 	{
 		string Id;
@@ -16,12 +16,12 @@ module CC
 		string DNSSuffix;
 		bool DNSEnbled;
 		bool DynamicDNS;
-		//IP 地址
+		//IP ???
 		StringList IPAddresses;	
-		// 组播地址
+		// ?鲥???
 		StringList MulticastAddresses;
 
-		//DHCP 服务器
+		//DHCP ??????
 		StringList DhcpServers;
 	};
 
@@ -40,13 +40,13 @@ module CC
 		int Port;
 	};
 
-	//网卡流量统计信息
+	//??????????????
 	struct InterfaceStatistics
 	{
 	    //bool HasValue;
-		//网卡名称
+		//????????
 		string IfName;
-		// 接收发送流量信息
+		// ??????????????
 		float BytesReceivedPerSec;
 		float BytesSentedPerSec;
 		float TotalBytesPerSec;
@@ -55,7 +55,7 @@ module CC
 		long BytesSented;
 		long BytesTotal;
 
-		// 接收发送包信息
+		// ???????????
 		long UnicastPacketReceived;
 		long UnicastPacketSented;
 		long MulticastPacketReceived;
@@ -65,18 +65,18 @@ module CC
 	["clr:generic:List"]
 	sequence<InterfaceStatistics> InterfacesStatistics;
 
-	//统计信息
+	//??????
 	struct Statistics
 	{
 		string StationId;
-		// UDP信息
+		// UDP???
 		long DatagramsReceived;
 		long DatagramsSent;
 		long DatagramsDiscarded;
 		long DatagramsWithErrors;
 		int UDPListeners;
 
-		//TCP信息
+		//TCP???
 		long SegmentsReceived;
 		long SegmentsSent;
 		long ErrorsReceived;

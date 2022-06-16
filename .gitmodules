@@ -1,0 +1,3 @@
+[submodule "CC-Src/NIStatusDetectors"]
+	path = CC-Src/NIStatusDetectors
+	url = ../NIStatusDetectors
