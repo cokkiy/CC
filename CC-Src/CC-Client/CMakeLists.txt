@@ -12,6 +12,9 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 FIND_PACKAGE(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 set(HEADER_FILES
 aboutdialog.h
@@ -129,9 +132,31 @@ upgradestationservicedlg.ui
 viewlogdialog.ui
 weatherimageoptiondlg.ui
 )
+
+set(SLICE_FILES)
+
+find_package(Ice COMPONENTS Ice)
 add_subdirectory("Slice")
+include_directories(${Ice_INCLUDE_DIR})
+set(COMPILED_SLICES)
+set(OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+message(${OUTDIR})
+foreach(ice_file ${SLICE_FILES})
+  message("slice compiling ${ice_file}...")
+  string(REPLACE ".ice" ".h" header_file ${ice_file})
+  string(REPLACE ".ice" ".cpp" cpp_file ${ice_file})
+  add_custom_command(
+  OUTPUT ${OUTDIR}/${header_file}  ${OUTDIR}/${cpp_file}
+  COMMAND ${Ice_SLICE2CPP_EXECUTABLE} -I. --impl-c++11 --output-dir ${OUTDIR}  ${CMAKE_CURRENT_SOURCE_DIR}/Slice/${ice_file}
+  DEPENDS ${ice_file}
+  )
+  list(APPEND COMPILED_SLICES ${OUTDIR}/${header_file}  ${OUTDIR}/${cpp_file})
+endforeach(ice_file )
+
 # 生成可执行文件，需添加RCC_FILES、WRAP_FILES
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${RCC_FILES}  ${UI_FILES})
+ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${RCC_FILES}  ${UI_FILES} ${COMPILED_SLICES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${OUTDIR})
 
 # 添加Qt5依赖项
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} Qt5::Widgets Qt5::Core Qt5::Gui)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} Qt5::Widgets Qt5::Core Qt5::Gui ${Ice_Ice++11_LIBRARIES})
