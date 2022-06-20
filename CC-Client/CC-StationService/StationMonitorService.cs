@@ -61,7 +61,7 @@ namespace CC_StationService
             initData.logger = logger;
             
             string value=initData.properties.getProperty("StateReceiver.Proxy");
-            var match = Regex.Match(value, @"--sourceAddress\s(?<IP>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
+            var match = Regex.Match(value, @"--sourceAddress\s+(?<IP>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
             if (match.Success)
             {
                 var ip = match.Groups["IP"].Value;
@@ -109,10 +109,10 @@ namespace CC_StationService
                 downloader.Logger = logger;
                 downloader.Option = LoadFromSetting();
 
-                if (!downloader.IsRunning)
-                {
-                    downloader.Start();
-                }
+                //if (!downloader.IsRunning)
+                //{
+                //    downloader.Start();
+                //}
 
                 isStarted = true;
             }
@@ -131,11 +131,11 @@ namespace CC_StationService
                 controlAdapter.destroy();
                 //停止监视系统
                 watcher.StopWatching();
-                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-                if (downloader.IsRunning)
-                {
-                    downloader.Stop();
-                }
+                //WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
+                //if (downloader.IsRunning)
+                //{
+                //    downloader.Stop();
+                //}
 
                 if (ic != null)
                 {

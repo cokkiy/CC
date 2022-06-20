@@ -51,7 +51,7 @@ namespace CC_StationService
                         break;
                     default:
                         Console.WriteLine("Usage: CC-StationService.exe -i or -install to install this service.");
-                        Console.WriteLine("            CC-StationService.exe -u or -uninstall to uninstall this service.");
+                        Console.WriteLine("       CC-StationService.exe -u or -uninstall to uninstall this service.");
                         break;
                 }
             }

@@ -1,33 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props" Condition="Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props')" />
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F78E65D0-113E-42CE-BE1A-3BF1B0513D3C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <ProjectGuid>{5B01C007-5ACC-489B-9C29-019B3C56172D}</ProjectGuid>
+    <OutputType>exe</OutputType>
     <RootNamespace>CC_StationService</RootNamespace>
     <AssemblyName>CC-StationService</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <ProjectTypeGuids>{28993779-3132-408A-BCB0-1D78225F4824};{3C53C28F-DC44-46B0-8B85-0C96B85B2042};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
+    <Deterministic>true</Deterministic>
     <MapFileExtensions>true</MapFileExtensions>
+    <AutorunEnabled>true</AutorunEnabled>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -43,7 +29,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,24 +38,20 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ice, Version=3.6.1.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(IceAssembliesDir)\Ice.dll</HintPath>
-    </Reference>
-    <Reference Include="NIStatusDetectors_FullFW">
-      <HintPath>..\..\..\Projects\NIStatusDetector\NIStatusDetectors_FullFW\bin\Debug\NIStatusDetectors_FullFW.dll</HintPath>
+    <Reference Include="Ice">
+      <HintPath>C:\Program Files (x86)\ZeroC\Ice-3.6.5\Assemblies\Ice.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.OracleClient" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,39 +59,35 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CCVersion.cs" />
     <Compile Include="ControllerImp.cs" />
     <Compile Include="FileTranslation.cs" />
     <Compile Include="FileTranslationImp.cs" />
-    <Compile Include="generated\AppControlParameter.cs" />
-    <Compile Include="generated\IAppLuncher.cs" />
-    <Compile Include="generated\IController.cs" />
-    <Compile Include="generated\IStationStateReceiver.cs" />
-    <Compile Include="generated\Network.cs" />
-    <Compile Include="generated\Version.cs" />
+    <Compile Include="Generated\AppControlParameter.cs" />
+    <Compile Include="Generated\IAppLuncher.cs" />
+    <Compile Include="Generated\IController.cs" />
+    <Compile Include="Generated\IStationStateReceiver.cs" />
+    <Compile Include="Generated\Network.cs" />
+    <Compile Include="Generated\Version.cs" />
     <Compile Include="IPlatformMethod.cs" />
-    <Compile Include="LinuxMethod.cs" />
     <Compile Include="LinuxLogger.cs" />
+    <Compile Include="LinuxMethod.cs" />
     <Compile Include="MemoryInfo.cs" />
     <Compile Include="NetworkHelper.cs" />
+    <Compile Include="NIStatusDetector.cs" />
     <Compile Include="PictureType.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StateGatherer.cs" />
     <Compile Include="StationMonitorService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="StationMonitorService.Designer.cs">
-      <DependentUpon>StationMonitorService.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StationMonitorService.Designer.cs" />
     <Compile Include="StationMonitorServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -125,24 +102,23 @@
     <None Include="Config.Client">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <SliceCompile Include="Slice\AppControlParameter.ice" />
-    <SliceCompile Include="Slice\IAppLuncher.ice" />
-    <SliceCompile Include="Slice\IController.ice" />
-    <SliceCompile Include="Slice\IStationStateReceiver.ice" />
-    <SliceCompile Include="Slice\Network.ice" />
-    <SliceCompile Include="Slice\Version.ice" />
+    <None Include="Properties\Settings.settings" />
+    <None Include="Slice\AppControlParameter.ice" />
+    <None Include="Slice\IAppLuncher.ice" />
+    <None Include="Slice\IController.ice" />
+    <None Include="Slice\IStationStateReceiver.ice" />
+    <None Include="Slice\Network.ice" />
+    <None Include="Slice\Version.ice" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="StationMonitorService.resx">
-      <DependentUpon>StationMonitorService.cs</DependentUpon>
-    </EmbeddedResource>
+    <EmbeddedResource Include="StationMonitorService.resx" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
@@ -150,19 +126,4 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.props'))" />
-    <Error Condition="!Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets'))" />
-  </Target>
-  <Import Project="..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets" Condition="Exists('..\packages\zeroc.icebuilder.msbuild.5.0.3\build\zeroc.icebuilder.msbuild.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
