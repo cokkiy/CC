@@ -54,24 +54,31 @@ namespace CC_StationService
 
         internal void Start()
         {
-            //初始化ICE 通信对象
-            initData = new Ice.InitializationData();
-            initData.properties = Ice.Util.createProperties();
-            initData.properties.load("Config.Client");
-            initData.logger = logger;
-            
-            string value=initData.properties.getProperty("StateReceiver.Proxy");
-            var match = Regex.Match(value, @"--sourceAddress\s+(?<IP>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
-            if (match.Success)
+            try
             {
-                var ip = match.Groups["IP"].Value;
-                detector = new NIStatusDetector(ip);
-                detector.NIStateChanged += Detector_NIStateChanged;
-                // 开始状态检测
-                detector.Start();
+                //初始化ICE 通信对象
+                initData = new Ice.InitializationData();
+                initData.properties = Ice.Util.createProperties();
+                initData.properties.load("Config.Client");
+                initData.logger = logger;
 
-                logger.print("监控服务启动...");
-            }                      
+                string value = initData.properties.getProperty("StateReceiver.Proxy");
+                var match = Regex.Match(value, @"--sourceAddress\s+(?<IP>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
+                if (match.Success)
+                {
+                    var ip = match.Groups["IP"].Value;
+                    detector = new NIStatusDetector(ip);
+                    detector.NIStateChanged += Detector_NIStateChanged;
+                    // 开始状态检测
+                    detector.Start();
+
+                    logger.print("监控服务启动...");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.error(String.Format("发生错误:{0}",ex));
+            }
         }
 
         private void Detector_NIStateChanged(object sender, NIStateChangedEventArgs e)

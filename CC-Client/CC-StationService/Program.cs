@@ -68,7 +68,7 @@ namespace CC_StationService
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            string path = Path.Combine(Path.GetTempPath(), @"ccservice-install-error.txt");
+            string path = Path.Combine(Path.GetTempPath(), @"ccservice-error.txt");
             Exception ex = e.ExceptionObject as Exception;
             File.AppendAllText(path, ex.Message + ex.InnerException.Message);
         }

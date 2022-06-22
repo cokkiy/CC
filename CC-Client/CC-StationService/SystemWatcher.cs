@@ -202,6 +202,10 @@ namespace CC_StationService
                     Thread.Sleep(Interval); //汇报间隔
                 }
             }
+            else
+            {
+                logger.print("Ice.Communicator is null.");
+            }
         }
 
         //版本信息
