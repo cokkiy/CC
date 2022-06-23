@@ -1,11 +1,13 @@
 ﻿#pragma once
 
+#include <qpainter.h>
 #include <qwt_plot.h>
+#include <qwt_text.h>
 #include "cpustat.h"
 #include <qwt_scale_draw.h>
 #include <qwt_plot_item.h>
 #include <qwt_plot_curve.h>
-
+#include <qwt_scale_map.h>
 class TimeScaleDraw : public QwtScaleDraw
 {
 public:
