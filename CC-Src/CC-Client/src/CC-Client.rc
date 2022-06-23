@@ -1,0 +1,32 @@
+#include "winver.h"
+
+IDI_ICON1               ICON    DISCARDABLE     "CC-Client.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,8,2,0
+ PRODUCTVERSION 2,8,2,0
+ FILEFLAGS 0x0L
+ FILEFLAGSMASK 0x3fL
+ FILEOS 0x00040004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "JQSLC"
+            VALUE "FileDescription", "CC Client"
+            VALUE "FileVersion", "2.8.2.0"
+            VALUE "LegalCopyright", "Copyright (C) 2018 JQSLC."
+            VALUE "InternalName", "CC-Client"
+            VALUE "OriginalFilename", "CC-Client.exe"
+            VALUE "ProductName", "CC Client"
+            VALUE "ProductVersion", "2.8.2.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
