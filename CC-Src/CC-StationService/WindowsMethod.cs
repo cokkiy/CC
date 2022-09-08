@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace CC_StationService
 {
+#pragma warning disable CA1416
     class WindowsMethod : IPlatformMethod
     {
         //总内存
@@ -30,12 +31,12 @@ namespace CC_StationService
 
         public void Reboot()
         {
-            System.Diagnostics.Process.Start("shutdown"," -r -f -t 0");
+            System.Diagnostics.Process.Start("shutdown", " -r -f -t 0");
         }
 
         public void Shutdown()
         {
-            System.Diagnostics.Process.Start("shutdown"," -s -f -t 0");
+            System.Diagnostics.Process.Start("shutdown", " -s -f -t 0");
         }
 
         /// <summary>
@@ -59,4 +60,5 @@ namespace CC_StationService
         }
 
     }
+#pragma warning restore CA1416   
 }
