@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>disable</Nullable>
-    <ImplicitUsings>false</ImplicitUsings>
+    <ImplicitUsings>true</ImplicitUsings>
     <UserSecretsId>dotnet-fs-8C6A7FF3-24AE-48CE-BFD1-553563B895AF</UserSecretsId>
     <RootNamespace>CC_StationService</RootNamespace>
     <AssemblyName>CC-StationService</AssemblyName>
@@ -18,11 +18,12 @@
     <PackageReference Include="Spectre.Console" Version="0.44.0" />
     <PackageReference Include="system.management" Version="6.0.0" />
     <PackageReference Include="system.serviceprocess.servicecontroller" Version="6.0.0" />
-    <PackageReference Include="zeroc.ice.net" Version="3.7.7" />
+    <PackageReference Include="zeroc.ice.net" Version="3.7.8" />
     <PackageReference Include="zeroc.icebuilder.msbuild" Version="5.0.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NIStatusDetectors\NIStatusDetectors\NIStatusDetectors.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
   </ItemGroup>
 </Project>
