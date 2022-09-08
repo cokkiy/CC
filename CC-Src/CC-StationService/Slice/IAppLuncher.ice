@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "AppControlParameter.ice"
 #include "Version.ice"
 module AppController

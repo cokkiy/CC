@@ -34,7 +34,7 @@ namespace CC_StationService
     }
 
     /// <summary>
-    /// Factory for Platfrom specified method and log
+    /// Factory for Platform specified method and log
     /// </summary>
     static class PlatformMethodFactory
     {

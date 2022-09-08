@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "IStationStateReceiver.ice"
 #include "AppControlParameter.ice"
 #include "Version.ice"

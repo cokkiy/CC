@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "Version.ice"
 #include "Network.ice"
+
 [["cpp:include:list"]]
 [["cpp:include:string"]]
 
