@@ -1,0 +1,16 @@
+[Unit]
+Description=CC Rust Station Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cc-rstationservice
+ExecStart=/opt/cc-rstationservice/cc-rstationservice foreground --config /opt/cc-rstationservice/CC-rStationService.toml
+Restart=always
+RestartSec=2
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[service]
+service_name = "CC-rStationService"
+station_id = ""
+state_interval_seconds = 5
+watched_processes = []
+udp_display_target = "127.0.0.1:9008"
+launcher_proxy_path = ""
+
+[control]
+listen_addr = "0.0.0.0:50051"
+
+[agent]
+listen_addr = "127.0.0.1:50052"
+auth_token = "local-change-me"
+preferred_display_index = 0
