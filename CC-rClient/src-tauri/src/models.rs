@@ -1,0 +1,157 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NetworkInterface {
+    pub mac: String,
+    pub ips: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StartProgram {
+    pub path: String,
+    pub arguments: String,
+    pub process_name: String,
+    pub allow_multi_instance: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WeatherImageOption {
+    pub download: i32,
+    pub url: String,
+    pub user_name: String,
+    pub password: String,
+    pub last_hours: i32,
+    pub interval: i32,
+    pub delete_previous_files: bool,
+    pub delete_how_hours_ago: i32,
+    pub sub_directory: String,
+    pub save_path_for_linux: String,
+    pub save_path_for_windows: String,
+}
+
+impl Default for WeatherImageOption {
+    fn default() -> Self {
+        Self {
+            download: 2,
+            url: String::new(),
+            user_name: String::new(),
+            password: String::new(),
+            last_hours: 0,
+            interval: 2,
+            delete_previous_files: false,
+            delete_how_hours_ago: 0,
+            sub_directory: String::new(),
+            save_path_for_linux: String::new(),
+            save_path_for_windows: String::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Station {
+    pub id: String,
+    pub name: String,
+    pub blocked: bool,
+    pub network_interfaces: Vec<NetworkInterface>,
+    pub start_programs: Vec<StartProgram>,
+    pub monitor_processes: Vec<String>,
+    pub last_action: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ClientOptions {
+    pub interval: i32,
+    pub is_first_time_run: bool,
+    pub start_apps: Vec<StartProgram>,
+    pub monitor_processes: Vec<String>,
+    pub weather_image_download_option: WeatherImageOption,
+}
+
+impl Default for ClientOptions {
+    fn default() -> Self {
+        Self {
+            interval: 2,
+            is_first_time_run: true,
+            start_apps: Vec::new(),
+            monitor_processes: Vec::new(),
+            weather_image_download_option: WeatherImageOption::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PersistedState {
+    pub stations: Vec<Station>,
+    pub options: ClientOptions,
+}
+
+impl Default for PersistedState {
+    fn default() -> Self {
+        Self {
+            stations: Vec::new(),
+            options: ClientOptions::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppSnapshot {
+    pub stations: Vec<Station>,
+    pub options: ClientOptions,
+    pub storage_path: String,
+    pub legacy_imported: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StationAction {
+    PowerOn,
+    Block,
+    Unblock,
+    StartApp,
+    RestartApp,
+    ExitApp,
+    Shutdown,
+    Reboot,
+    FullScreen,
+    RealTime,
+    PrevPage,
+    NextPage,
+    ClearPage,
+}
+
+impl StationAction {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Self::PowerOn => "Power On",
+            Self::Block => "Block",
+            Self::Unblock => "Unblock",
+            Self::StartApp => "Start App",
+            Self::RestartApp => "Restart App",
+            Self::ExitApp => "Exit App",
+            Self::Shutdown => "Shutdown",
+            Self::Reboot => "Reboot",
+            Self::FullScreen => "Full Screen",
+            Self::RealTime => "Real Time",
+            Self::PrevPage => "Previous Page",
+            Self::NextPage => "Next Page",
+            Self::ClearPage => "Clear Page",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ActionResult {
+    pub ok: bool,
+    pub message: String,
+    pub stations: Option<Vec<Station>>,
+    pub implemented: bool,
+}
