@@ -18,6 +18,7 @@ use crate::grpc::cc::{
     SetStateGatheringIntervalRequest, SetWatchingAppRequest, TelemetryClientMessage, UploadChunk,
 };
 use crate::models::Station;
+use tracing::{debug, error, info, warn};
 
 const FILE_CHUNK_SIZE: usize = 64 * 1024;
 
@@ -281,6 +282,7 @@ pub async fn fetch_station_runtime(
                         have_apps_state = true;
                     }
                     Some(telemetry_server_message::Body::NetStatistics(stats)) => {
+                        debug!("Received network statistics: {} interfaces", stats.interface_statistics.len());
                         snapshot.network_stats = stats
                             .interface_statistics
                             .into_iter()
@@ -298,6 +300,7 @@ pub async fn fetch_station_runtime(
                                 multicast_packet_sented: item.multicast_packet_sented,
                             })
                             .collect();
+                        debug!("Network statistics collection completed");
                         have_net_stats = true;
                     }
                     Some(telemetry_server_message::Body::ServerVersion(version)) => {

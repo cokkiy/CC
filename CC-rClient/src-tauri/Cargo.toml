@@ -29,4 +29,5 @@ tokio = { version = "1.48.0", features = ["fs", "io-util", "macros", "rt-multi-t
 tokio-stream = "0.1.18"
 tonic = { version = "0.14.2", features = ["transport"] }
 tonic-prost = "0.14.2"
+tracing = "0.1"
 uuid = { version = "1.18.1", features = ["v4", "serde"] }

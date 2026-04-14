@@ -13,7 +13,7 @@ use tokio::sync::watch;
 use tonic::metadata::MetadataValue;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status, Streaming};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::config::AppConfig;
 use crate::grpc::agent::desktop_agent_client::DesktopAgentClient;
@@ -334,7 +334,10 @@ impl StationControl for StationControlService {
         &self,
         _request: Request<Empty>,
     ) -> Result<Response<GetNetworkInterfacesResponse>, Status> {
-        Ok(Response::new(self.state.network_interfaces()))
+        debug!("gRPC: get_network_interfaces called");
+        let response = self.state.network_interfaces();
+        debug!("gRPC: returning {} network interfaces", response.items.len());
+        Ok(Response::new(response))
     }
 
     async fn get_connection_informations(

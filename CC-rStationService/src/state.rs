@@ -23,6 +23,7 @@ use crate::grpc::cc::{
     StationRunningState, StationSystemState, Statistics, VersionInfo,
 };
 use crate::network_counters;
+use tracing::debug;
 
 pub struct AppState {
     config: AppConfig,
@@ -655,6 +656,7 @@ impl NetworkSampler {
             .collect::<HashMap<_, _>>();
 
         let snapshot = network_counters::collect().unwrap_or_default();
+        debug!("Collected network counters: {} interfaces", snapshot.interface_counters.len());
         let mut interface_statistics = snapshot
             .interface_counters
             .iter()

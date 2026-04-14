@@ -855,12 +855,25 @@ export default function App() {
                     {selectedRuntime.networkStats.length === 0 ? (
                       <p className="emptyInline">No network counters returned yet.</p>
                     ) : (
-                      selectedRuntime.networkStats.map((item) => (
+                      selectedRuntime.networkStats.map((item) => {
+                        console.log(`UI: Displaying ${selectedRuntime.networkStats.length} network interfaces`);
+                        selectedRuntime.networkStats.forEach((item, index) => {
+                          console.log(`UI: Interface ${index}: ${item.ifName}, RX=${item.bytesReceivedPerSec}, TX=${item.bytesSentedPerSec}`);
+                        });
+                        return (
                         <div key={item.ifName} className="logEntry">
-                          {item.ifName} · RX {formatBytes(item.bytesReceivedPerSec)}/s · TX{" "}
-                          {formatBytes(item.bytesSentedPerSec)}/s · Uni RX {item.unicastPacketReceived} · Uni TX {item.unicastPacketSented} · Multi RX {item.multicastPacketReceived} · Multi TX {item.multicastPacketSented}
+                          <div>
+                            {item.ifName} · Total {formatBytes(item.totalBytesPerSec)}/s · RX {formatBytes(item.bytesReceivedPerSec)}/s · TX {formatBytes(item.bytesSentedPerSec)}/s
+                          </div>
+                          <div>
+                            Uni RX {item.unicastPacketReceived} · Uni TX {item.unicastPacketSented} · Multi RX {item.multicastPacketReceived} · Multi TX {item.multicastPacketSented}
+                          </div>
+                          <div>
+                            RX Total {formatBytes(item.bytesReceived)} · TX Total {formatBytes(item.bytesSented)} · Total {formatBytes(item.bytesTotal)}
+                          </div>
                         </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 </div>
