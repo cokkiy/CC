@@ -61,12 +61,16 @@ pub struct RemoteAppState {
 #[serde(rename_all = "camelCase")]
 pub struct RemoteInterfaceStat {
     pub if_name: String,
-    pub bytes_received_per_sec: f32,
-    pub bytes_sented_per_sec: f32,
-    pub total_bytes_per_sec: f32,
+    pub bytes_received_per_sec: f64,
+    pub bytes_sented_per_sec: f64,
+    pub total_bytes_per_sec: f64,
     pub bytes_received: i64,
     pub bytes_sented: i64,
     pub bytes_total: i64,
+    pub unicast_packet_received: i64,
+    pub unicast_packet_sented: i64,
+    pub multicast_packet_received: i64,
+    pub multicast_packet_sented: i64,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -106,7 +110,7 @@ pub async fn fetch_station_runtime(
         .filter(|value| !value.is_empty())
         .map(ToOwned::to_owned)
         .collect::<Vec<_>>();
-    let wait_window = Duration::from_secs(interval_seconds.max(1) as u64 + 2);
+    let wait_window = Duration::from_secs(interval_seconds.max(1) as u64 * 2 + 15);
 
     with_station_endpoint(station, move |endpoint| {
         let monitor_processes = monitor_processes.clone();
@@ -189,7 +193,9 @@ pub async fn fetch_station_runtime(
             })
             .await
             .map_err(|error| format!("send telemetry connect request via {endpoint}: {error}"))?;
-            drop(tx);
+            // Keep tx alive until after we collect all telemetry data. Dropping it here would
+            // close the inbound stream on the service side, causing the select loop to break
+            // before the sleep interval fires — meaning cpu/memory/proc_count are never sent.
 
             let response = telemetry
                 .stream_telemetry(Request::new(ReceiverStream::new(rx)))
@@ -208,10 +214,21 @@ pub async fn fetch_station_runtime(
                 let remaining = wait_window
                     .checked_sub(started.elapsed())
                     .unwrap_or_else(|| Duration::from_secs(0));
-                let next = timeout(remaining, inbound.message())
-                    .await
-                    .map_err(|_| format!("telemetry timed out via {endpoint}"))?
-                    .map_err(|error| format!("read telemetry message via {endpoint}: {error}"))?;
+                let next = match timeout(remaining, inbound.message()).await {
+                    Err(_) => break, // wait_window elapsed — return whatever partial data we have
+                    Ok(Err(error)) => {
+                        // Stream closed with error. If we already received the running state
+                        // return the partial snapshot rather than failing entirely.
+                        if have_running_state {
+                            eprintln!("telemetry stream error after running state received (returning partial data): {error}");
+                            break;
+                        }
+                        return Err(format!(
+                            "read telemetry message via {endpoint}: {error}"
+                        ));
+                    }
+                    Ok(Ok(msg)) => msg,
+                };
                 let Some(message) = next else {
                     break;
                 };
@@ -227,12 +244,11 @@ pub async fn fetch_station_runtime(
                         snapshot.message = ack.message;
                     }
                     Some(telemetry_server_message::Body::StationRunningState(state)) => {
+                        //println!("UI telemetry: cpu={:.2} mem={} proc={}", state.cpu, state.current_memory, state.proc_count);
                         snapshot.current_memory = state.current_memory;
                         snapshot.cpu = state.cpu;
                         snapshot.proc_count = state.proc_count;
-                        if !snapshot.station_id.is_empty() {
-                            have_running_state = true;
-                        }
+                        have_running_state = true;
                     }
                     Some(telemetry_server_message::Body::AppsRunningState(state)) => {
                         snapshot.app_states = state
@@ -270,12 +286,16 @@ pub async fn fetch_station_runtime(
                             .into_iter()
                             .map(|item| RemoteInterfaceStat {
                                 if_name: item.if_name,
-                                bytes_received_per_sec: item.bytes_received_per_sec,
-                                bytes_sented_per_sec: item.bytes_sented_per_sec,
-                                total_bytes_per_sec: item.total_bytes_per_sec,
+                                bytes_received_per_sec: item.bytes_received_per_sec as f64,
+                                bytes_sented_per_sec: item.bytes_sented_per_sec as f64,
+                                total_bytes_per_sec: item.total_bytes_per_sec as f64,
                                 bytes_received: item.bytes_received,
                                 bytes_sented: item.bytes_sented,
                                 bytes_total: item.bytes_total,
+                                unicast_packet_received: item.unicast_packet_received,
+                                unicast_packet_sented: item.unicast_packet_sented,
+                                multicast_packet_received: item.multicast_packet_received,
+                                multicast_packet_sented: item.multicast_packet_sented,
                             })
                             .collect();
                         have_net_stats = true;

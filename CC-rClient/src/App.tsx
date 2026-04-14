@@ -45,6 +45,44 @@ const emptyStation = (): Station => ({
   lastAction: null
 });
 
+function CpuPie({ cpu }: { cpu: number }) {
+  const pct = Math.min(Math.max(cpu, 0), 100);
+  const r = 40;
+  const cx = 56;
+  const cy = 56;
+  const circumference = 2 * Math.PI * r;
+  const used = (pct / 100) * circumference;
+  const free = circumference - used;
+
+  const color =
+    pct >= 90 ? "#d64545" :
+    pct >= 70 ? "#c78a00" :
+    "#1f9d55";
+
+  return (
+    <div className="cpuPie">
+      <svg viewBox="0 0 112 112" width="112" height="112" aria-label={`CPU ${pct.toFixed(1)}%`}>
+        {/* track */}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--cpuPie-track)" strokeWidth="16" />
+        {/* used arc — starts at top (−90°) */}
+        <circle
+          cx={cx} cy={cy} r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="16"
+          strokeDasharray={`${used} ${free}`}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${cx} ${cy})`}
+          style={{ transition: "stroke-dasharray 0.5s ease, stroke 0.5s ease" }}
+        />
+        {/* centre label */}
+        <text x={cx} y={cy - 6} textAnchor="middle" className="cpuPie-value">{pct.toFixed(1)}%</text>
+        <text x={cx} y={cy + 12} textAnchor="middle" className="cpuPie-label">CPU</text>
+      </svg>
+    </div>
+  );
+}
+
 function formatBytes(value: number) {
   if (!Number.isFinite(value) || value <= 0) {
     return "0 B";
@@ -57,6 +95,53 @@ function formatBytes(value: number) {
     index += 1;
   }
   return `${next.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+}
+
+type StationVisualState = "ready" | "warning" | "error" | "offline";
+
+function getStationVisualState(
+  station: Station,
+  runtime: StationRuntimeSnapshot | null | undefined
+): StationVisualState {
+  if (!runtime) {
+    return "offline";
+  }
+
+  const runtimeMessage = runtime.message.toLowerCase();
+  const lastAction = (station.lastAction ?? "").toLowerCase();
+  const hasErrorSignal =
+    runtimeMessage.includes("error") ||
+    runtimeMessage.includes("failed") ||
+    runtimeMessage.includes("unavailable") ||
+    runtimeMessage.includes("timeout") ||
+    lastAction.includes("error") ||
+    lastAction.includes("failed");
+
+  if (hasErrorSignal) {
+    return "error";
+  }
+
+  const hasWarningSignal =
+    station.blocked || runtime.appStates.some((app) => !app.isRunning);
+
+  if (hasWarningSignal) {
+    return "warning";
+  }
+
+  return "ready";
+}
+
+function ComputerStatusIcon({ state }: { state: StationVisualState }) {
+  return (
+    <span className={`computerIcon computerIcon--${state}`} aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <rect x="3.5" y="4.5" width="17" height="11" rx="2" />
+        <path d="M9 19h6" />
+        <path d="M12 15.5V19" />
+        <path d="M7 19h10" />
+      </svg>
+    </span>
+  );
 }
 
 export default function App() {
@@ -79,6 +164,8 @@ export default function App() {
   const [uploadLocalPath, setUploadLocalPath] = useState("");
   const [renameSourcePath, setRenameSourcePath] = useState("");
   const [renameTargetPath, setRenameTargetPath] = useState("");
+  const [activePage, setActivePage] = useState<"stations" | "settings">("stations");
+  const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
 
   useEffect(() => {
     void loadSnapshot();
@@ -340,6 +427,8 @@ export default function App() {
     const station = emptyStation();
     setStations((current) => [station, ...current]);
     setSelectedId(station.id);
+    setActivePage("stations");
+    setIsEditingStationDetail(true);
   }
 
   function removeSelectedStation() {
@@ -350,6 +439,7 @@ export default function App() {
       current.filter((station) => station.id !== selectedStation.id)
     );
     setSelectedId("");
+    setIsEditingStationDetail(false);
   }
 
   function patchSelected(patch: Partial<Station>) {
@@ -386,6 +476,18 @@ export default function App() {
       </header>
 
       <section className="toolbar">
+        <button
+          className={activePage === "stations" ? "accent" : ""}
+          onClick={() => setActivePage("stations")}
+        >
+          Stations
+        </button>
+        <button
+          className={activePage === "settings" ? "accent" : ""}
+          onClick={() => setActivePage("settings")}
+        >
+          Settings
+        </button>
         <button onClick={addStation}>Add Station</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
           Remove
@@ -414,500 +516,574 @@ export default function App() {
         <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
           Reboot
         </button>
-        <button onClick={() => void executeAction("full_screen", selectedIds)} disabled={!selectedStation}>
-          Full Screen
-        </button>
-        <button onClick={() => void executeAction("real_time", selectedIds)} disabled={!selectedStation}>
-          Real Time
-        </button>
-        <button onClick={() => void executeAction("prev_page", selectedIds)} disabled={!selectedStation}>
-          Prev Page
-        </button>
-        <button onClick={() => void executeAction("next_page", selectedIds)} disabled={!selectedStation}>
-          Next Page
-        </button>
-        <button onClick={() => void executeAction("clear_page", selectedIds)} disabled={!selectedStation}>
-          Clear Page
-        </button>
         <button className="accent" onClick={() => void saveState()} disabled={saving}>
           {saving ? "Saving..." : "Save"}
         </button>
         <button onClick={() => void exportLegacyFiles()}>Export Legacy</button>
       </section>
 
-      <main className="grid">
-        <aside className="panel stationPanel">
-          <div className="panelHeader">
-            <h2>Stations</h2>
-            <div className="panelControls">
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Filter by name, MAC, or IP"
-              />
-              <select
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value as "name" | "ip")}
-              >
-                <option value="name">Sort: Name</option>
-                <option value="ip">Sort: IP</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="stationList">
-            {loading ? (
-              <p className="emptyState">Loading state…</p>
-            ) : filteredStations.length === 0 ? (
-              <p className="emptyState">No stations match the current filter.</p>
-            ) : (
-              filteredStations.map((station) => {
-                const ip = station.networkInterfaces[0]?.ips[0] ?? "No IP";
-                return (
-                  <button
-                    key={station.id}
-                    className={`stationCard ${station.id === selectedId ? "selected" : ""}`}
-                    onClick={() => setSelectedId(station.id)}
-                  >
-                    <span className="stationName">{station.name || "Unnamed Station"}</span>
-                    <span className="stationMeta">{ip}</span>
-                    <span className={`badge ${station.blocked ? "blocked" : "ready"}`}>
-                      {station.blocked ? "Blocked" : "Ready"}
-                    </span>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </aside>
-
-        <section className="panel detailPanel">
-          <div className="panelHeader">
-            <h2>Station Detail</h2>
-            {selectedStation ? (
-              <span className="hint">
-                {selectedStation.id}
-                {selectedStation.lastAction ? ` | ${selectedStation.lastAction}` : ""}
-              </span>
-            ) : null}
-          </div>
-
-          {!selectedStation ? (
-            <p className="emptyState">Select or create a station to edit it.</p>
-          ) : (
-            <div className="detailLayout">
-              <label className="field">
-                <span>Name</span>
+      {activePage === "stations" ? (
+        <main className={`grid ${isEditingStationDetail ? "gridDetailMode" : "gridRuntimeMode"}`}>
+          <aside className="panel stationPanel">
+            <div className="panelHeader">
+              <h2>Stations</h2>
+              <div className="panelControls">
                 <input
-                  value={selectedStation.name}
-                  onChange={(event) => patchSelected({ name: event.target.value })}
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Filter by name, MAC, or IP"
                 />
-              </label>
+                <select
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value as "name" | "ip")}
+                >
+                  <option value="name">Sort: Name</option>
+                  <option value="ip">Sort: IP</option>
+                </select>
+              </div>
+            </div>
 
-              <div className="collection">
-                <div className="subHeader">
-                  <h3>Network Interfaces</h3>
-                  <button
-                    onClick={() =>
-                      patchSelected({
-                        networkInterfaces: [
-                          ...selectedStation.networkInterfaces,
-                          { mac: "", ips: [""] }
-                        ]
-                      })
-                    }
-                  >
-                    Add NIC
-                  </button>
-                </div>
-                {selectedStation.networkInterfaces.map((ni, index) => (
-                  <div key={`${selectedStation.id}-ni-${index}`} className="cardGrid">
-                    <label className="field">
-                      <span>MAC</span>
-                      <input
-                        value={ni.mac}
-                        onChange={(event) => {
-                          const next = [...selectedStation.networkInterfaces];
-                          next[index] = { ...ni, mac: event.target.value };
-                          patchSelected({ networkInterfaces: next });
-                        }}
-                      />
-                    </label>
-                    <label className="field wide">
-                      <span>IPs</span>
-                      <input
-                        value={ni.ips.join(", ")}
-                        onChange={(event) => {
-                          const next = [...selectedStation.networkInterfaces];
-                          next[index] = {
-                            ...ni,
-                            ips: event.target.value
-                              .split(",")
-                              .map((value) => value.trim())
-                              .filter(Boolean)
-                          };
-                          patchSelected({ networkInterfaces: next });
-                        }}
-                      />
-                    </label>
-                  </div>
-                ))}
+            <div className="stationList">
+              {loading ? (
+                <p className="emptyState">Loading state…</p>
+              ) : filteredStations.length === 0 ? (
+                <p className="emptyState">No stations match the current filter.</p>
+              ) : (
+                filteredStations.map((station) => {
+                  const ip = station.networkInterfaces[0]?.ips[0] ?? "No IP";
+                  const stationVisualState = getStationVisualState(
+                    station,
+                    runtimeByStation[station.id] ?? null
+                  );
+                  return (
+                    <div
+                      key={station.id}
+                      className={`stationCard ${station.id === selectedId ? "selected" : ""}`}
+                      onClick={() => {
+                        setSelectedId(station.id);
+                        setIsEditingStationDetail(false);
+                      }}
+                    >
+                      <div className="stationCardTopRow">
+                        <div className="stationCardIdentity">
+                          <ComputerStatusIcon state={stationVisualState} />
+                          <span className="stationName">{station.name || "Unnamed Station"}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="stationEditButton"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedId(station.id);
+                            setIsEditingStationDetail(true);
+                          }}
+                          aria-label={`Edit ${station.name || "station"}`}
+                        >
+                          Edit
+                        </button>
+                      </div>
+                      <span className="stationMeta">{ip}</span>
+                      <span className={`badge ${stationVisualState}`}>
+                        {stationVisualState === "ready"
+                          ? "Ready"
+                          : stationVisualState === "warning"
+                            ? "Warning"
+                            : stationVisualState === "error"
+                              ? "Error"
+                              : "Offline"}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </aside>
+
+          {isEditingStationDetail ? (
+            <section className="panel detailPanel detailPanelExpanded">
+              <div className="panelHeader">
+                <h2>Station Detail</h2>
+                {selectedStation ? (
+                  <span className="hint">
+                    {selectedStation.id}
+                    {selectedStation.lastAction ? ` | ${selectedStation.lastAction}` : ""}
+                  </span>
+                ) : null}
               </div>
 
-              <div className="collection">
-                <div className="subHeader">
-                  <h3>Startup Programs</h3>
-                  <button
-                    onClick={() =>
-                      patchPrograms([
-                        ...selectedStation.startPrograms,
-                        {
-                          path: "",
-                          arguments: "",
-                          processName: "",
-                          allowMultiInstance: false
+              {!selectedStation ? (
+                <p className="emptyState">Select or create a station to edit it.</p>
+              ) : (
+                <div className="detailLayout">
+                  <div className="subHeader">
+                    <h3>Edit Station</h3>
+                    <button type="button" onClick={() => setIsEditingStationDetail(false)}>
+                      Close
+                    </button>
+                  </div>
+
+                  <label className="field">
+                    <span>Name</span>
+                    <input
+                      value={selectedStation.name}
+                      onChange={(event) => patchSelected({ name: event.target.value })}
+                    />
+                  </label>
+
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Network Interfaces</h3>
+                      <button
+                        onClick={() =>
+                          patchSelected({
+                            networkInterfaces: [
+                              ...selectedStation.networkInterfaces,
+                              { mac: "", ips: [""] }
+                            ]
+                          })
                         }
-                      ])
-                    }
-                  >
-                    Add Program
-                  </button>
+                      >
+                        Add NIC
+                      </button>
+                    </div>
+                    {selectedStation.networkInterfaces.map((ni, index) => (
+                      <div key={`${selectedStation.id}-ni-${index}`} className="cardGrid">
+                        <label className="field">
+                          <span>MAC</span>
+                          <input
+                            value={ni.mac}
+                            onChange={(event) => {
+                              const next = [...selectedStation.networkInterfaces];
+                              next[index] = { ...ni, mac: event.target.value };
+                              patchSelected({ networkInterfaces: next });
+                            }}
+                          />
+                        </label>
+                        <label className="field wide">
+                          <span>IPs</span>
+                          <input
+                            value={ni.ips.join(", ")}
+                            onChange={(event) => {
+                              const next = [...selectedStation.networkInterfaces];
+                              next[index] = {
+                                ...ni,
+                                ips: event.target.value
+                                  .split(",")
+                                  .map((value) => value.trim())
+                                  .filter(Boolean)
+                              };
+                              patchSelected({ networkInterfaces: next });
+                            }}
+                          />
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Startup Programs</h3>
+                      <button
+                        onClick={() =>
+                          patchPrograms([
+                            ...selectedStation.startPrograms,
+                            {
+                              path: "",
+                              arguments: "",
+                              processName: "",
+                              allowMultiInstance: false
+                            }
+                          ])
+                        }
+                      >
+                        Add Program
+                      </button>
+                    </div>
+                    {selectedStation.startPrograms.length === 0 ? (
+                      <p className="emptyInline">No station-specific startup programs.</p>
+                    ) : (
+                      selectedStation.startPrograms.map((program, index) => (
+                        <div key={`${selectedStation.id}-program-${index}`} className="programCard">
+                          <label className="field wide">
+                            <span>Path</span>
+                            <input
+                              value={program.path}
+                              onChange={(event) => {
+                                const next = [...selectedStation.startPrograms];
+                                next[index] = { ...program, path: event.target.value };
+                                patchPrograms(next);
+                              }}
+                            />
+                          </label>
+                          <label className="field">
+                            <span>Arguments</span>
+                            <input
+                              value={program.arguments}
+                              onChange={(event) => {
+                                const next = [...selectedStation.startPrograms];
+                                next[index] = { ...program, arguments: event.target.value };
+                                patchPrograms(next);
+                              }}
+                            />
+                          </label>
+                          <label className="field">
+                            <span>Process Name</span>
+                            <input
+                              value={program.processName}
+                              onChange={(event) => {
+                                const next = [...selectedStation.startPrograms];
+                                next[index] = { ...program, processName: event.target.value };
+                                patchPrograms(next);
+                              }}
+                            />
+                          </label>
+                          <label className="checkField">
+                            <input
+                              type="checkbox"
+                              checked={program.allowMultiInstance}
+                              onChange={(event) => {
+                                const next = [...selectedStation.startPrograms];
+                                next[index] = {
+                                  ...program,
+                                  allowMultiInstance: event.target.checked
+                                };
+                                patchPrograms(next);
+                              }}
+                            />
+                            <span>Allow multi-instance</span>
+                          </label>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <label className="field">
+                    <span>Monitor Processes</span>
+                    <textarea
+                      rows={5}
+                      value={selectedStation.monitorProcesses.join("\n")}
+                      onChange={(event) =>
+                        patchSelected({
+                          monitorProcesses: event.target.value
+                            .split("\n")
+                            .map((value) => value.trim())
+                            .filter(Boolean)
+                        })
+                      }
+                    />
+                  </label>
                 </div>
-                {selectedStation.startPrograms.length === 0 ? (
-                  <p className="emptyInline">No station-specific startup programs.</p>
+              )}
+            </section>
+          ) : null}
+
+          {!isEditingStationDetail ? (
+            <section className="panel sidePanel sidePanelExpanded">
+            <div className="panelHeader">
+              <h2>Runtime & Tools</h2>
+              <span className="hint">Station live data, screen capture, and remote files</span>
+            </div>
+
+            <div className="collection">
+              <div className="subHeader">
+                <h3>Runtime</h3>
+                <button
+                  onClick={() => void refreshRuntime(selectedStation?.id, true)}
+                  disabled={!selectedStation || runtimeLoadingId === selectedStation.id}
+                >
+                  {runtimeLoadingId === selectedStation?.id ? "Refreshing..." : "Refresh"}
+                </button>
+              </div>
+              {!selectedStation ? (
+                <p className="emptyInline">Select a station to view live runtime data.</p>
+              ) : !selectedRuntime ? (
+                <p className="emptyInline">No live runtime data loaded yet.</p>
+              ) : (
+                <div className="programCard">
+                  <div className="statsGrid">
+                    <div className="statTile">
+                      <span>Endpoint</span>
+                      <strong>{selectedRuntime.endpoint}</strong>
+                    </div>
+                    <div className="statTile">
+                      <span>Remote Station ID</span>
+                      <strong>{selectedRuntime.stationId || "n/a"}</strong>
+                    </div>
+                    <CpuPie cpu={selectedRuntime.cpu} />
+                    <div className="statTile">
+                      <span>Memory</span>
+                      <strong>
+                        {formatBytes(selectedRuntime.currentMemory)} / {formatBytes(selectedRuntime.totalMemory)}
+                      </strong>
+                    </div>
+                    <div className="statTile">
+                      <span>Processes</span>
+                      <strong>{selectedRuntime.procCount}</strong>
+                    </div>
+                    <div className="statTile">
+                      <span>Service Version</span>
+                      <strong>{selectedRuntime.serviceVersion || "n/a"}</strong>
+                    </div>
+                  </div>
+                  <div className="logEntry">{selectedRuntime.message}</div>
+                  <div className="logEntry">
+                    {selectedRuntime.computerName || "Unknown host"} · {selectedRuntime.osName || "Unknown OS"}{" "}
+                    {selectedRuntime.osVersion}
+                  </div>
+                  <div className="logEntry">Service path: {selectedRuntime.servicePath || "n/a"}</div>
+                  <div className="logEntry">Launcher path: {selectedRuntime.appLauncherPath || "n/a"}</div>
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Watched Apps</h3>
+                    </div>
+                    {selectedRuntime.appStates.length === 0 ? (
+                      <p className="emptyInline">No watched app state returned yet.</p>
+                    ) : (
+                      selectedRuntime.appStates.map((item) => (
+                        <div key={`${item.monitorName}-${item.processId}`} className="logEntry">
+                          {item.monitorName || item.processName || "Unknown process"} ·{" "}
+                          {item.isRunning ? "Running" : "Stopped"} · CPU {item.cpu.toFixed(1)}% · Mem{" "}
+                          {formatBytes(item.currentMemory)}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Network</h3>
+                    </div>
+                    {selectedRuntime.networkStats.length === 0 ? (
+                      <p className="emptyInline">No network counters returned yet.</p>
+                    ) : (
+                      selectedRuntime.networkStats.map((item) => (
+                        <div key={item.ifName} className="logEntry">
+                          {item.ifName} · RX {formatBytes(item.bytesReceivedPerSec)}/s · TX{" "}
+                          {formatBytes(item.bytesSentedPerSec)}/s · Uni RX {item.unicastPacketReceived} · Uni TX {item.unicastPacketSented} · Multi RX {item.multicastPacketReceived} · Multi TX {item.multicastPacketSented}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="collection">
+              <div className="subHeader">
+                <h3>Screen Capture</h3>
+                <button onClick={() => void captureScreen()} disabled={!selectedStation || remoteBusy === "capture"}>
+                  {remoteBusy === "capture" ? "Capturing..." : "Capture"}
+                </button>
+              </div>
+              {!selectedCapture ? (
+                <p className="emptyInline">No remote screenshot captured yet.</p>
+              ) : (
+                <div className="programCard">
+                  <div className="logEntry">
+                    {selectedCapture.endpoint} · {formatBytes(selectedCapture.byteLen)}
+                  </div>
+                  <img className="capturePreview" src={selectedCapture.dataUrl} alt="Remote station capture" />
+                </div>
+              )}
+            </div>
+
+            <div className="collection">
+              <div className="subHeader">
+                <h3>Remote Files</h3>
+                <button onClick={() => void browseRemote()} disabled={!selectedStation || remoteBusy === "browse"}>
+                  {remoteBusy === "browse" ? "Browsing..." : "Browse"}
+                </button>
+              </div>
+              <label className="field">
+                <span>Remote Browse Path</span>
+                <input value={remotePath} onChange={(event) => setRemotePath(event.target.value)} />
+              </label>
+              <label className="field">
+                <span>Remote Source Path</span>
+                <input value={renameSourcePath} onChange={(event) => setRenameSourcePath(event.target.value)} />
+              </label>
+              <label className="field">
+                <span>Remote Target Path</span>
+                <input value={renameTargetPath} onChange={(event) => setRenameTargetPath(event.target.value)} />
+              </label>
+              <label className="field">
+                <span>Local Download Path</span>
+                <input value={downloadLocalPath} onChange={(event) => setDownloadLocalPath(event.target.value)} />
+              </label>
+              <label className="field">
+                <span>Local Upload Path</span>
+                <input value={uploadLocalPath} onChange={(event) => setUploadLocalPath(event.target.value)} />
+              </label>
+              <div className="toolbar miniToolbar">
+                <button onClick={() => void renameRemote()} disabled={!selectedStation || remoteBusy === "rename"}>
+                  Rename
+                </button>
+                <button onClick={() => void downloadRemote()} disabled={!selectedStation || remoteBusy === "download"}>
+                  Download
+                </button>
+                <button onClick={() => void uploadRemote()} disabled={!selectedStation || remoteBusy === "upload"}>
+                  Upload
+                </button>
+              </div>
+              {!selectedBrowser ? (
+                <p className="emptyInline">Browse a remote path to inspect files.</p>
+              ) : (
+                <div className="logList">
+                  {selectedBrowser.items.length === 0 ? (
+                    <p className="emptyInline">No remote entries returned for this path.</p>
+                  ) : (
+                    selectedBrowser.items.map((item) => (
+                      <button
+                        key={item.path}
+                        className="stationCard fileEntry"
+                        onClick={() => {
+                          setRenameSourcePath(item.path);
+                          setRenameTargetPath(item.path);
+                          if (item.isDirectory) {
+                            setRemotePath(item.path);
+                            void browseRemote(item.path);
+                          }
+                        }}
+                      >
+                        <span className="stationName">{item.isDirectory ? "Directory" : "File"}</span>
+                        <span className="stationMeta">{item.path}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="collection">
+              <div className="subHeader">
+                <h3>Action Log</h3>
+              </div>
+              <div className="logList">
+                {log.length === 0 ? (
+                  <p className="emptyInline">No actions yet.</p>
                 ) : (
-                  selectedStation.startPrograms.map((program, index) => (
-                    <div key={`${selectedStation.id}-program-${index}`} className="programCard">
-                      <label className="field wide">
-                        <span>Path</span>
-                        <input
-                          value={program.path}
-                          onChange={(event) => {
-                            const next = [...selectedStation.startPrograms];
-                            next[index] = { ...program, path: event.target.value };
-                            patchPrograms(next);
-                          }}
-                        />
-                      </label>
-                      <label className="field">
-                        <span>Arguments</span>
-                        <input
-                          value={program.arguments}
-                          onChange={(event) => {
-                            const next = [...selectedStation.startPrograms];
-                            next[index] = { ...program, arguments: event.target.value };
-                            patchPrograms(next);
-                          }}
-                        />
-                      </label>
-                      <label className="field">
-                        <span>Process Name</span>
-                        <input
-                          value={program.processName}
-                          onChange={(event) => {
-                            const next = [...selectedStation.startPrograms];
-                            next[index] = { ...program, processName: event.target.value };
-                            patchPrograms(next);
-                          }}
-                        />
-                      </label>
-                      <label className="checkField">
-                        <input
-                          type="checkbox"
-                          checked={program.allowMultiInstance}
-                          onChange={(event) => {
-                            const next = [...selectedStation.startPrograms];
-                            next[index] = {
-                              ...program,
-                              allowMultiInstance: event.target.checked
-                            };
-                            patchPrograms(next);
-                          }}
-                        />
-                        <span>Allow multi-instance</span>
-                      </label>
+                  log.map((entry, index) => (
+                    <div key={`${entry}-${index}`} className="logEntry">
+                      {entry}
                     </div>
                   ))
                 )}
               </div>
+            </div>
+          </section>
+          ) : null}
+        </main>
+      ) : (
+        <main className="grid">
+          <section className="panel detailPanel">
+            <div className="panelHeader">
+              <h2>Client Options</h2>
+              <span className="hint">Opened from the Settings button</span>
+            </div>
+
+            <div className="detailLayout">
+              <label className="field">
+                <span>Monitor Interval</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={options.interval}
+                  onChange={(event) =>
+                    setOptions((current) => ({
+                      ...current,
+                      interval: Number(event.target.value)
+                    }))
+                  }
+                />
+              </label>
+
+              <label className="checkField">
+                <input
+                  type="checkbox"
+                  checked={options.isFirstTimeRun}
+                  onChange={(event) =>
+                    setOptions((current) => ({
+                      ...current,
+                      isFirstTimeRun: event.target.checked
+                    }))
+                  }
+                />
+                <span>First run flow still enabled</span>
+              </label>
 
               <label className="field">
-                <span>Monitor Processes</span>
+                <span>Global Monitor Processes</span>
                 <textarea
-                  rows={5}
-                  value={selectedStation.monitorProcesses.join("\n")}
+                  rows={8}
+                  value={options.monitorProcesses.join("\n")}
                   onChange={(event) =>
-                    patchSelected({
+                    setOptions((current) => ({
+                      ...current,
                       monitorProcesses: event.target.value
                         .split("\n")
                         .map((value) => value.trim())
                         .filter(Boolean)
-                    })
+                    }))
                   }
                 />
               </label>
+
+              <div className="collection">
+                <div className="subHeader">
+                  <h3>Weather Download Options</h3>
+                </div>
+                <p className="emptyInline">
+                  Weather Source URL input has been removed from the UI.
+                </p>
+              </div>
             </div>
-          )}
-        </section>
+          </section>
 
-        <section className="panel sidePanel">
-          <div className="panelHeader">
-            <h2>Client Options</h2>
-            <span className="hint">Imported from the legacy INI format</span>
-          </div>
-
-          <label className="field">
-            <span>Monitor Interval</span>
-            <input
-              type="number"
-              min={1}
-              value={options.interval}
-              onChange={(event) =>
-                setOptions((current) => ({
-                  ...current,
-                  interval: Number(event.target.value)
-                }))
-              }
-            />
-          </label>
-
-          <label className="checkField">
-            <input
-              type="checkbox"
-              checked={options.isFirstTimeRun}
-              onChange={(event) =>
-                setOptions((current) => ({
-                  ...current,
-                  isFirstTimeRun: event.target.checked
-                }))
-              }
-            />
-            <span>First run flow still enabled</span>
-          </label>
-
-          <label className="field">
-            <span>Global Monitor Processes</span>
-            <textarea
-              rows={5}
-              value={options.monitorProcesses.join("\n")}
-              onChange={(event) =>
-                setOptions((current) => ({
-                  ...current,
-                  monitorProcesses: event.target.value
-                    .split("\n")
-                    .map((value) => value.trim())
-                    .filter(Boolean)
-                }))
-              }
-            />
-          </label>
-
-          <label className="field">
-            <span>Weather Source URL</span>
-            <input
-              value={options.weatherImageDownloadOption.url}
-              onChange={(event) =>
-                setOptions((current) => ({
-                  ...current,
-                  weatherImageDownloadOption: {
-                    ...current.weatherImageDownloadOption,
-                    url: event.target.value
-                  }
-                }))
-              }
-            />
-          </label>
-
-          <div className="collection">
-            <div className="subHeader">
-              <h3>Runtime</h3>
-              <button
-                onClick={() => void refreshRuntime(selectedStation?.id, true)}
-                disabled={!selectedStation || runtimeLoadingId === selectedStation.id}
-              >
-                {runtimeLoadingId === selectedStation?.id ? "Refreshing..." : "Refresh"}
-              </button>
+          <section className="panel sidePanel">
+            <div className="panelHeader">
+              <h2>Settings Summary</h2>
+              <span className="hint">Client-only configuration page</span>
             </div>
-            {!selectedStation ? (
-              <p className="emptyInline">Select a station to view live runtime data.</p>
-            ) : !selectedRuntime ? (
-              <p className="emptyInline">No live runtime data loaded yet.</p>
-            ) : (
-              <div className="programCard">
-                <div className="statsGrid">
-                  <div className="statTile">
-                    <span>Endpoint</span>
-                    <strong>{selectedRuntime.endpoint}</strong>
-                  </div>
-                  <div className="statTile">
-                    <span>Remote Station ID</span>
-                    <strong>{selectedRuntime.stationId || "n/a"}</strong>
-                  </div>
-                  <div className="statTile">
-                    <span>CPU</span>
-                    <strong>{selectedRuntime.cpu.toFixed(1)}%</strong>
-                  </div>
-                  <div className="statTile">
-                    <span>Memory</span>
-                    <strong>
-                      {formatBytes(selectedRuntime.currentMemory)} / {formatBytes(selectedRuntime.totalMemory)}
-                    </strong>
-                  </div>
-                  <div className="statTile">
-                    <span>Processes</span>
-                    <strong>{selectedRuntime.procCount}</strong>
-                  </div>
-                  <div className="statTile">
-                    <span>Service Version</span>
-                    <strong>{selectedRuntime.serviceVersion || "n/a"}</strong>
-                  </div>
+
+            <div className="programCard">
+              <div className="statsGrid">
+                <div className="statTile">
+                  <span>Monitor Interval</span>
+                  <strong>{options.interval}s</strong>
                 </div>
-                <div className="logEntry">{selectedRuntime.message}</div>
-                <div className="logEntry">
-                  {selectedRuntime.computerName || "Unknown host"} · {selectedRuntime.osName || "Unknown OS"}{" "}
-                  {selectedRuntime.osVersion}
+                <div className="statTile">
+                  <span>First Run</span>
+                  <strong>{options.isFirstTimeRun ? "Enabled" : "Disabled"}</strong>
                 </div>
-                <div className="logEntry">Service path: {selectedRuntime.servicePath || "n/a"}</div>
-                <div className="logEntry">Launcher path: {selectedRuntime.appLauncherPath || "n/a"}</div>
-                <div className="collection">
-                  <div className="subHeader">
-                    <h3>Watched Apps</h3>
-                  </div>
-                  {selectedRuntime.appStates.length === 0 ? (
-                    <p className="emptyInline">No watched app state returned yet.</p>
-                  ) : (
-                    selectedRuntime.appStates.map((item) => (
-                      <div key={`${item.monitorName}-${item.processId}`} className="logEntry">
-                        {item.monitorName || item.processName || "Unknown process"} ·{" "}
-                        {item.isRunning ? "Running" : "Stopped"} · CPU {item.cpu.toFixed(1)}% · Mem{" "}
-                        {formatBytes(item.currentMemory)}
-                      </div>
-                    ))
-                  )}
+                <div className="statTile">
+                  <span>Global Monitors</span>
+                  <strong>{options.monitorProcesses.length}</strong>
                 </div>
-                <div className="collection">
-                  <div className="subHeader">
-                    <h3>Network</h3>
-                  </div>
-                  {selectedRuntime.networkStats.length === 0 ? (
-                    <p className="emptyInline">No network counters returned yet.</p>
-                  ) : (
-                    selectedRuntime.networkStats.map((item) => (
-                      <div key={item.ifName} className="logEntry">
-                        {item.ifName} · RX {formatBytes(item.bytesReceivedPerSec)}/s · TX{" "}
-                        {formatBytes(item.bytesSentedPerSec)}/s
-                      </div>
-                    ))
-                  )}
+                <div className="statTile">
+                  <span>Startup Apps</span>
+                  <strong>{options.startApps.length}</strong>
                 </div>
               </div>
-            )}
-          </div>
-
-          <div className="collection">
-            <div className="subHeader">
-              <h3>Screen Capture</h3>
-              <button onClick={() => void captureScreen()} disabled={!selectedStation || remoteBusy === "capture"}>
-                {remoteBusy === "capture" ? "Capturing..." : "Capture"}
-              </button>
             </div>
-            {!selectedCapture ? (
-              <p className="emptyInline">No remote screenshot captured yet.</p>
-            ) : (
-              <div className="programCard">
-                <div className="logEntry">
-                  {selectedCapture.endpoint} · {formatBytes(selectedCapture.byteLen)}
-                </div>
-                <img className="capturePreview" src={selectedCapture.dataUrl} alt="Remote station capture" />
+
+            <div className="collection">
+              <div className="subHeader">
+                <h3>Action Log</h3>
               </div>
-            )}
-          </div>
-
-          <div className="collection">
-            <div className="subHeader">
-              <h3>Remote Files</h3>
-              <button onClick={() => void browseRemote()} disabled={!selectedStation || remoteBusy === "browse"}>
-                {remoteBusy === "browse" ? "Browsing..." : "Browse"}
-              </button>
-            </div>
-            <label className="field">
-              <span>Remote Browse Path</span>
-              <input value={remotePath} onChange={(event) => setRemotePath(event.target.value)} />
-            </label>
-            <label className="field">
-              <span>Remote Source Path</span>
-              <input value={renameSourcePath} onChange={(event) => setRenameSourcePath(event.target.value)} />
-            </label>
-            <label className="field">
-              <span>Remote Target Path</span>
-              <input value={renameTargetPath} onChange={(event) => setRenameTargetPath(event.target.value)} />
-            </label>
-            <label className="field">
-              <span>Local Download Path</span>
-              <input value={downloadLocalPath} onChange={(event) => setDownloadLocalPath(event.target.value)} />
-            </label>
-            <label className="field">
-              <span>Local Upload Path</span>
-              <input value={uploadLocalPath} onChange={(event) => setUploadLocalPath(event.target.value)} />
-            </label>
-            <div className="toolbar miniToolbar">
-              <button onClick={() => void renameRemote()} disabled={!selectedStation || remoteBusy === "rename"}>
-                Rename
-              </button>
-              <button onClick={() => void downloadRemote()} disabled={!selectedStation || remoteBusy === "download"}>
-                Download
-              </button>
-              <button onClick={() => void uploadRemote()} disabled={!selectedStation || remoteBusy === "upload"}>
-                Upload
-              </button>
-            </div>
-            {!selectedBrowser ? (
-              <p className="emptyInline">Browse a remote path to inspect files.</p>
-            ) : (
               <div className="logList">
-                {selectedBrowser.items.length === 0 ? (
-                  <p className="emptyInline">No remote entries returned for this path.</p>
+                {log.length === 0 ? (
+                  <p className="emptyInline">No actions yet.</p>
                 ) : (
-                  selectedBrowser.items.map((item) => (
-                    <button
-                      key={item.path}
-                      className="stationCard fileEntry"
-                      onClick={() => {
-                        setRenameSourcePath(item.path);
-                        setRenameTargetPath(item.path);
-                        if (item.isDirectory) {
-                          setRemotePath(item.path);
-                          void browseRemote(item.path);
-                        }
-                      }}
-                    >
-                      <span className="stationName">{item.isDirectory ? "Directory" : "File"}</span>
-                      <span className="stationMeta">{item.path}</span>
-                    </button>
+                  log.map((entry, index) => (
+                    <div key={`${entry}-${index}`} className="logEntry">
+                      {entry}
+                    </div>
                   ))
                 )}
               </div>
-            )}
-          </div>
-
-          <div className="collection">
-            <div className="subHeader">
-              <h3>Action Log</h3>
             </div>
-            <div className="logList">
-              {log.length === 0 ? (
-                <p className="emptyInline">No actions yet.</p>
-              ) : (
-                log.map((entry, index) => (
-                  <div key={`${entry}-${index}`} className="logEntry">
-                    {entry}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      )}
     </div>
   );
 }

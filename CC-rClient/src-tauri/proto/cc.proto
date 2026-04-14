@@ -215,9 +215,9 @@ message ListenerInfo {
 
 message InterfaceStatistics {
   string if_name = 1;
-  float bytes_received_per_sec = 2;
-  float bytes_sented_per_sec = 3;
-  float total_bytes_per_sec = 4;
+  double bytes_received_per_sec = 2;
+  double bytes_sented_per_sec = 3;
+  double total_bytes_per_sec = 4;
   int64 bytes_received = 5;
   int64 bytes_sented = 6;
   int64 bytes_total = 7;

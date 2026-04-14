@@ -80,6 +80,10 @@ export type RemoteInterfaceStat = {
   bytesReceived: number;
   bytesSented: number;
   bytesTotal: number;
+  unicastPacketReceived: number;
+  unicastPacketSented: number;
+  multicastPacketReceived: number;
+  multicastPacketSented: number;
 };
 
 export type StationRuntimeSnapshot = {

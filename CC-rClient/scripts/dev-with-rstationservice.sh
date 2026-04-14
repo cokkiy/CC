@@ -146,7 +146,7 @@ fi
 HOME="$TEST_HOME" \
 CARGO_HOME="$HOST_CARGO_HOME" \
 RUSTUP_HOME="$HOST_RUSTUP_HOME" \
-"$SERVICE_BIN" foreground --config "$SERVICE_CONFIG_PATH" >"$SERVICE_LOG" 2>&1 &
+"$SERVICE_BIN" foreground  --config "$SERVICE_CONFIG_PATH" >"$SERVICE_LOG" 2>&1 &
 SERVICE_PID="$!"
 
 for _ in $(seq 1 50); do

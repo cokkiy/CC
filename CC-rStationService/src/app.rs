@@ -35,7 +35,11 @@ use crate::grpc::cc::{
 use crate::platform;
 use crate::state::{AppState, find_process_ids_by_name, terminate_process};
 
-pub async fn run(config_path: Option<PathBuf>, mut shutdown: watch::Receiver<bool>) -> Result<()> {
+pub async fn run(
+    config_path: Option<PathBuf>,
+    mut shutdown: watch::Receiver<bool>,
+    console_telemetry: bool,
+) -> Result<()> {
     let config = AppConfig::load(config_path.as_deref())?;
     let service_path = std::env::current_exe().context("resolve current executable")?;
     let state = Arc::new(AppState::new(config, service_path)?);
@@ -51,8 +55,13 @@ pub async fn run(config_path: Option<PathBuf>, mut shutdown: watch::Receiver<boo
         station_id = state.station_id(),
         listen_addr = %listen_addr,
         watched_processes = state.watched_processes().len(),
+        console_telemetry,
         "starting CC-rStationService"
     );
+
+    if console_telemetry {
+        tokio::spawn(console_telemetry_task(Arc::clone(&state)));
+    }
 
     Server::builder()
         .add_service(StationControlServer::new(StationControlService {
@@ -586,8 +595,9 @@ impl Telemetry for TelemetryRpc {
                         }
                     }
                     _ = &mut sleep => {
-                        yield telemetry_message(telemetry_server_message::Body::StationRunningState(state.running_state()));
-                        yield telemetry_message(telemetry_server_message::Body::AppsRunningState(state.apps_running_state()));
+                        let (running, apps) = state.running_and_apps_state().await;
+                        yield telemetry_message(telemetry_server_message::Body::StationRunningState(running));
+                        yield telemetry_message(telemetry_server_message::Body::AppsRunningState(apps));
                         yield telemetry_message(telemetry_server_message::Body::NetStatistics(state.network_statistics()));
                     }
                 }
@@ -748,6 +758,63 @@ fn telemetry_message(body: telemetry_server_message::Body) -> TelemetryServerMes
     TelemetryServerMessage {
         message_id: uuid::Uuid::new_v4().to_string(),
         body: Some(body),
+    }
+}
+
+async fn console_telemetry_task(state: Arc<AppState>) {
+    let mut ticker = tokio::time::interval(Duration::from_secs(state.interval_seconds()));
+    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+    loop {
+        ticker.tick().await;
+
+        let (running, apps) = state.running_and_apps_state().await;
+        let network = state.network_statistics();
+
+        let watched = apps
+            .items
+            .iter()
+            .map(|item| {
+                let process_name = item
+                    .process
+                    .as_ref()
+                    .map(|process| process.process_monitor_name.as_str())
+                    .unwrap_or("<unknown>");
+                format!(
+                    "{}:running={},proc_count={},cpu={:.2},memory={}",
+                    process_name, item.is_running, item.proc_count, item.cpu, item.current_memory
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(" | ");
+
+        let network_summary = network
+            .interface_statistics
+            .iter()
+            .map(|item| {
+                format!(
+                    "{} rx/s={:.0} tx/s={:.0}",
+                    item.if_name, item.bytes_received_per_sec, item.bytes_sented_per_sec
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(" | ");
+
+        println!(
+            "[telemetry] station={} cpu={:.2}% memory={} proc_count={} tcp_connections={} udp_listeners={} watched=[{}] net=[{}]",
+            running.station_id,
+            running.cpu,
+            running.current_memory,
+            running.proc_count,
+            network.current_connections,
+            network.udp_listeners,
+            watched,
+            network_summary
+        );
+
+        let next_seconds = state.interval_seconds().max(1);
+        ticker = tokio::time::interval(Duration::from_secs(next_seconds));
+        ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     }
 }
 

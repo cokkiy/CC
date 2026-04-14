@@ -24,7 +24,7 @@ fn main() -> Result<()> {
         platform::daemonize()?;
     }
 
-    run_foreground(cli.config_path)
+    run_foreground(cli.config_path, cli.console_telemetry)
 }
 
 fn init_tracing() {
@@ -33,7 +33,7 @@ fn init_tracing() {
         .try_init();
 }
 
-fn run_foreground(config_path: Option<PathBuf>) -> Result<()> {
+fn run_foreground(config_path: Option<PathBuf>, console_telemetry: bool) -> Result<()> {
     let runtime = Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -46,7 +46,7 @@ fn run_foreground(config_path: Option<PathBuf>) -> Result<()> {
             let _ = shutdown_tx.send(true);
         });
 
-        let result = app::run(config_path, shutdown_rx).await;
+        let result = app::run(config_path, shutdown_rx, console_telemetry).await;
         signal_task.abort();
         result
     })
@@ -82,6 +82,7 @@ enum RunMode {
 struct Cli {
     mode: RunMode,
     config_path: Option<PathBuf>,
+    console_telemetry: bool,
 }
 
 impl Cli {
@@ -89,6 +90,7 @@ impl Cli {
         let mut args = std::env::args().skip(1);
         let mut mode = RunMode::Auto;
         let mut config_path = None;
+        let mut console_telemetry = false;
 
         while let Some(arg) = args.next() {
             match arg.as_str() {
@@ -100,11 +102,18 @@ impl Cli {
                     };
                     config_path = Some(PathBuf::from(path));
                 }
+                "--console-telemetry" | "--telemetry-console" => {
+                    console_telemetry = true;
+                }
                 other => return Err(anyhow!("unknown argument: {other}")),
             }
         }
 
-        Ok(Self { mode, config_path })
+        Ok(Self {
+            mode,
+            config_path,
+            console_telemetry,
+        })
     }
 }
 
@@ -171,7 +180,7 @@ fn run_windows_service() -> Result<()> {
     });
 
     set_service_status(&status_handle, ServiceState::Running)?;
-    let result = runtime.block_on(app::run(None, shutdown_rx));
+    let result = runtime.block_on(app::run(None, shutdown_rx, false));
     set_service_status(&status_handle, ServiceState::Stopped)?;
     result
 }

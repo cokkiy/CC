@@ -3,6 +3,8 @@ use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, RwLock};
+use std::thread;
+use std::time::Duration;
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Local};
@@ -10,7 +12,7 @@ use netstat2::{AddressFamilyFlags, ProtocolFlags, ProtocolSocketInfo, TcpState, 
 use pnet_datalink::interfaces;
 #[cfg(windows)]
 use sysinfo::Disks;
-use sysinfo::{Networks, Pid, System};
+use sysinfo::{MINIMUM_CPU_UPDATE_INTERVAL, Networks, Pid, ProcessesToUpdate, System};
 
 use crate::config::AppConfig;
 use crate::grpc::cc::{
@@ -124,8 +126,7 @@ impl AppState {
     }
 
     pub fn system_state(&self) -> StationSystemState {
-        let mut system = System::new_all();
-        system.refresh_all();
+        let system = prepared_system_snapshot();
 
         StationSystemState {
             station_id: self.station_id.clone(),
@@ -139,8 +140,7 @@ impl AppState {
     }
 
     pub fn running_state(&self) -> StationRunningState {
-        let mut system = System::new_all();
-        system.refresh_all();
+        let system = prepared_system_snapshot();
 
         StationRunningState {
             station_id: self.station_id.clone(),
@@ -153,8 +153,7 @@ impl AppState {
 
     pub fn apps_running_state(&self) -> AppsRunningStateEnvelope {
         let watched = self.watched_processes();
-        let mut system = System::new_all();
-        system.refresh_all();
+        let system = prepared_system_snapshot();
 
         let items = watched
             .iter()
@@ -164,9 +163,36 @@ impl AppState {
         AppsRunningStateEnvelope { items }
     }
 
+    /// Single async snapshot for both running_state and apps_running_state — avoids
+    /// two separate blocking sleeps per telemetry cycle.
+    pub async fn running_and_apps_state(
+        &self,
+    ) -> (StationRunningState, AppsRunningStateEnvelope) {
+        let station_id = self.station_id.clone();
+        let watched = self.watched_processes();
+        let server_version = self.server_version();
+
+        let system = prepared_system_snapshot_async().await;
+
+        let running = StationRunningState {
+            station_id: station_id.clone(),
+            current_memory: saturating_i64(system.used_memory()),
+            cpu: system.global_cpu_usage(),
+            proc_count: system.processes().len() as i32,
+            version: Some(server_version),
+        };
+
+        let items = watched
+            .iter()
+            .map(|name| collect_app_running_state(&system, &station_id, name))
+            .collect();
+        let apps = AppsRunningStateEnvelope { items };
+
+        (running, apps)
+    }
+
     pub fn all_process_info(&self) -> GetAllProcessInfoResponse {
-        let mut system = System::new_all();
-        system.refresh_all();
+        let system = prepared_system_snapshot();
 
         let mut items = system
             .processes()
@@ -360,13 +386,12 @@ pub fn find_process_ids_by_name(name: &str) -> Vec<i32> {
     let mut system = System::new_all();
     system.refresh_all();
 
-    process_name_candidates(name)
-        .into_iter()
-        .flat_map(|candidate| {
-            system.processes().iter().filter_map(move |(pid, process)| {
-                let process_name = process.name().to_string_lossy().to_ascii_lowercase();
-                (process_name == candidate).then_some(pid.as_u32() as i32)
-            })
+    let candidates = process_name_candidates(name);
+    system
+        .processes()
+        .iter()
+        .filter_map(|(pid, process)| {
+            process_matches_name(process, &candidates).then_some(pid.as_u32() as i32)
         })
         .collect()
 }
@@ -418,7 +443,7 @@ fn collect_app_running_state(system: &System, station_id: &str, name: &str) -> A
                 is_running: true,
                 cpu: pid.1.cpu_usage(),
                 proc_count: 1,
-                thread_count: 0,
+                thread_count: thread_count(pid.1),
                 current_memory: saturating_i64(pid.1.memory()),
                 app_version: String::new(),
                 start_time: saturating_i64(pid.1.start_time()),
@@ -449,19 +474,20 @@ fn collect_app_running_state(system: &System, station_id: &str, name: &str) -> A
     let mut process_id = -1;
     let mut process_name = String::new();
     let mut start_time = 0i64;
+    let mut thread_count_total = 0i32;
 
     for (pid, process) in system.processes() {
-        let current_name = process.name().to_string_lossy().to_ascii_lowercase();
-        if candidates
-            .iter()
-            .any(|candidate| candidate == &current_name)
-        {
+        if process_matches_name(process, &candidates) {
             proc_count += 1;
             current_memory += saturating_i64(process.memory());
             cpu += process.cpu_usage();
             process_id = pid.as_u32() as i32;
             process_name = process.name().to_string_lossy().into_owned();
             start_time = saturating_i64(process.start_time());
+            thread_count_total += process
+                .tasks()
+                .map(|tasks| i32::try_from(tasks.len()).unwrap_or(i32::MAX))
+                .unwrap_or_default();
         }
     }
 
@@ -475,7 +501,7 @@ fn collect_app_running_state(system: &System, station_id: &str, name: &str) -> A
         is_running: proc_count > 0,
         cpu,
         proc_count,
-        thread_count: 0,
+        thread_count: thread_count_total,
         current_memory,
         app_version: String::new(),
         start_time,
@@ -493,6 +519,49 @@ fn process_name_candidates(name: &str) -> Vec<String> {
     } else {
         vec![lower.clone(), format!("{lower}.exe")]
     }
+}
+
+/// Returns true if `process` matches the watched `name`.
+///
+/// Two match strategies are used to handle Linux quirks:
+/// 1. **Prefix match on process name**: Linux truncates comm (and thus `name()`) to 15
+///    characters in `/proc/[pid]/stat`. So `cc-rstationservice` (18 chars) appears as
+///    `cc-rstationserv`. We match when the watched name *starts with* the process name.
+/// 2. **Cmdline substring match**: Script runners (node, python, sh) show up under the
+///    interpreter name. We check whether any cmdline token *contains* the watched name,
+///    so `vite` running as `node /path/to/vite` is found via its cmdline.
+fn process_matches_name(process: &sysinfo::Process, candidates: &[String]) -> bool {
+    let proc_name = process.name().to_string_lossy().to_ascii_lowercase();
+
+    for candidate in candidates {
+        // Exact match
+        if proc_name == *candidate {
+            return true;
+        }
+
+        // Prefix match: kernel truncates comm to 15 chars on Linux.
+        // e.g. "cc-rstationserv" matches watched name "cc-rstationservice"
+        if candidate.starts_with(&proc_name) && proc_name.len() == 15 {
+            return true;
+        }
+
+        // Cmdline match: catch scripts running under an interpreter.
+        // e.g. "node /usr/local/bin/vite" matched by watched name "vite"
+        for arg in process.cmd() {
+            let arg_lower = arg.to_string_lossy().to_ascii_lowercase();
+            // Match on the file stem of any cmdline token to avoid false positives
+            // from full paths like "/home/user/.nvm/node"
+            let stem = std::path::Path::new(arg_lower.as_str())
+                .file_stem()
+                .map(|s| s.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            if stem == *candidate {
+                return true;
+            }
+        }
+    }
+
+    false
 }
 
 fn resolve_browse_path(path: &str) -> PathBuf {
@@ -524,6 +593,34 @@ fn saturating_i64(value: u64) -> i64 {
     i64::try_from(value).unwrap_or(i64::MAX)
 }
 
+fn prepared_system_snapshot() -> System {
+    let mut system = System::new_all();
+    system.refresh_all();
+
+    // Use a short blocking sleep so cpu_usage() is meaningful. This is intentionally
+    // blocking (not async) because System is not Send, but call sites that care about
+    // not blocking the async executor should use spawn_blocking.
+    thread::sleep(MINIMUM_CPU_UPDATE_INTERVAL.max(Duration::from_millis(200)));
+    system.refresh_cpu_usage();
+    system.refresh_processes(ProcessesToUpdate::All, true);
+
+    system
+}
+
+/// Async-safe version: runs the blocking snapshot on a dedicated thread pool thread.
+pub async fn prepared_system_snapshot_async() -> System {
+    tokio::task::spawn_blocking(prepared_system_snapshot)
+        .await
+        .unwrap_or_else(|_| System::new_all())
+}
+
+fn thread_count(process: &sysinfo::Process) -> i32 {
+    process
+        .tasks()
+        .map(|tasks| i32::try_from(tasks.len()).unwrap_or(i32::MAX))
+        .unwrap_or_default()
+}
+
 struct NetworkSampler {
     networks: Networks,
 }
@@ -541,19 +638,19 @@ impl NetworkSampler {
         let rates = self
             .networks
             .iter()
-            .map(|(name, data)| InterfaceStatistics {
-                if_name: name.to_string(),
-                bytes_received_per_sec: data.received() as f32,
-                bytes_sented_per_sec: data.transmitted() as f32,
-                total_bytes_per_sec: (data.received() + data.transmitted()) as f32,
-                bytes_received: 0,
-                bytes_sented: 0,
-                bytes_total: 0,
-                unicast_packet_received: 0,
-                unicast_packet_sented: 0,
-                multicast_packet_received: 0,
-                multicast_packet_sented: 0,
-            })
+                .map(|(name, data)| InterfaceStatistics {
+                    if_name: name.to_string(),
+                    bytes_received_per_sec: data.received() as f64,
+                    bytes_sented_per_sec: data.transmitted() as f64,
+                    total_bytes_per_sec: (data.received() + data.transmitted()) as f64,
+                    bytes_received: 0,
+                    bytes_sented: 0,
+                    bytes_total: 0,
+                    unicast_packet_received: 0,
+                    unicast_packet_sented: 0,
+                    multicast_packet_received: 0,
+                    multicast_packet_sented: 0,
+                })
             .map(|item| (item.if_name.clone(), item))
             .collect::<HashMap<_, _>>();
 
