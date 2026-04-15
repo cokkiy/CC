@@ -10,20 +10,6 @@ export type StartProgram = {
   allowMultiInstance: boolean;
 };
 
-export type WeatherImageOption = {
-  download: number;
-  url: string;
-  userName: string;
-  password: string;
-  lastHours: number;
-  interval: number;
-  deletePreviousFiles: boolean;
-  deleteHowHoursAgo: number;
-  subDirectory: string;
-  savePathForLinux: string;
-  savePathForWindows: string;
-};
-
 export type Station = {
   id: string;
   name: string;
@@ -39,7 +25,6 @@ export type ClientOptions = {
   isFirstTimeRun: boolean;
   startApps: StartProgram[];
   monitorProcesses: string[];
-  weatherImageDownloadOption: WeatherImageOption;
 };
 
 export type PersistedState = {
@@ -156,4 +141,13 @@ export type StationGroup = {
   description: string;
   tags: string[];
   stationIds: string[];
+};
+
+export type BatchCapture = {
+  stationId: string;
+  stationName: string;
+  endpoint: string;
+  byteLen: number;
+  dataUrl: string;
+  error?: string;
 };

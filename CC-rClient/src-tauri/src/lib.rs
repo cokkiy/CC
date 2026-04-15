@@ -1,5 +1,5 @@
-use control::{execute_station_action, set_station_gathering_interval, set_station_weather_picture_option};
-use models::{ActionResult, AppSnapshot, PersistedState, StationAction, StationGroup, WeatherImageOption};
+use control::{execute_station_action, set_station_gathering_interval};
+use models::{ActionResult, AppSnapshot, PersistedState, StationAction, StationGroup};
 use remote::{
     browse_station_files, capture_station_screen, download_station_file, execute_station_command,
     fetch_station_runtime, rename_station_file, upload_station_file, CommandExecutionResult,
@@ -240,32 +240,6 @@ async fn set_station_gathering_interval_for_ui(
     }
 }
 
-#[tauri::command]
-async fn set_station_weather_option_for_ui(
-    option: WeatherImageOption,
-) -> Result<String, String> {
-    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
-    if snapshot.stations.is_empty() {
-        return Err("No stations configured.".into());
-    }
-    let mut ok_count = 0usize;
-    let mut errs = Vec::new();
-    for station in &snapshot.stations {
-        match set_station_weather_picture_option(station, &option).await {
-            Ok(()) => ok_count += 1,
-            Err(e) => errs.push(format!("{}: {e}", station.name)),
-        }
-    }
-    if errs.is_empty() {
-        Ok(format!("Weather options saved to {ok_count} station(s).").into())
-    } else {
-        Err(format!(
-            "Saved to {ok_count} station(s); failed on: {}",
-            errs.join("; ")
-        ))
-    }
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -286,7 +260,6 @@ pub fn run() {
             update_station_group,
             delete_station_group,
             set_station_gathering_interval_for_ui,
-            set_station_weather_option_for_ui,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

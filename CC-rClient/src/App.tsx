@@ -13,6 +13,7 @@ import {
 import type {
   ActionResult,
   AppSnapshot,
+  BatchCapture,
   ClientOptions,
   CommandExecutionResult,
   PersistedState,
@@ -25,26 +26,11 @@ import type {
   StationScreenCapture
 } from "./types";
 
-const emptyWeatherOption = {
-  download: 2,
-  url: "",
-  userName: "",
-  password: "",
-  lastHours: 0,
-  interval: 2,
-  deletePreviousFiles: false,
-  deleteHowHoursAgo: 0,
-  subDirectory: "",
-  savePathForLinux: "",
-  savePathForWindows: ""
-};
-
 const emptyOptions: ClientOptions = {
   interval: 2,
   isFirstTimeRun: true,
   startApps: [],
-  monitorProcesses: [],
-  weatherImageDownloadOption: emptyWeatherOption
+  monitorProcesses: []
 };
 
 const emptyStation = (): Station => ({
@@ -156,6 +142,12 @@ function ComputerStatusIcon({ state }: { state: StationVisualState }) {
   );
 }
 
+type NetworkDataPoint = {
+  ts: number;
+  rxbps: number;
+  txbps: number;
+};
+
 type ChartDataPoint = { ts: number; cpu: number; memory: number; memPct: number };
 
 function PerformanceCharts({
@@ -228,6 +220,58 @@ function PerformanceCharts({
   );
 }
 
+function NetworkTrafficChart({
+  history,
+}: {
+  history: { ts: number; rxbps: number; txbps: number }[];
+}) {
+  const data = history.map((h) => ({
+    ts: h.ts,
+    rxbps: h.rxbps,
+    txbps: h.txbps,
+  }));
+
+  if (data.length < 2) {
+    return <p className="emptyInline">Collecting network traffic data…</p>;
+  }
+
+  return (
+    <div style={{ flex: "1 1 300px", minWidth: "300px" }}>
+      <p style={{ margin: "0 0 0.25rem", fontWeight: 600, fontSize: "0.8rem" }}>Network Traffic</p>
+      <ResponsiveContainer width="100%" height={100}>
+        <LineChart data={data} margin={{ top: 2, right: 4, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--cpuPie-track)" />
+          <XAxis dataKey="ts" tickFormatter={(v) => new Date(v).toLocaleTimeString()} tick={{ fontSize: 9 }} />
+          <YAxis tick={{ fontSize: 9 }} tickFormatter={(v) => formatBytes(v)} />
+          <Tooltip
+            formatter={(v, name) => [formatBytes(Number(v)), name === "rxbps" ? "RX/s" : "TX/s"]}
+            labelFormatter={(v) => new Date(Number(v)).toLocaleTimeString()}
+          />
+          <Legend formatter={(v) => (v === "rxbps" ? "RX/s" : "TX/s")} />
+          <Line
+            type="monotone"
+            dataKey="rxbps"
+            stroke="#1f9d55"
+            strokeWidth={1.5}
+            dot={false}
+            name="rxbps"
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="txbps"
+            stroke="#2d8cf0"
+            strokeWidth={1.5}
+            dot={false}
+            name="txbps"
+            isAnimationActive={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 export default function App() {
   const [snapshot, setSnapshot] = useState<AppSnapshot | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
@@ -239,10 +283,11 @@ export default function App() {
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [runtimeByStation, setRuntimeByStation] = useState<Record<string, StationRuntimeSnapshot>>({});
-  const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; ts: number }[]>>({});
+  const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; ts: number; rxbps: number; txbps: number }[]>>({});
   const MAX_HISTORY = 30;
   const [browserByStation, setBrowserByStation] = useState<Record<string, RemoteFileBrowserResult>>({});
   const [captureByStation, setCaptureByStation] = useState<Record<string, StationScreenCapture>>({});
+  const [batchCaptures, setBatchCaptures] = useState<BatchCapture[]>([]);
   const [runtimeLoadingId, setRuntimeLoadingId] = useState<string>("");
   const [remoteBusy, setRemoteBusy] = useState<string>("");
   const [remotePath, setRemotePath] = useState("");
@@ -256,7 +301,7 @@ export default function App() {
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
-  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups">("stations");
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
 
   useEffect(() => {
@@ -414,9 +459,11 @@ export default function App() {
       setRuntimeByStation((current) => ({ ...current, [targetId]: runtime }));
       setHistoryByStation((current) => {
         const prev = current[targetId] ?? [];
+        const totalRx = runtime.networkStats.reduce((s, n) => s + n.bytesReceivedPerSec, 0);
+        const totalTx = runtime.networkStats.reduce((s, n) => s + n.bytesSentedPerSec, 0);
         const next = [
           ...prev.slice(-(MAX_HISTORY - 1)),
-          { cpu: runtime.cpu, memory: runtime.currentMemory, ts: Date.now() },
+          { cpu: runtime.cpu, memory: runtime.currentMemory, ts: Date.now(), rxbps: totalRx, txbps: totalTx },
         ];
         return { ...current, [targetId]: next };
       });
@@ -587,6 +634,53 @@ export default function App() {
       setLog((current) => [`Captured screen from ${capture.endpoint}.`, ...current]);
     } catch (error) {
       setLog((current) => [`Screen capture failed: ${String(error)}`, ...current]);
+    } finally {
+      setRemoteBusy("");
+    }
+  }
+
+  async function batchCaptureScreen() {
+    if (filteredStations.length === 0) {
+      setLog((current) => ["No stations available for batch capture.", ...current]);
+      return;
+    }
+
+    setRemoteBusy("batchCapture");
+    setBatchCaptures([]);
+    let success = 0;
+    let failed = 0;
+    const results: BatchCapture[] = [];
+    try {
+      for (const station of filteredStations) {
+        try {
+          const capture = await invoke<StationScreenCapture>("capture_station_screen_for_ui", {
+            id: station.id
+          });
+          results.push({
+            stationId: station.id,
+            stationName: station.name,
+            endpoint: capture.endpoint,
+            byteLen: capture.byteLen,
+            dataUrl: capture.dataUrl,
+          });
+          success += 1;
+        } catch (error) {
+          results.push({
+            stationId: station.id,
+            stationName: station.name,
+            endpoint: "",
+            byteLen: 0,
+            dataUrl: "",
+            error: String(error),
+          });
+          failed += 1;
+        }
+      }
+      setBatchCaptures(results);
+      setLog((current) => [
+        `Batch capture finished: ${success} success, ${failed} failed.`,
+        ...current
+      ]);
     } finally {
       setRemoteBusy("");
     }
@@ -780,6 +874,9 @@ export default function App() {
           {saving ? "Saving..." : "Save"}
         </button>
         <button onClick={() => void exportLegacyFiles()}>Export Legacy</button>
+        <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
+          {remoteBusy === "batchCapture" ? "批量截图..." : "批量截图"}
+        </button>
       </section>
 
       {activePage === "stations" ? (
@@ -1175,6 +1272,45 @@ export default function App() {
                     {selectedCapture.endpoint} · {formatBytes(selectedCapture.byteLen)}
                   </div>
                   <img className="capturePreview" src={selectedCapture.dataUrl} alt="Remote station capture" />
+                </div>
+              )}
+            </div>
+
+            <div className="collection">
+              <div className="subHeader">
+                <h3>Batch Captures ({batchCaptures.length})</h3>
+                <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
+                  {remoteBusy === "batchCapture" ? "Capturing..." : "Batch Capture All"}
+                </button>
+              </div>
+              {batchCaptures.length === 0 ? (
+                <p className="emptyInline">Click "Batch Capture All" to capture screenshots from all filtered stations.</p>
+              ) : (
+                <div className="captureGrid">
+                  {batchCaptures.map((capture) => (
+                    <div key={capture.stationId} className="captureThumb">
+                      {capture.error ? (
+                        <div className="captureThumbError">
+                          <div className="captureThumbName">{capture.stationName}</div>
+                          <div className="captureThumbErrMsg">Failed: {capture.error}</div>
+                        </div>
+                      ) : (
+                        <>
+                          <img
+                            src={capture.dataUrl}
+                            alt={`Screen of ${capture.stationName}`}
+                            className="captureThumbImg"
+                            onClick={() => {
+                              setSelectedId(capture.stationId);
+                              setIsEditingStationDetail(false);
+                            }}
+                            title={`${capture.stationName} · ${capture.endpoint} · ${formatBytes(capture.byteLen)}`}
+                          />
+                          <div className="captureThumbName">{capture.stationName}</div>
+                        </>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -1608,225 +1744,6 @@ export default function App() {
                 />
               </label>
 
-              <div className="collection">
-                <div className="subHeader">
-                  <h3>Weather Image Download Options</h3>
-                </div>
-                <label className="checkField">
-                  <input
-                    type="checkbox"
-                    checked={options.weatherImageDownloadOption.download === 1}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          download: event.target.checked ? 1 : 0
-                        }
-                      }))
-                    }
-                  />
-                  <span>Enable weather image download</span>
-                </label>
-
-                <label className="field">
-                  <span>FTP URL</span>
-                  <input
-                    type="text"
-                    value={options.weatherImageDownloadOption.url}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          url: event.target.value
-                        }
-                      }))
-                    }
-                    placeholder="ftp://example.com/weather"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Username</span>
-                  <input
-                    type="text"
-                    value={options.weatherImageDownloadOption.userName}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          userName: event.target.value
-                        }
-                      }))
-                    }
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Password</span>
-                  <input
-                    type="password"
-                    value={options.weatherImageDownloadOption.password}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          password: event.target.value
-                        }
-                      }))
-                    }
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Refresh Interval (minutes)</span>
-                  <input
-                    type="number"
-                    min={1}
-                    value={options.weatherImageDownloadOption.interval}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          interval: Number(event.target.value)
-                        }
-                      }))
-                    }
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Lookback Hours</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={options.weatherImageDownloadOption.lastHours}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          lastHours: Number(event.target.value)
-                        }
-                      }))
-                    }
-                  />
-                </label>
-
-                <label className="checkField">
-                  <input
-                    type="checkbox"
-                    checked={options.weatherImageDownloadOption.deletePreviousFiles}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          deletePreviousFiles: event.target.checked
-                        }
-                      }))
-                    }
-                  />
-                  <span>Delete previous files</span>
-                </label>
-
-                {options.weatherImageDownloadOption.deletePreviousFiles && (
-                  <label className="field">
-                    <span>Delete files older than (hours)</span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={options.weatherImageDownloadOption.deleteHowHoursAgo}
-                      onChange={(event) =>
-                        setOptions((current) => ({
-                          ...current,
-                          weatherImageDownloadOption: {
-                            ...current.weatherImageDownloadOption,
-                            deleteHowHoursAgo: Number(event.target.value)
-                          }
-                        }))
-                      }
-                    />
-                  </label>
-                )}
-
-                <label className="field">
-                  <span>Sub Directory</span>
-                  <input
-                    type="text"
-                    value={options.weatherImageDownloadOption.subDirectory}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          subDirectory: event.target.value
-                        }
-                      }))
-                    }
-                    placeholder="weather_images"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Save Path (Linux)</span>
-                  <input
-                    type="text"
-                    value={options.weatherImageDownloadOption.savePathForLinux}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          savePathForLinux: event.target.value
-                        }
-                      }))
-                    }
-                    placeholder="/var/lib/weather"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Save Path (Windows)</span>
-                  <input
-                    type="text"
-                    value={options.weatherImageDownloadOption.savePathForWindows}
-                    onChange={(event) =>
-                      setOptions((current) => ({
-                        ...current,
-                        weatherImageDownloadOption: {
-                          ...current.weatherImageDownloadOption,
-                          savePathForWindows: event.target.value
-                        }
-                      }))
-                    }
-                    placeholder="C:\\WeatherImages"
-                  />
-                </label>
-
-                <div className="toolbar miniToolbar" style={{ marginTop: "0.5rem" }}>
-                  <button
-                    className="accent"
-                    onClick={async () => {
-                      try {
-                        const msg = await invoke<string>(
-                          "set_station_weather_option_for_ui",
-                          { option: options.weatherImageDownloadOption }
-                        );
-                        setLog((current) => [msg, ...current]);
-                      } catch (err) {
-                        setLog((current) => [`Failed to save weather options: ${String(err)}`, ...current]);
-                      }
-                    }}
-                  >
-                    Save Weather Options
-                  </button>
-                </div>
-              </div>
             </div>
           </section>
 

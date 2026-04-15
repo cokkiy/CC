@@ -7,11 +7,9 @@ use tonic::transport::Channel;
 use crate::grpc::cc::{
     station_control_client::StationControlClient, AppStartParameter, AppStartingResult,
     CloseAppRequest, Empty, GetAllProcessInfoResponse, RebootRequest, RestartAppRequest,
-    SetStateGatheringIntervalRequest, SetWeatherPictureDownloadOptionRequest,
+    SetStateGatheringIntervalRequest,
     ShutdownRequest, StartAppRequest, SwitchDisplayPageAndModeRequest,
-    WeatherPictureDownloadOption as GrpcWeatherPictureDownloadOption,
 };
-use crate::models::WeatherImageOption;
 use crate::models::{ActionResult, StartProgram, Station, StationAction};
 use crate::storage::StorageError;
 use crate::wol;
@@ -605,33 +603,5 @@ pub async fn set_station_gathering_interval(
         })
         .await
         .map_err(|e| format!("set_state_gathering_interval RPC via {endpoint}: {e}"))?;
-    Ok(())
-}
-
-/// Set the weather picture download option on a station via gRPC.
-pub async fn set_station_weather_picture_option(
-    station: &Station,
-    option: &WeatherImageOption,
-) -> Result<(), String> {
-    let (mut client, endpoint) = connect_station(station).await?;
-    let proto_option = GrpcWeatherPictureDownloadOption {
-        download: option.download != 0,
-        url: option.url.clone(),
-        user_name: option.user_name.clone(),
-        password: option.password.clone(),
-        interval: option.interval,
-        last_hours: option.last_hours,
-        delete_previous_files: option.delete_previous_files,
-        delete_how_hours_ago: option.delete_how_hours_ago,
-        sub_directory: option.sub_directory.clone(),
-        save_path_for_linux: option.save_path_for_linux.clone(),
-        save_path_for_windows: option.save_path_for_windows.clone(),
-    };
-    client
-        .set_weather_picture_download_option(SetWeatherPictureDownloadOptionRequest {
-            option: Some(proto_option),
-        })
-        .await
-        .map_err(|e| format!("set_weather_picture_download_option RPC via {endpoint}: {e}"))?;
     Ok(())
 }

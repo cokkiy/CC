@@ -1,6 +1,5 @@
 use crate::models::{
     AppSnapshot, ClientOptions, NetworkInterface, PersistedState, StartProgram, Station,
-    StationGroup, WeatherImageOption,
 };
 use quick_xml::escape::escape;
 use roxmltree::Document;
@@ -266,57 +265,11 @@ fn load_legacy_options() -> Result<ClientOptions, StorageError> {
         .map(parse_pipe_list)
         .unwrap_or_default();
 
-    let weather = WeatherImageOption {
-        download: section_value(&sections, "WeatherImageDownloadOption", "Download")
-            .and_then(|value| value.parse::<i32>().ok())
-            .unwrap_or(2),
-        url: section_value(&sections, "WeatherImageDownloadOption", "Url").unwrap_or_default(),
-        user_name: section_value(&sections, "WeatherImageDownloadOption", "UserName")
-            .unwrap_or_default(),
-        password: section_value(&sections, "WeatherImageDownloadOption", "Password")
-            .unwrap_or_default(),
-        last_hours: section_value(&sections, "WeatherImageDownloadOption", "LastHours")
-            .and_then(|value| value.parse::<i32>().ok())
-            .unwrap_or_default(),
-        interval: section_value(&sections, "WeatherImageDownloadOption", "Interval")
-            .and_then(|value| value.parse::<i32>().ok())
-            .unwrap_or(2),
-        delete_previous_files: section_value(
-            &sections,
-            "WeatherImageDownloadOption",
-            "DeletePreviousFiles",
-        )
-        .map(parse_bool)
-        .unwrap_or(false),
-        delete_how_hours_ago: section_value(
-            &sections,
-            "WeatherImageDownloadOption",
-            "DeleteHowHoursAgo",
-        )
-        .and_then(|value| value.parse::<i32>().ok())
-        .unwrap_or_default(),
-        sub_directory: section_value(&sections, "WeatherImageDownloadOption", "SubDirectory")
-            .unwrap_or_default(),
-        save_path_for_linux: section_value(
-            &sections,
-            "WeatherImageDownloadOption",
-            "SavePathForLinux",
-        )
-        .unwrap_or_default(),
-        save_path_for_windows: section_value(
-            &sections,
-            "WeatherImageDownloadOption",
-            "SavePathForWindows",
-        )
-        .unwrap_or_default(),
-    };
-
     Ok(ClientOptions {
         interval,
         is_first_time_run,
         start_apps,
         monitor_processes,
-        weather_image_download_option: weather,
     })
 }
 
@@ -457,26 +410,11 @@ pub fn export_legacy_ini(options: &ClientOptions) -> String {
     let monitor_processes = options.monitor_processes.join("|");
 
     format!(
-    "Interval={interval}\nIsFirstTimeRun={first_run}\n[ControlAndMonitor]\nStartApps={start_apps}\nMonitorProc={monitor_processes}\n[WeatherImageDownloadOption]\nDownload={download}\nUrl={url}\nUserName={user_name}\nPassword={password}\nLastHours={last_hours}\nInterval={weather_interval}\nDeletePreviousFiles={delete_previous}\nDeleteHowHoursAgo={delete_hours}\nSubDirectory={sub_directory}\nSavePathForLinux={linux_path}\nSavePathForWindows={windows_path}\n",
+    "Interval={interval}\nIsFirstTimeRun={first_run}\n[ControlAndMonitor]\nStartApps={start_apps}\nMonitorProc={monitor_processes}\n",
     interval = options.interval,
     first_run = if options.is_first_time_run { "true" } else { "false" },
     start_apps = start_apps,
     monitor_processes = monitor_processes,
-    download = options.weather_image_download_option.download,
-    url = options.weather_image_download_option.url,
-    user_name = options.weather_image_download_option.user_name,
-    password = options.weather_image_download_option.password,
-    last_hours = options.weather_image_download_option.last_hours,
-    weather_interval = options.weather_image_download_option.interval,
-    delete_previous = if options.weather_image_download_option.delete_previous_files {
-      "true"
-    } else {
-      "false"
-    },
-    delete_hours = options.weather_image_download_option.delete_how_hours_ago,
-    sub_directory = options.weather_image_download_option.sub_directory,
-    linux_path = options.weather_image_download_option.save_path_for_linux,
-    windows_path = options.weather_image_download_option.save_path_for_windows,
   )
 }
 
@@ -548,19 +486,6 @@ SavePathForWindows=C:\weather
             monitor_processes: parse_pipe_list(
                 section_value(&sections, "ControlAndMonitor", "MonitorProc").unwrap(),
             ),
-            weather_image_download_option: WeatherImageOption {
-                download: 2,
-                url: "http://example.com".into(),
-                user_name: "u".into(),
-                password: "p".into(),
-                last_hours: 8,
-                interval: 3,
-                delete_previous_files: true,
-                delete_how_hours_ago: 24,
-                sub_directory: "weather".into(),
-                save_path_for_linux: "/tmp/weather".into(),
-                save_path_for_windows: "C:\\weather".into(),
-            },
         };
 
         assert_eq!(options.interval, 5);
@@ -609,13 +534,11 @@ SavePathForWindows=C:\weather
                 allow_multi_instance: true,
             }],
             monitor_processes: vec!["alpha".into(), "beta".into()],
-            weather_image_download_option: WeatherImageOption::default(),
         });
 
         assert!(ini.contains("Interval=7"));
         assert!(ini.contains("[ControlAndMonitor]"));
         assert!(ini.contains("StartApps=/opt/app && --x && proc && 1"));
         assert!(ini.contains("MonitorProc=alpha|beta"));
-        assert!(ini.contains("[WeatherImageDownloadOption]"));
     }
 }

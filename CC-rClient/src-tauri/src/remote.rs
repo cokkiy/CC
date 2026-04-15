@@ -14,12 +14,12 @@ use crate::control::{station_endpoints, station_label};
 use crate::grpc::cc::{
     self, file_transfer_client::FileTransferClient, station_control_client::StationControlClient,
     telemetry_client::TelemetryClient, telemetry_client_message, telemetry_server_message,
-    CaptureScreenRequest, DownloadRequest, Empty, ExecuteCommandRequest, ExecuteCommandResponse,
+    CaptureScreenRequest, DownloadRequest, Empty, ExecuteCommandRequest,
     PathRef, RenameFileRequest, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
     TelemetryClientMessage, UploadChunk,
 };
 use crate::models::Station;
-use tracing::{debug, error, info, warn};
+use tracing::{debug};
 
 const FILE_CHUNK_SIZE: usize = 64 * 1024;
 

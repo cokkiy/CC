@@ -53,24 +53,8 @@ message ExecuteCommandResponse {
 
 ---
 
-### 7.3 气象云图配置表单
-**文件:** `CC-rClient/src/App.tsx` + 设置页面
-**现状:** gRPC 有但 UI 仅显示文字
-**目标:** 在设置页面添加完整的气象云图配置表单
 
-**操作步骤：**
-1. 在设置页面找到气象云图相关区域
-2. 添加完整表单字段：FTP URL、用户名、密码、刷新间隔、保存路径
-3. 调用现有 `ConfigureWeatherMap` 或类似 gRPC 保存配置
-4. 添加保存/测试连接按钮
-5. 显示当前配置状态（已配置/未配置）
-
-**工作量:** 1-2 天
-**编译验证:** `npm run build`
-
----
-
-### 7.4 设备分组和标签管理
+### 7.3 设备分组和标签管理
 **文件:** `CC-rStationService/src/` + `CC-rClient/src/`
 **现状:** 只有 name/mac/ip 过滤，无分组
 **目标:** 添加工作站分组功能
@@ -107,29 +91,7 @@ message ExecuteCommandResponse {
 ## 预计工时
 - 7.1 远程命令行: 5-7 天
 - 7.2 监视间隔配置: 0.5 天
-- 7.3 气象云图配置: 1-2 天
-- 7.4 设备分组管理: 3-5 天
+- 7.3 设备分组管理: 3-5 天
 - 总计: 9.5-14.5 天
 
 ---
-
-## 执行记录
-
-### 2026-04-15 Hermes 执行
-
-| 任务 | 状态 | 说明 |
-|------|------|------|
-| 7.1 远程命令行/脚本执行 | ✅ 已完成（之前已实现） | gRPC + UI 完整实现 end-to-end |
-| 7.2 监视间隔配置 UI | ✅ 已完成 | 添加 Save to Stations 按钮，调用 gRPC |
-| 7.3 气象云图配置表单 | ✅ 已完成 | 添加完整表单（FTP URL/用户名/密码/间隔/路径等）+ Save 按钮 |
-| 7.4 设备分组和标签管理 | ✅ 已完成（之前已实现） | Groups 页面完整，CRUD + 标签 + 过滤 |
-
-**代码变更文件：**
-- `CC-rClient/src-tauri/src/control.rs` — 新增 `set_station_gathering_interval()` 和 `set_station_weather_picture_option()` |
-- `CC-rClient/src-tauri/src/lib.rs` — 新增两个 Tauri 命令 |
-- `CC-rClient/src/App.tsx` — Settings 页面重构：Monitor Interval 添加 Save 按钮 + 完整气象配置表单 |
-
-**编译验证：**
-- CC-rStationService `cargo build` ✅ Pass
-- CC-rClient (Tauri) `cargo build` ✅ Pass（3个 unused import warning）
-- CC-rClient (Frontend) `npm run build` ✅ Pass

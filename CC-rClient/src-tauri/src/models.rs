@@ -18,40 +18,6 @@ pub struct StartProgram {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct WeatherImageOption {
-    pub download: i32,
-    pub url: String,
-    pub user_name: String,
-    pub password: String,
-    pub last_hours: i32,
-    pub interval: i32,
-    pub delete_previous_files: bool,
-    pub delete_how_hours_ago: i32,
-    pub sub_directory: String,
-    pub save_path_for_linux: String,
-    pub save_path_for_windows: String,
-}
-
-impl Default for WeatherImageOption {
-    fn default() -> Self {
-        Self {
-            download: 2,
-            url: String::new(),
-            user_name: String::new(),
-            password: String::new(),
-            last_hours: 0,
-            interval: 2,
-            delete_previous_files: false,
-            delete_how_hours_ago: 0,
-            sub_directory: String::new(),
-            save_path_for_linux: String::new(),
-            save_path_for_windows: String::new(),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Station {
     pub id: String,
     pub name: String,
@@ -69,7 +35,6 @@ pub struct ClientOptions {
     pub is_first_time_run: bool,
     pub start_apps: Vec<StartProgram>,
     pub monitor_processes: Vec<String>,
-    pub weather_image_download_option: WeatherImageOption,
 }
 
 impl Default for ClientOptions {
@@ -79,7 +44,6 @@ impl Default for ClientOptions {
             is_first_time_run: true,
             start_apps: Vec::new(),
             monitor_processes: Vec::new(),
-            weather_image_download_option: WeatherImageOption::default(),
         }
     }
 }

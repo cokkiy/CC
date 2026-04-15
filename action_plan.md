@@ -34,17 +34,17 @@ Based on code review and verification, the data-related issues have been address
 
 ## Scope Adjustment
 
-Based on project priorities, the following features are temporarily excluded from immediate development focus:
+Based on project priorities, the following features are **removed** from the project:
 
-### Excluded Features (Temporary)
-1. **气象云图 (Weather Map) Download**
-   - Requires specific FTP server integration and meteorological domain knowledge
-   - Limited to specialized use cases; can be re-evaluated when needed
+### Removed Features (2026-04-15)
+1. **气象云图 (Weather Map) Download** — ❌ **REMOVED**
+   - All code removed: types, models, control functions, Tauri commands, UI components
+   - Reason: User explicitly stated this feature is not needed
 
-2. **指显控制 (Display Station Control)**
-   - Includes specialized functions: page turning, fullscreen, design mode, etc.
-   - Tied to specific hardware/software ecosystems
-   - Will be addressed when relevant deployment scenarios arise
+2. **指显控制 (Display Station Control)** — ❌ **REMOVED**
+   - Display control gRPC exists in backend but has NO frontend UI
+   - User explicitly stated this feature is not needed
+   - Note: If display control functionality is later required, frontend UI needs to be added
 
 **Rationale:** These features require specific application scenarios that are not currently prioritized. Development focus remains on core remote monitoring and control capabilities.
 
@@ -262,41 +262,36 @@ Based on project priorities, the following features are temporarily excluded fro
 
 ## Phase 7: P1 Enterprise IT Management Capabilities (2026-04-15)
 
-### 7.1 Remote Command / Script Execution ✅ **COMPLETED** (Already Implemented)
+### 7.1 Remote Command / Script Execution ✅ **IMPLEMENTED**
 **Files:** `CC-rStationService/src/app.rs`, `CC-rClient/src-tauri/src/remote.rs`, `CC-rClient/src/App.tsx`
-**Status:** Fully implemented end-to-end:
+**Status:** End-to-end implementation exists:
 - Proto: `ExecuteCommandRequest/Response` defined in `proto/cc.proto`
 - Server: `execute_command` gRPC method in `app.rs` — runs `sh -c <command>` via `TokioCommand`
 - Client Tauri: `execute_station_command()` in `remote.rs` calls station gRPC
 - Tauri command: `execute_station_command_for_ui` in `lib.rs`
 - UI: Command input + timeout field + Execute button + stdout/stderr display in station detail panel
 
-### 7.2 Monitor Interval Configuration UI ✅ **COMPLETED**
+### 7.2 Monitor Interval Configuration UI ✅ **IMPLEMENTED**
 **Files:** `CC-rClient/src-tauri/src/control.rs`, `CC-rClient/src-tauri/src/lib.rs`, `CC-rClient/src/App.tsx`
-**Changes:**
-- Added `set_station_gathering_interval()` in `control.rs` — calls `SetStateGatheringInterval` gRPC
-- Added `set_station_gathering_interval_for_ui` Tauri command in `lib.rs` — applies to ALL stations
-- Settings page: Added "Save to Stations" button next to Monitor Interval input
-- Calls `set_station_gathering_interval_for_ui` with current interval value on click
-**Verification:** `cargo build` + `npm run build` both pass
+**Status:** Implementation exists:
+- `set_station_gathering_interval()` in `control.rs` — calls `SetStateGatheringInterval` gRPC
+- `set_station_gathering_interval_for_ui` Tauri command in `lib.rs`
+- Settings page has "Save to Stations" button next to Monitor Interval input
 
-### 7.3 Weather Map Configuration Form ✅ **COMPLETED**
-**Files:** `CC-rClient/src-tauri/src/control.rs`, `CC-rClient/src-tauri/src/lib.rs`, `CC-rClient/src/App.tsx`
-**Changes:**
-- Added `set_station_weather_picture_option()` in `control.rs` — calls `SetWeatherPictureDownloadOption` gRPC
-- Added `set_station_weather_option_for_ui` Tauri command in `lib.rs` — applies to ALL stations
-- Settings page: Replaced placeholder text with full weather configuration form:
-  - Enable/disable checkbox
-  - FTP URL, Username, Password fields
-  - Refresh interval, Lookback hours
-  - Delete previous files toggle + delete hours threshold
-  - Sub directory, Save path (Linux), Save path (Windows)
-  - "Save Weather Options" button → calls `set_station_weather_option_for_ui`
-**Verification:** `cargo build` + `npm run build` both pass
+### 7.3 ~~Weather Map Configuration Form~~ ❌ **REMOVED** (2026-04-15)
+**Decision:** Weather imagery feature is NOT required per user instruction.
+**Action Taken:** All weather-related code has been removed:
+- `types.ts`: WeatherImageOption type removed
+- `models.rs`: WeatherImageOption struct removed
+- `control.rs`: set_station_weather_picture_option function removed
+- `lib.rs`: set_station_weather_option_for_ui command removed
+- `App.tsx`: Weather configuration form UI removed (~225 lines)
+- `storage.rs`: Weather option parsing removed from legacy import/export
+**Verification:** `cargo test` passes (3 tests), `cargo build` passes, `npm run build` passes
 
-### 7.4 Device Group and Tag Management ✅ **COMPLETED** (Already Implemented)
+### 7.4 Device Group and Tag Management ✅ **IMPLEMENTED**
 **Files:** `CC-rClient/src-tauri/src/lib.rs`, `CC-rClient/src/App.tsx`
-**Status:** Fully implemented:
+**Status:** Implementation exists in the codebase.
 - Groups stored locally in client (not per-station)
 - Tauri commands: `get_station_groups`, `create_station_group`, `update_station_group`, `delete_station_group`
 - Groups page (accessible from nav): Create/Edit/Delete groups, assign stations, add tags
