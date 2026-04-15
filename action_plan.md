@@ -212,4 +212,52 @@ Based on project priorities, the following features are temporarily excluded fro
 
 ---
 
+## Phase 6: P0 Core Feature Enhancement (2026-04-15)
+
+### 6.1 WoL Remote Boot ✅ **COMPLETED** (Already Implemented)
+**Location:** `CC-rClient/src-tauri/src/wol.rs`, `control.rs`, `models.rs`
+**Status:** WoL functionality was already fully implemented:
+- `send_magic_packets()` in `wol.rs` sends UDP magic packets (6×0xFF + 16×MAC) to broadcast address
+- Integrated into `execute_station_action` via `StationAction::PowerOn`
+- "Power On" button in toolbar triggers WoL for selected station
+- Batch WoL handled by new `BatchPowerOn` action
+
+### 6.2 Batch Power Operations ✅ **COMPLETED**
+**Location:** `CC-rClient/src-tauri/src/control.rs`, `models.rs`, `App.tsx`
+**Changes:**
+- Added `StationAction::BatchPowerOn`, `BatchShutdown`, `BatchReboot` enum variants
+- Implemented `execute_batch_action()` in `control.rs` — operates on ALL stations (ignores selection)
+- Added batch buttons in React toolbar: 全部开机 / 全部关机 / 全部重启
+- Proto updated with `BatchActionType`, `BatchPowerActionRequest`, `BatchPowerActionResponse` (message definitions only; batch logic implemented client-side)
+**Verification:** `cargo build` + `npm run build` both pass
+
+### 6.3 CPU/Memory Real-time Monitoring Charts ✅ **COMPLETED**
+**Location:** `CC-rClient/src/App.tsx`, `types.ts`, `package.json`
+**Changes:**
+- Installed `recharts` npm package
+- Added `historyByStation` state tracking last 30 data points per station
+- Added `PerformanceCharts` component using recharts `LineChart` with CPU% and Memory% lines
+- Charts update on every telemetry refresh (every 2 seconds by default)
+- Tooltips show formatted time and percentage values
+**Verification:** `npm run build` passes, bundle size warning is cosmetic only
+
+### 6.4 Batch File Transfer ✅ **COMPLETED**
+**Location:** `CC-rClient/src/App.tsx`
+**Changes:**
+- Added `batchDownloadAll()` function — iterates all stations, downloads same remote→local file
+- Added `batchUploadAll()` function — iterates all stations, uploads same local→remote file
+- Added buttons in Remote Files miniToolbar: 发送全部 (Download All) / 接收全部 (Upload All)
+- Progress logged per-station with success/failure count summary
+**Verification:** `npm run build` passes
+
+## Compilation Verification (2026-04-15)
+
+| Component | Command | Status |
+|-----------|---------|--------|
+| CC-rStationService | `cargo build` | ✅ Pass |
+| CC-rClient (Tauri) | `cargo build` | ✅ Pass (1 unused import warning) |
+| CC-rClient (Frontend) | `npm run build` | ✅ Pass |
+
+---
+
 *This document will be updated as testing progresses and new issues are identified.*

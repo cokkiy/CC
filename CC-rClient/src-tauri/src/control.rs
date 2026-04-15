@@ -34,14 +34,22 @@ pub async fn execute_station_action(
     ids: Vec<String>,
     stations: &mut Vec<Station>,
 ) -> Result<ActionResult, String> {
-    let selected_indices = stations
-        .iter()
-        .enumerate()
-        .filter(|(_, station)| ids.iter().any(|id| id == &station.id))
-        .map(|(index, _)| index)
-        .collect::<Vec<_>>();
+    // For batch actions, operate on ALL stations (ignore the ids parameter)
+    let target_indices: Vec<usize> = if matches!(
+        action,
+        StationAction::BatchPowerOn | StationAction::BatchShutdown | StationAction::BatchReboot
+    ) {
+        (0..stations.len()).collect()
+    } else {
+        stations
+            .iter()
+            .enumerate()
+            .filter(|(_, station)| ids.iter().any(|id| id == &station.id))
+            .map(|(index, _)| index)
+            .collect::<Vec<_>>()
+    };
 
-    if selected_indices.is_empty() {
+    if target_indices.is_empty() {
         return Ok(ActionResult {
             ok: false,
             message: "No stations matched the requested action.".into(),
@@ -50,12 +58,17 @@ pub async fn execute_station_action(
         });
     }
 
-    let result = match action {
-        StationAction::PowerOn | StationAction::Block | StationAction::Unblock => {
-            execute_native_action(&action, &selected_indices, stations)
-                .map_err(|error| error.to_string())?
-        }
-        _ => execute_remote_action(&action, &selected_indices, stations).await?,
+    // Batch actions: loop through each target and execute the corresponding single action
+    let result = if matches!(
+        action,
+        StationAction::BatchPowerOn | StationAction::BatchShutdown | StationAction::BatchReboot
+    ) {
+        execute_batch_action(&action, &target_indices, stations).await?
+    } else if matches!(action, StationAction::PowerOn | StationAction::Block | StationAction::Unblock) {
+        execute_native_action(&action, &target_indices, stations)
+            .map_err(|error| error.to_string())?
+    } else {
+        execute_remote_action(&action, &target_indices, stations).await?
     };
 
     Ok(ActionResult {
@@ -114,6 +127,83 @@ fn execute_native_action(
         }
         _ => unreachable!("remote actions are handled separately"),
     }
+}
+
+async fn execute_batch_action(
+    action: &StationAction,
+    target_indices: &[usize],
+    stations: &mut [Station],
+) -> Result<ActionResult, String> {
+    let single_action = match action {
+        StationAction::BatchPowerOn => StationAction::PowerOn,
+        StationAction::BatchShutdown => StationAction::Shutdown,
+        StationAction::BatchReboot => StationAction::Reboot,
+        _ => unreachable!(),
+    };
+
+    let mut success_count = 0usize;
+    let mut failure_count = 0usize;
+    let mut messages = Vec::with_capacity(target_indices.len());
+
+    for index in target_indices {
+        let station = &mut stations[*index];
+        let result = if matches!(single_action, StationAction::PowerOn) {
+            wol::send_magic_packets(station)
+                .map(|_| {
+                    station.last_action = Some("Wake-on-LAN packet sent".into());
+                    "Wake-on-LAN packet sent".to_string()
+                })
+                .map_err(|e| e.to_string())
+        } else {
+            let (mut client, endpoint) = connect_station(station).await?;
+            match &single_action {
+                StationAction::Shutdown => {
+                    client
+                        .shutdown(ShutdownRequest {})
+                        .await
+                        .map(|_| {
+                            station.last_action = Some(format!("Shutdown requested via {endpoint}"));
+                            format!("Shutdown requested via {endpoint}")
+                        })
+                        .map_err(|e| format!("shutdown RPC failed via {endpoint}: {e}"))
+                }
+                StationAction::Reboot => {
+                    client
+                        .reboot(RebootRequest { force: false })
+                        .await
+                        .map(|_| {
+                            station.last_action = Some(format!("Reboot requested via {endpoint}"));
+                            format!("Reboot requested via {endpoint}")
+                        })
+                        .map_err(|e| format!("reboot RPC failed via {endpoint}: {e}"))
+                }
+                _ => unreachable!(),
+            }
+        };
+
+        match result {
+            Ok(msg) => {
+                success_count += 1;
+                messages.push(format!("{}: {msg}", station_label(station)));
+            }
+            Err(err) => {
+                failure_count += 1;
+                station.last_action = Some(err.clone());
+                messages.push(format!("{}: {err}", station_label(station)));
+            }
+        }
+    }
+
+    let action_label = single_action.label();
+    Ok(ActionResult {
+        ok: failure_count == 0,
+        message: format!(
+            "Batch {action_label}: {success_count} success, {failure_count} failed. {}",
+            messages.join(" | ")
+        ),
+        stations: None,
+        implemented: true,
+    })
 }
 
 async fn execute_remote_action(
@@ -224,6 +314,9 @@ async fn execute_remote_action_for_station(
         }
         StationAction::PowerOn | StationAction::Block | StationAction::Unblock => {
             Err(format!("{} is handled locally.", action.label()))
+        }
+        StationAction::BatchPowerOn | StationAction::BatchShutdown | StationAction::BatchReboot => {
+            Err(format!("Batch action {} is handled in the batch dispatcher.", action.label()))
         }
     }
 }
@@ -475,7 +568,17 @@ fn action_display_command(action: &StationAction) -> i32 {
         StationAction::PrevPage => DISPLAY_COMMAND_PREV_PAGE,
         StationAction::NextPage => DISPLAY_COMMAND_NEXT_PAGE,
         StationAction::ClearPage => DISPLAY_COMMAND_CLEAR_PAGE,
-        _ => 0,
+        StationAction::PowerOn
+        | StationAction::Block
+        | StationAction::Unblock
+        | StationAction::StartApp
+        | StationAction::RestartApp
+        | StationAction::ExitApp
+        | StationAction::Shutdown
+        | StationAction::Reboot
+        | StationAction::BatchPowerOn
+        | StationAction::BatchShutdown
+        | StationAction::BatchReboot => 0,
     }
 }
 

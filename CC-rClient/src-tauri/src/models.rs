@@ -125,6 +125,9 @@ pub enum StationAction {
     PrevPage,
     NextPage,
     ClearPage,
+    BatchPowerOn,
+    BatchShutdown,
+    BatchReboot,
 }
 
 impl StationAction {
@@ -143,6 +146,9 @@ impl StationAction {
             Self::PrevPage => "Previous Page",
             Self::NextPage => "Next Page",
             Self::ClearPage => "Clear Page",
+            Self::BatchPowerOn => "Batch Power On",
+            Self::BatchShutdown => "Batch Shutdown",
+            Self::BatchReboot => "Batch Reboot",
         }
     }
 }

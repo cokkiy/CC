@@ -138,4 +138,7 @@ export type StationAction =
   | "real_time"
   | "prev_page"
   | "next_page"
-  | "clear_page";
+  | "clear_page"
+  | "batch_power_on"
+  | "batch_shutdown"
+  | "batch_reboot";

@@ -93,6 +93,27 @@ message RebootRequest {
 
 message ShutdownRequest {}
 
+enum BatchActionType {
+  BATCH_ACTION_UNSPECIFIED = 0;
+  POWER_ON = 1;
+  SHUTDOWN = 2;
+  REBOOT = 3;
+  START_APP = 4;
+  STOP_APP = 5;
+}
+
+message BatchPowerActionRequest {
+  repeated string station_ids = 1;
+  BatchActionType action = 2;
+}
+
+message BatchPowerActionResponse {
+  int32 total = 1;
+  int32 success_count = 2;
+  int32 failure_count = 3;
+  repeated string messages = 4;
+}
+
 message PathRef {
   string name = 1;
 }

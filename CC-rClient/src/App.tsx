@@ -1,5 +1,15 @@
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import type {
   ActionResult,
   AppSnapshot,
@@ -144,6 +154,78 @@ function ComputerStatusIcon({ state }: { state: StationVisualState }) {
   );
 }
 
+type ChartDataPoint = { ts: number; cpu: number; memory: number; memPct: number };
+
+function PerformanceCharts({
+  history,
+  totalMemory,
+}: {
+  history: { cpu: number; memory: number; ts: number }[];
+  totalMemory: number;
+}) {
+  const data: ChartDataPoint[] = history.map((h) => ({
+    ts: h.ts,
+    cpu: h.cpu,
+    memory: h.memory,
+    memPct: totalMemory > 0 ? (h.memory / totalMemory) * 100 : 0,
+  }));
+
+  if (data.length < 2) {
+    return <p className="emptyInline">Collecting performance data…</p>;
+  }
+
+  return (
+    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+      <div style={{ flex: "1 1 240px", minWidth: "240px" }}>
+        <p style={{ margin: "0 0 0.25rem", fontWeight: 600, fontSize: "0.8rem" }}>CPU %</p>
+        <ResponsiveContainer width="100%" height={100}>
+          <LineChart data={data} margin={{ top: 2, right: 4, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--cpuPie-track)" />
+            <XAxis dataKey="ts" tickFormatter={(v) => new Date(v).toLocaleTimeString()} tick={{ fontSize: 9 }} />
+            <YAxis domain={[0, 100]} tick={{ fontSize: 9 }} tickFormatter={(v) => `${v}%`} />
+            <Tooltip
+              formatter={(v) => [`${Number(v).toFixed(1)}%`, "CPU"]}
+              labelFormatter={(v) => new Date(Number(v)).toLocaleTimeString()}
+            />
+            <Line
+              type="monotone"
+              dataKey="cpu"
+              stroke="#d64545"
+              strokeWidth={1.5}
+              dot={false}
+              name="CPU %"
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <div style={{ flex: "1 1 240px", minWidth: "240px" }}>
+        <p style={{ margin: "0 0 0.25rem", fontWeight: 600, fontSize: "0.8rem" }}>Memory %</p>
+        <ResponsiveContainer width="100%" height={100}>
+          <LineChart data={data} margin={{ top: 2, right: 4, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--cpuPie-track)" />
+            <XAxis dataKey="ts" tickFormatter={(v) => new Date(v).toLocaleTimeString()} tick={{ fontSize: 9 }} />
+            <YAxis domain={[0, 100]} tick={{ fontSize: 9 }} tickFormatter={(v) => `${v}%`} />
+            <Tooltip
+              formatter={(v) => [`${Number(v).toFixed(1)}%`, "Memory"]}
+              labelFormatter={(v) => new Date(Number(v)).toLocaleTimeString()}
+            />
+            <Line
+              type="monotone"
+              dataKey="memPct"
+              stroke="#c78a00"
+              strokeWidth={1.5}
+              dot={false}
+              name="Memory %"
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [snapshot, setSnapshot] = useState<AppSnapshot | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
@@ -155,6 +237,8 @@ export default function App() {
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [runtimeByStation, setRuntimeByStation] = useState<Record<string, StationRuntimeSnapshot>>({});
+  const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; ts: number }[]>>({});
+  const MAX_HISTORY = 30;
   const [browserByStation, setBrowserByStation] = useState<Record<string, RemoteFileBrowserResult>>({});
   const [captureByStation, setCaptureByStation] = useState<Record<string, StationScreenCapture>>({});
   const [runtimeLoadingId, setRuntimeLoadingId] = useState<string>("");
@@ -311,6 +395,14 @@ export default function App() {
         intervalSeconds: Math.max(options.interval, 1)
       });
       setRuntimeByStation((current) => ({ ...current, [targetId]: runtime }));
+      setHistoryByStation((current) => {
+        const prev = current[targetId] ?? [];
+        const next = [
+          ...prev.slice(-(MAX_HISTORY - 1)),
+          { cpu: runtime.cpu, memory: runtime.currentMemory, ts: Date.now() },
+        ];
+        return { ...current, [targetId]: next };
+      });
       if (logSuccess) {
         setLog((current) => [`Telemetry refreshed from ${runtime.endpoint}.`, ...current]);
       }
@@ -399,6 +491,66 @@ export default function App() {
       await browseRemote(selectedBrowser?.requestedPath ?? remotePath);
     } catch (error) {
       setLog((current) => [`Upload failed: ${String(error)}`, ...current]);
+    } finally {
+      setRemoteBusy("");
+    }
+  }
+
+  async function batchDownloadAll() {
+    if (!renameSourcePath.trim() || !downloadLocalPath.trim()) {
+      setLog((current) => ["Batch download requires remote source path and local download path.", ...current]);
+      return;
+    }
+
+    setRemoteBusy("batchDownload");
+    let success = 0;
+    let failed = 0;
+    try {
+      for (const station of stations) {
+        try {
+          const message = await invoke<string>("download_station_file_for_ui", {
+            id: station.id,
+            remotePath: renameSourcePath,
+            localPath: downloadLocalPath
+          });
+          setLog((current) => [`[${station.name}] ${message}`, ...current]);
+          success += 1;
+        } catch (error) {
+          setLog((current) => [`[${station.name}] Download failed: ${String(error)}`, ...current]);
+          failed += 1;
+        }
+      }
+      setLog((current) => [`Batch download finished: ${success} success, ${failed} failed.`, ...current]);
+    } finally {
+      setRemoteBusy("");
+    }
+  }
+
+  async function batchUploadAll() {
+    if (!uploadLocalPath.trim() || !renameTargetPath.trim()) {
+      setLog((current) => ["Batch upload requires local upload path and remote target path.", ...current]);
+      return;
+    }
+
+    setRemoteBusy("batchUpload");
+    let success = 0;
+    let failed = 0;
+    try {
+      for (const station of stations) {
+        try {
+          const message = await invoke<string>("upload_station_file_for_ui", {
+            id: station.id,
+            localPath: uploadLocalPath,
+            remotePath: renameTargetPath
+          });
+          setLog((current) => [`[${station.name}] ${message}`, ...current]);
+          success += 1;
+        } catch (error) {
+          setLog((current) => [`[${station.name}] Upload failed: ${String(error)}`, ...current]);
+          failed += 1;
+        }
+      }
+      setLog((current) => [`Batch upload finished: ${success} success, ${failed} failed.`, ...current]);
     } finally {
       setRemoteBusy("");
     }
@@ -515,6 +667,15 @@ export default function App() {
         </button>
         <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
           Reboot
+        </button>
+        <button onClick={() => void executeAction("batch_power_on", [])} disabled={stations.length === 0}>
+          全部开机
+        </button>
+        <button onClick={() => void executeAction("batch_shutdown", [])} disabled={stations.length === 0}>
+          全部关机
+        </button>
+        <button onClick={() => void executeAction("batch_reboot", [])} disabled={stations.length === 0}>
+          全部重启
         </button>
         <button className="accent" onClick={() => void saveState()} disabled={saving}>
           {saving ? "Saving..." : "Save"}
@@ -825,6 +986,15 @@ export default function App() {
                       <strong>{selectedRuntime.serviceVersion || "n/a"}</strong>
                     </div>
                   </div>
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Performance (30-point history)</h3>
+                    </div>
+                    <PerformanceCharts
+                      history={historyByStation[selectedStation.id] ?? []}
+                      totalMemory={selectedRuntime.totalMemory}
+                    />
+                  </div>
                   <div className="logEntry">{selectedRuntime.message}</div>
                   <div className="logEntry">
                     {selectedRuntime.computerName || "Unknown host"} · {selectedRuntime.osName || "Unknown OS"}{" "}
@@ -935,6 +1105,12 @@ export default function App() {
                 </button>
                 <button onClick={() => void uploadRemote()} disabled={!selectedStation || remoteBusy === "upload"}>
                   Upload
+                </button>
+                <button onClick={() => void batchDownloadAll()} disabled={stations.length === 0 || remoteBusy === "batchDownload"}>
+                  {remoteBusy === "batchDownload" ? "Sending..." : "发送全部"}
+                </button>
+                <button onClick={() => void batchUploadAll()} disabled={stations.length === 0 || remoteBusy === "batchUpload"}>
+                  {remoteBusy === "batchUpload" ? "Receiving..." : "接收全部"}
                 </button>
               </div>
               {!selectedBrowser ? (
