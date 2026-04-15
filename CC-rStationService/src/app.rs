@@ -9,6 +9,7 @@ use async_stream::try_stream;
 use futures_util::Stream;
 use tokio::fs::{self, File, OpenOptions};
 use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
+use tokio::process::Command as TokioCommand;
 use tokio::sync::watch;
 use tonic::metadata::MetadataValue;
 use tonic::transport::Server;
@@ -19,18 +20,19 @@ use crate::config::AppConfig;
 use crate::grpc::agent::desktop_agent_client::DesktopAgentClient;
 use crate::grpc::cc::{
     Ack, AppControlResult, AppStartParameter, AppStartingResult, CaptureScreenChunk,
-    CaptureScreenRequest, CloseAppRequest, CloseAppResponse, DownloadChunk, DownloadRequest, Empty,
-    GetAllProcessInfoResponse, GetAppLauncherPathResponse, GetConnectionInformationsResponse,
-    GetFileInfoResponse, GetNetworkInterfacesResponse, GetServicePathResponse,
-    GetTcpListenerInfosResponse, GetUdpListenerInfosResponse, OpenSpecPageRequest, PathRef,
-    RebootRequest, RenameFileRequest, RenameFileResponse, RestartAppRequest, RestartAppResponse,
-    SendRemoteCtrlCommandRequest, ServerVersionInfo, SetStateGatheringIntervalRequest,
-    SetWatchingAppRequest, SetWeatherPictureDownloadOptionRequest, ShutdownRequest,
-    StartAppRequest, StartAppResponse, SwitchDisplayPageAndModeRequest, TelemetryClientMessage,
-    TelemetryServerMessage, UploadChunk, UploadResult, file_transfer_server::FileTransfer,
-    file_transfer_server::FileTransferServer, station_control_server::StationControl,
-    station_control_server::StationControlServer, telemetry_client_message,
-    telemetry_server::Telemetry, telemetry_server::TelemetryServer, telemetry_server_message,
+    CaptureScreenRequest, CloseAppRequest, CloseAppResponse, DownloadChunk, DownloadRequest,
+    Empty, ExecuteCommandRequest, ExecuteCommandResponse, GetAllProcessInfoResponse,
+    GetAppLauncherPathResponse, GetConnectionInformationsResponse, GetFileInfoResponse,
+    GetNetworkInterfacesResponse, GetServicePathResponse, GetTcpListenerInfosResponse,
+    GetUdpListenerInfosResponse, OpenSpecPageRequest, PathRef, RebootRequest, RenameFileRequest,
+    RenameFileResponse, RestartAppRequest, RestartAppResponse, SendRemoteCtrlCommandRequest,
+    ServerVersionInfo, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
+    SetWeatherPictureDownloadOptionRequest, ShutdownRequest, StartAppRequest, StartAppResponse,
+    SwitchDisplayPageAndModeRequest, TelemetryClientMessage, TelemetryServerMessage, UploadChunk,
+    UploadResult, file_transfer_server::FileTransfer, file_transfer_server::FileTransferServer,
+    station_control_server::StationControl, station_control_server::StationControlServer,
+    telemetry_client_message, telemetry_server::Telemetry, telemetry_server::TelemetryServer,
+    telemetry_server_message,
 };
 use crate::platform;
 use crate::state::{AppState, find_process_ids_by_name, terminate_process};
@@ -362,6 +364,30 @@ impl StationControl for StationControlService {
     ) -> Result<Response<GetUdpListenerInfosResponse>, Status> {
         let response = self.state.udp_listener_infos().map_err(status_from_error)?;
         Ok(Response::new(response))
+    }
+
+    async fn execute_command(
+        &self,
+        request: Request<ExecuteCommandRequest>,
+    ) -> Result<Response<ExecuteCommandResponse>, Status> {
+        let req = request.into_inner();
+        let timeout_secs = req.timeout_seconds.max(1).min(600) as u64;
+
+        let output = tokio::time::timeout(
+            std::time::Duration::from_secs(timeout_secs),
+            TokioCommand::new("sh")
+                .args(["-c", &req.command])
+                .output(),
+        )
+        .await
+        .map_err(|_| Status::deadline_exceeded("command timed out"))?
+        .map_err(|error| Status::internal(format!("failed to spawn command: {error}")))?;
+
+        Ok(Response::new(ExecuteCommandResponse {
+            exit_code: output.status.code().unwrap_or(-1),
+            stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
+            stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
+        }))
     }
 }
 

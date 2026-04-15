@@ -45,6 +45,7 @@ export type ClientOptions = {
 export type PersistedState = {
   stations: Station[];
   options: ClientOptions;
+  groups: StationGroup[];
 };
 
 export type AppSnapshot = PersistedState & {
@@ -142,3 +143,17 @@ export type StationAction =
   | "batch_power_on"
   | "batch_shutdown"
   | "batch_reboot";
+
+export type CommandExecutionResult = {
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+};
+
+export type StationGroup = {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  stationIds: string[];
+};

@@ -381,6 +381,17 @@ message DownloadChunk {
   bool completed = 4;
 }
 
+message ExecuteCommandRequest {
+  string command = 1;
+  int32 timeout_seconds = 2;
+}
+
+message ExecuteCommandResponse {
+  int32 exit_code = 1;
+  string stdout = 2;
+  string stderr = 3;
+}
+
 service StationControl {
   rpc StartApp(StartAppRequest) returns (StartAppResponse);
   rpc CloseApp(CloseAppRequest) returns (CloseAppResponse);
@@ -405,6 +416,7 @@ service StationControl {
   rpc GetConnectionInformations(Empty) returns (GetConnectionInformationsResponse);
   rpc GetTcpListenerInfos(Empty) returns (GetTcpListenerInfosResponse);
   rpc GetUdpListenerInfos(Empty) returns (GetUdpListenerInfosResponse);
+  rpc ExecuteCommand(ExecuteCommandRequest) returns (ExecuteCommandResponse);
 }
 
 service FileTransfer {

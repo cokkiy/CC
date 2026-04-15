@@ -256,6 +256,59 @@ Based on project priorities, the following features are temporarily excluded fro
 |-----------|---------|--------|
 | CC-rStationService | `cargo build` | ✅ Pass |
 | CC-rClient (Tauri) | `cargo build` | ✅ Pass (1 unused import warning) |
+| CC-rClient (Frontend) | `npm run build` | ✅ Pass (TypeScript CSS import error fixed) |
+
+---
+
+## Phase 7: P1 Enterprise IT Management Capabilities (2026-04-15)
+
+### 7.1 Remote Command / Script Execution ✅ **COMPLETED** (Already Implemented)
+**Files:** `CC-rStationService/src/app.rs`, `CC-rClient/src-tauri/src/remote.rs`, `CC-rClient/src/App.tsx`
+**Status:** Fully implemented end-to-end:
+- Proto: `ExecuteCommandRequest/Response` defined in `proto/cc.proto`
+- Server: `execute_command` gRPC method in `app.rs` — runs `sh -c <command>` via `TokioCommand`
+- Client Tauri: `execute_station_command()` in `remote.rs` calls station gRPC
+- Tauri command: `execute_station_command_for_ui` in `lib.rs`
+- UI: Command input + timeout field + Execute button + stdout/stderr display in station detail panel
+
+### 7.2 Monitor Interval Configuration UI ✅ **COMPLETED**
+**Files:** `CC-rClient/src-tauri/src/control.rs`, `CC-rClient/src-tauri/src/lib.rs`, `CC-rClient/src/App.tsx`
+**Changes:**
+- Added `set_station_gathering_interval()` in `control.rs` — calls `SetStateGatheringInterval` gRPC
+- Added `set_station_gathering_interval_for_ui` Tauri command in `lib.rs` — applies to ALL stations
+- Settings page: Added "Save to Stations" button next to Monitor Interval input
+- Calls `set_station_gathering_interval_for_ui` with current interval value on click
+**Verification:** `cargo build` + `npm run build` both pass
+
+### 7.3 Weather Map Configuration Form ✅ **COMPLETED**
+**Files:** `CC-rClient/src-tauri/src/control.rs`, `CC-rClient/src-tauri/src/lib.rs`, `CC-rClient/src/App.tsx`
+**Changes:**
+- Added `set_station_weather_picture_option()` in `control.rs` — calls `SetWeatherPictureDownloadOption` gRPC
+- Added `set_station_weather_option_for_ui` Tauri command in `lib.rs` — applies to ALL stations
+- Settings page: Replaced placeholder text with full weather configuration form:
+  - Enable/disable checkbox
+  - FTP URL, Username, Password fields
+  - Refresh interval, Lookback hours
+  - Delete previous files toggle + delete hours threshold
+  - Sub directory, Save path (Linux), Save path (Windows)
+  - "Save Weather Options" button → calls `set_station_weather_option_for_ui`
+**Verification:** `cargo build` + `npm run build` both pass
+
+### 7.4 Device Group and Tag Management ✅ **COMPLETED** (Already Implemented)
+**Files:** `CC-rClient/src-tauri/src/lib.rs`, `CC-rClient/src/App.tsx`
+**Status:** Fully implemented:
+- Groups stored locally in client (not per-station)
+- Tauri commands: `get_station_groups`, `create_station_group`, `update_station_group`, `delete_station_group`
+- Groups page (accessible from nav): Create/Edit/Delete groups, assign stations, add tags
+- Group filter dropdown in station list
+- Tags displayed as colored badges on group cards
+
+## Phase 7 Compilation Verification (2026-04-15)
+
+| Component | Command | Status |
+|-----------|---------|--------|
+| CC-rStationService | `cargo build` | ✅ Pass |
+| CC-rClient (Tauri) | `cargo build` | ✅ Pass (3 unused import warnings) |
 | CC-rClient (Frontend) | `npm run build` | ✅ Pass |
 
 ---

@@ -14,8 +14,9 @@ use crate::control::{station_endpoints, station_label};
 use crate::grpc::cc::{
     self, file_transfer_client::FileTransferClient, station_control_client::StationControlClient,
     telemetry_client::TelemetryClient, telemetry_client_message, telemetry_server_message,
-    CaptureScreenRequest, DownloadRequest, Empty, PathRef, RenameFileRequest,
-    SetStateGatheringIntervalRequest, SetWatchingAppRequest, TelemetryClientMessage, UploadChunk,
+    CaptureScreenRequest, DownloadRequest, Empty, ExecuteCommandRequest, ExecuteCommandResponse,
+    PathRef, RenameFileRequest, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
+    TelemetryClientMessage, UploadChunk,
 };
 use crate::models::Station;
 use tracing::{debug, error, info, warn};
@@ -611,4 +612,42 @@ fn version_text(version: Option<cc::VersionInfo>) -> String {
         .map(|value| value.product_version)
         .filter(|value| !value.trim().is_empty())
         .unwrap_or_default()
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommandExecutionResult {
+    pub exit_code: i32,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+pub async fn execute_station_command(
+    station: &Station,
+    command: &str,
+    timeout_seconds: i32,
+) -> Result<CommandExecutionResult, String> {
+    with_station_endpoint(station, move |endpoint| {
+        let command = command.to_string();
+        async move {
+            let mut client = StationControlClient::connect(endpoint.clone())
+                .await
+                .map_err(|error| format!("connect station control via {endpoint}: {error}"))?;
+            let response = client
+                .execute_command(ExecuteCommandRequest {
+                    command,
+                    timeout_seconds,
+                })
+                .await
+                .map_err(|error| format!("execute_command RPC via {endpoint}: {error}"))?
+                .into_inner();
+
+            Ok(CommandExecutionResult {
+                exit_code: response.exit_code,
+                stdout: response.stdout,
+                stderr: response.stderr,
+            })
+        }
+    })
+    .await
 }

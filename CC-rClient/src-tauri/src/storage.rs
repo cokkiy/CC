@@ -1,6 +1,6 @@
 use crate::models::{
     AppSnapshot, ClientOptions, NetworkInterface, PersistedState, StartProgram, Station,
-    WeatherImageOption,
+    StationGroup, WeatherImageOption,
 };
 use quick_xml::escape::escape;
 use roxmltree::Document;
@@ -70,6 +70,7 @@ impl StateStore {
             return Ok(AppSnapshot {
                 stations: payload.stations,
                 options: payload.options,
+                groups: payload.groups,
                 storage_path: storage_path.display().to_string(),
                 legacy_imported: false,
             });
@@ -99,6 +100,7 @@ impl StateStore {
         Ok(AppSnapshot {
             stations: normalized.stations,
             options: normalized.options,
+            groups: normalized.groups,
             storage_path: storage_path.display().to_string(),
             legacy_imported: false,
         })
@@ -148,7 +150,11 @@ fn ensure_parent_dir(path: &Path) -> Result<(), StorageError> {
 fn import_legacy_state() -> Result<PersistedState, StorageError> {
     let stations = load_legacy_stations()?;
     let options = load_legacy_options()?;
-    Ok(PersistedState { stations, options })
+    Ok(PersistedState {
+        stations,
+        options,
+        groups: Vec::new(),
+    })
 }
 
 fn load_legacy_stations() -> Result<Vec<Station>, StorageError> {

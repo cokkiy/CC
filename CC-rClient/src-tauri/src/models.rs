@@ -89,6 +89,7 @@ impl Default for ClientOptions {
 pub struct PersistedState {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
+    pub groups: Vec<StationGroup>,
 }
 
 impl Default for PersistedState {
@@ -96,6 +97,7 @@ impl Default for PersistedState {
         Self {
             stations: Vec::new(),
             options: ClientOptions::default(),
+            groups: Vec::new(),
         }
     }
 }
@@ -105,6 +107,7 @@ impl Default for PersistedState {
 pub struct AppSnapshot {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
+    pub groups: Vec<StationGroup>,
     pub storage_path: String,
     pub legacy_imported: bool,
 }
@@ -160,4 +163,26 @@ pub struct ActionResult {
     pub message: String,
     pub stations: Option<Vec<Station>>,
     pub implemented: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StationGroup {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub tags: Vec<String>,
+    pub station_ids: Vec<String>,
+}
+
+impl StationGroup {
+    pub fn new(name: &str) -> Self {
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            name: name.to_string(),
+            description: String::new(),
+            tags: Vec::new(),
+            station_ids: Vec::new(),
+        }
+    }
 }

@@ -14,11 +14,13 @@ import type {
   ActionResult,
   AppSnapshot,
   ClientOptions,
+  CommandExecutionResult,
   PersistedState,
   RemoteFileBrowserResult,
   StartProgram,
   Station,
   StationAction,
+  StationGroup,
   StationRuntimeSnapshot,
   StationScreenCapture
 } from "./types";
@@ -248,7 +250,13 @@ export default function App() {
   const [uploadLocalPath, setUploadLocalPath] = useState("");
   const [renameSourcePath, setRenameSourcePath] = useState("");
   const [renameTargetPath, setRenameTargetPath] = useState("");
-  const [activePage, setActivePage] = useState<"stations" | "settings">("stations");
+  const [commandInput, setCommandInput] = useState("");
+  const [commandTimeout, setCommandTimeout] = useState(30);
+  const [commandOutput, setCommandOutput] = useState<CommandExecutionResult | null>(null);
+  const [groups, setGroups] = useState<StationGroup[]>([]);
+  const [groupFilter, setGroupFilter] = useState<string>("");
+  const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
 
   useEffect(() => {
@@ -257,7 +265,7 @@ export default function App() {
 
   const filteredStations = useMemo(() => {
     const lowered = search.trim().toLowerCase();
-    const next = stations.filter((station) => {
+    let next = stations.filter((station) => {
       if (!lowered) {
         return true;
       }
@@ -269,6 +277,14 @@ export default function App() {
       );
     });
 
+    // Group filter: show only stations in the selected group
+    if (groupFilter) {
+      const group = groups.find((g) => g.id === groupFilter);
+      if (group) {
+        next = next.filter((s) => group.stationIds.includes(s.id));
+      }
+    }
+
     return next.sort((left, right) => {
       if (sortBy === "ip") {
         const leftIp = left.networkInterfaces[0]?.ips[0] ?? "";
@@ -277,7 +293,7 @@ export default function App() {
       }
       return left.name.localeCompare(right.name, undefined, { numeric: true });
     });
-  }, [search, sortBy, stations]);
+  }, [search, sortBy, stations, groupFilter, groups]);
 
   const selectedStation =
     filteredStations.find((station) => station.id === selectedId) ??
@@ -294,6 +310,7 @@ export default function App() {
       setSnapshot(next);
       setStations(next.stations);
       setOptions(next.options);
+      setGroups(next.groups ?? []);
       setSelectedId(next.stations[0]?.id ?? "");
       setLog((current) => [
         next.legacyImported
@@ -341,7 +358,7 @@ export default function App() {
   async function saveState() {
     setSaving(true);
     try {
-      const payload: PersistedState = { stations, options };
+      const payload: PersistedState = { stations, options, groups };
       const next = await invoke<AppSnapshot>("save_state", { payload });
       setSnapshot(next);
       setStations(next.stations);
@@ -575,6 +592,79 @@ export default function App() {
     }
   }
 
+  async function executeRemoteCommand() {
+    if (!selectedStation || !commandInput.trim()) {
+      return;
+    }
+
+    setRemoteBusy("command");
+    setCommandOutput(null);
+    try {
+      const result = await invoke<CommandExecutionResult>("execute_station_command_for_ui", {
+        id: selectedStation.id,
+        command: commandInput.trim(),
+        timeoutSeconds: commandTimeout
+      });
+      setCommandOutput(result);
+      setLog((current) => [
+        `Command "${commandInput.trim().slice(0, 60)}" on ${selectedStation.name} → exit ${result.exitCode}.`,
+        ...current
+      ]);
+    } catch (error) {
+      setLog((current) => [`Remote command failed: ${String(error)}`, ...current]);
+    } finally {
+      setRemoteBusy("");
+    }
+  }
+
+  async function loadGroups() {
+    try {
+      const result = await invoke<StationGroup[]>("get_station_groups");
+      setGroups(result);
+    } catch (error) {
+      setLog((current) => [`Failed to load groups: ${String(error)}`, ...current]);
+    }
+  }
+
+  async function createGroup(name: string) {
+    try {
+      const group = await invoke<StationGroup>("create_station_group", { name });
+      setGroups((current) => [...current, group]);
+      setLog((current) => [`Group "${name}" created.`, ...current]);
+    } catch (error) {
+      setLog((current) => [`Failed to create group: ${String(error)}`, ...current]);
+    }
+  }
+
+  async function updateGroup(group: StationGroup) {
+    try {
+      const updated = await invoke<StationGroup>("update_station_group", {
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        tags: group.tags,
+        stationIds: group.stationIds
+      });
+      setGroups((current) =>
+        current.map((g) => (g.id === updated.id ? updated : g))
+      );
+      setEditingGroup(null);
+      setLog((current) => [`Group "${updated.name}" updated.`, ...current]);
+    } catch (error) {
+      setLog((current) => [`Failed to update group: ${String(error)}`, ...current]);
+    }
+  }
+
+  async function deleteGroup(id: string) {
+    try {
+      await invoke<string>("delete_station_group", { id });
+      setGroups((current) => current.filter((g) => g.id !== id));
+      setLog((current) => [`Group deleted.`, ...current]);
+    } catch (error) {
+      setLog((current) => [`Failed to delete group: ${String(error)}`, ...current]);
+    }
+  }
+
   function addStation() {
     const station = emptyStation();
     setStations((current) => [station, ...current]);
@@ -640,6 +730,15 @@ export default function App() {
         >
           Settings
         </button>
+        <button
+          className={activePage === "groups" ? "accent" : ""}
+          onClick={() => {
+            setActivePage("groups");
+            void loadGroups();
+          }}
+        >
+          Groups
+        </button>
         <button onClick={addStation}>Add Station</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
           Remove
@@ -701,6 +800,17 @@ export default function App() {
                   <option value="name">Sort: Name</option>
                   <option value="ip">Sort: IP</option>
                 </select>
+                {groups.length > 0 && (
+                  <select
+                    value={groupFilter}
+                    onChange={(event) => setGroupFilter(event.target.value)}
+                  >
+                    <option value="">All Groups</option>
+                    {groups.map((g) => (
+                      <option key={g.id} value={g.id}>{g.name}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -1071,6 +1181,53 @@ export default function App() {
 
             <div className="collection">
               <div className="subHeader">
+                <h3>Remote Command</h3>
+                <button onClick={() => void executeRemoteCommand()} disabled={!selectedStation || remoteBusy === "command"}>
+                  {remoteBusy === "command" ? "Executing..." : "Execute"}
+                </button>
+              </div>
+              <label className="field">
+                <span>Command</span>
+                <input
+                  value={commandInput}
+                  onChange={(event) => setCommandInput(event.target.value)}
+                  placeholder="e.g. uname -a, df -h, ps aux"
+                  onKeyDown={(event) => { if (event.key === "Enter") void executeRemoteCommand(); }}
+                />
+              </label>
+              <label className="field">
+                <span>Timeout (seconds)</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={600}
+                  value={commandTimeout}
+                  onChange={(event) => setCommandTimeout(Math.max(1, Math.min(600, Number(event.target.value))))}
+                />
+              </label>
+              {commandOutput ? (
+                <div className="programCard">
+                  <div className="logEntry">
+                    <strong>Exit code:</strong> {commandOutput.exitCode}
+                  </div>
+                  {commandOutput.stdout ? (
+                    <details>
+                      <summary style={{ cursor: "pointer", userSelect: "none" }}>stdout ({commandOutput.stdout.split("\n").length} lines)</summary>
+                      <pre className="commandOutput">{commandOutput.stdout}</pre>
+                    </details>
+                  ) : null}
+                  {commandOutput.stderr ? (
+                    <details>
+                      <summary style={{ cursor: "pointer", userSelect: "none" }}>stderr ({commandOutput.stderr.split("\n").length} lines)</summary>
+                      <pre className="commandOutput" style={{ color: "#d64545" }}>{commandOutput.stderr}</pre>
+                    </details>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="collection">
+              <div className="subHeader">
                 <h3>Remote Files</h3>
                 <button onClick={() => void browseRemote()} disabled={!selectedStation || remoteBusy === "browse"}>
                   {remoteBusy === "browse" ? "Browsing..." : "Browse"}
@@ -1161,6 +1318,216 @@ export default function App() {
           </section>
           ) : null}
         </main>
+      ) : activePage === "groups" ? (
+        <main className="grid">
+          <section className="panel detailPanel" style={{ flex: 1 }}>
+            <div className="panelHeader">
+              <h2>Device Groups</h2>
+              <span className="hint">Organize stations into groups with tags</span>
+            </div>
+
+            <div className="toolbar" style={{ marginBottom: "1rem" }}>
+              <button
+                onClick={() => {
+                  setEditingGroup({
+                    id: "",
+                    name: "",
+                    description: "",
+                    tags: [],
+                    stationIds: []
+                  });
+                }}
+              >
+                + New Group
+              </button>
+            </div>
+
+            {groups.length === 0 ? (
+              <p className="emptyInline">No groups yet. Create one to organize your stations.</p>
+            ) : (
+              <div className="logList">
+                {groups.map((group) => (
+                  <div key={group.id} className="stationCard">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <strong className="stationName">{group.name}</strong>
+                        {group.description && (
+                          <span className="stationMeta" style={{ marginLeft: "0.5rem" }}>
+                            — {group.description}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", gap: "0.25rem" }}>
+                        <button
+                          onClick={() => setEditingGroup(group)}
+                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem" }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Delete group "${group.name}"?`)) {
+                              void deleteGroup(group.id);
+                            }
+                          }}
+                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem", color: "#d64545" }}
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => {
+                            setGroupFilter(group.id);
+                            setActivePage("stations");
+                          }}
+                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem" }}
+                        >
+                          Filter Stations
+                        </button>
+                      </div>
+                    </div>
+                    {group.tags.length > 0 && (
+                      <div style={{ display: "flex", gap: "0.25rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
+                        {group.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            style={{
+                              background: "var(--accent, #1f9d55)",
+                              color: "#fff",
+                              padding: "0.1rem 0.4rem",
+                              borderRadius: "3px",
+                              fontSize: "0.7rem"
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="stationMeta" style={{ marginTop: "0.25rem" }}>
+                      {group.stationIds.length} station{group.stationIds.length !== 1 ? "s" : ""}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {editingGroup && (
+            <section className="panel sidePanel">
+              <div className="panelHeader">
+                <h2>{editingGroup.id ? "Edit Group" : "New Group"}</h2>
+                <button
+                  onClick={() => setEditingGroup(null)}
+                  style={{ fontSize: "0.8rem", padding: "0.2rem 0.5rem" }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="detailLayout">
+                <label className="field">
+                  <span>Group Name</span>
+                  <input
+                    type="text"
+                    value={editingGroup.name}
+                    onChange={(event) =>
+                      setEditingGroup((g) => g ? { ...g, name: event.target.value } : g)
+                    }
+                    placeholder="e.g. Guangzhou Office, Lab Devices"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Description</span>
+                  <input
+                    type="text"
+                    value={editingGroup.description}
+                    onChange={(event) =>
+                      setEditingGroup((g) => g ? { ...g, description: event.target.value } : g)
+                    }
+                    placeholder="Optional description"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Tags (comma-separated)</span>
+                  <input
+                    type="text"
+                    value={editingGroup.tags.join(", ")}
+                    onChange={(event) =>
+                      setEditingGroup((g) =>
+                        g ? {
+                          ...g,
+                          tags: event.target.value
+                            .split(",")
+                            .map((t) => t.trim())
+                            .filter(Boolean)
+                        } : g
+                      )
+                    }
+                    placeholder="guangzhou, lab, production"
+                  />
+                </label>
+
+                <div className="collection">
+                  <div className="subHeader">
+                    <h3>Assign Stations ({editingGroup.stationIds.length})</h3>
+                  </div>
+                  {stations.length === 0 ? (
+                    <p className="emptyInline">No stations available.</p>
+                  ) : (
+                    <div className="logList">
+                      {stations.map((station) => {
+                        const checked = editingGroup.stationIds.includes(station.id);
+                        return (
+                          <label key={station.id} className="checkField">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(event) => {
+                                setEditingGroup((g) => {
+                                  if (!g) return g;
+                                  return {
+                                    ...g,
+                                    stationIds: event.target.checked
+                                      ? [...g.stationIds, station.id]
+                                      : g.stationIds.filter((id) => id !== station.id)
+                                  };
+                                });
+                              }}
+                            />
+                            <span>{station.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="toolbar miniToolbar" style={{ marginTop: "1rem" }}>
+                  <button
+                    onClick={() => {
+                      if (!editingGroup.name.trim()) {
+                        setLog((current) => ["Group name is required.", ...current]);
+                        return;
+                      }
+                      if (editingGroup.id) {
+                        void updateGroup(editingGroup);
+                      } else {
+                        void createGroup(editingGroup.name.trim());
+                        setEditingGroup(null);
+                      }
+                    }}
+                    className="accent"
+                  >
+                    {editingGroup.id ? "Save Changes" : "Create Group"}
+                  </button>
+                  <button onClick={() => setEditingGroup(null)}>Cancel</button>
+                </div>
+              </div>
+            </section>
+          )}
+        </main>
       ) : (
         <main className="grid">
           <section className="panel detailPanel">
@@ -1170,20 +1537,45 @@ export default function App() {
             </div>
 
             <div className="detailLayout">
-              <label className="field">
-                <span>Monitor Interval</span>
-                <input
-                  type="number"
-                  min={1}
-                  value={options.interval}
-                  onChange={(event) =>
-                    setOptions((current) => ({
-                      ...current,
-                      interval: Number(event.target.value)
-                    }))
-                  }
-                />
-              </label>
+              <div className="collection">
+                <div className="subHeader">
+                  <h3>Monitor Settings</h3>
+                </div>
+                <label className="field">
+                  <span>Monitor Interval (seconds)</span>
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <input
+                      type="number"
+                      min={1}
+                      max={60}
+                      value={options.interval}
+                      onChange={(event) =>
+                        setOptions((current) => ({
+                          ...current,
+                          interval: Number(event.target.value)
+                        }))
+                      }
+                      style={{ width: "80px" }}
+                    />
+                    <button
+                      className="accent"
+                      onClick={async () => {
+                        try {
+                          const msg = await invoke<string>(
+                            "set_station_gathering_interval_for_ui",
+                            { intervalSeconds: options.interval }
+                          );
+                          setLog((current) => [msg, ...current]);
+                        } catch (err) {
+                          setLog((current) => [`Failed to set interval: ${String(err)}`, ...current]);
+                        }
+                      }}
+                    >
+                      Save to Stations
+                    </button>
+                  </div>
+                </label>
+              </div>
 
               <label className="checkField">
                 <input
@@ -1218,11 +1610,222 @@ export default function App() {
 
               <div className="collection">
                 <div className="subHeader">
-                  <h3>Weather Download Options</h3>
+                  <h3>Weather Image Download Options</h3>
                 </div>
-                <p className="emptyInline">
-                  Weather Source URL input has been removed from the UI.
-                </p>
+                <label className="checkField">
+                  <input
+                    type="checkbox"
+                    checked={options.weatherImageDownloadOption.download === 1}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          download: event.target.checked ? 1 : 0
+                        }
+                      }))
+                    }
+                  />
+                  <span>Enable weather image download</span>
+                </label>
+
+                <label className="field">
+                  <span>FTP URL</span>
+                  <input
+                    type="text"
+                    value={options.weatherImageDownloadOption.url}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          url: event.target.value
+                        }
+                      }))
+                    }
+                    placeholder="ftp://example.com/weather"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Username</span>
+                  <input
+                    type="text"
+                    value={options.weatherImageDownloadOption.userName}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          userName: event.target.value
+                        }
+                      }))
+                    }
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Password</span>
+                  <input
+                    type="password"
+                    value={options.weatherImageDownloadOption.password}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          password: event.target.value
+                        }
+                      }))
+                    }
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Refresh Interval (minutes)</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={options.weatherImageDownloadOption.interval}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          interval: Number(event.target.value)
+                        }
+                      }))
+                    }
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Lookback Hours</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={options.weatherImageDownloadOption.lastHours}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          lastHours: Number(event.target.value)
+                        }
+                      }))
+                    }
+                  />
+                </label>
+
+                <label className="checkField">
+                  <input
+                    type="checkbox"
+                    checked={options.weatherImageDownloadOption.deletePreviousFiles}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          deletePreviousFiles: event.target.checked
+                        }
+                      }))
+                    }
+                  />
+                  <span>Delete previous files</span>
+                </label>
+
+                {options.weatherImageDownloadOption.deletePreviousFiles && (
+                  <label className="field">
+                    <span>Delete files older than (hours)</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={options.weatherImageDownloadOption.deleteHowHoursAgo}
+                      onChange={(event) =>
+                        setOptions((current) => ({
+                          ...current,
+                          weatherImageDownloadOption: {
+                            ...current.weatherImageDownloadOption,
+                            deleteHowHoursAgo: Number(event.target.value)
+                          }
+                        }))
+                      }
+                    />
+                  </label>
+                )}
+
+                <label className="field">
+                  <span>Sub Directory</span>
+                  <input
+                    type="text"
+                    value={options.weatherImageDownloadOption.subDirectory}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          subDirectory: event.target.value
+                        }
+                      }))
+                    }
+                    placeholder="weather_images"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Save Path (Linux)</span>
+                  <input
+                    type="text"
+                    value={options.weatherImageDownloadOption.savePathForLinux}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          savePathForLinux: event.target.value
+                        }
+                      }))
+                    }
+                    placeholder="/var/lib/weather"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Save Path (Windows)</span>
+                  <input
+                    type="text"
+                    value={options.weatherImageDownloadOption.savePathForWindows}
+                    onChange={(event) =>
+                      setOptions((current) => ({
+                        ...current,
+                        weatherImageDownloadOption: {
+                          ...current.weatherImageDownloadOption,
+                          savePathForWindows: event.target.value
+                        }
+                      }))
+                    }
+                    placeholder="C:\\WeatherImages"
+                  />
+                </label>
+
+                <div className="toolbar miniToolbar" style={{ marginTop: "0.5rem" }}>
+                  <button
+                    className="accent"
+                    onClick={async () => {
+                      try {
+                        const msg = await invoke<string>(
+                          "set_station_weather_option_for_ui",
+                          { option: options.weatherImageDownloadOption }
+                        );
+                        setLog((current) => [msg, ...current]);
+                      } catch (err) {
+                        setLog((current) => [`Failed to save weather options: ${String(err)}`, ...current]);
+                      }
+                    }}
+                  >
+                    Save Weather Options
+                  </button>
+                </div>
               </div>
             </div>
           </section>
