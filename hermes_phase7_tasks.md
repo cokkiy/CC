@@ -76,7 +76,7 @@ message ExecuteCommandResponse {
 ## 交付物
 1. 远程命令行/脚本执行功能 ✅
 2. 监视间隔配置 UI ✅
-3. 气象云图配置表单 ✅
+3. 气象云图配置表单 ❌ **REMOVED** (per user request 2026-04-16)
 4. 设备分组和标签管理 ✅
 5. 所有编译通过 ✅
 6. 更新 `action_plan.md` 记录本阶段状态 ✅
