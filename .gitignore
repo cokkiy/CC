@@ -279,3 +279,4 @@ logs
 .agents
 .claude
 skills-lock.json
+AGENTS.md
