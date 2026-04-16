@@ -8,7 +8,7 @@ use crate::grpc::cc::{
     station_control_client::StationControlClient, AppStartParameter, AppStartingResult,
     CloseAppRequest, Empty, GetAllProcessInfoResponse, RebootRequest, RestartAppRequest,
     SetStateGatheringIntervalRequest,
-    ShutdownRequest, StartAppRequest, SwitchDisplayPageAndModeRequest,
+    ShutdownRequest, StartAppRequest,
 };
 use crate::models::{ActionResult, StartProgram, Station, StationAction};
 use crate::storage::StorageError;
@@ -24,11 +24,6 @@ const APP_CONTROL_RESULT_CLOSED: i32 = 5;
 const APP_CONTROL_RESULT_FAIL_TO_CLOSE: i32 = 6;
 const APP_CONTROL_RESULT_ERROR: i32 = 7;
 
-const DISPLAY_COMMAND_FULL_SCREEN: i32 = 1;
-const DISPLAY_COMMAND_REALTIME_MODE: i32 = 2;
-const DISPLAY_COMMAND_CLEAR_PAGE: i32 = 3;
-const DISPLAY_COMMAND_NEXT_PAGE: i32 = 4;
-const DISPLAY_COMMAND_PREV_PAGE: i32 = 5;
 
 pub async fn execute_station_action(
     action: StationAction,
@@ -300,19 +295,6 @@ async fn execute_remote_action_for_station(
                 .map_err(|error| format!("reboot RPC failed via {endpoint}: {error}"))?;
             Ok(format!("Reboot requested via {endpoint}."))
         }
-        StationAction::FullScreen
-        | StationAction::RealTime
-        | StationAction::PrevPage
-        | StationAction::NextPage
-        | StationAction::ClearPage => {
-            client
-                .switch_display_page_and_mode(SwitchDisplayPageAndModeRequest {
-                    command: action_display_command(action),
-                })
-                .await
-                .map_err(|error| format!("display RPC failed via {endpoint}: {error}"))?;
-            Ok(format!("{} command sent via {endpoint}.", action.label()))
-        }
         StationAction::PowerOn | StationAction::Block | StationAction::Unblock => {
             Err(format!("{} is handled locally.", action.label()))
         }
@@ -562,26 +544,6 @@ fn display_process_name(result: &AppStartingResult) -> String {
     }
 }
 
-fn action_display_command(action: &StationAction) -> i32 {
-    match action {
-        StationAction::FullScreen => DISPLAY_COMMAND_FULL_SCREEN,
-        StationAction::RealTime => DISPLAY_COMMAND_REALTIME_MODE,
-        StationAction::PrevPage => DISPLAY_COMMAND_PREV_PAGE,
-        StationAction::NextPage => DISPLAY_COMMAND_NEXT_PAGE,
-        StationAction::ClearPage => DISPLAY_COMMAND_CLEAR_PAGE,
-        StationAction::PowerOn
-        | StationAction::Block
-        | StationAction::Unblock
-        | StationAction::StartApp
-        | StationAction::RestartApp
-        | StationAction::ExitApp
-        | StationAction::Shutdown
-        | StationAction::Reboot
-        | StationAction::BatchPowerOn
-        | StationAction::BatchShutdown
-        | StationAction::BatchReboot => 0,
-    }
-}
 
 pub(crate) fn station_label(station: &Station) -> &str {
     if station.name.trim().is_empty() {

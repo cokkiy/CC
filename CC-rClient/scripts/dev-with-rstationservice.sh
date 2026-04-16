@@ -111,7 +111,8 @@ cat >"$CLIENT_STATE_PATH" <<EOF
       "savePathForLinux": "",
       "savePathForWindows": ""
     }
-  }
+  },
+  "groups": []
 }
 EOF
 

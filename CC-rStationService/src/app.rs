@@ -24,11 +24,10 @@ use crate::grpc::cc::{
     Empty, ExecuteCommandRequest, ExecuteCommandResponse, GetAllProcessInfoResponse,
     GetAppLauncherPathResponse, GetConnectionInformationsResponse, GetFileInfoResponse,
     GetNetworkInterfacesResponse, GetServicePathResponse, GetTcpListenerInfosResponse,
-    GetUdpListenerInfosResponse, OpenSpecPageRequest, PathRef, RebootRequest, RenameFileRequest,
-    RenameFileResponse, RestartAppRequest, RestartAppResponse, SendRemoteCtrlCommandRequest,
+    GetUdpListenerInfosResponse, PathRef, RebootRequest, RenameFileRequest,
+    RenameFileResponse, RestartAppRequest, RestartAppResponse,
     ServerVersionInfo, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
-    SetWeatherPictureDownloadOptionRequest, ShutdownRequest, StartAppRequest, StartAppResponse,
-    SwitchDisplayPageAndModeRequest, TelemetryClientMessage, TelemetryServerMessage, UploadChunk,
+    ShutdownRequest, StartAppRequest, StartAppResponse, TelemetryClientMessage, TelemetryServerMessage, UploadChunk,
     UploadResult, file_transfer_server::FileTransfer, file_transfer_server::FileTransferServer,
     station_control_server::StationControl, station_control_server::StationControlServer,
     telemetry_client_message, telemetry_server::Telemetry, telemetry_server::TelemetryServer,
@@ -182,12 +181,7 @@ impl StationControl for StationControlService {
         Ok(Response::new(Empty {}))
     }
 
-    async fn set_weather_picture_download_option(
-        &self,
-        _request: Request<SetWeatherPictureDownloadOptionRequest>,
-    ) -> Result<Response<Empty>, Status> {
-        Ok(Response::new(Empty {}))
-    }
+
 
     async fn capture_screen(
         &self,
@@ -254,39 +248,11 @@ impl StationControl for StationControlService {
         Ok(Response::new(self.state.server_version()))
     }
 
-    async fn switch_display_page_and_mode(
-        &self,
-        request: Request<SwitchDisplayPageAndModeRequest>,
-    ) -> Result<Response<Empty>, Status> {
-        let command = request.into_inner().command;
-        platform::send_udp_command(self.state.udp_target(), command, &[])
-            .map_err(status_from_error)?;
-        Ok(Response::new(Empty {}))
-    }
 
-    async fn open_spec_page(
-        &self,
-        request: Request<OpenSpecPageRequest>,
-    ) -> Result<Response<Empty>, Status> {
-        let page_num = request.into_inner().page_num;
-        platform::send_udp_command(self.state.udp_target(), 10, &page_num.to_le_bytes())
-            .map_err(status_from_error)?;
-        Ok(Response::new(Empty {}))
-    }
 
-    async fn send_remote_ctrl_command(
-        &self,
-        request: Request<SendRemoteCtrlCommandRequest>,
-    ) -> Result<Response<Empty>, Status> {
-        let request = request.into_inner();
-        platform::send_udp_command(
-            self.state.udp_target(),
-            request.command_code,
-            &request.control_params,
-        )
-        .map_err(status_from_error)?;
-        Ok(Response::new(Empty {}))
-    }
+
+
+
 
     async fn get_service_path(
         &self,

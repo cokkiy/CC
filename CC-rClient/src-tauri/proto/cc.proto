@@ -20,19 +20,7 @@ enum AppControlResult {
   APP_CONTROL_RESULT_ERROR = 7;
 }
 
-enum DisplayCommand {
-  DISPLAY_COMMAND_UNSPECIFIED = 0;
-  DISPLAY_COMMAND_FULL_SCREEN = 1;
-  DISPLAY_COMMAND_REALTIME_MODE = 2;
-  DISPLAY_COMMAND_CLEAR_PAGE = 3;
-  DISPLAY_COMMAND_NEXT_PAGE = 4;
-  DISPLAY_COMMAND_PREV_PAGE = 5;
-  DISPLAY_COMMAND_SPECIFIED_PAGE = 6;
-  DISPLAY_COMMAND_GET_CURRENT_PAGE = 7;
-  DISPLAY_COMMAND_CLEAR_SUB_SYS_PAGE = 8;
-  DISPLAY_COMMAND_EXIT = 9;
-  DISPLAY_COMMAND_OPEN_SPECIFIED_PAGE = 10;
-}
+
 
 message VersionInfo {
   int32 major = 1;
@@ -149,23 +137,9 @@ message SetStateGatheringIntervalRequest {
   int32 interval_seconds = 1;
 }
 
-message WeatherPictureDownloadOption {
-  bool download = 1;
-  string url = 2;
-  string user_name = 3;
-  string password = 4;
-  int32 interval = 5;
-  int32 last_hours = 6;
-  bool delete_previous_files = 7;
-  int32 delete_how_hours_ago = 8;
-  string sub_directory = 9;
-  string save_path_for_linux = 10;
-  string save_path_for_windows = 11;
-}
 
-message SetWeatherPictureDownloadOptionRequest {
-  WeatherPictureDownloadOption option = 1;
-}
+
+
 
 message CaptureScreenRequest {
   int64 start_position = 1;
@@ -187,18 +161,11 @@ message RenameFileResponse {
   bool ok = 1;
 }
 
-message OpenSpecPageRequest {
-  int32 page_num = 1;
-}
 
-message SwitchDisplayPageAndModeRequest {
-  DisplayCommand command = 1;
-}
 
-message SendRemoteCtrlCommandRequest {
-  int32 command_code = 1;
-  bytes control_params = 2;
-}
+
+
+
 
 message GetServicePathResponse {
   string path = 1;
@@ -291,7 +258,7 @@ message StationSystemState {
   repeated StationNetworkInterface network_interfaces = 4;
   string os_name = 5;
   string os_version = 6;
-  bool download_weather_image = 7;
+
 }
 
 message StationRunningState {
@@ -401,14 +368,14 @@ service StationControl {
   rpc GetSystemState(Empty) returns (StationSystemState);
   rpc SetWatchingApp(SetWatchingAppRequest) returns (Empty);
   rpc SetStateGatheringInterval(SetStateGatheringIntervalRequest) returns (Empty);
-  rpc SetWeatherPictureDownloadOption(SetWeatherPictureDownloadOptionRequest) returns (Empty);
+
   rpc CaptureScreen(CaptureScreenRequest) returns (stream CaptureScreenChunk);
   rpc GetFileInfo(PathRef) returns (GetFileInfoResponse);
   rpc GetAllProcessInfo(Empty) returns (GetAllProcessInfoResponse);
   rpc GetServerVersion(Empty) returns (ServerVersionInfo);
-  rpc SwitchDisplayPageAndMode(SwitchDisplayPageAndModeRequest) returns (Empty);
-  rpc OpenSpecPage(OpenSpecPageRequest) returns (Empty);
-  rpc SendRemoteCtrlCommand(SendRemoteCtrlCommandRequest) returns (Empty);
+
+
+
   rpc GetServicePath(Empty) returns (GetServicePathResponse);
   rpc GetAppLauncherPath(Empty) returns (GetAppLauncherPathResponse);
   rpc RenameFile(RenameFileRequest) returns (RenameFileResponse);

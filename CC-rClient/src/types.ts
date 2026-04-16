@@ -120,11 +120,6 @@ export type StationAction =
   | "exit_app"
   | "shutdown"
   | "reboot"
-  | "full_screen"
-  | "real_time"
-  | "prev_page"
-  | "next_page"
-  | "clear_page"
   | "batch_power_on"
   | "batch_shutdown"
   | "batch_reboot";

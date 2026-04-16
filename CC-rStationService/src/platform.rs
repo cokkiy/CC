@@ -1,4 +1,3 @@
-use std::net::{SocketAddr, UdpSocket};
 use std::process::Command;
 
 use anyhow::{Context, Result, anyhow};
@@ -32,24 +31,7 @@ pub fn shutdown() -> Result<()> {
     }
 }
 
-pub fn send_udp_command(
-    target: SocketAddr,
-    command_code: i32,
-    control_params: &[u8],
-) -> Result<()> {
-    let socket = UdpSocket::bind("0.0.0.0:0").context("bind UDP socket")?;
-    let mut payload = [0u8; 512];
-    payload[..4].copy_from_slice(&command_code.to_le_bytes());
 
-    let data_len = control_params.len().min(payload.len() - 4);
-    payload[4..4 + data_len].copy_from_slice(&control_params[..data_len]);
-
-    socket
-        .send_to(&payload, target)
-        .with_context(|| format!("send UDP display command to {target}"))?;
-
-    Ok(())
-}
 
 #[cfg(unix)]
 pub fn daemonize() -> Result<()> {

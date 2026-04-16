@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct NetworkInterface {
     pub mac: String,
     pub ips: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct StartProgram {
     pub path: String,
     pub arguments: String,
@@ -16,8 +16,8 @@ pub struct StartProgram {
     pub allow_multi_instance: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct Station {
     pub id: String,
     pub name: String,
@@ -29,7 +29,7 @@ pub struct Station {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 pub struct ClientOptions {
     pub interval: i32,
     pub is_first_time_run: bool,
@@ -49,7 +49,7 @@ impl Default for ClientOptions {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 pub struct PersistedState {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
@@ -87,11 +87,6 @@ pub enum StationAction {
     ExitApp,
     Shutdown,
     Reboot,
-    FullScreen,
-    RealTime,
-    PrevPage,
-    NextPage,
-    ClearPage,
     BatchPowerOn,
     BatchShutdown,
     BatchReboot,
@@ -108,11 +103,6 @@ impl StationAction {
             Self::ExitApp => "Exit App",
             Self::Shutdown => "Shutdown",
             Self::Reboot => "Reboot",
-            Self::FullScreen => "Full Screen",
-            Self::RealTime => "Real Time",
-            Self::PrevPage => "Previous Page",
-            Self::NextPage => "Next Page",
-            Self::ClearPage => "Clear Page",
             Self::BatchPowerOn => "Batch Power On",
             Self::BatchShutdown => "Batch Shutdown",
             Self::BatchReboot => "Batch Reboot",
@@ -129,8 +119,8 @@ pub struct ActionResult {
     pub implemented: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct StationGroup {
     pub id: String,
     pub name: String,

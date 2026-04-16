@@ -136,7 +136,6 @@ impl AppState {
             network_interfaces: collect_station_network_interfaces(),
             os_name: System::name().unwrap_or_default(),
             os_version: System::os_version().unwrap_or_default(),
-            download_weather_image: false,
         }
     }
 

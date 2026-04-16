@@ -5,7 +5,7 @@ description = "Rust/Tauri migration of CC-Client"
 authors = ["OpenAI Codex"]
 license = ""
 repository = ""
-edition = "2021"
+edition = "2024"
 
 [lib]
 name = "cc_rclient_lib"
