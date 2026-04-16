@@ -65,7 +65,11 @@ impl StateStore {
 
         if storage_path.exists() {
             let data = fs::read_to_string(&storage_path)?;
-            let payload = serde_json::from_str::<PersistedState>(&data)?;
+            let payload = normalize_payload(serde_json::from_str::<PersistedState>(&data)?);
+            let normalized_json = serde_json::to_string_pretty(&payload)?;
+            if normalized_json != data {
+                fs::write(&storage_path, normalized_json)?;
+            }
             return Ok(AppSnapshot {
                 stations: payload.stations,
                 options: payload.options,
@@ -540,5 +544,47 @@ SavePathForWindows=C:\weather
         assert!(ini.contains("[ControlAndMonitor]"));
         assert!(ini.contains("StartApps=/opt/app && --x && proc && 1"));
         assert!(ini.contains("MonitorProc=alpha|beta"));
+    }
+
+    #[test]
+    fn deserializes_legacy_state_without_groups_and_normalizes_ips() {
+        let json = r#"
+{
+  "stations": [
+    {
+      "id": "local-rstationservice",
+      "name": "Local CC-rStationService",
+      "networkInterfaces": [
+        {
+          "mac": "",
+          "ips": [" 127.0.0.1:50051 ", ""]
+        }
+      ],
+      "monitorProcesses": ["vite", " ", "cc-rstationservice"]
+    }
+  ],
+  "options": {
+    "interval": 2,
+    "isFirstTimeRun": false,
+    "monitorProcesses": ["vite", "cc-rclient", "cc-rstationservice"],
+    "weatherImageDownloadOption": {
+      "download": 2
+    }
+  }
+}
+"#;
+
+        let payload = normalize_payload(serde_json::from_str::<PersistedState>(json).unwrap());
+
+        assert!(payload.groups.is_empty());
+        assert_eq!(payload.stations.len(), 1);
+        assert_eq!(
+            payload.stations[0].network_interfaces[0].ips,
+            vec!["127.0.0.1:50051"]
+        );
+        assert_eq!(
+            payload.stations[0].monitor_processes,
+            vec!["vite", "cc-rstationservice"]
+        );
     }
 }
