@@ -7,8 +7,10 @@ use remote::{
 };
 use storage::StateStore;
 
+
 pub mod control;
 pub mod remote;
+pub mod websocket;
 
 mod grpc;
 mod models;

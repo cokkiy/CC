@@ -1,0 +1,331 @@
+//! WebSocket bridge module for CC-rClient
+//! 
+//! This module implements WebSocket connection to CC-Aggregator
+//! and bridges between the Tauri frontend and MQTT message broker.
+
+use anyhow::{Context, Result};
+use futures_util::{SinkExt, StreamExt};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::{broadcast, mpsc, RwLock};
+use tokio_tungstenite::{connect_async, tungstenite::Message};
+use tracing::{debug, error, info, warn};
+
+use crate::models::Station;
+
+/// WebSocket client for connecting to CC-Aggregator
+pub struct WebSocketClient {
+    aggregator_url: String,
+    stations: Arc<RwLock<HashMap<String, Station>>>,
+    message_tx: broadcast::Sender<WsMessage>,
+}
+
+impl WebSocketClient {
+    /// Create a new WebSocket client
+    pub fn new(aggregator_url: &str) -> Self {
+        let (message_tx, _) = broadcast::channel::<WsMessage>(1000);
+        
+        Self {
+            aggregator_url: aggregator_url.to_string(),
+            stations: Arc::new(RwLock::new(HashMap::new())),
+            message_tx,
+        }
+    }
+
+    /// Connect to the aggregator and start message processing
+    pub async fn connect(&self) -> Result<()> {
+        let url = &self.aggregator_url;
+        info!("Connecting to CC-Aggregator at: {}", url);
+        
+        let (ws_stream, _) = connect_async(url)
+            .await
+            .context("Failed to connect to CC-Aggregator")?;
+        
+        info!("Connected to CC-Aggregator");
+        
+        let (mut write, mut read) = ws_stream.split();
+        let message_tx = self.message_tx.clone();
+        let stations = self.stations.clone();
+        
+        // Send initial subscription message
+        let subscribe_msg = WsMessage::Subscribe {
+            stations: Vec::new(), // Subscribe to all stations initially
+        };
+        
+        let json = serde_json::to_string(&subscribe_msg)?;
+        write.send(Message::Text(json.into())).await?;
+        
+        // Start message processing loop
+        tokio::spawn(async move {
+            loop {
+                match read.next().await {
+                    Some(Ok(Message::Text(text))) => {
+                        if let Err(e) = handle_incoming_message(&text, &stations, &message_tx).await {
+                            warn!("Failed to handle incoming message: {:?}", e);
+                        }
+                    }
+                    Some(Ok(Message::Binary(data))) => {
+                        if let Ok(text) = String::from_utf8(data.to_vec()) {
+                            if let Err(e) = handle_incoming_message(&text, &stations, &message_tx).await {
+                                warn!("Failed to handle binary message: {:?}", e);
+                            }
+                        }
+                    }
+                    Some(Ok(Message::Close(_))) => {
+                        info!("WebSocket connection closed");
+                        break;
+                    }
+                    Some(Err(e)) => {
+                        error!("WebSocket error: {:?}", e);
+                        break;
+                    }
+                    None => {
+                        info!("WebSocket stream ended");
+                        break;
+                    }
+                    _ => {}
+                }
+            }
+        });
+        
+        Ok(())
+    }
+
+    /// Subscribe to station updates
+    pub async fn subscribe_stations(&self, station_ids: Vec<String>) -> Result<()> {
+        let msg = WsMessage::Subscribe { stations: station_ids };
+        self.broadcast_message(msg).await
+    }
+
+    /// Unsubscribe from station updates
+    pub async fn unsubscribe_stations(&self, station_ids: Vec<String>) -> Result<()> {
+        let msg = WsMessage::Unsubscribe { stations: station_ids };
+        self.broadcast_message(msg).await
+    }
+
+    /// Request station list
+    pub async fn request_stations(&self) -> Result<()> {
+        let msg = WsMessage::GetStations;
+        self.broadcast_message(msg).await
+    }
+
+    /// Broadcast a message to all connected clients
+    async fn broadcast_message(&self, msg: WsMessage) -> Result<()> {
+        // In a real implementation, this would send the message via WebSocket
+        // For now, we'll just log it
+        debug!("Would broadcast message: {:?}", msg);
+        Ok(())
+    }
+
+    /// Get a receiver for incoming messages
+    pub fn subscribe_messages(&self) -> broadcast::Receiver<WsMessage> {
+        self.message_tx.subscribe()
+    }
+}
+
+/// WebSocket message types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
+pub enum WsMessage {
+    #[serde(rename = "subscribe")]
+    Subscribe { stations: Vec<String> },
+    
+    #[serde(rename = "unsubscribe")]
+    Unsubscribe { stations: Vec<String> },
+    
+    #[serde(rename = "getStations")]
+    GetStations,
+    
+    #[serde(rename = "telemetry")]
+    Telemetry {
+        station_id: String,
+        data: TelemetryBundle,
+    },
+    
+    #[serde(rename = "status")]
+    Status {
+        station_id: String,
+        status: StationStatus,
+    },
+    
+    #[serde(rename = "stationList")]
+    StationList { stations: Vec<String> },
+    
+    #[serde(rename = "error")]
+    Error { message: String },
+}
+
+/// Telemetry bundle from CC-Aggregator
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryBundle {
+    pub ts: i64,
+    pub station_id: String,
+    pub interval_ms: u32,
+    pub values: Vec<TelemetryValue>,
+}
+
+/// Telemetry value
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryValue {
+    pub key: String,
+    pub v: f64,
+}
+
+/// Station status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StationStatus {
+    pub station_id: String,
+    pub online: bool,
+    pub last_seen: i64,
+    pub version: Option<String>,
+    pub alert: Option<String>,
+}
+
+/// Handle incoming WebSocket message
+async fn handle_incoming_message(
+    text: &str,
+    stations: &Arc<RwLock<HashMap<String, Station>>>,
+    message_tx: &broadcast::Sender<WsMessage>,
+) -> Result<()> {
+    debug!("Received WebSocket message: {}", text);
+    
+    match serde_json::from_str::<WsMessage>(text) {
+        Ok(msg) => {
+            match msg {
+                WsMessage::Telemetry { station_id, data } => {
+                    handle_telemetry_message(&station_id, &data, stations).await?;
+                }
+                WsMessage::Status { station_id, status } => {
+                    handle_status_message(&station_id, &status, stations).await?;
+                }
+                WsMessage::StationList { stations: station_ids } => {
+                    handle_station_list(&station_ids, stations).await?;
+                }
+                WsMessage::Error { message } => {
+                    error!("Received error from aggregator: {}", message);
+                }
+                _ => {
+                    debug!("Received other message type: {:?}", msg);
+                }
+            }
+            
+            // Forward the message to subscribers
+            if message_tx.send(msg).is_err() {
+                warn!("No active subscribers for WebSocket message");
+            }
+        }
+        Err(e) => {
+            warn!("Failed to parse WebSocket message: {:?}, text: {}", e, text);
+        }
+    }
+    
+    Ok(())
+}
+
+/// Handle telemetry message
+async fn handle_telemetry_message(
+    station_id: &str,
+    data: &TelemetryBundle,
+    stations: &Arc<RwLock<HashMap<String, Station>>>,
+) -> Result<()> {
+    debug!("Processing telemetry for station: {}", station_id);
+    
+    let mut stations = stations.write().await;
+    
+    // Update or create station
+    if let Some(station) = stations.get_mut(station_id) {
+        // Update station runtime data from telemetry
+        for value in &data.values {
+            match value.key.as_str() {
+                "cpu_usage_percent" => {
+                    // Update CPU usage
+                    // station.cpu = value.v as f32;
+                }
+                "memory_used_mb" => {
+                    // Update memory usage
+                    // station.current_memory = (value.v * 1024.0 * 1024.0) as i64;
+                }
+                "process_count" => {
+                    // Update process count
+                    // station.proc_count = value.v as i32;
+                }
+                _ => {
+                    // Handle other telemetry values
+                    if value.key.starts_with("network_rx_bytes_per_sec_") {
+                        // Network RX rate
+                    } else if value.key.starts_with("network_tx_bytes_per_sec_") {
+                        // Network TX rate
+                    }
+                }
+            }
+        }
+    } else {
+        // Create new station entry
+        let station = Station {
+            id: station_id.to_string(),
+            name: station_id.to_string(),
+            blocked: false,
+            network_interfaces: Vec::new(),
+            start_programs: Vec::new(),
+            monitor_processes: Vec::new(),
+            last_action: None,
+        };
+        
+        stations.insert(station_id.to_string(), station);
+    }
+    
+    Ok(())
+}
+
+/// Handle status message
+async fn handle_status_message(
+    station_id: &str,
+    status: &StationStatus,
+    stations: &Arc<RwLock<HashMap<String, Station>>>,
+) -> Result<()> {
+    debug!("Processing status for station: {}, online: {}", station_id, status.online);
+    
+    let mut stations = stations.write().await;
+    
+    if let Some(station) = stations.get_mut(station_id) {
+        // Update station status
+        // station.online = status.online;
+        // station.last_seen = status.last_seen;
+    }
+    
+    Ok(())
+}
+
+/// Handle station list message
+async fn handle_station_list(
+    station_ids: &[String],
+    stations: &Arc<RwLock<HashMap<String, Station>>>,
+) -> Result<()> {
+    debug!("Received station list with {} stations", station_ids.len());
+    
+    // Update station list
+    let mut stations = stations.write().await;
+    
+    // Remove stations not in the list
+    stations.retain(|id, _| station_ids.contains(id));
+    
+    // Add new stations
+    for station_id in station_ids {
+        if !stations.contains_key(station_id) {
+            let station = Station {
+                id: station_id.clone(),
+                name: station_id.clone(),
+                blocked: false,
+                network_interfaces: Vec::new(),
+                start_programs: Vec::new(),
+                monitor_processes: Vec::new(),
+                last_action: None,
+            };
+            
+            stations.insert(station_id.clone(), station);
+        }
+    }
+    
+    Ok(())
+}
