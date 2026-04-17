@@ -1,0 +1,24 @@
+# CC-Aggregator Configuration
+
+[server]
+# Unique identifier for this aggregator instance
+id = "aggregator-001"
+
+[mqtt]
+# MQTT broker connection settings
+host = "localhost"
+port = 4222
+client_id = "cc-aggregator-001"
+keepalive_secs = 30
+telemetry_qos = 1
+command_qos = 1
+
+[websocket]
+# WebSocket server for client connections
+listen_addr = "127.0.0.1:8080"
+max_connections = 1000
+
+[logging]
+# Logging configuration
+level = "info"
+# file = "/var/log/cc-aggregator.log"  # Optional: log to file
