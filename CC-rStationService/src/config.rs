@@ -10,6 +10,7 @@ pub struct AppConfig {
     pub service: ServiceConfig,
     pub control: ControlConfig,
     pub agent: AgentConfig,
+    pub mqtt: MqttConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -35,6 +36,16 @@ pub struct AgentConfig {
     pub listen_addr: String,
     pub auth_token: String,
     pub preferred_display_index: u32,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(default)]
+pub struct MqttConfig {
+    pub enabled: bool,
+    pub broker_host: String,
+    pub broker_port: u16,
+    pub telemetry_enabled: bool,
+    pub status_enabled: bool,
 }
 
 impl Default for ServiceConfig {
@@ -64,6 +75,18 @@ impl Default for AgentConfig {
             listen_addr: "127.0.0.1:50052".to_string(),
             auth_token: "local-change-me".to_string(),
             preferred_display_index: 0,
+        }
+    }
+}
+
+impl Default for MqttConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            broker_host: "localhost".to_string(),
+            broker_port: 4222,
+            telemetry_enabled: true,
+            status_enabled: true,
         }
     }
 }

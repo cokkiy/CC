@@ -22,6 +22,7 @@ use crate::grpc::cc::{
     NetworkInterfaceInfo, Process, ProcessInfo, ServerVersionInfo, StationNetworkInterface,
     StationRunningState, StationSystemState, Statistics, VersionInfo,
 };
+use crate::mqtt::MqttClient;
 use crate::network_counters;
 use tracing::debug;
 
@@ -35,6 +36,7 @@ pub struct AppState {
     interval_seconds: AtomicU64,
     network_sampler: Mutex<NetworkSampler>,
     server_version: ServerVersionInfo,
+    mqtt_client: Option<MqttClient>,
 }
 
 impl AppState {
@@ -51,6 +53,26 @@ impl AppState {
             .parse::<SocketAddr>()
             .with_context(|| format!("parse agent target {}", config.agent.listen_addr))?;
 
+        // Initialize MQTT client if enabled
+        let mqtt_client = if config.mqtt.enabled {
+            match MqttClient::new(
+                &config.mqtt.broker_host,
+                config.mqtt.broker_port,
+                &station_id,
+            ) {
+                Ok(client) => {
+                    tracing::info!("MQTT client initialized for station: {}", station_id);
+                    Some(client)
+                }
+                Err(e) => {
+                    tracing::error!("Failed to initialize MQTT client: {:?}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
         Ok(Self {
             watched_processes: RwLock::new(config.service.watched_processes.clone()),
             interval_seconds: AtomicU64::new(config.service.state_interval_seconds.max(1)),
@@ -61,6 +83,7 @@ impl AppState {
             service_path,
             udp_target,
             agent_target,
+            mqtt_client,
         })
     }
 
@@ -187,6 +210,23 @@ impl AppState {
             .map(|name| collect_app_running_state(&system, &station_id, name))
             .collect();
         let apps = AppsRunningStateEnvelope { items };
+
+        // Publish telemetry via MQTT if enabled
+        if let Some(mqtt_client) = &self.mqtt_client {
+            if self.config.mqtt.telemetry_enabled {
+                let interval_ms = (self.interval_seconds.load(Ordering::Relaxed) * 1000) as u32;
+                let telemetry_bundle = crate::mqtt::TelemetryBundle::from_station_state(&running, interval_ms);
+                
+                // Spawn async task to publish telemetry
+                let client = mqtt_client.clone();
+                let bundle = telemetry_bundle.clone();
+                tokio::spawn(async move {
+                    if let Err(e) = client.publish_telemetry(&bundle).await {
+                        tracing::error!("Failed to publish telemetry via MQTT: {:?}", e);
+                    }
+                });
+            }
+        }
 
         (running, apps)
     }
