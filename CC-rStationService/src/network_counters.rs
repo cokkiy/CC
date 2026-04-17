@@ -113,6 +113,7 @@ mod platform {
                     unicast_packet_received: received_packets.saturating_sub(multicast_received),
                     unicast_packet_sented: sent_packets,
                     multicast_packet_received: multicast_received,
+                    // Linux: multicast_packet_sented always returns 0 due to platform limitation
                     multicast_packet_sented: 0,
                 })
             })
