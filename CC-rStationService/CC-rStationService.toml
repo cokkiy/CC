@@ -13,3 +13,10 @@ listen_addr = "0.0.0.0:50051"
 listen_addr = "127.0.0.1:50052"
 auth_token = "local-change-me"
 preferred_display_index = 0
+
+[mqtt]
+enabled = false
+broker_host = "localhost"
+broker_port = 4222
+telemetry_enabled = true
+status_enabled = true
