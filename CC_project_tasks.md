@@ -1,7 +1,49 @@
-# CC 项目 Phase 3-5 详细任务计划
+# CC 项目 Phase 1-5 详细任务计划
 
 ## 项目背景
-CC 项目已完成核心功能迁移（Rust/Tauri），正处于 Phase 3 调试日志阶段。
+CC 项目已完成核心功能迁移（Rust/Tauri），当前正在进行架构重构和数据流测试。
+
+---
+
+## Phase 1: 架构重构 (gRPC → MQTT/NATS)
+
+### 1.1 消息中间件部署 ⏳
+**负责人:** 架构师
+**任务:**
+- [ ] 部署NATS服务器
+- [ ] 配置MQTT插件
+- [ ] 验证服务器启动
+
+### 1.2 CC-Aggregator开发 ✅
+**负责人:** 开发团队
+**任务:**
+- [x] 创建Aggregator项目结构
+- [x] 实现MQTT客户端模块(rumqttc)
+- [x] 实现遥测数据结构模块(JSON自描述格式)
+- [x] 实现WebSocket服务器模块
+- [x] 添加配置文件和README
+- [ ] 完善代码并清理warning
+
+### 1.3 CC-rStationService MQTT改造 ⏳
+**负责人:** 开发团队
+**任务:**
+- [ ] 添加rumqttc依赖
+- [ ] 创建MQTT客户端模块
+- [ ] 实现遥测数据发布
+- [ ] 实现命令接收
+
+### 1.4 CC-rClient WebSocket桥接 ⏳
+**负责人:** 开发团队
+**任务:**
+- [ ] 实现Tauri端WebSocket-MQTT桥接
+- [ ] 更新前端API调用
+- [ ] 测试数据流
+
+---
+
+## Phase 3-5: 调试日志和数据流测试
+
+### Phase 3: 调试日志添加 ✅
 
 ## Phase 3: 调试日志添加
 
