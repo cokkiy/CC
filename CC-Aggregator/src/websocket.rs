@@ -105,7 +105,7 @@ impl WsServer {
     }
 
     /// Broadcast telemetry to subscribed clients
-    pub async fn broadcast_telemetry(&self, station_id: &str, data: &TelemetryBundle) {
+    pub async fn broadcast_telemetry(&self, station_id: &str, _data: &TelemetryBundle) {
         let sessions = self.sessions.read();
         
         for (session_id, session) in sessions.iter() {
@@ -117,7 +117,7 @@ impl WsServer {
     }
 
     /// Broadcast status update to subscribed clients
-    pub async fn broadcast_status(&self, station_id: &str, status: &StationStatus) {
+    pub async fn broadcast_status(&self, station_id: &str, _status: &StationStatus) {
         let sessions = self.sessions.read();
         
         for (session_id, session) in sessions.iter() {
@@ -148,7 +148,7 @@ async fn handle_connection(
         sessions.insert(session_id.clone(), WsSession::new(session_id.clone()));
     }
 
-    let (mut write, mut read) = ws_stream.split();
+    let (_write, mut read) = ws_stream.split();
     
     // Handle incoming messages
     while let Some(msg_result) = read.next().await {

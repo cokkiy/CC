@@ -16,7 +16,7 @@ use mqtt::MqttClient;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio::sync::broadcast;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 use websocket::WsServer;
 
@@ -64,7 +64,7 @@ async fn main() -> Result<()> {
     
     // Create broadcast channel for MQTT messages
     let (mqtt_broadcast_tx, _) = broadcast::channel::<mqtt::MqttMessage>(1000);
-    let mqtt_broadcast_tx_clone = mqtt_broadcast_tx.clone();
+    let _mqtt_broadcast_tx_clone = mqtt_broadcast_tx.clone();
     
     // Create mpsc channel for the event loop
     let (tx, rx) = mpsc::channel::<mqtt::MqttMessage>(1000);
