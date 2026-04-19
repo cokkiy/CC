@@ -371,3 +371,72 @@ export function getAllLayoutPresets(): Array<{ id: string; name: string; descrip
     description: config.description,
   }));
 }
+
+// ============================================
+// Layout Validator
+// ============================================
+
+/**
+ * Validate a layout configuration
+ */
+export function validateLayout(layout: LayoutConfig): LayoutValidationResult {
+  const errors: LayoutValidationError[] = [];
+  const warnings: LayoutValidationWarning[] = [];
+
+  // Check version
+  if (!layout.version) {
+    warnings.push({
+      path: 'version',
+      message: 'Layout version is not specified',
+      code: 'MISSING_VERSION',
+    });
+  }
+
+  // Check panels
+  if (!layout.panels || layout.panels.length === 0) {
+    warnings.push({
+      path: 'panels',
+      message: 'Layout has no panels defined',
+      code: 'NO_PANELS',
+    });
+  }
+
+  // Check for duplicate panel IDs
+  const panelIds = new Set<string>();
+  layout.panels?.forEach((panel, index) => {
+    if (panelIds.has(panel.id)) {
+      errors.push({
+        path: `panels[${index}].id`,
+        message: `Duplicate panel ID: ${panel.id}`,
+        code: 'DUPLICATE_PANEL_ID',
+      });
+    }
+    panelIds.add(panel.id);
+
+    // Check panel type
+    const validTypes = ['card', 'chart', 'table', 'form', 'custom'];
+    if (!validTypes.includes(panel.type)) {
+      errors.push({
+        path: `panels[${index}].type`,
+        message: `Invalid panel type: ${panel.type}. Valid types: ${validTypes.join(', ')}`,
+        code: 'INVALID_PANEL_TYPE',
+      });
+    }
+
+    // Check panel position
+    const validPositions = ['top', 'bottom', 'left', 'right', 'center', 'overlay'];
+    if (!validPositions.includes(panel.position)) {
+      errors.push({
+        path: `panels[${index}].position`,
+        message: `Invalid panel position: ${panel.position}. Valid positions: ${validPositions.join(', ')}`,
+        code: 'INVALID_PANEL_POSITION',
+      });
+    }
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}

@@ -20,3 +20,6 @@ export {
 
 // Layout Manager Component
 export { LayoutManager, LayoutPresetSelector } from './LayoutManager';
+
+// Template Marketplace
+export * from './TemplateMarketplace';
