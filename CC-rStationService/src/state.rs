@@ -22,9 +22,9 @@ use crate::grpc::cc::{
     NetworkInterfaceInfo, Process, ProcessInfo, ServerVersionInfo, StationNetworkInterface,
     StationRunningState, StationSystemState, Statistics, VersionInfo,
 };
-use crate::mqtt::MqttClient;
+use crate::mqtt::{Command, CommandAck, MqttClient};
 use crate::network_counters;
-use tracing::debug;
+use tracing::{debug, info, warn};
 
 pub struct AppState {
     config: AppConfig,
@@ -91,6 +91,16 @@ impl AppState {
         &self.station_id
     }
 
+    /// Get a reference to the MQTT client, if MQTT is enabled
+    pub fn mqtt_client(&self) -> Option<&MqttClient> {
+        self.mqtt_client.as_ref()
+    }
+
+    /// Check if MQTT is enabled in configuration
+    pub fn mqtt_enabled(&self) -> bool {
+        self.config.mqtt.enabled
+    }
+
     pub fn listen_addr(&self) -> Result<SocketAddr> {
         self.config
             .control
@@ -142,6 +152,67 @@ impl AppState {
     pub fn set_watched_processes(&self, processes: Vec<String>) {
         if let Ok(mut guard) = self.watched_processes.write() {
             *guard = processes;
+        }
+    }
+
+    /// Handle an MQTT command and return the appropriate ack
+    pub fn handle_mqtt_command(&self, command: &Command) -> CommandAck {
+        let timestamp = chrono::Utc::now().timestamp_millis();
+        
+        info!("Handling MQTT command: {} (id: {})", command.command, command.command_id);
+        
+        match command.command.as_str() {
+            "restart_process" => {
+                // Get the process name from params
+                let process_name = command.params.get("process_name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default()
+                    .to_string();
+                
+                if process_name.is_empty() {
+                    return CommandAck {
+                        command_id: command.command_id.clone(),
+                        success: false,
+                        message: "process_name is required".to_string(),
+                        timestamp,
+                    };
+                }
+                
+                // Find and restart the process
+                let pids = crate::state::find_process_ids_by_name(&process_name);
+                if pids.is_empty() {
+                    return CommandAck {
+                        command_id: command.command_id.clone(),
+                        success: false,
+                        message: format!("Process '{}' not found", process_name),
+                        timestamp,
+                    };
+                }
+                
+                // Terminate existing processes
+                for pid in &pids {
+                    if let Err(e) = crate::state::terminate_process(*pid) {
+                        warn!("Failed to terminate process {}: {:?}", pid, e);
+                    }
+                }
+                
+                info!("Restarted process: {}", process_name);
+                CommandAck {
+                    command_id: command.command_id.clone(),
+                    success: true,
+                    message: format!("Process '{}' restarted successfully", process_name),
+                    timestamp,
+                }
+            }
+            _ => {
+                warn!("Unknown MQTT command: {}", command.command);
+                CommandAck {
+                    command_id: command.command_id.clone(),
+                    success: false,
+                    message: format!("Unknown command: {}", command.command),
+                    timestamp,
+                }
+            }
         }
     }
 

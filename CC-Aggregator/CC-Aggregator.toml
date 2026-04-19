@@ -7,7 +7,7 @@ id = "aggregator-001"
 [mqtt]
 # MQTT broker connection settings
 host = "localhost"
-port = 1883  # MQTT port (NATS with MQTT support)
+port = 1883  # MQTT port (Mosquitto Broker)
 nats_port = 4222  # NATS core port (for future use)
 client_id = "cc-aggregator-001"
 keepalive_secs = 30

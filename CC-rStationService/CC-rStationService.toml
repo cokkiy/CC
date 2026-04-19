@@ -17,6 +17,6 @@ preferred_display_index = 0
 [mqtt]
 enabled = true  # Enable MQTT telemetry publishing
 broker_host = "localhost"
-broker_port = 1883  # MQTT port (NATS with MQTT support)
+broker_port = 1883  # MQTT port (Mosquitto Broker)
 telemetry_enabled = true
 status_enabled = true

@@ -6,16 +6,19 @@ use remote::{
     RemoteFileBrowserResult, StationRuntimeSnapshot, StationScreenCapture,
 };
 use storage::StateStore;
-
+use tokio::sync::RwLock;
+use ws_bridge::MqttWsBridge;
 
 pub mod control;
+pub mod grpc;
+pub mod models;
 pub mod remote;
-pub mod websocket;
+pub mod storage;
+pub mod wol;
+pub mod ws_bridge;
 
-mod grpc;
-mod models;
-mod storage;
-mod wol;
+// Global WebSocket bridge instance - lazily initialized
+static WS_BRIDGE: RwLock<Option<MqttWsBridge>> = RwLock::const_new(None);
 #[tauri::command]
 fn load_state() -> Result<AppSnapshot, String> {
     StateStore::load_snapshot().map_err(|error| error.to_string())

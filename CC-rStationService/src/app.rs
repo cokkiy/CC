@@ -14,7 +14,7 @@ use tokio::sync::watch;
 use tonic::metadata::MetadataValue;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status, Streaming};
-use tracing::{debug, info, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::config::AppConfig;
 use crate::grpc::agent::desktop_agent_client::DesktopAgentClient;
@@ -62,6 +62,32 @@ pub async fn run(
 
     if console_telemetry {
         tokio::spawn(console_telemetry_task(Arc::clone(&state)));
+    }
+
+    // Start MQTT command listener if MQTT is enabled
+    if state.mqtt_enabled() {
+        if let Some(mqtt_client) = state.mqtt_client() {
+            let mqtt_client = mqtt_client.clone();
+            let state_clone = Arc::clone(&state);
+            tokio::spawn(async move {
+                match mqtt_client.subscribe_commands().await {
+                    Ok(mut command_rx) => {
+                        info!("MQTT command listener started");
+                        while let Some(command) = command_rx.recv().await {
+                            // Handle the command and send ack
+                            let ack = state_clone.handle_mqtt_command(&command);
+                            if let Err(e) = mqtt_client.publish_command_ack(&ack).await {
+                                warn!("Failed to publish command ack: {:?}", e);
+                            }
+                        }
+                        info!("MQTT command listener ended");
+                    }
+                    Err(e) => {
+                        error!("Failed to subscribe to MQTT commands: {:?}", e);
+                    }
+                }
+            });
+        }
     }
 
     Server::builder()
