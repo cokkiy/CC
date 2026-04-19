@@ -376,7 +376,7 @@ pub trait TelemetryPlugin: Send + Sync {
     /// Get statistics about this plugin's execution.
     ///
     /// Returns statistics about collection counts, errors, etc.
-    fn stats(&self) -> &PluginStats {
+    fn stats(&self) -> PluginStats {
         unimplemented!("stats not implemented for this plugin")
     }
 
