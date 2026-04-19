@@ -5,4 +5,5 @@ pub mod grpc;
 pub mod mqtt;
 pub mod network_counters;
 pub mod platform;
+pub mod plugins;
 pub mod state;
