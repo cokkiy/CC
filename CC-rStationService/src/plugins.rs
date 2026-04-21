@@ -447,7 +447,7 @@ mod tests {
 
     #[test]
     fn test_plugin_metadata() {
-        let metadata = PluginMetadata::new("cpu_plugin", "CPU Plugin", "1.0.0")
+        let metadata = PluginMetadata::new("cpu_plugin".to_string(), "CPU Plugin", "1.0.0")
             .with_description("Collects CPU usage metrics");
 
         assert_eq!(metadata.id, "cpu_plugin");

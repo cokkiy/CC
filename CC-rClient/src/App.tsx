@@ -25,6 +25,7 @@ import type {
   StationRuntimeSnapshot,
   StationScreenCapture
 } from "./types";
+import { ScriptProvider, ScriptsPage } from "./plugin/script";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -301,7 +302,7 @@ export default function App() {
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
-  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages">("stations");
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages" | "scripts">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
 
   useEffect(() => {
@@ -832,6 +833,12 @@ export default function App() {
           }}
         >
           Groups
+        </button>
+        <button
+          className={activePage === "scripts" ? "accent" : ""}
+          onClick={() => setActivePage("scripts")}
+        >
+          Scripts
         </button>
         <button onClick={addStation}>Add Station</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
@@ -1664,6 +1671,12 @@ export default function App() {
             </section>
           )}
         </main>
+      ) : activePage === "scripts" ? (
+        <ScriptProvider>
+          <ScriptsPage
+            stations={stations}
+          />
+        </ScriptProvider>
       ) : (
         <main className="grid">
           <section className="panel detailPanel">

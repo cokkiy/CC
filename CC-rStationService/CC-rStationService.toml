@@ -1,6 +1,6 @@
 [service]
 service_name = "CC-rStationService"
-station_id = ""
+station_id = "station-01"
 state_interval_seconds = 5
 watched_processes = []
 udp_display_target = "127.0.0.1:9008"

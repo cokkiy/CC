@@ -101,7 +101,7 @@ pub struct StationScreenCapture {
     pub data_url: String,
 }
 
-pub async fn fetch_station_runtime(
+ pub async fn fetch_station_runtime(
     station: &Station,
     interval_seconds: i32,
 ) -> Result<StationRuntimeSnapshot, String> {
