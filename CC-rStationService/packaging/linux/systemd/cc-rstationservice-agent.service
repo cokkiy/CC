@@ -1,0 +1,14 @@
+[Unit]
+Description=CC Rust Station Desktop Agent
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/lib/cc-rstationservice
+ExecStart=%h/.local/lib/cc-rstationservice/cc-rstationservice-agent --config %h/.local/lib/cc-rstationservice/CC-rStationService.toml
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

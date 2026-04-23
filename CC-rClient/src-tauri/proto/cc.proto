@@ -1,0 +1,396 @@
+syntax = "proto3";
+
+package cc.grpc.v1;
+
+message Empty {}
+
+message Ack {
+  bool ok = 1;
+  string message = 2;
+}
+
+enum AppControlResult {
+  APP_CONTROL_RESULT_UNSPECIFIED = 0;
+  APP_CONTROL_RESULT_ALREADY_RUNNING = 1;
+  APP_CONTROL_RESULT_STARTED = 2;
+  APP_CONTROL_RESULT_FAIL_TO_START = 3;
+  APP_CONTROL_RESULT_NOT_RUNNING = 4;
+  APP_CONTROL_RESULT_CLOSED = 5;
+  APP_CONTROL_RESULT_FAIL_TO_CLOSE = 6;
+  APP_CONTROL_RESULT_ERROR = 7;
+}
+
+
+
+message VersionInfo {
+  int32 major = 1;
+  int32 minor = 2;
+  int32 build = 3;
+  int32 private = 4;
+  string product_version = 5;
+}
+
+message ServerVersionInfo {
+  VersionInfo services_version = 1;
+  VersionInfo app_launcher_version = 2;
+}
+
+message AppStartParameter {
+  int32 param_id = 1;
+  string app_path = 2;
+  string arguments = 3;
+  string process_name = 4;
+  bool allow_multi_instance = 5;
+}
+
+message AppStartingResult {
+  int32 param_id = 1;
+  int32 process_id = 2;
+  string process_name = 3;
+  AppControlResult control_result = 4;
+  string result = 5;
+}
+
+message StartAppRequest {
+  repeated AppStartParameter apps = 1;
+}
+
+message StartAppResponse {
+  repeated AppStartingResult results = 1;
+}
+
+message CloseAppRequest {
+  repeated int32 process_ids = 1;
+}
+
+message CloseAppResponse {
+  repeated AppControlResult results = 1;
+}
+
+message RestartAppRequest {
+  repeated AppStartParameter apps = 1;
+}
+
+message RestartAppResponse {
+  repeated AppStartingResult results = 1;
+}
+
+message RebootRequest {
+  bool force = 1;
+}
+
+message ShutdownRequest {}
+
+enum BatchActionType {
+  BATCH_ACTION_UNSPECIFIED = 0;
+  POWER_ON = 1;
+  SHUTDOWN = 2;
+  REBOOT = 3;
+  START_APP = 4;
+  STOP_APP = 5;
+}
+
+message BatchPowerActionRequest {
+  repeated string station_ids = 1;
+  BatchActionType action = 2;
+}
+
+message BatchPowerActionResponse {
+  int32 total = 1;
+  int32 success_count = 2;
+  int32 failure_count = 3;
+  repeated string messages = 4;
+}
+
+message PathRef {
+  string name = 1;
+}
+
+message FileInfo {
+  string parent = 1;
+  string path = 2;
+  bool is_directory = 3;
+  string creation_time = 4;
+  string last_modify = 5;
+}
+
+message GetFileInfoResponse {
+  repeated FileInfo items = 1;
+}
+
+message ProcessInfo {
+  int32 id = 1;
+  string name = 2;
+  string time = 3;
+  int64 memory_size = 4;
+}
+
+message GetAllProcessInfoResponse {
+  repeated ProcessInfo items = 1;
+}
+
+message SetWatchingAppRequest {
+  repeated string process_names = 1;
+}
+
+message SetStateGatheringIntervalRequest {
+  int32 interval_seconds = 1;
+}
+
+
+
+
+
+message CaptureScreenRequest {
+  int64 start_position = 1;
+}
+
+message CaptureScreenChunk {
+  int64 position = 1;
+  int32 length = 2;
+  bytes data = 3;
+  bool completed = 4;
+}
+
+message RenameFileRequest {
+  string old_name = 1;
+  string new_name = 2;
+}
+
+message RenameFileResponse {
+  bool ok = 1;
+}
+
+
+
+
+
+
+
+message GetServicePathResponse {
+  string path = 1;
+}
+
+message GetAppLauncherPathResponse {
+  string path = 1;
+}
+
+message NetworkInterfaceInfo {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_up = 4;
+  string dns_suffix = 5;
+  bool dns_enabled = 6;
+  bool dynamic_dns = 7;
+  repeated string ip_addresses = 8;
+  repeated string multicast_addresses = 9;
+  repeated string dhcp_servers = 10;
+}
+
+message ConnectionInformation {
+  string local_address = 1;
+  int32 local_port = 2;
+  string remote = 3;
+  int32 remote_port = 4;
+  string state = 5;
+}
+
+message ListenerInfo {
+  string address = 1;
+  int32 port = 2;
+}
+
+message InterfaceStatistics {
+  string if_name = 1;
+  double bytes_received_per_sec = 2;
+  double bytes_sented_per_sec = 3;
+  double total_bytes_per_sec = 4;
+  int64 bytes_received = 5;
+  int64 bytes_sented = 6;
+  int64 bytes_total = 7;
+  int64 unicast_packet_received = 8;
+  int64 unicast_packet_sented = 9;
+  int64 multicast_packet_received = 10;
+  int64 multicast_packet_sented = 11;
+}
+
+message Statistics {
+  string station_id = 1;
+  int64 datagrams_received = 2;
+  int64 datagrams_sent = 3;
+  int64 datagrams_discarded = 4;
+  int64 datagrams_with_errors = 5;
+  int32 udp_listeners = 6;
+  int64 segments_received = 7;
+  int64 segments_sent = 8;
+  int64 errors_received = 9;
+  int32 current_connections = 10;
+  int32 reset_connections = 11;
+  repeated InterfaceStatistics interface_statistics = 12;
+}
+
+message GetNetworkInterfacesResponse {
+  repeated NetworkInterfaceInfo items = 1;
+}
+
+message GetConnectionInformationsResponse {
+  repeated ConnectionInformation items = 1;
+}
+
+message GetTcpListenerInfosResponse {
+  repeated ListenerInfo items = 1;
+}
+
+message GetUdpListenerInfosResponse {
+  repeated ListenerInfo items = 1;
+}
+
+message StationNetworkInterface {
+  string mac = 1;
+  repeated string ips = 2;
+}
+
+message StationSystemState {
+  string station_id = 1;
+  int64 total_memory = 2;
+  string computer_name = 3;
+  repeated StationNetworkInterface network_interfaces = 4;
+  string os_name = 5;
+  string os_version = 6;
+
+}
+
+message StationRunningState {
+  string station_id = 1;
+  int64 current_memory = 2;
+  float cpu = 3;
+  int32 proc_count = 4;
+  ServerVersionInfo version = 5;
+}
+
+message Process {
+  int32 id = 1;
+  string process_name = 2;
+  string process_monitor_name = 3;
+}
+
+message AppRunningState {
+  string station_id = 1;
+  Process process = 2;
+  bool is_running = 3;
+  float cpu = 4;
+  int32 proc_count = 5;
+  int32 thread_count = 6;
+  int64 current_memory = 7;
+  string app_version = 8;
+  int64 start_time = 9;
+}
+
+message AppsRunningStateEnvelope {
+  repeated AppRunningState items = 1;
+}
+
+message TelemetryClientMessage {
+  oneof body {
+    ConnectRequest connect = 1;
+    TelemetryPing ping = 2;
+    TelemetryAck ack = 3;
+  }
+}
+
+message ConnectRequest {
+  string controller_id = 1;
+  string requested_station_id = 2;
+}
+
+message TelemetryPing {
+  int64 unix_millis = 1;
+}
+
+message TelemetryAck {
+  string message_id = 1;
+}
+
+message TelemetryServerMessage {
+  string message_id = 1;
+  oneof body {
+    Ack accepted = 2;
+    StationSystemState system_state = 3;
+    StationRunningState station_running_state = 4;
+    AppsRunningStateEnvelope apps_running_state = 5;
+    Statistics net_statistics = 6;
+    ServerVersionInfo server_version = 7;
+  }
+}
+
+message UploadChunk {
+  string file_name = 1;
+  int64 position = 2;
+  bytes data = 3;
+  bool close_after_write = 4;
+}
+
+message UploadResult {
+  bool ok = 1;
+  string message = 2;
+}
+
+message DownloadRequest {
+  string file_name = 1;
+  int64 start_position = 2;
+}
+
+message DownloadChunk {
+  int64 position = 1;
+  bytes data = 2;
+  int32 length = 3;
+  bool completed = 4;
+}
+
+message ExecuteCommandRequest {
+  string command = 1;
+  int32 timeout_seconds = 2;
+}
+
+message ExecuteCommandResponse {
+  int32 exit_code = 1;
+  string stdout = 2;
+  string stderr = 3;
+}
+
+service StationControl {
+  rpc StartApp(StartAppRequest) returns (StartAppResponse);
+  rpc CloseApp(CloseAppRequest) returns (CloseAppResponse);
+  rpc RestartApp(RestartAppRequest) returns (RestartAppResponse);
+  rpc Reboot(RebootRequest) returns (Empty);
+  rpc Shutdown(ShutdownRequest) returns (Empty);
+  rpc GetSystemState(Empty) returns (StationSystemState);
+  rpc SetWatchingApp(SetWatchingAppRequest) returns (Empty);
+  rpc SetStateGatheringInterval(SetStateGatheringIntervalRequest) returns (Empty);
+
+  rpc CaptureScreen(CaptureScreenRequest) returns (stream CaptureScreenChunk);
+  rpc GetFileInfo(PathRef) returns (GetFileInfoResponse);
+  rpc GetAllProcessInfo(Empty) returns (GetAllProcessInfoResponse);
+  rpc GetServerVersion(Empty) returns (ServerVersionInfo);
+
+
+
+  rpc GetServicePath(Empty) returns (GetServicePathResponse);
+  rpc GetAppLauncherPath(Empty) returns (GetAppLauncherPathResponse);
+  rpc RenameFile(RenameFileRequest) returns (RenameFileResponse);
+  rpc GetNetworkInterfaces(Empty) returns (GetNetworkInterfacesResponse);
+  rpc GetConnectionInformations(Empty) returns (GetConnectionInformationsResponse);
+  rpc GetTcpListenerInfos(Empty) returns (GetTcpListenerInfosResponse);
+  rpc GetUdpListenerInfos(Empty) returns (GetUdpListenerInfosResponse);
+  rpc ExecuteCommand(ExecuteCommandRequest) returns (ExecuteCommandResponse);
+}
+
+service FileTransfer {
+  rpc Upload(stream UploadChunk) returns (UploadResult);
+  rpc Download(DownloadRequest) returns (stream DownloadChunk);
+}
+
+service Telemetry {
+  rpc StreamTelemetry(stream TelemetryClientMessage) returns (stream TelemetryServerMessage);
+}
