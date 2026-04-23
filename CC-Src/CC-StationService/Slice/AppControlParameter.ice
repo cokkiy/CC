@@ -1,5 +1,3 @@
-﻿#pragma once
-
 //Center Control
 module CC
 {
@@ -7,7 +5,6 @@ module CC
 	sequence<int> ProcessIdList;
 	
 	///字节数组
-	["cpp:array"]
 	sequence<byte> ByteArray;	
 
 	///程序控制结果

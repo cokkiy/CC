@@ -1,10 +1,6 @@
-﻿using Ice;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ice;
 
 namespace CC_StationService
 {
@@ -32,18 +28,17 @@ namespace CC_StationService
         /// <param name="outParams"></param>
         /// <param name="current"></param>
         /// <returns>返回是否抛出异常</returns>
-        public bool createFile(byte[] inParams, out byte[] outParams, Ice.Current current)
+        public bool CreateFile(byte[] inParams, out byte[] outParams, Ice.Current current)
         {
             bool result = false;
             //Create file
             Ice.Communicator communicator = current.adapter.getCommunicator();
-            Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
+            var inStream = new InputStream(communicator, inParams);
             inStream.startEncapsulation();
             string fileName = inStream.readString();            
-            inStream.endEncapsulation();
-            inStream.destroy();            
+            inStream.endEncapsulation();          
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
-            Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
+            OutputStream outStream = new(communicator);
             try
             {
                 string dir = fileName;
@@ -52,7 +47,7 @@ namespace CC_StationService
                     pos = fileName.LastIndexOf(Path.AltDirectorySeparatorChar);
                 if (pos != -1)
                 {
-                    dir = fileName.Substring(0, pos + 1);
+                    dir = fileName[..(pos + 1)];
                 }
                 if (!Directory.Exists(dir))
                 {
@@ -80,10 +75,6 @@ namespace CC_StationService
                 outParams = outStream.finished();
                 result = false;
             }
-            finally
-            {
-                outStream.destroy();
-            }
 
             return result;
         }
@@ -99,18 +90,17 @@ namespace CC_StationService
             bool result = false;
             // trans data
             Ice.Communicator communicator = current.adapter.getCommunicator();
-            Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
+            Ice.InputStream inStream = new(communicator, inParams);
             inStream.startEncapsulation();
             long offset = inStream.readLong();
             int length = inStream.readInt();
             byte[] data = inStream.readByteSeq();
             inStream.endEncapsulation();
-            inStream.destroy();
-            Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
+            Ice.OutputStream outStream = new(communicator);
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
             if (length != data.Length)
             {
-                CC.FileTransException ex = new CC.FileTransException("", offset, length, data.Length, "接收到的数据长度与发送数据长度不一致。");
+                CC.FileTransException ex = new("", offset, length, data.Length, "接收到的数据长度与发送数据长度不一致。");
                 logger.error(string.Format("接收到的数据长度与发送数据长度不一致。 Parameters offset ={0} length={1}, Real data length={2}", offset, length, data.Length));
                 outStream.startEncapsulation();
                 outStream.writeBool(false);
@@ -153,10 +143,6 @@ namespace CC_StationService
                 outParams = outStream.finished();
                 result = false;
             }
-            finally
-            {
-                outStream.destroy();
-            }
 
             return result;
         }
@@ -169,7 +155,7 @@ namespace CC_StationService
             bool result = false;
             // closeFile
             Ice.Communicator communicator = current.adapter.getCommunicator();           
-            Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
+            Ice.OutputStream outStream = new(communicator);
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
             if (writeStream == null)
             {
@@ -199,7 +185,6 @@ namespace CC_StationService
                 outParams = outStream.finished();
                 result = true;             
             }
-            outStream.destroy();
             return result;
         }
 
@@ -213,13 +198,12 @@ namespace CC_StationService
         {
             bool result = false;
             Ice.Communicator communicator = current.adapter.getCommunicator();
-            Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
+            Ice.InputStream inStream = new(communicator, inParams);
             inStream.startEncapsulation();
             string fileName = inStream.readString();
             long offset = inStream.readLong();
             inStream.endEncapsulation();
-            inStream.destroy();
-            Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
+            Ice.OutputStream outStream = new(communicator);
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
             try
             {
@@ -248,10 +232,7 @@ namespace CC_StationService
                 outParams = outStream.finished();
                 result = false;
             }
-            finally
-            {
-                outStream.destroy();
-            }
+           
             return result;
         }
 
@@ -267,13 +248,12 @@ namespace CC_StationService
             bool result = false;
             // closeFile
             Ice.Communicator communicator = current.adapter.getCommunicator();
-            Ice.InputStream inStream = Ice.Util.createInputStream(communicator, inParams);
+            Ice.InputStream inStream = new(communicator, inParams);
             inStream.startEncapsulation();
             string fileName = inStream.readString();
             inStream.endEncapsulation();
-            inStream.destroy();
 
-            Ice.OutputStream outStream = Ice.Util.createOutputStream(communicator);
+            Ice.OutputStream outStream = new(communicator);
             Ice.Logger logger = PlatformMethodFactory.GetLogger();
 
             if (File.Exists(fileName))
@@ -314,8 +294,6 @@ namespace CC_StationService
                 outParams = outStream.finished();
                 result = false;
             }
-
-            outStream.destroy();
 
             return result;
         }

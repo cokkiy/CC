@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package cc.agent.v1;
+
+message Empty {}
+
+message CaptureRequest {
+  int64 start_position = 1;
+  int32 display_index = 2;
+  bool force_refresh = 3;
+}
+
+message CaptureChunk {
+  int64 position = 1;
+  int32 length = 2;
+  bytes data = 3;
+  bool completed = 4;
+  string mime_type = 5;
+}
+
+message PingReply {
+  string message = 1;
+}
+
+service DesktopAgent {
+  rpc CaptureScreen(CaptureRequest) returns (stream CaptureChunk);
+  rpc Ping(Empty) returns (PingReply);
+}

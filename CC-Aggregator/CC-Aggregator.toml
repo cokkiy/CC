@@ -1,0 +1,16 @@
+server_id = "aggregator-001"
+
+[mqtt]
+host = "localhost"
+port = 1883
+client_id = "cc-aggregator-001"
+keepalive_secs = 30
+telemetry_qos = 1
+command_qos = 1
+
+[websocket]
+listen_addr = "127.0.0.1:8080"
+max_connections = 1000
+
+[logging]
+level = "info"

@@ -1,4 +1,5 @@
-﻿using CC;
+﻿using System.Threading.Tasks;
+using CC;
 using NIStatusDetectors;
 using System;
 using System.ServiceProcess;
@@ -9,7 +10,7 @@ namespace CC_StationService
     /// <summary>
     /// 工作站信息监视服务
     /// </summary>
-    public partial class StationMonitorService : ServiceBase
+    public class StationMonitorService : BackgroundService
     {
         //ice communicator
         private Ice.Communicator ic = null;
@@ -32,16 +33,19 @@ namespace CC_StationService
 
         public StationMonitorService()
         {
-            InitializeComponent();
         }
 
-        protected override void OnStart(string[] args)
+        protected override Task ExecuteAsync(CancellationToken token)
+        {
+            return Task.CompletedTask;
+        }
+
+        protected void OnStart(string[] args)
         {
             try
             {
                 //设置工作目录为程序所在目录
-                System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);                
-                
+                System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
                 //开始监控
                 Start();
 
@@ -59,8 +63,8 @@ namespace CC_StationService
             initData.properties = Ice.Util.createProperties();
             initData.properties.load("Config.Client");
             initData.logger = logger;
-            
-            string value=initData.properties.getProperty("StateReceiver.Proxy");
+
+            string value = initData.properties.getProperty("StateReceiver.Proxy");
             var match = Regex.Match(value, @"--sourceAddress\s(?<IP>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
             if (match.Success)
             {
@@ -71,7 +75,7 @@ namespace CC_StationService
                 detector.Start();
 
                 logger.print("监控服务启动...");
-            }                      
+            }
         }
 
         private void Detector_NIStateChanged(object sender, NIStateChangedEventArgs e)
@@ -83,12 +87,12 @@ namespace CC_StationService
                 controlAdapter = ic.createObjectAdapter("Controller");
                 ControllerImp controllerServant = new ControllerImp(ic);
                 //将控制服务加入适配器并创建控制服务的本地代理
-                Ice.ObjectPrx objectPrx = controlAdapter.add(controllerServant, ic.stringToIdentity("StationController"));
+                Ice.ObjectPrx objectPrx = controlAdapter.add(controllerServant, Ice.Util.stringToIdentity("StationController"));
                 IControllerPrx controlPrx = IControllerPrxHelper.uncheckedCast(objectPrx);
 
                 //创建文件传输服务
                 FileTranslation fileTrans = new FileTranslation(ic);
-                objectPrx = controlAdapter.add(fileTrans, ic.stringToIdentity("FileTranslation"));
+                objectPrx = controlAdapter.add(fileTrans, Ice.Util.stringToIdentity("FileTranslation"));
                 IFileTranslationPrx filePrx = IFileTranslationPrxHelper.uncheckedCast(objectPrx);
 
                 //初始化监视应用程序列表为空
@@ -104,16 +108,6 @@ namespace CC_StationService
                 watcher.StartWatching();
                 logger.print("开始系统资源监视...");
 
-                //启动气象云图下载线程
-                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-                downloader.Logger = logger;
-                downloader.Option = LoadFromSetting();
-
-                if (!downloader.IsRunning)
-                {
-                    downloader.Start();
-                }
-
                 isStarted = true;
             }
             else
@@ -127,15 +121,10 @@ namespace CC_StationService
         private void StopMC()
         {
             if (isStarted)
-            {                
+            {
                 controlAdapter.destroy();
                 //停止监视系统
                 watcher.StopWatching();
-                WeartherImageDownloader downloader = WeartherImageDownloader.GetInstance();
-                if (downloader.IsRunning)
-                {
-                    downloader.Stop();
-                }
 
                 if (ic != null)
                 {
@@ -156,56 +145,27 @@ namespace CC_StationService
             }
         }
 
-        //从设置中加载气象云图下载选项
-        private WeatherPictureDowlnloadOption LoadFromSetting()
-        {
-            WeatherPictureDowlnloadOption option = new WeatherPictureDowlnloadOption();
-            try
-            {
-                Properties.Settings.Default.Load();
-                option.Url = Properties.Settings.Default.FtpUrl;
-                option.UserName = Properties.Settings.Default.UserName;
-                option.Password = Properties.Settings.Default.Password;
-                option.LastHours = Properties.Settings.Default.LastHours;
-                option.Interval = Properties.Settings.Default.Interval;
-                option.DeletePreviousFiles = Properties.Settings.Default.DeletePreviousFiles;
-                option.DeleteHowHoursAgo = Properties.Settings.Default.DeleteHowHoursAgo;
-                option.SubDirectory = Properties.Settings.Default.SubDirectory;
-                option.SavePathForLinux = Properties.Settings.Default.SavePathForLinux;
-                option.SavePathForWindows = Properties.Settings.Default.SavePathForWindows;
-                option.Download = Properties.Settings.Default.Download;
-            }
-            catch
-            {
-                option.Interval = 2;
-                option.Download = false;
-            }
-            return option;
-        }
-
-        protected override void OnPause()
+        protected void OnPause()
         {
             detector.NIStateChanged -= Detector_NIStateChanged;
             detector.Stop();
             StopMC();
-            base.OnPause();
             logger.print("服务已暂停.");
         }
 
-        protected override void OnContinue()
+        protected void OnContinue()
         {
-            base.OnContinue();
             Start();
             logger.print("服务继续...");
         }
 
-        protected override void OnStop()
+        protected void OnStop()
         {
             detector.NIStateChanged -= Detector_NIStateChanged;
             detector.Stop();
             StopMC();
             logger.print("服务已停止.");
         }
-      
+
     }
 }

@@ -1,37 +1,217 @@
-﻿# 中控项目说明
+# CC - Workstation & IoT Centralized Management Platform
 
-## 一.简介
+English | [中文](./README.zh.md)
 
-&emsp;&emsp;中控主要用来集中管理和控制计算机，基本功能有监控系统资源（包括CPU、
-内存占用率，网络流量）和远程控制计算机（包括启动关闭选定的程序、启动、
-关闭计算机等）。是基于ZeroC ICE框架构建的一套远程控管系统。
+## Project Overview
 
-## 二.项目组成
+CC (Central Control) is a unified management platform for workstations and IoT devices. It provides real-time monitoring, remote control, plugin extensibility, and data visualization for distributed computing environments.
 
-### 客户端
+**Tech Stack:** Rust + Tauri + TypeScript + React + MQTT + WebSocket
 
-客户端主要功能是为用户控制、监视工作站提供GUI,用户可以通过图形化界面远程监控和操作工作站。主要用Qt（界面）和标准C++,通信部分基于ICE框架开发的本地程序。支持Windows和Linux（包括麒麟）操作系统。在Windows下用Qt+VS2017开发编译,在Linux（包括麒麟）下用Qt和GCC编译生成Linux系统本地程序。
+## Architecture
 
-### 监控服务程序
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        CC-rClient (Tauri)                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
+│  │   React UI  │  │ Plugin Host │  │  WebSocket Bridge       │  │
+│  └─────────────┘  └─────────────┘  └───────────┬─────────────┘  │
+└──────────────────────────────────────────────┬──────────────────┘
+                                               │ ws://localhost:8080
+┌──────────────────────────────────────────────┴──────────────────┐
+│                    CC-Aggregator (Rust)                         │
+│  ┌─────────────────┐  ┌─────────────────────────────────────┐   │
+│  │ MQTT Consumer   │  │ WebSocket Server                    │   │
+│  │ (localhost:1883)│  │ (127.0.0.1:8080)                    │   │
+│  └─────────────────┘  └─────────────────────────────────────┘   │
+└──────────────────────────────────────────────┬───────────────────┘
+                                             │ MQTT (localhost:1883)
+┌──────────────────────────────────────────────┴───────────────────┐
+│                CC-rStationService (Rust)                        │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌────────────────┐   │
+│  │ Station Agent   │  │ Plugin Engine   │  │ Script Runner │   │
+│  └─────────────────┘  └─────────────────┘  └────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                                              ▲
+                                              │ Direct Execution
+┌─────────────────────────────────────────────┴───────────────────┐
+│                  Mosquitto MQTT Broker                          │
+│                      (Docker)                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-监控服务程序主要功能是收集所在工作站资源利用情况,包括CPU,内存占用率和网络流量监视,以及响应客户端控制请求,完成对工作站的控制功能。主要的控制功能包括：
+## Components
 
-1. 启动,关闭程序
-2. 传输文件
-3. 关闭或重启工作站
-4. 截取屏幕画面
+| Component | Description | Language |
+|-----------|-------------|----------|
+| CC-rClient | Desktop GUI client with plugin support | Tauri + React + TypeScript |
+| CC-Aggregator | Data aggregation and WebSocket bridge | Rust |
+| CC-rStationService | Workstation agent service | Rust |
 
-监控服务程序基于C#开发,支持运行在Windows和Linux（包括麒麟）操作系统,Windows下需要安装.Net Framework 4.0以上运行库,Linux系统下需要安装Mono运行库。
+## Features
 
-### 应用代理
+### Completed Phases
 
-应用代理主要功能是响应监控服务程序命令,在用户态（Level 5）启动程序。开发环境与监控服务程序一致。
+- **Phase 1: Architecture Refactoring** - Migration from gRPC to MQTT message bus
+- **Phase 2: Plugin System** - 5 built-in plugins (cpu, memory, network, process, disk) + Plugin Marketplace
+- **Phase 3: Client Plugin Architecture** - Configuration-driven UI + Template Marketplace
+- **Phase 4: Data Flow Testing** - MQTT + WebSocket integration
+- **Phase 5: Fix Verification** - Bug fixes and validation
+- **Phase 6: Command Script Management** - Script execution system
 
-### 工作站运行日志记录程序
+### Plugin System (5 Built-in Plugins)
 
-主要功能是记录监控服务程序发来的工作站资源利用情况到MySql数据库中,以便以后分析。主要记录了工作站基本情况（内存大小,网络配置等）,开关机时间,CPU、内存占用率，以及应用程序启停。由C#开发,支持运行在.Net Framework 4.5和Mono环境中。
+1. **CPU Monitor** - Real-time CPU usage and metrics
+2. **Memory Monitor** - RAM utilization tracking
+3. **Network Monitor** - Network interface statistics
+4. **Process Monitor** - Running process management
+5. **Disk Monitor** - Storage usage and I/O metrics
 
-### 工作站运行日志查看Web
+### Marketplace Features
 
-是一套由dotNetCore 2.0 和 Angular 5.X 前端组成的单页面（SAP）Web程序,提供了图形化资源显示功能,主要是方便查看日志记录程序记录的数据。可以部署到IIS7（Windows）或nginx（Linux）服务器上,或直接运行。也可以部署到Docker上。
+- **Plugin Marketplace** - Browse and install community plugins
+- **Template Marketplace** - UI layout and visualization templates
 
+## Project Structure
+
+```
+~/CC/
+├── CC-rClient/           # Tauri desktop client (React + TypeScript)
+│   ├── src/              # Frontend source
+│   │   ├── plugin/       # Plugin system
+│   │   └── App.tsx       # Main application
+│   └── src-tauri/       # Rust backend
+│       └── src/
+│           ├── ws_bridge.rs    # WebSocket client
+│           └── lib.rs           # Tauri commands
+├── CC-Aggregator/       # Data aggregator (MQTT → WebSocket)
+│   ├── src/
+│   │   ├── mqtt.rs       # MQTT client
+│   │   ├── websocket.rs  # WebSocket server
+│   │   └── config.rs    # Configuration
+│   └── CC-Aggregator.toml
+├── CC-rStationService/  # Workstation agent
+│   └── ...
+├── scripts/              # Startup scripts
+│   └── start-all.sh     # One-click start
+└── logs/                # Application logs
+```
+
+## Quick Start
+
+### Prerequisites
+
+- Docker (for MQTT broker)
+- Rust 1.70+
+- Node.js 18+
+- pnpm (recommended) or npm
+
+### Step 1: Start MQTT Broker
+
+```bash
+# Start Mosquitto MQTT broker
+docker run -d --name mosquitto \
+  -p 1883:1883 \
+  -p 9001:9001 \
+  eclipse-mosquitto:latest \
+  mosquitto -c /mosquitto-no-auth.conf
+```
+
+### Step 2: Start All Components
+
+```bash
+cd ~/CC
+./scripts/start-all.sh
+```
+
+This script starts:
+1. CC-Aggregator (MQTT → WebSocket bridge)
+2. CC-rStationService (Workstation agent)
+3. CC-rClient (Desktop UI)
+
+### Step 3: Access the Application
+
+- Desktop Client: Launch CC-rClient application
+- WebSocket: `ws://127.0.0.1:8080`
+- MQTT: `localhost:1883`
+
+## Configuration
+
+### CC-Aggregator (CC-Aggregator.toml)
+
+```toml
+server_id = "aggregator-001"
+
+[mqtt]
+host = "localhost"
+port = 1883
+client_id = "cc-aggregator-001"
+keepalive_secs = 30
+
+[websocket]
+listen_addr = "127.0.0.1:8080"
+max_connections = 1000
+
+[logging]
+level = "info"
+```
+
+### CC-rStationService (CC-rStationService.toml)
+
+Configuration for workstation agent (MQTT client, plugins, etc.)
+
+## Development
+
+### Build Components
+
+```bash
+# Build Aggregator
+cd CC-Aggregator && cargo build
+
+# Build Station Service
+cd CC-rStationService && cargo build
+
+# Build Client
+cd CC-rClient && pnpm install && pnpm tauri build
+```
+
+### Logs
+
+Logs are stored in `~/CC/logs/`:
+- `aggregator.log` - Aggregator output
+- `rstationservice.log` - Station service output
+- `rclient.log` - Client output
+
+## Troubleshooting
+
+### Connection Refused Errors
+
+If you see "Could not connect to localhost: Connection refused":
+
+1. **Check MQTT Broker**
+   ```bash
+   docker ps | grep mosquitto
+   nc -zv localhost 1883
+   ```
+
+2. **Check Aggregator Running**
+   ```bash
+   ps aux | grep cc-aggregator
+   tail -f logs/aggregator.log
+   ```
+
+3. **Check WebSocket Port**
+   ```bash
+   ss -tlnp | grep 8080
+   ```
+
+### Rebuild After Changes
+
+```bash
+cd CC-Aggregator && cargo build --release
+./scripts/start-all.sh
+```
+
+## License
+
+MIT License

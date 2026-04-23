@@ -6,18 +6,18 @@
 //-----------------------------------------------------------------
 
 #include <qwt_plot_item.h>
-
-class CounterPieMarker: public QwtPlotItem
-{
+struct PerfCurves;
+class CounterPieMarker : public QwtPlotItem {
 public:
-    CounterPieMarker(PerfCurves* perfCurves, int size, bool isCPUPlot = true);
+  CounterPieMarker(PerfCurves *perfCurves, int size, bool isCPUPlot = true);
 
-    virtual int rtti() const;
+  virtual int rtti() const;
 
-    virtual void draw( QPainter *,
-        const QwtScaleMap &, const QwtScaleMap &, const QRectF & ) const;
+  virtual void draw(QPainter *, const QwtScaleMap &, const QwtScaleMap &,
+                    const QRectF &) const;
+
 private:
-    PerfCurves* perfCurves;
-    int size;
-    bool isCPUPlot;
+  PerfCurves *perfCurves;
+  int size;
+  bool isCPUPlot;
 };
