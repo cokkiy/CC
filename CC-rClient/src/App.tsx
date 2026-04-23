@@ -26,6 +26,8 @@ import type {
   StationScreenCapture
 } from "./types";
 import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script";
+import { BatchProvider, useBatch } from "./plugin/batch";
+import { BatchPage } from "./plugin/batch/BatchPage";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -302,7 +304,7 @@ export default function App() {
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
-  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages" | "scripts">("stations");
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages" | "scripts" | "batch">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
 
   useEffect(() => {
@@ -839,6 +841,12 @@ export default function App() {
           onClick={() => setActivePage("scripts")}
         >
           Scripts
+        </button>
+        <button
+          className={activePage === "batch" ? "accent" : ""}
+          onClick={() => setActivePage("batch")}
+        >
+          Batch
         </button>
         <button onClick={addStation}>Add Station</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
@@ -1673,6 +1681,10 @@ export default function App() {
             />
           </ScriptsUIProvider>
         </ScriptProvider>
+      ) : activePage === "batch" ? (
+        <BatchProvider>
+          <BatchPage stations={stations} />
+        </BatchProvider>
       ) : (
         <main className="grid">
           <section className="panel detailPanel">
