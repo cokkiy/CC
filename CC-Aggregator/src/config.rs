@@ -34,8 +34,10 @@ impl AggregatorConfig {
         let content = std::fs::read_to_string(path.as_ref())
             .context("Failed to read configuration file")?;
         
-        toml::from_str(&content)
-            .context("Failed to parse configuration file")
+        let config: AggregatorConfig = toml::from_str(&content)
+            .map_err(|e| anyhow::anyhow!("TOML parse error: {}", e))?;
+        
+        Ok(config)
     }
 
     /// Save configuration to file

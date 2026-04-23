@@ -280,3 +280,4 @@ logs
 .claude
 skills-lock.json
 AGENTS.md
+**/target/

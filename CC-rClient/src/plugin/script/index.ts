@@ -32,3 +32,6 @@ export { ScriptProvider, useScripts, useScriptsSafe } from './ScriptContext';
 // API
 export { scriptApi } from './api';
 export { default as scriptApiDefault } from './api';
+
+// UI state / modal lifecycle
+export { ScriptsUIProvider, useScriptsUI } from './ScriptsUIContext';

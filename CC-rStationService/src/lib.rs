@@ -1,5 +1,7 @@
 pub mod agent;
 pub mod app;
+pub mod batch;
+pub mod batch_store;
 pub mod config;
 pub mod cpu_monitor;
 pub mod disk_monitor;

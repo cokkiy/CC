@@ -11,6 +11,7 @@ mod telemetry;
 mod websocket;
 
 use anyhow::Result;
+use clap::Parser;
 use config::AggregatorConfig;
 use mqtt::MqttClient;
 use std::sync::Arc;
@@ -19,6 +20,15 @@ use tokio::sync::broadcast;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 use websocket::WsServer;
+
+/// CLI arguments for CC-Aggregator
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Path to the configuration file
+    #[arg(short, long, default_value = "CC-Aggregator.toml")]
+    config: String,
+}
 
 /// Initialize tracing/logging
 fn init_tracing(config: &config::LoggingConfig) {
@@ -37,10 +47,14 @@ fn init_tracing(config: &config::LoggingConfig) {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Parse CLI arguments
+    let args = Args::parse();
+    
     // Load configuration
-    let config = AggregatorConfig::load("CC-Aggregator.toml")
-        .unwrap_or_else(|_| {
-            info!("Using default configuration");
+    let config = AggregatorConfig::load(&args.config)
+        .unwrap_or_else(|e| {
+            eprintln!("[WARN] Failed to load {}: {}", args.config, e);
+            eprintln!("[WARN] Using default configuration");
             AggregatorConfig::default()
         });
     

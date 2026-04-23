@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Error","PacketType","Protocol","QoS"],"fn":["check","has_wildcards","matches","qos","valid_filter","valid_topic"],"mod":["v4"],"struct":["FixedHeader"]};

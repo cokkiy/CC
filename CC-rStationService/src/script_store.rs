@@ -150,7 +150,9 @@ impl ScriptStore {
                 selected_options_json,
             ],
         )?;
-        eprintln!("DEBUG create(): inserted {} rows for script '{}'", rows_affected, script.name);
+        // Keep tests quiet. If you need debug output, use `tracing` behind the appropriate log level.
+        // eprintln!("DEBUG create(): inserted {} rows ...");
+        let _ = rows_affected;
 
         Ok(script.clone())
     }
@@ -303,7 +305,8 @@ impl ScriptStore {
             .filter_map(|r| r.ok())
             .collect();
 
-        eprintln!("DEBUG list(): returning {} scripts", scripts.len());
+        // Keep tests quiet; remove unconditional debug output.
+        // eprintln!("DEBUG list(): returning {} scripts", scripts.len());
         Ok(scripts)
     }
 

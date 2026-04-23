@@ -3,8 +3,9 @@
  * Part of Phase 6: Frontend Integration
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useScripts } from './ScriptContext';
+import { useScriptsUI } from './ScriptsUIContext';
 import { ScriptList, ScriptEditor, ScriptRunner, ScriptMarketplace } from './index';
 import type { CommandScript, ScriptExecutionContext, ScriptExecutionResult, ScriptPackage, ScriptImportResult } from './types';
 import type { Station } from '../../types';
@@ -26,25 +27,28 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
     exportScripts,
   } = useScripts();
 
-  // Modal states
-  const [scriptEditorOpen, setScriptEditorOpen] = useState(false);
-  const [editingScript, setEditingScript] = useState<CommandScript | null>(null);
-  const [scriptRunnerOpen, setScriptRunnerOpen] = useState(false);
-  const [runningScript, setRunningScript] = useState<CommandScript | null>(null);
-  const [scriptMarketplaceOpen, setScriptMarketplaceOpen] = useState(false);
+  const { 
+    editor,
+    runner,
+    marketplace,
+    openEditor,
+    closeEditor,
+    openRunner,
+    closeRunner,
+    openMarketplace,
+    closeMarketplace,
+  } = useScriptsUI();
 
   // Convert stations to targets for ScriptRunner
   const targets = stations.map(s => ({ id: s.id, name: s.name, status: s.blocked ? 'blocked' : 'ready' }));
 
   // ScriptList handlers
   const handleEditScript = (script: CommandScript | undefined) => {
-    setEditingScript(script ?? null);
-    setScriptEditorOpen(true);
+    openEditor(script ?? null);
   };
 
   const handleExecuteScript = (script: CommandScript) => {
-    setRunningScript(script);
-    setScriptRunnerOpen(true);
+    openRunner(script);
   };
 
   const handleDeleteScript = async (scriptId: string) => {
@@ -62,13 +66,11 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
   // ScriptEditor handlers
   const handleSaveScript = async (script: Partial<CommandScript>) => {
     await saveScript(script);
-    setScriptEditorOpen(false);
-    setEditingScript(null);
+    closeEditor();
   };
 
   const handleCancelEdit = () => {
-    setScriptEditorOpen(false);
-    setEditingScript(null);
+    closeEditor();
   };
 
   // ScriptRunner handlers
@@ -77,8 +79,7 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
   };
 
   const handleCancelRun = () => {
-    setScriptRunnerOpen(false);
-    setRunningScript(null);
+    closeRunner();
   };
 
   // ScriptMarketplace handlers
@@ -101,7 +102,7 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
             onDeleteScript={handleDeleteScript}
             onToggleFavorite={handleToggleFavorite}
             onDuplicateScript={handleDuplicateScript}
-            onImport={() => setScriptMarketplaceOpen(true)}
+            onImport={openMarketplace}
             onExport={(selectedScripts) => {
               const pkg: ScriptPackage = {
                 metadata: {
@@ -121,29 +122,29 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
         </section>
       </main>
 
-      {scriptEditorOpen && (
+      {editor.open && (
         <ScriptEditor
-          script={editingScript ?? undefined}
+          script={editor.script ?? undefined}
           onSave={handleSaveScript}
           onCancel={handleCancelEdit}
         />
       )}
 
-      {scriptRunnerOpen && runningScript && (
+      {runner.open && runner.script && (
         <ScriptRunner
-          script={runningScript}
+          script={runner.script}
           targets={targets}
           onExecute={handleRunScripts}
           onCancel={handleCancelRun}
         />
       )}
 
-      {scriptMarketplaceOpen && (
+      {marketplace.open && (
         <ScriptMarketplace
           scripts={scripts}
           onImport={handleImportScripts}
           onExport={handleExportScripts}
-          onClose={() => setScriptMarketplaceOpen(false)}
+          onClose={closeMarketplace}
         />
       )}
     </>

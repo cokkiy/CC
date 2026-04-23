@@ -25,7 +25,7 @@ import type {
   StationRuntimeSnapshot,
   StationScreenCapture
 } from "./types";
-import { ScriptProvider, ScriptsPage } from "./plugin/script";
+import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -1239,12 +1239,7 @@ export default function App() {
                     {selectedRuntime.networkStats.length === 0 ? (
                       <p className="emptyInline">No network counters returned yet.</p>
                     ) : (
-                      selectedRuntime.networkStats.map((item) => {
-                        console.log(`UI: Displaying ${selectedRuntime.networkStats.length} network interfaces`);
-                        selectedRuntime.networkStats.forEach((item, index) => {
-                          console.log(`UI: Interface ${index}: ${item.ifName}, RX=${item.bytesReceivedPerSec}, TX=${item.bytesSentedPerSec}`);
-                        });
-                        return (
+                      selectedRuntime.networkStats.map((item) => (
                         <div key={item.ifName} className="logEntry">
                           <div>
                             {item.ifName} · Total {formatBytes(item.totalBytesPerSec)}/s · RX {formatBytes(item.bytesReceivedPerSec)}/s · TX {formatBytes(item.bytesSentedPerSec)}/s
@@ -1256,8 +1251,7 @@ export default function App() {
                             RX Total {formatBytes(item.bytesReceived)} · TX Total {formatBytes(item.bytesSented)} · Total {formatBytes(item.bytesTotal)}
                           </div>
                         </div>
-                        );
-                      })
+                      ))
                     )}
                   </div>
                 </div>
@@ -1673,9 +1667,11 @@ export default function App() {
         </main>
       ) : activePage === "scripts" ? (
         <ScriptProvider>
-          <ScriptsPage
-            stations={stations}
-          />
+          <ScriptsUIProvider>
+            <ScriptsPage
+              stations={stations}
+            />
+          </ScriptsUIProvider>
         </ScriptProvider>
       ) : (
         <main className="grid">
