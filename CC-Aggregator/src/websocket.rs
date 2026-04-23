@@ -58,51 +58,51 @@ pub enum WsOutboundMessage {
     Error { message: String },
 }
 
+impl From<&WsOutboundMessage> for TelemetryWsMessage {
+    fn from(message: &WsOutboundMessage) -> Self {
+        match message {
+            WsOutboundMessage::Telemetry { station_id, data } => TelemetryWsMessage {
+                msg_type: "telemetry".to_string(),
+                station_id: station_id.clone(),
+                data: Some(data.clone()),
+                status: None,
+                stations: None,
+                message: None,
+            },
+            WsOutboundMessage::StatusUpdate { station_id, status } => TelemetryWsMessage {
+                msg_type: "status".to_string(),
+                station_id: station_id.clone(),
+                data: None,
+                status: Some(status.clone()),
+                stations: None,
+                message: None,
+            },
+            WsOutboundMessage::StationList(stations) => TelemetryWsMessage {
+                msg_type: "stationList".to_string(),
+                station_id: String::new(),
+                data: None,
+                status: None,
+                stations: Some(stations.clone()),
+                message: None,
+            },
+            WsOutboundMessage::Error { message } => TelemetryWsMessage {
+                msg_type: "error".to_string(),
+                station_id: String::new(),
+                data: None,
+                status: None,
+                stations: None,
+                message: Some(message.clone()),
+            },
+        }
+    }
+}
+
 impl WsOutboundMessage {
     /// Serialize to JSON string
     pub fn to_json_string(&self) -> Result<String> {
-        match self {
-            WsOutboundMessage::Telemetry { station_id, data } => {
-                serde_json::to_string(&TelemetryWsMessage {
-                    msg_type: "telemetry".to_string(),
-                    station_id: station_id.clone(),
-                    data: Some(data.clone()),
-                    status: None,
-                    stations: None,
-                    message: None,
-                }).context("Failed to serialize telemetry message")
-            }
-            WsOutboundMessage::StatusUpdate { station_id, status } => {
-                serde_json::to_string(&TelemetryWsMessage {
-                    msg_type: "status".to_string(),
-                    station_id: station_id.clone(),
-                    data: None,
-                    status: Some(status.clone()),
-                    stations: None,
-                    message: None,
-                }).context("Failed to serialize status message")
-            }
-            WsOutboundMessage::StationList(stations) => {
-                serde_json::to_string(&TelemetryWsMessage {
-                    msg_type: "stationList".to_string(),
-                    station_id: String::new(),
-                    data: None,
-                    status: None,
-                    stations: Some(stations.clone()),
-                    message: None,
-                }).context("Failed to serialize station list message")
-            }
-            WsOutboundMessage::Error { message } => {
-                serde_json::to_string(&TelemetryWsMessage {
-                    msg_type: "error".to_string(),
-                    station_id: String::new(),
-                    data: None,
-                    status: None,
-                    stations: None,
-                    message: Some(message.clone()),
-                }).context("Failed to serialize error message")
-            }
-        }
+        let message = TelemetryWsMessage::from(self);
+
+        serde_json::to_string(&message).context("Failed to serialize websocket message")
     }
 }
 
@@ -168,10 +168,10 @@ impl WsServer {
 
     /// Broadcast telemetry to subscribed clients
     pub async fn broadcast_telemetry(&self, station_id: &str, data: &TelemetryBundle) {
-        let msg = match (WsOutboundMessage::Telemetry {
+        let msg = match WsOutboundMessage::Telemetry {
             station_id: station_id.to_string(),
             data: data.clone(),
-        }).to_json_string() {
+        }.to_json_string() {
             Ok(j) => j,
             Err(e) => {
                 error!("Failed to serialize telemetry message: {:?}", e);
