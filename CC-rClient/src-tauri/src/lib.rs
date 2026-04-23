@@ -9,14 +9,15 @@ use storage::StateStore;
 use tokio::sync::RwLock;
 use ws_bridge::MqttWsBridge;
 
+
 pub mod control;
 pub mod grpc;
 pub mod models;
 pub mod remote;
 pub mod storage;
+pub mod websocket;
 pub mod wol;
 pub mod ws_bridge;
-
 // Global WebSocket bridge instance - lazily initialized
 static WS_BRIDGE: RwLock<Option<MqttWsBridge>> = RwLock::const_new(None);
 #[tauri::command]

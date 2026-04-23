@@ -12,6 +12,7 @@ pub mod network_counters;
 pub mod network_monitor;
 pub mod platform;
 pub mod plugins;
+pub mod process_monitor;
 pub mod script_engine;
 pub mod script_store;
 pub mod scripts;
