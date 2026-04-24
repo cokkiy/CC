@@ -53,15 +53,15 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   const [showStationPicker, setShowStationPicker] = useState(false);
 
   // Get station objects for this group
-  const groupStations = group.stationIds
+  const groupStations = group.station_ids
     .map(id => stations.find(s => s.id === id))
     .filter((s): s is Station => !!s);
 
   // Get available stations (not in this group)
-  const availableStations = stations.filter(s => !group.stationIds.includes(s.id));
+  const availableStations = stations.filter(s => !(group.station_ids || []).includes(s.id));
 
   const handleStationToggle = (stationId: string) => {
-    if (group.stationIds.includes(stationId)) {
+    if ((group.station_ids || []).includes(stationId)) {
       onRemoveStation(stationId);
     } else {
       onAddStation(stationId);
@@ -97,7 +97,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
       </div>
 
       <div className="group-stats">
-        <span className="station-count">{group.stationIds.length} stations</span>
+        <span className="station-count">{(group.station_ids || []).length} stations</span>
         {group.tags.length > 0 && (
           <span className="tag-count">{group.tags.length} tags</span>
         )}
@@ -143,7 +143,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
               <label key={station.id} className="station-option">
                 <input
                   type="checkbox"
-                  checked={group.stationIds.includes(station.id)}
+                  checked={(group.station_ids || []).includes(station.id)}
                   onChange={() => handleStationToggle(station.id)}
                 />
                 <span>{station.name}</span>

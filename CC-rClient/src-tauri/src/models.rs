@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -48,12 +49,46 @@ impl Default for ClientOptions {
     }
 }
 
+/// A tag definition for categorizing stations.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TagDefinition {
+    /// Unique identifier
+    pub id: String,
+    /// Tag name
+    pub name: String,
+    /// Tag description
+    pub description: String,
+    /// Tag color (hex format, e.g., "#FF5733")
+    pub color: String,
+    /// Creation timestamp
+    pub created_at: DateTime<Utc>,
+    /// Last update timestamp
+    pub updated_at: DateTime<Utc>,
+}
+
+impl TagDefinition {
+    /// Create a new tag definition
+    pub fn new(name: impl Into<String>) -> Self {
+        let now = Utc::now();
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            name: name.into(),
+            description: String::new(),
+            color: String::new(),
+            created_at: now,
+            updated_at: now,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct PersistedState {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
     pub groups: Vec<StationGroup>,
+    pub tags: Vec<TagDefinition>,
 }
 
 impl Default for PersistedState {
@@ -62,6 +97,7 @@ impl Default for PersistedState {
             stations: Vec::new(),
             options: ClientOptions::default(),
             groups: Vec::new(),
+            tags: Vec::new(),
         }
     }
 }
@@ -72,6 +108,7 @@ pub struct AppSnapshot {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
     pub groups: Vec<StationGroup>,
+    pub tags: Vec<TagDefinition>,
     pub storage_path: String,
     pub legacy_imported: bool,
 }

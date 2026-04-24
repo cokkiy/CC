@@ -97,8 +97,8 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
     const tagDefinition = await tagsApi.updateTag(key, data);
     setState(prev => ({
       ...prev,
-      tagDefinitions: prev.tagDefinitions.map(t => (t.key === key ? tagDefinition : t)),
-      selectedTag: prev.selectedTag?.key === key ? tagDefinition : prev.selectedTag,
+      tagDefinitions: prev.tagDefinitions.map(t => ((t.key || t.id) === key ? tagDefinition : t)),
+      selectedTag: (prev.selectedTag?.key || prev.selectedTag?.id) === key ? tagDefinition : prev.selectedTag,
     }));
     return tagDefinition;
   }, []);
@@ -107,8 +107,8 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
     await tagsApi.deleteTag(key);
     setState(prev => ({
       ...prev,
-      tagDefinitions: prev.tagDefinitions.filter(t => t.key !== key),
-      selectedTag: prev.selectedTag?.key === key ? null : prev.selectedTag,
+      tagDefinitions: prev.tagDefinitions.filter(t => (t.key || t.id) !== key),
+      selectedTag: (prev.selectedTag?.key || prev.selectedTag?.id) === key ? null : prev.selectedTag,
     }));
   }, []);
 
@@ -154,8 +154,7 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
     for (const tag of tags) {
       try {
         await tagsApi.createTag({
-          key: tag.key,
-          label: tag.label,
+          name: tag.name || tag.label || tag.key || 'Unknown',
           type: tag.type,
           options: tag.options,
           required: tag.required,

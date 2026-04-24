@@ -35,8 +35,8 @@ export const TagDefinitionList: React.FC<{
   const [searchTerm, setSearchTerm] = React.useState('');
 
   const filteredTags = tagDefinitions.filter(
-    t => t.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         t.key.toLowerCase().includes(searchTerm.toLowerCase())
+    t => (t.label || t.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+         (t.key || t.id || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleImportClick = () => {
@@ -93,7 +93,7 @@ export const TagDefinitionList: React.FC<{
             )}
             <div className="tag-card-actions">
               <button className="tag-action-btn" onClick={() => onEditTag(tag)}>Edit</button>
-              <button className="tag-action-btn delete" onClick={() => onDeleteTag(tag.key)}>Delete</button>
+              <button className="tag-action-btn delete" onClick={() => onDeleteTag(tag.key || tag.id)}>Delete</button>
             </div>
           </div>
         ))}
@@ -196,8 +196,7 @@ export const TagEditor: React.FC<TagEditorProps> = ({
     if (!validate()) return;
 
     onSave({
-      key: key.trim(),
-      label: label.trim(),
+      name: label.trim(),
       type,
       options: type === 'select' ? options : undefined,
       required,

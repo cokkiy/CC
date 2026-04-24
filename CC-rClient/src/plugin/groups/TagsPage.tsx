@@ -67,7 +67,7 @@ export const TagsPage: React.FC<TagsPageProps> = () => {
     setIsLoading(true);
     try {
       if (editingTag) {
-        await updateTag(editingTag.key, data as UpdateTagDTO);
+        await updateTag(editingTag.key || editingTag.id, data as UpdateTagDTO);
       } else {
         await createTag(data as CreateTagDTO);
       }

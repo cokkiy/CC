@@ -74,6 +74,7 @@ impl StateStore {
                 stations: payload.stations,
                 options: payload.options,
                 groups: payload.groups,
+                tags: payload.tags,
                 storage_path: storage_path.display().to_string(),
                 legacy_imported: false,
             });
@@ -104,6 +105,7 @@ impl StateStore {
             stations: normalized.stations,
             options: normalized.options,
             groups: normalized.groups,
+            tags: normalized.tags,
             storage_path: storage_path.display().to_string(),
             legacy_imported: false,
         })
@@ -157,6 +159,7 @@ fn import_legacy_state() -> Result<PersistedState, StorageError> {
         stations,
         options,
         groups: Vec::new(),
+        tags: Vec::new(),
     })
 }
 

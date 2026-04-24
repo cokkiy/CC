@@ -1,5 +1,5 @@
 use control::{execute_station_action, set_station_gathering_interval};
-use models::{ActionResult, AppSnapshot, PersistedState, StationAction, StationGroup};
+use models::{ActionResult, AppSnapshot, PersistedState, StationAction, StationGroup, TagDefinition};
 use remote::{
     browse_station_files, capture_station_screen, download_station_file, execute_station_command,
     fetch_station_runtime, rename_station_file, upload_station_file, CommandExecutionResult,
@@ -49,6 +49,7 @@ async fn run_station_action(
             stations: next_stations,
             options: snapshot.options,
             groups: snapshot.groups,
+            tags: snapshot.tags,
         })
         .map_err(|error| error.to_string())?;
     }
@@ -170,6 +171,7 @@ fn create_station_group(name: String) -> Result<StationGroup, String> {
         stations: snapshot.stations,
         options: snapshot.options,
         groups: snapshot.groups,
+        tags: snapshot.tags,
     })
     .map_err(|error| error.to_string())?;
     Ok(group)
@@ -198,6 +200,7 @@ fn update_station_group(
         stations: snapshot.stations,
         options: snapshot.options,
         groups: snapshot.groups,
+        tags: snapshot.tags,
     })
     .map_err(|error| error.to_string())?;
     Ok(updated)
@@ -215,9 +218,274 @@ fn delete_station_group(id: String) -> Result<String, String> {
         stations: snapshot.stations,
         options: snapshot.options,
         groups: snapshot.groups,
+        tags: snapshot.tags,
     })
     .map_err(|error| error.to_string())?;
     Ok(format!("Group {id} deleted."))
+}
+
+// ============================================
+// Phase 8: Alias commands matching frontend API
+// ============================================
+
+#[tauri::command]
+fn load_groups() -> Result<Vec<StationGroup>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    Ok(snapshot.groups)
+}
+
+#[tauri::command]
+fn create_group(name: String, description: String) -> Result<StationGroup, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let mut group = StationGroup::new(&name);
+    group.description = description;
+    snapshot.groups.push(group.clone());
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups.clone(),
+        tags: snapshot.tags.clone(),
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(group)
+}
+
+#[tauri::command]
+fn update_group(id: String, name: String, description: String, tags: Vec<String>, station_ids: Vec<String>) -> Result<StationGroup, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let group = snapshot.groups.iter_mut().find(|g| g.id == id)
+        .ok_or_else(|| format!("No group found for id {id}"))?;
+    group.name = name;
+    group.description = description;
+    group.tags = tags;
+    group.station_ids = station_ids;
+    let updated = group.clone();
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups.clone(),
+        tags: snapshot.tags.clone(),
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(updated)
+}
+
+#[tauri::command]
+fn delete_group(group_id: String) -> Result<String, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let initial_len = snapshot.groups.len();
+    snapshot.groups.retain(|g| g.id != group_id);
+    if snapshot.groups.len() == initial_len {
+        return Err(format!("No group found for id {group_id}"));
+    }
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(format!("Group {group_id} deleted."))
+}
+
+#[tauri::command]
+fn add_station_to_group(group_id: String, station_id: String) -> Result<StationGroup, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let group = snapshot.groups.iter_mut().find(|g| g.id == group_id)
+        .ok_or_else(|| format!("No group found for id {group_id}"))?;
+    if !group.station_ids.contains(&station_id) {
+        group.station_ids.push(station_id);
+    }
+    let updated = group.clone();
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(updated)
+}
+
+#[tauri::command]
+fn remove_station_from_group(group_id: String, station_id: String) -> Result<StationGroup, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let group = snapshot.groups.iter_mut().find(|g| g.id == group_id)
+        .ok_or_else(|| format!("No group found for id {group_id}"))?;
+    group.station_ids.retain(|id| id != &station_id);
+    let updated = group.clone();
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(updated)
+}
+
+#[tauri::command]
+fn get_stations_in_group(group_id: String) -> Result<Vec<String>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let group = snapshot.groups.iter().find(|g| g.id == group_id)
+        .ok_or_else(|| format!("No group found for id {group_id}"))?;
+    Ok(group.station_ids.clone())
+}
+
+#[tauri::command]
+fn export_groups() -> Result<Vec<StationGroup>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    Ok(snapshot.groups)
+}
+
+#[tauri::command]
+fn get_group_stats() -> Result<Vec<StationGroup>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    Ok(snapshot.groups)
+}
+
+#[tauri::command]
+fn load_tag_definitions() -> Result<Vec<TagDefinition>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    Ok(snapshot.tags)
+}
+
+#[tauri::command]
+fn create_tag_definition(name: String, description: String, color: String) -> Result<TagDefinition, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let mut tag = TagDefinition::new(&name);
+    tag.description = description;
+    tag.color = color;
+    snapshot.tags.push(tag.clone());
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups.clone(),
+        tags: snapshot.tags.clone(),
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(tag)
+}
+
+#[tauri::command]
+fn update_tag_definition(id: String, name: String, description: String, color: String) -> Result<TagDefinition, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let tag = snapshot.tags.iter_mut().find(|t| t.id == id)
+        .ok_or_else(|| format!("No tag found for id {id}"))?;
+    tag.name = name;
+    tag.description = description;
+    tag.color = color;
+    tag.updated_at = chrono::Utc::now();
+    let updated = tag.clone();
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups.clone(),
+        tags: snapshot.tags.clone(),
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(updated)
+}
+
+#[tauri::command]
+fn delete_tag_definition(key: String) -> Result<String, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let initial_len = snapshot.tags.len();
+    snapshot.tags.retain(|t| t.id != key);
+    if snapshot.tags.len() == initial_len {
+        return Err(format!("No tag found for id {key}"));
+    }
+    // Also remove this tag from all groups that reference it
+    for group in &mut snapshot.groups {
+        group.tags.retain(|tag_id| tag_id != &key);
+    }
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(format!("Tag {key} deleted."))
+}
+
+#[tauri::command]
+fn export_tag_definitions() -> Result<Vec<TagDefinition>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    Ok(snapshot.tags)
+}
+
+#[tauri::command]
+fn get_tags() -> Result<Vec<TagDefinition>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    Ok(snapshot.tags)
+}
+
+#[tauri::command]
+fn create_tag(name: String, description: String, color: String) -> Result<TagDefinition, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let mut tag = TagDefinition::new(&name);
+    tag.description = description;
+    tag.color = color;
+    snapshot.tags.push(tag.clone());
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(tag)
+}
+
+#[tauri::command]
+fn update_tag(
+    id: String,
+    name: String,
+    description: String,
+    color: String,
+) -> Result<TagDefinition, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let tag = snapshot
+        .tags
+        .iter_mut()
+        .find(|t| t.id == id)
+        .ok_or_else(|| format!("No tag found for id {id}"))?;
+    tag.name = name;
+    tag.description = description;
+    tag.color = color;
+    tag.updated_at = chrono::Utc::now();
+    let updated = tag.clone();
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(updated)
+}
+
+#[tauri::command]
+fn delete_tag(id: String) -> Result<String, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let initial_len = snapshot.tags.len();
+    snapshot.tags.retain(|t| t.id != id);
+    if snapshot.tags.len() == initial_len {
+        return Err(format!("No tag found for id {id}"));
+    }
+    // Also remove this tag from all groups that reference it
+    for group in &mut snapshot.groups {
+        group.tags.retain(|tag_id| tag_id != &id);
+    }
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+    Ok(format!("Tag {id} deleted."))
 }
 
 #[tauri::command]
@@ -265,7 +533,26 @@ pub fn run() {
             create_station_group,
             update_station_group,
             delete_station_group,
+            get_tags,
+            create_tag,
+            update_tag,
+            delete_tag,
             set_station_gathering_interval_for_ui,
+            // Phase 8 frontend API aliases
+            load_groups,
+            create_group,
+            update_group,
+            delete_group,
+            add_station_to_group,
+            remove_station_from_group,
+            get_stations_in_group,
+            export_groups,
+            get_group_stats,
+            load_tag_definitions,
+            create_tag_definition,
+            update_tag_definition,
+            delete_tag_definition,
+            export_tag_definitions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

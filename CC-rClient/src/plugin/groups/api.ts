@@ -63,8 +63,7 @@ export const groupsApi = {
    */
   async loadGroups(): Promise<StationGroup[]> {
     try {
-      const result = await invoke<LoadGroupsResult>('load_groups');
-      return result.groups;
+      return await invoke<StationGroup[]>('load_groups');
     } catch (error) {
       console.error('[GroupsApi] Failed to load groups:', error);
       throw error;
@@ -76,8 +75,7 @@ export const groupsApi = {
    */
   async createGroup(data: CreateGroupDTO): Promise<StationGroup> {
     try {
-      const result = await invoke<SaveGroupResult>('create_group', { data });
-      return result.group;
+      return await invoke<StationGroup>('create_group', { name: data.name, description: data.description || '' });
     } catch (error) {
       console.error('[GroupsApi] Failed to create group:', error);
       throw error;
@@ -89,8 +87,13 @@ export const groupsApi = {
    */
   async updateGroup(id: string, data: UpdateGroupDTO): Promise<StationGroup> {
     try {
-      const result = await invoke<SaveGroupResult>('update_group', { id, data });
-      return result.group;
+      return await invoke<StationGroup>('update_group', {
+        id,
+        name: data.name,
+        description: data.description || '',
+        tags: data.tags || [],
+        station_ids: data.stationIds || [],
+      });
     } catch (error) {
       console.error('[GroupsApi] Failed to update group:', error);
       throw error;
@@ -102,7 +105,7 @@ export const groupsApi = {
    */
   async deleteGroup(groupId: string): Promise<void> {
     try {
-      await invoke<DeleteGroupResult>('delete_group', { group_id: groupId });
+      await invoke<string>('delete_group', { group_id: groupId });
     } catch (error) {
       console.error('[GroupsApi] Failed to delete group:', error);
       throw error;
@@ -112,9 +115,9 @@ export const groupsApi = {
   /**
    * Add a station to a group
    */
-  async addStationToGroup(groupId: string, stationId: string): Promise<void> {
+  async addStationToGroup(groupId: string, stationId: string): Promise<StationGroup> {
     try {
-      await invoke('add_station_to_group', { group_id: groupId, station_id: stationId });
+      return await invoke<StationGroup>('add_station_to_group', { group_id: groupId, station_id: stationId });
     } catch (error) {
       console.error('[GroupsApi] Failed to add station to group:', error);
       throw error;
@@ -124,9 +127,9 @@ export const groupsApi = {
   /**
    * Remove a station from a group
    */
-  async removeStationFromGroup(groupId: string, stationId: string): Promise<void> {
+  async removeStationFromGroup(groupId: string, stationId: string): Promise<StationGroup> {
     try {
-      await invoke('remove_station_from_group', { group_id: groupId, station_id: stationId });
+      return await invoke<StationGroup>('remove_station_from_group', { group_id: groupId, station_id: stationId });
     } catch (error) {
       console.error('[GroupsApi] Failed to remove station from group:', error);
       throw error;
@@ -138,25 +141,9 @@ export const groupsApi = {
    */
   async getStationsInGroup(groupId: string): Promise<string[]> {
     try {
-      const result = await invoke<{ station_ids: string[] }>('get_stations_in_group', {
-        group_id: groupId,
-      });
-      return result.station_ids;
+      return await invoke<string[]>('get_stations_in_group', { group_id: groupId });
     } catch (error) {
       console.error('[GroupsApi] Failed to get stations in group:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Import groups from a package
-   */
-  async importGroups(groups: StationGroup[], options?: { overwrite?: boolean }): Promise<GroupImportResult> {
-    try {
-      const result = await invoke<GroupImportResult>('import_groups', { groups, options });
-      return result;
-    } catch (error) {
-      console.error('[GroupsApi] Failed to import groups:', error);
       throw error;
     }
   },
@@ -166,8 +153,7 @@ export const groupsApi = {
    */
   async exportGroups(): Promise<StationGroup[]> {
     try {
-      const result = await invoke<{ groups: StationGroup[] }>('export_groups');
-      return result.groups;
+      return await invoke<StationGroup[]>('export_groups');
     } catch (error) {
       console.error('[GroupsApi] Failed to export groups:', error);
       throw error;
@@ -179,8 +165,8 @@ export const groupsApi = {
    */
   async getGroupStats(): Promise<GroupStatsResult[]> {
     try {
-      const result = await invoke<{ stats: GroupStatsResult[] }>('get_group_stats');
-      return result.stats;
+      const groups = await invoke<StationGroup[]>('get_group_stats');
+      return groups.map(g => ({ groupId: g.id, stationCount: g.station_ids?.length || 0 }));
     } catch (error) {
       console.error('[GroupsApi] Failed to get group stats:', error);
       throw error;
@@ -198,8 +184,7 @@ export const tagsApi = {
    */
   async loadTagDefinitions(): Promise<TagDefinition[]> {
     try {
-      const result = await invoke<LoadTagDefinitionsResult>('load_tag_definitions');
-      return result.tagDefinitions;
+      return await invoke<TagDefinition[]>('load_tag_definitions');
     } catch (error) {
       console.error('[TagsApi] Failed to load tag definitions:', error);
       throw error;
@@ -211,8 +196,11 @@ export const tagsApi = {
    */
   async createTag(data: CreateTagDTO): Promise<TagDefinition> {
     try {
-      const result = await invoke<SaveTagResult>('create_tag_definition', { data });
-      return result.tagDefinition;
+      return await invoke<TagDefinition>('create_tag_definition', {
+        name: data.name,
+        description: data.description || '',
+        color: data.color || '#3B82F6',
+      });
     } catch (error) {
       console.error('[TagsApi] Failed to create tag definition:', error);
       throw error;
@@ -224,8 +212,12 @@ export const tagsApi = {
    */
   async updateTag(key: string, data: UpdateTagDTO): Promise<TagDefinition> {
     try {
-      const result = await invoke<SaveTagResult>('update_tag_definition', { key, data });
-      return result.tagDefinition;
+      return await invoke<TagDefinition>('update_tag_definition', {
+        id: key,
+        name: data.name,
+        description: data.description || '',
+        color: data.color || '#3B82F6',
+      });
     } catch (error) {
       console.error('[TagsApi] Failed to update tag definition:', error);
       throw error;
@@ -237,7 +229,7 @@ export const tagsApi = {
    */
   async deleteTag(key: string): Promise<void> {
     try {
-      await invoke<DeleteTagResult>('delete_tag_definition', { key });
+      await invoke<string>('delete_tag_definition', { key });
     } catch (error) {
       console.error('[TagsApi] Failed to delete tag definition:', error);
       throw error;
@@ -246,29 +238,14 @@ export const tagsApi = {
 
   /**
    * Get tag statistics across all stations
+   * Note: Returns empty array as station tags are not yet implemented
    */
   async getTagStats(): Promise<Array<{ tagKey: string; tagLabel: string; tagValue: string; count: number }>> {
     try {
-      const result = await invoke<{ stats: Array<{ tagKey: string; tagLabel: string; tagValue: string; count: number }> }>('get_tag_stats');
-      return result.stats;
+      const tags = await invoke<TagDefinition[]>('load_tag_definitions');
+      return tags.map(t => ({ tagKey: t.id, tagLabel: t.name, tagValue: t.name, count: 0 }));
     } catch (error) {
       console.error('[TagsApi] Failed to get tag stats:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Import tag definitions from a package
-   */
-  async importTagDefinitions(
-    tagDefinitions: TagDefinition[],
-    options?: { overwrite?: boolean }
-  ): Promise<TagImportResult> {
-    try {
-      const result = await invoke<TagImportResult>('import_tag_definitions', { tagDefinitions, options });
-      return result;
-    } catch (error) {
-      console.error('[TagsApi] Failed to import tag definitions:', error);
       throw error;
     }
   },
@@ -278,8 +255,7 @@ export const tagsApi = {
    */
   async exportTagDefinitions(): Promise<TagDefinition[]> {
     try {
-      const result = await invoke<{ tagDefinitions: TagDefinition[] }>('export_tag_definitions');
-      return result.tagDefinitions;
+      return await invoke<TagDefinition[]>('export_tag_definitions');
     } catch (error) {
       console.error('[TagsApi] Failed to export tag definitions:', error);
       throw error;
@@ -289,6 +265,7 @@ export const tagsApi = {
 
 // ============================================
 // Station Tags API
+// Note: Per-station tags not yet implemented, returns empty
 // ============================================
 
 export const stationTagsApi = {
@@ -297,11 +274,10 @@ export const stationTagsApi = {
    */
   async getStationTags(stationId: string): Promise<StationTags> {
     try {
-      const result = await invoke<UpdateStationTagsResult>('get_station_tags', { station_id: stationId });
-      return result.tags;
+      return await invoke<StationTags>('get_station_tags', { station_id: stationId });
     } catch (error) {
       console.error('[StationTagsApi] Failed to get station tags:', error);
-      throw error;
+      return {};
     }
   },
 
@@ -310,8 +286,7 @@ export const stationTagsApi = {
    */
   async updateStationTags(stationId: string, tags: StationTags): Promise<StationTags> {
     try {
-      const result = await invoke<UpdateStationTagsResult>('update_station_tags', { station_id: stationId, tags });
-      return result.tags;
+      return await invoke<StationTags>('update_station_tags', { station_id: stationId, tags });
     } catch (error) {
       console.error('[StationTagsApi] Failed to update station tags:', error);
       throw error;

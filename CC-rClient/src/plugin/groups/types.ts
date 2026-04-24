@@ -1,36 +1,28 @@
 /**
  * Station Group and Tag System Type Definitions
  * Part of Phase 8: Device Group and Tag System
+ *
+ * NOTE: Types are aligned with Rust backend models in CC-rClient/src-tauri/src/
+ * - StationGroup: { id, name, description, tags, station_ids }
+ * - TagDefinition: { id, name, description, color, created_at, updated_at }
  */
 
 // ============================================
-// Location Type
-// ============================================
-
-export type Location = {
-  latitude?: number;
-  longitude?: number;
-  altitude?: number;
-  address?: string;
-  region?: string;
-  country?: string;
-};
-
-// ============================================
-// Station Group Types
+// Station Group Types (matches Rust StationGroup)
 // ============================================
 
 export interface StationGroup {
   id: string;
   name: string;
   description: string;
-  color: string;
+  tags: string[];        // tag definition IDs
+  station_ids: string[]; // matches Rust field name
+  // Optional UI fields
+  color?: string;
   icon?: string;
-  tags: string[];
-  stationIds: string[];
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
 }
 
 export interface CreateGroupDTO {
@@ -47,41 +39,51 @@ export interface UpdateGroupDTO {
   color?: string;
   icon?: string;
   tags?: string[];
+  stationIds?: string[];  // frontend uses camelCase
 }
 
 // ============================================
-// Tag Definition Types
+// Tag Definition Types (matches Rust TagDefinition)
 // ============================================
 
 export type TagValueType = 'string' | 'number' | 'boolean' | 'select';
 
 export interface TagDefinition {
-  key: string;
-  label: string;
-  type: TagValueType;
-  options?: string[];
-  required: boolean;
-  defaultValue?: string;
-  description?: string;
-}
-
-export interface CreateTagDTO {
-  key: string;
-  label: string;
-  type: TagValueType;
-  options?: string[];
-  required?: boolean;
-  defaultValue?: string;
-  description?: string;
-}
-
-export interface UpdateTagDTO {
-  label?: string;
+  // Backend fields (Rust)
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  created_at?: string;
+  updated_at?: string;
+  // UI aliases
+  label?: string;  // alias for name
+  key?: string;      // alias for id
+  // Optional UI fields
   type?: TagValueType;
   options?: string[];
   required?: boolean;
   defaultValue?: string;
+}
+
+export interface CreateTagDTO {
+  name: string;         // matches Rust create_tag_definition param
   description?: string;
+  color?: string;
+  type?: TagValueType;
+  options?: string[];
+  required?: boolean;
+  defaultValue?: string;
+}
+
+export interface UpdateTagDTO {
+  name?: string;
+  description?: string;
+  color?: string;
+  type?: TagValueType;
+  options?: string[];
+  required?: boolean;
+  defaultValue?: string;
 }
 
 // ============================================
@@ -122,6 +124,11 @@ export interface TagImportResult {
   skipped: number;
   errors: string[];
   warnings: string[];
+}
+
+export interface GroupStatsResult {
+  groupId: string;
+  stationCount: number;
 }
 
 // ============================================

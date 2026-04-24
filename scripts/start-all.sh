@@ -157,8 +157,8 @@ start_mosquitto() {
     # Fallback: try to start directly with docker
     if docker run -d --name mosquitto \
         -p 1883:1883 -p 9001:9001 \
-        eclipse-mosquitto:latest \
-        /mosquitto-no-auth.conf >/dev/null 2>&1; then
+        docker.xuanyuan.run/library/eclipse-mosquitto:latest \
+         >/dev/null 2>&1; then
         sleep 2
         if check_mosquitto; then
             log_success "Mosquitto started via docker run"

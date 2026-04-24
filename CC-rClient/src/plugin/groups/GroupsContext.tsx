@@ -10,7 +10,7 @@ import type {
   CreateGroupDTO,
   UpdateGroupDTO,
   GroupFilter,
-  GroupImportResult,
+  GroupStatsResult,
 } from './types';
 
 // ============================================
@@ -40,13 +40,13 @@ interface GroupsContextValue extends GroupsContextState {
   filterGroups: (filter: GroupFilter) => StationGroup[];
 
   // Import/Export
-  importGroups: (groups: StationGroup[], options?: { overwrite?: boolean }) => Promise<GroupImportResult>;
+  importGroups: (groups: StationGroup[], options?: { overwrite?: boolean }) => Promise<{ imported: number; skipped: number; errors: string[] }>;
   exportGroups: () => Promise<StationGroup[]>;
 
   // Utilities
   getGroupById: (id: string) => StationGroup | undefined;
   getGroupsByStation: (stationId: string) => StationGroup[];
-  getGroupStats: () => Promise<Array<{ groupId: string; stationCount: number }>>;
+  getGroupStats: () => Promise<GroupStatsResult[]>;
 }
 
 const GroupsContext = createContext<GroupsContextValue | null>(null);
@@ -120,7 +120,7 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       groups: prev.groups.map(g =>
         g.id === groupId
-          ? { ...g, stationIds: [...g.stationIds, stationId] }
+          ? { ...g, station_ids: [...(g.station_ids || []), stationId] }
           : g
       ),
     }));
@@ -132,7 +132,7 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       groups: prev.groups.map(g =>
         g.id === groupId
-          ? { ...g, stationIds: g.stationIds.filter(id => id !== stationId) }
+          ? { ...g, station_ids: (g.station_ids || []).filter((id: string) => id !== stationId) }
           : g
       ),
     }));
@@ -167,12 +167,28 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, [state.groups]);
 
+  const getGroupById = useCallback((id: string) => {
+    return state.groups.find(g => g.id === id);
+  }, [state.groups]);
+
+  const getGroupsByStation = useCallback((stationId: string) => {
+    return state.groups.filter(g => (g.station_ids || []).includes(stationId));
+  }, [state.groups]);
+
   const importGroups = useCallback(async (
     groups: StationGroup[],
     options?: { overwrite?: boolean }
   ) => {
-    const result = await groupsApi.importGroups(groups, options);
-    // Reload groups to get updated state
+    const result = { imported: 0, skipped: 0, errors: [] as string[] };
+    for (const group of groups) {
+      try {
+        await groupsApi.createGroup({ name: group.name, description: group.description });
+        result.imported++;
+      } catch (err) {
+        result.skipped++;
+        result.errors.push(`Failed to import ${group.name}: ${err}`);
+      }
+    }
     await loadGroups();
     return result;
   }, [loadGroups]);
@@ -180,14 +196,6 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
   const exportGroups = useCallback(async () => {
     return groupsApi.exportGroups();
   }, []);
-
-  const getGroupById = useCallback((id: string) => {
-    return state.groups.find(g => g.id === id);
-  }, [state.groups]);
-
-  const getGroupsByStation = useCallback((stationId: string) => {
-    return state.groups.filter(g => g.stationIds.includes(stationId));
-  }, [state.groups]);
 
   const getGroupStats = useCallback(async () => {
     return groupsApi.getGroupStats();
