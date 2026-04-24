@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import topBanner from "../images/top_banner.png";
 import type {
   ActionResult,
   AppSnapshot,
@@ -28,6 +29,7 @@ import type {
 import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script";
 import { BatchProvider, useBatch } from "./plugin/batch";
 import { BatchPage } from "./plugin/batch/BatchPage";
+import { BatchUIProvider } from "./plugin/batch/BatchUIContext";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -43,7 +45,10 @@ const emptyStation = (): Station => ({
   networkInterfaces: [{ mac: "", ips: [""] }],
   startPrograms: [],
   monitorProcesses: [],
-  lastAction: null
+  lastAction: null,
+  groups: [],
+  tags: {},
+  metadata: {}
 });
 
 function CpuPie({ cpu }: { cpu: number }) {
@@ -109,14 +114,11 @@ function getStationVisualState(
   }
 
   const runtimeMessage = runtime.message.toLowerCase();
-  const lastAction = (station.lastAction ?? "").toLowerCase();
   const hasErrorSignal =
     runtimeMessage.includes("error") ||
     runtimeMessage.includes("failed") ||
     runtimeMessage.includes("unavailable") ||
-    runtimeMessage.includes("timeout") ||
-    lastAction.includes("error") ||
-    lastAction.includes("failed");
+    runtimeMessage.includes("timeout");
 
   if (hasErrorSignal) {
     return "error";
@@ -142,6 +144,61 @@ function ComputerStatusIcon({ state }: { state: StationVisualState }) {
         <path d="M7 19h10" />
       </svg>
     </span>
+  );
+}
+
+function CpuIcon() {
+  return (
+    <svg className="stationStatIconSvg" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="3" y="3" width="10" height="10" rx="1" fill="none" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="5.5" y="5.5" width="5" height="5" rx="0.5" />
+      <line x1="1" y1="5" x2="3" y2="5" stroke="currentColor" strokeWidth="1" />
+      <line x1="1" y1="8" x2="3" y2="8" stroke="currentColor" strokeWidth="1" />
+      <line x1="1" y1="11" x2="3" y2="11" stroke="currentColor" strokeWidth="1" />
+      <line x1="13" y1="5" x2="15" y2="5" stroke="currentColor" strokeWidth="1" />
+      <line x1="13" y1="8" x2="15" y2="8" stroke="currentColor" strokeWidth="1" />
+      <line x1="13" y1="11" x2="15" y2="11" stroke="currentColor" strokeWidth="1" />
+      <line x1="5" y1="1" x2="5" y2="3" stroke="currentColor" strokeWidth="1" />
+      <line x1="8" y1="1" x2="8" y2="3" stroke="currentColor" strokeWidth="1" />
+      <line x1="11" y1="1" x2="11" y2="3" stroke="currentColor" strokeWidth="1" />
+      <line x1="5" y1="13" x2="5" y2="15" stroke="currentColor" strokeWidth="1" />
+      <line x1="8" y1="13" x2="8" y2="15" stroke="currentColor" strokeWidth="1" />
+      <line x1="11" y1="13" x2="11" y2="15" stroke="currentColor" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function MemoryIcon() {
+  return (
+    <svg className="stationStatIconSvg" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="1" y="5" width="14" height="6" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="2.5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="7.5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="10" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="12.5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <line x1="2.5" y1="11" x2="2.5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="5" y1="11" x2="5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="7.5" y1="11" x2="7.5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="10" y1="11" x2="10" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="12.5" y1="11" x2="12.5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+function ProcessIcon() {
+  return (
+    <svg className="stationStatIconSvg" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="1" y="2" width="14" height="3.5" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="1" y="6.2" width="14" height="3.5" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="1" y="10.4" width="14" height="3.5" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <circle cx="2.8" cy="3.75" r="0.7" />
+      <circle cx="2.8" cy="7.95" r="0.7" />
+      <circle cx="2.8" cy="12.15" r="0.7" />
+      <line x1="4.5" y1="3.75" x2="12" y2="3.75" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+      <line x1="4.5" y1="7.95" x2="12" y2="7.95" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+      <line x1="4.5" y1="12.15" x2="9" y2="12.15" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -350,6 +407,7 @@ export default function App() {
   const selectedRuntime = selectedStation ? runtimeByStation[selectedStation.id] ?? null : null;
   const selectedBrowser = selectedStation ? browserByStation[selectedStation.id] ?? null : null;
   const selectedCapture = selectedStation ? captureByStation[selectedStation.id] ?? null : null;
+  const hasRuntimeData = Object.keys(runtimeByStation).length > 0;
 
   async function loadSnapshot() {
     setLoading(true);
@@ -796,21 +854,13 @@ export default function App() {
 
   return (
     <div className="shell">
-      <header className="hero">
-        <div>
-          <p className="eyebrow">CC Client Migration</p>
-          <h1>CC-rClient</h1>
-          <p className="lede">
-            Rust/Tauri replacement for the legacy Qt workstation console with
-            Rust-native state ownership, legacy import/export, Wake-on-LAN, and
-            direct gRPC control for the completed `CC-rStationService` actions.
-          </p>
-        </div>
-        <div className="heroCard">
-          <span>Stations</span>
-          <strong>{stations.length}</strong>
-          <span>Storage</span>
-          <code>{snapshot?.storagePath ?? "loading..."}</code>
+      <header className={`hero ${hasRuntimeData ? "hero--compact" : "hero--expanded"}`}>
+        <div className="heroBanner">
+          <img
+            src={topBanner}
+            alt="CC-rClient top banner"
+            className="heroBannerImage"
+          />
         </div>
       </header>
 
@@ -965,16 +1015,36 @@ export default function App() {
                           Edit
                         </button>
                       </div>
-                      <span className="stationMeta">{ip}</span>
-                      <span className={`badge ${stationVisualState}`}>
-                        {stationVisualState === "ready"
-                          ? "Ready"
-                          : stationVisualState === "warning"
-                            ? "Warning"
-                            : stationVisualState === "error"
-                              ? "Error"
-                              : "Offline"}
-                      </span>
+                      <div className="stationMeta">
+                        <span className={`badge ${stationVisualState}`}>
+                          {stationVisualState === "ready"
+                            ? "Ready"
+                            : stationVisualState === "warning"
+                              ? "Warning"
+                              : stationVisualState === "error"
+                                ? "Error"
+                                : "Offline"}
+                        </span>
+                        {(runtimeByStation[station.id]) && (
+                          <span className="stationStats">
+                            <span className="stationStatItem" title="CPU">
+                              <CpuIcon />
+                              {runtimeByStation[station.id].cpu.toFixed(0)}%
+                            </span>
+                            <span className="stationStatItem" title="Memory">
+                              <MemoryIcon />
+                              {runtimeByStation[station.id].totalMemory > 0
+                                ? (runtimeByStation[station.id].currentMemory / runtimeByStation[station.id].totalMemory * 100).toFixed(0)
+                                : 0}%
+                            </span>
+                            <span className="stationStatItem" title="Processes">
+                              <ProcessIcon />
+                              {runtimeByStation[station.id].procCount}
+                            </span>
+                          </span>
+                        )}
+                        <span className="stationIp">{ip}</span>
+                      </div>
                     </div>
                   );
                 })
@@ -1686,7 +1756,7 @@ export default function App() {
           <BatchPage stations={stations} />
         </BatchProvider>
       ) : (
-        <main className="grid">
+        <main className="grid gridSettingsMode">
           <section className="panel detailPanel">
             <div className="panelHeader">
               <h2>Client Options</h2>

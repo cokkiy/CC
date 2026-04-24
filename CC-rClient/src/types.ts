@@ -18,6 +18,10 @@ export type Station = {
   startPrograms: StartProgram[];
   monitorProcesses: string[];
   lastAction?: string | null;
+  groups: string[];
+  tags: Record<string, string>;
+  metadata: Record<string, string>;
+  location?: Location;
 };
 
 export type ClientOptions = {
@@ -128,6 +132,20 @@ export type CommandExecutionResult = {
   exitCode: number;
   stdout: string;
   stderr: string;
+};
+
+export type Location = {
+  latitude?: number;
+  longitude?: number;
+  altitude?: number;
+  accuracy?: number;
+  address?: string;
+};
+
+export type TagDefinition = {
+  key: string;
+  label: string;
+  description?: string;
 };
 
 export type StationGroup = {
