@@ -414,6 +414,8 @@ export default function App() {
   const selectedBrowser = selectedStation ? browserByStation[selectedStation.id] ?? null : null;
   const selectedCapture = selectedStation ? captureByStation[selectedStation.id] ?? null : null;
   const hasRuntimeData = Object.keys(runtimeByStation).length > 0;
+  const hasActiveFilter = search.trim().length > 0 || Boolean(groupFilter);
+  const filtersHideStations = stations.length > 0 && filteredStations.length === 0;
 
   async function loadSnapshot() {
     setLoading(true);
@@ -1024,7 +1026,13 @@ export default function App() {
               {loading ? (
                 <p className="emptyState">Loading state…</p>
               ) : filteredStations.length === 0 ? (
-                <p className="emptyState">No stations match the current filter.</p>
+                <p className="emptyState">
+                  {filtersHideStations
+                    ? hasActiveFilter
+                      ? "Current search/group filter is hiding all stations. Clear filters to show them."
+                      : "Stations exist but are currently hidden by filters."
+                    : "No stations configured yet. Add a station to begin."}
+                </p>
               ) : (
                 filteredStations.map((station) => {
                   const ip = station.networkInterfaces[0]?.ips[0] ?? "No IP";

@@ -6,8 +6,14 @@ use roxmltree::Document;
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
 use std::fs;
+use std::net::{TcpStream, ToSocketAddrs};
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 use uuid::Uuid;
+
+const LOCAL_STATION_ID: &str = "local-rstationservice";
+const LOCAL_STATION_NAME: &str = "Local CC-rStationService";
+const LOCAL_STATION_ENDPOINTS: [&str; 2] = ["127.0.0.1:50051", "localhost:50051"];
 
 #[derive(Debug)]
 pub enum StorageError {
@@ -65,7 +71,8 @@ impl StateStore {
 
         if storage_path.exists() {
             let data = fs::read_to_string(&storage_path)?;
-            let payload = normalize_payload(serde_json::from_str::<PersistedState>(&data)?);
+            let mut payload = normalize_payload(serde_json::from_str::<PersistedState>(&data)?);
+            maybe_inject_local_station(&mut payload, local_station_probe_available);
             let normalized_json = serde_json::to_string_pretty(&payload)?;
             if normalized_json != data {
                 fs::write(&storage_path, normalized_json)?;
@@ -80,12 +87,15 @@ impl StateStore {
             });
         }
 
-        let payload = import_legacy_state()?;
-        let legacy_imported = !payload.stations.is_empty()
-            || !payload.options.start_apps.is_empty()
-            || !payload.options.monitor_processes.is_empty()
-            || payload.options.interval != 2
-            || !payload.options.is_first_time_run;
+        let imported_payload = import_legacy_state()?;
+        let legacy_imported = !imported_payload.stations.is_empty()
+            || !imported_payload.options.start_apps.is_empty()
+            || !imported_payload.options.monitor_processes.is_empty()
+            || imported_payload.options.interval != 2
+            || !imported_payload.options.is_first_time_run;
+
+        let mut payload = normalize_payload(imported_payload);
+        maybe_inject_local_station(&mut payload, local_station_probe_available);
 
         let snapshot = Self::save_payload(payload)?;
         Ok(AppSnapshot {
@@ -454,6 +464,101 @@ fn normalize_payload(mut payload: PersistedState) -> PersistedState {
     payload
 }
 
+fn maybe_inject_local_station<F>(payload: &mut PersistedState, probe_available: F) -> bool
+where
+    F: Fn() -> bool,
+{
+    if payload.stations.iter().any(station_matches_localhost) {
+        return false;
+    }
+
+    if !probe_available() {
+        return false;
+    }
+
+    payload.stations.insert(0, build_local_station());
+    true
+}
+
+fn build_local_station() -> Station {
+    Station {
+        id: LOCAL_STATION_ID.to_string(),
+        name: LOCAL_STATION_NAME.to_string(),
+        blocked: false,
+        network_interfaces: vec![NetworkInterface {
+            mac: "loopback".to_string(),
+            ips: LOCAL_STATION_ENDPOINTS
+                .iter()
+                .map(|value| value.to_string())
+                .collect(),
+        }],
+        start_programs: Vec::new(),
+        monitor_processes: Vec::new(),
+        last_action: Some("Auto-discovered local station endpoint".to_string()),
+    }
+}
+
+fn local_station_probe_available() -> bool {
+    let timeout = Duration::from_millis(250);
+    LOCAL_STATION_ENDPOINTS
+        .iter()
+        .filter_map(|endpoint| endpoint.split_once(':'))
+        .filter_map(|(host, port_text)| {
+            port_text
+                .parse::<u16>()
+                .ok()
+                .map(|port| (host.to_string(), port))
+        })
+        .any(|(host, port)| can_connect_to_host_port(&host, port, timeout))
+}
+
+fn can_connect_to_host_port(host: &str, port: u16, timeout: Duration) -> bool {
+    let Ok(addrs) = (host, port).to_socket_addrs() else {
+        return false;
+    };
+
+    addrs
+        .into_iter()
+        .any(|addr| TcpStream::connect_timeout(&addr, timeout).is_ok())
+}
+
+fn station_matches_localhost(station: &Station) -> bool {
+    if station.id.trim().eq_ignore_ascii_case(LOCAL_STATION_ID) {
+        return true;
+    }
+
+    station
+        .network_interfaces
+        .iter()
+        .flat_map(|iface| iface.ips.iter())
+        .any(|ip| ip_matches_localhost(ip))
+}
+
+fn ip_matches_localhost(raw: &str) -> bool {
+    let trimmed = raw.trim().to_ascii_lowercase();
+    if trimmed.is_empty() {
+        return false;
+    }
+
+    let without_scheme = trimmed
+        .strip_prefix("http://")
+        .or_else(|| trimmed.strip_prefix("https://"))
+        .unwrap_or(trimmed.as_str());
+
+    let authority = without_scheme
+        .split('/')
+        .next()
+        .unwrap_or(without_scheme);
+
+    if let Some(stripped) = authority.strip_prefix('[') {
+        let host = stripped.split(']').next().unwrap_or_default();
+        return host == "localhost" || host == "127.0.0.1";
+    }
+
+    let host = authority.split(':').next().unwrap_or(authority);
+    host == "localhost" || host == "127.0.0.1"
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -589,5 +694,46 @@ SavePathForWindows=C:\weather
             payload.stations[0].monitor_processes,
             vec!["vite", "cc-rstationservice"]
         );
+    }
+
+    #[test]
+    fn injects_local_station_when_probe_is_available() {
+        let mut payload = PersistedState::default();
+
+        let inserted = maybe_inject_local_station(&mut payload, || true);
+
+        assert!(inserted);
+        assert_eq!(payload.stations.len(), 1);
+        assert_eq!(payload.stations[0].id, LOCAL_STATION_ID);
+        assert!(payload.stations[0]
+            .network_interfaces
+            .iter()
+            .flat_map(|iface| iface.ips.iter())
+            .any(|ip| ip == "127.0.0.1:50051"));
+    }
+
+    #[test]
+    fn skips_local_station_injection_when_existing_station_matches_localhost() {
+        let mut payload = PersistedState {
+            stations: vec![Station {
+                id: "custom-station".to_string(),
+                name: "Custom".to_string(),
+                blocked: false,
+                network_interfaces: vec![NetworkInterface {
+                    mac: "".to_string(),
+                    ips: vec!["http://localhost:50051".to_string()],
+                }],
+                start_programs: Vec::new(),
+                monitor_processes: Vec::new(),
+                last_action: None,
+            }],
+            ..PersistedState::default()
+        };
+
+        let inserted = maybe_inject_local_station(&mut payload, || true);
+
+        assert!(!inserted);
+        assert_eq!(payload.stations.len(), 1);
+        assert_eq!(payload.stations[0].id, "custom-station");
     }
 }
