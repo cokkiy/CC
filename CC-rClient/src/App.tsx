@@ -30,6 +30,11 @@ import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script"
 import { BatchProvider, useBatch } from "./plugin/batch";
 import { BatchPage } from "./plugin/batch/BatchPage";
 import { BatchUIProvider } from "./plugin/batch/BatchUIContext";
+import { LayoutPresetSelector } from "./plugin/components/LayoutManager";
+import { getAllLayoutPresets } from "./plugin/components/LayoutConfig";
+import { GroupsPage, TagsPage } from "./plugin/groups";
+import { GroupsProvider } from "./plugin/groups/GroupsContext";
+import { TagsProvider } from "./plugin/groups/TagsContext";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -361,8 +366,9 @@ export default function App() {
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
-  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages" | "scripts" | "batch">("stations");
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
+  const [activeLayout, setActiveLayout] = useState<string>("default");
 
   useEffect(() => {
     void loadSnapshot();
@@ -865,6 +871,7 @@ export default function App() {
       </header>
 
       <section className="toolbar">
+        {/* Navigation */}
         <button
           className={activePage === "stations" ? "accent" : ""}
           onClick={() => setActivePage("stations")}
@@ -887,6 +894,12 @@ export default function App() {
           Groups
         </button>
         <button
+          className={activePage === "tags" ? "accent" : ""}
+          onClick={() => setActivePage("tags")}
+        >
+          Tags
+        </button>
+        <button
           className={activePage === "scripts" ? "accent" : ""}
           onClick={() => setActivePage("scripts")}
         >
@@ -898,19 +911,38 @@ export default function App() {
         >
           Batch
         </button>
-        <button onClick={addStation}>Add Station</button>
+
+        <div className="toolbar-divider" />
+
+        {/* Layout */}
+        <LayoutPresetSelector
+          currentPreset={activeLayout}
+          onSelectPreset={(preset) => {
+            setActiveLayout(preset);
+            console.log('[App] Layout changed to:', preset);
+          }}
+        />
+
+        <div className="toolbar-divider" />
+
+        {/* Station Actions */}
+        <button onClick={addStation}>+ Add</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
           Remove
         </button>
         <button onClick={() => void executeAction("power_on", selectedIds)} disabled={!selectedStation}>
           Power On
         </button>
-        <button onClick={() => void executeAction("block", selectedIds)} disabled={!selectedStation}>
-          Block
+        <button onClick={() => void executeAction("shutdown", selectedIds)} disabled={!selectedStation}>
+          Shutdown
         </button>
-        <button onClick={() => void executeAction("unblock", selectedIds)} disabled={!selectedStation}>
-          Unblock
+        <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
+          Reboot
         </button>
+
+        <div className="toolbar-divider" />
+
+        {/* App Control */}
         <button onClick={() => void executeAction("start_app", selectedIds)} disabled={!selectedStation}>
           Start App
         </button>
@@ -920,12 +952,20 @@ export default function App() {
         <button onClick={() => void executeAction("exit_app", selectedIds)} disabled={!selectedStation}>
           Exit App
         </button>
-        <button onClick={() => void executeAction("shutdown", selectedIds)} disabled={!selectedStation}>
-          Shutdown
+
+        <div className="toolbar-divider" />
+
+        {/* Block Control */}
+        <button onClick={() => void executeAction("block", selectedIds)} disabled={!selectedStation}>
+          Block
         </button>
-        <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
-          Reboot
+        <button onClick={() => void executeAction("unblock", selectedIds)} disabled={!selectedStation}>
+          Unblock
         </button>
+
+        <div className="toolbar-divider" />
+
+        {/* Batch Actions */}
         <button onClick={() => void executeAction("batch_power_on", [])} disabled={stations.length === 0}>
           全部开机
         </button>
@@ -935,12 +975,16 @@ export default function App() {
         <button onClick={() => void executeAction("batch_reboot", [])} disabled={stations.length === 0}>
           全部重启
         </button>
+
+        <div className="toolbar-divider" />
+
+        {/* System */}
         <button className="accent" onClick={() => void saveState()} disabled={saving}>
           {saving ? "Saving..." : "Save"}
         </button>
-        <button onClick={() => void exportLegacyFiles()}>Export Legacy</button>
+        <button onClick={() => void exportLegacyFiles()}>Export</button>
         <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
-          {remoteBusy === "batchCapture" ? "批量截图..." : "批量截图"}
+          {remoteBusy === "batchCapture" ? "截图中..." : "截图"}
         </button>
       </section>
 
@@ -1534,215 +1578,13 @@ export default function App() {
           ) : null}
         </main>
       ) : activePage === "groups" ? (
-        <main className="grid">
-          <section className="panel detailPanel" style={{ flex: 1 }}>
-            <div className="panelHeader">
-              <h2>Device Groups</h2>
-              <span className="hint">Organize stations into groups with tags</span>
-            </div>
-
-            <div className="toolbar" style={{ marginBottom: "1rem" }}>
-              <button
-                onClick={() => {
-                  setEditingGroup({
-                    id: "",
-                    name: "",
-                    description: "",
-                    tags: [],
-                    stationIds: []
-                  });
-                }}
-              >
-                + New Group
-              </button>
-            </div>
-
-            {groups.length === 0 ? (
-              <p className="emptyInline">No groups yet. Create one to organize your stations.</p>
-            ) : (
-              <div className="logList">
-                {groups.map((group) => (
-                  <div key={group.id} className="stationCard">
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <strong className="stationName">{group.name}</strong>
-                        {group.description && (
-                          <span className="stationMeta" style={{ marginLeft: "0.5rem" }}>
-                            — {group.description}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <button
-                          onClick={() => setEditingGroup(group)}
-                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem" }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Delete group "${group.name}"?`)) {
-                              void deleteGroup(group.id);
-                            }
-                          }}
-                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem", color: "#d64545" }}
-                        >
-                          Delete
-                        </button>
-                        <button
-                          onClick={() => {
-                            setGroupFilter(group.id);
-                            setActivePage("stations");
-                          }}
-                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem" }}
-                        >
-                          Filter Stations
-                        </button>
-                      </div>
-                    </div>
-                    {group.tags.length > 0 && (
-                      <div style={{ display: "flex", gap: "0.25rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
-                        {group.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            style={{
-                              background: "var(--accent, #1f9d55)",
-                              color: "#fff",
-                              padding: "0.1rem 0.4rem",
-                              borderRadius: "3px",
-                              fontSize: "0.7rem"
-                            }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="stationMeta" style={{ marginTop: "0.25rem" }}>
-                      {group.stationIds.length} station{group.stationIds.length !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {editingGroup && (
-            <section className="panel sidePanel">
-              <div className="panelHeader">
-                <h2>{editingGroup.id ? "Edit Group" : "New Group"}</h2>
-                <button
-                  onClick={() => setEditingGroup(null)}
-                  style={{ fontSize: "0.8rem", padding: "0.2rem 0.5rem" }}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="detailLayout">
-                <label className="field">
-                  <span>Group Name</span>
-                  <input
-                    type="text"
-                    value={editingGroup.name}
-                    onChange={(event) =>
-                      setEditingGroup((g) => g ? { ...g, name: event.target.value } : g)
-                    }
-                    placeholder="e.g. Guangzhou Office, Lab Devices"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Description</span>
-                  <input
-                    type="text"
-                    value={editingGroup.description}
-                    onChange={(event) =>
-                      setEditingGroup((g) => g ? { ...g, description: event.target.value } : g)
-                    }
-                    placeholder="Optional description"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Tags (comma-separated)</span>
-                  <input
-                    type="text"
-                    value={editingGroup.tags.join(", ")}
-                    onChange={(event) =>
-                      setEditingGroup((g) =>
-                        g ? {
-                          ...g,
-                          tags: event.target.value
-                            .split(",")
-                            .map((t) => t.trim())
-                            .filter(Boolean)
-                        } : g
-                      )
-                    }
-                    placeholder="guangzhou, lab, production"
-                  />
-                </label>
-
-                <div className="collection">
-                  <div className="subHeader">
-                    <h3>Assign Stations ({editingGroup.stationIds.length})</h3>
-                  </div>
-                  {stations.length === 0 ? (
-                    <p className="emptyInline">No stations available.</p>
-                  ) : (
-                    <div className="logList">
-                      {stations.map((station) => {
-                        const checked = editingGroup.stationIds.includes(station.id);
-                        return (
-                          <label key={station.id} className="checkField">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={(event) => {
-                                setEditingGroup((g) => {
-                                  if (!g) return g;
-                                  return {
-                                    ...g,
-                                    stationIds: event.target.checked
-                                      ? [...g.stationIds, station.id]
-                                      : g.stationIds.filter((id) => id !== station.id)
-                                  };
-                                });
-                              }}
-                            />
-                            <span>{station.name}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                <div className="toolbar miniToolbar" style={{ marginTop: "1rem" }}>
-                  <button
-                    onClick={() => {
-                      if (!editingGroup.name.trim()) {
-                        setLog((current) => ["Group name is required.", ...current]);
-                        return;
-                      }
-                      if (editingGroup.id) {
-                        void updateGroup(editingGroup);
-                      } else {
-                        void createGroup(editingGroup.name.trim());
-                        setEditingGroup(null);
-                      }
-                    }}
-                    className="accent"
-                  >
-                    {editingGroup.id ? "Save Changes" : "Create Group"}
-                  </button>
-                  <button onClick={() => setEditingGroup(null)}>Cancel</button>
-                </div>
-              </div>
-            </section>
-          )}
-        </main>
+        <GroupsProvider>
+          <GroupsPage stations={stations} />
+        </GroupsProvider>
+      ) : activePage === "tags" ? (
+        <TagsProvider>
+          <TagsPage />
+        </TagsProvider>
       ) : activePage === "scripts" ? (
         <ScriptProvider>
           <ScriptsUIProvider>

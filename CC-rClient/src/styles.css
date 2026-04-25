@@ -250,11 +250,87 @@ body {
   border: 1px solid var(--border-color);
 }
 
+/* Toolbar styles */
+section.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+section.toolbar button {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  border-radius: 5px;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-main);
+  transition: all 0.15s ease;
+}
+
+section.toolbar button:hover:not(:disabled) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(45, 140, 240, 0.25);
+}
+
+section.toolbar button.accent {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+section.toolbar button.accent:hover:not(:disabled) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+section.toolbar button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .toolbar-divider {
   width: 1px;
-  height: 24px;
+  height: 20px;
   background: var(--border-color);
-  margin: 0 4px;
+  margin: 0 2px;
+}
+
+/* Toolbar layout selector */
+.toolbar .layout-preset-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar .layout-preset-selector__label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.toolbar .layout-preset-selector__select {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.toolbar .layout-preset-selector__select:hover {
+  border-color: var(--primary);
 }
 
 /* Base components */
@@ -309,8 +385,8 @@ input:focus, select:focus, textarea:focus {
 .panel, .cardGrid, .programCard, .statTile {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .panel {
@@ -322,13 +398,15 @@ input:focus, select:focus, textarea:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .panelHeader h2 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 .grid {
@@ -357,28 +435,49 @@ input:focus, select:focus, textarea:focus {
 .stationList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .stationCard {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 14px 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.stationCard::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s ease;
 }
 
 .stationCard:hover {
   border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.stationCard:hover::before {
+  background: var(--primary);
 }
 
 .stationCard.selected {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(45, 140, 240, 0.2);
+  box-shadow: 0 0 0 2px rgba(45, 140, 240, 0.15), 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.stationCard.selected::before {
+  background: var(--primary);
 }
 
 .stationCardTopRow {
@@ -454,10 +553,12 @@ input:focus, select:focus, textarea:focus {
 .computerIcon--offline { background: rgba(136, 136, 136, 0.1); color: var(--text-muted); }
 
 .badge {
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .badge.ready { background: var(--success); color: #fff; }
