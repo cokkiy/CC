@@ -75,7 +75,12 @@ export const groupsApi = {
    */
   async createGroup(data: CreateGroupDTO): Promise<StationGroup> {
     try {
-      return await invoke<StationGroup>('create_group', { name: data.name, description: data.description || '' });
+      return await invoke<StationGroup>('create_group', { 
+        name: data.name, 
+        description: data.description || '',
+        tags: data.tags || [],
+        station_ids: [],
+      });
     } catch (error) {
       console.error('[GroupsApi] Failed to create group:', error);
       throw error;
@@ -89,7 +94,7 @@ export const groupsApi = {
     try {
       return await invoke<StationGroup>('update_group', {
         id,
-        name: data.name,
+        name: data.name || '',
         description: data.description || '',
         tags: data.tags || [],
         station_ids: data.stationIds || [],

@@ -35,6 +35,7 @@ export type PersistedState = {
   stations: Station[];
   options: ClientOptions;
   groups: StationGroup[];
+  tags: TagDefinition[];
 };
 
 export type AppSnapshot = PersistedState & {
@@ -143,9 +144,15 @@ export type Location = {
 };
 
 export type TagDefinition = {
-  key: string;
-  label: string;
-  description?: string;
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  created_at?: string;
+  updated_at?: string;
+  // UI aliases
+  label?: string;
+  key?: string;
 };
 
 export type StationGroup = {
@@ -154,6 +161,10 @@ export type StationGroup = {
   description: string;
   tags: string[];
   stationIds: string[];
+  // Optional UI fields
+  color?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type BatchCapture = {

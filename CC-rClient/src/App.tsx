@@ -35,6 +35,7 @@ import { getAllLayoutPresets } from "./plugin/components/LayoutConfig";
 import { GroupsPage, TagsPage } from "./plugin/groups";
 import { GroupsProvider } from "./plugin/groups/GroupsContext";
 import { TagsProvider } from "./plugin/groups/TagsContext";
+import type { TagDefinition } from "./plugin/groups/types";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -365,6 +366,8 @@ export default function App() {
   const [commandOutput, setCommandOutput] = useState<CommandExecutionResult | null>(null);
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
+  const [tagFilter, setTagFilter] = useState<string>("");
+  const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>([]);
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
   const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
@@ -396,6 +399,11 @@ export default function App() {
       }
     }
 
+    // Tag filter: show only stations with the selected tag
+    if (tagFilter) {
+      next = next.filter((s) => (s.tags || {}).hasOwnProperty(tagFilter));
+    }
+
     return next.sort((left, right) => {
       if (sortBy === "ip") {
         const leftIp = left.networkInterfaces[0]?.ips[0] ?? "";
@@ -404,7 +412,7 @@ export default function App() {
       }
       return left.name.localeCompare(right.name, undefined, { numeric: true });
     });
-  }, [search, sortBy, stations, groupFilter, groups]);
+  }, [search, sortBy, stations, groupFilter, tagFilter, groups]);
 
   const selectedStation =
     filteredStations.find((station) => station.id === selectedId) ??
@@ -414,7 +422,7 @@ export default function App() {
   const selectedBrowser = selectedStation ? browserByStation[selectedStation.id] ?? null : null;
   const selectedCapture = selectedStation ? captureByStation[selectedStation.id] ?? null : null;
   const hasRuntimeData = Object.keys(runtimeByStation).length > 0;
-  const hasActiveFilter = search.trim().length > 0 || Boolean(groupFilter);
+  const hasActiveFilter = search.trim().length > 0 || Boolean(groupFilter) || Boolean(tagFilter);
   const filtersHideStations = stations.length > 0 && filteredStations.length === 0;
 
   async function loadSnapshot() {
@@ -425,6 +433,7 @@ export default function App() {
       setStations(next.stations);
       setOptions(next.options);
       setGroups(next.groups ?? []);
+      setTagDefinitions(next.tags ?? []);
       setSelectedId(next.stations[0]?.id ?? "");
       setLog((current) => [
         next.legacyImported
@@ -472,7 +481,7 @@ export default function App() {
   async function saveState() {
     setSaving(true);
     try {
-      const payload: PersistedState = { stations, options, groups };
+      const payload: PersistedState = { stations, options, groups, tags: tagDefinitions };
       const next = await invoke<AppSnapshot>("save_state", { payload });
       setSnapshot(next);
       setStations(next.stations);
@@ -789,6 +798,15 @@ export default function App() {
     }
   }
 
+  async function loadTagDefinitions() {
+    try {
+      const result = await invoke<TagDefinition[]>("load_tag_definitions");
+      setTagDefinitions(result);
+    } catch (error) {
+      setLog((current) => [`Failed to load tag definitions: ${String(error)}`, ...current]);
+    }
+  }
+
   async function createGroup(name: string) {
     try {
       const group = await invoke<StationGroup>("create_station_group", { name });
@@ -897,7 +915,10 @@ export default function App() {
         </button>
         <button
           className={activePage === "tags" ? "accent" : ""}
-          onClick={() => setActivePage("tags")}
+          onClick={() => {
+            setActivePage("tags");
+            void loadTagDefinitions();
+          }}
         >
           Tags
         </button>
@@ -1019,6 +1040,17 @@ export default function App() {
                     ))}
                   </select>
                 )}
+                {tagDefinitions.length > 0 && (
+                  <select
+                    value={tagFilter}
+                    onChange={(event) => setTagFilter(event.target.value)}
+                  >
+                    <option value="">All Tags</option>
+                    {tagDefinitions.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -1029,7 +1061,7 @@ export default function App() {
                 <p className="emptyState">
                   {filtersHideStations
                     ? hasActiveFilter
-                      ? "Current search/group filter is hiding all stations. Clear filters to show them."
+                      ? "Current search/group/tag filter is hiding all stations. Clear filters to show them."
                       : "Stations exist but are currently hidden by filters."
                     : "No stations configured yet. Add a station to begin."}
                 </p>
