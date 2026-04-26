@@ -240,6 +240,10 @@ fn load_legacy_stations() -> Result<Vec<Station>, StorageError> {
                 start_programs,
                 monitor_processes,
                 last_action: Some("Imported from legacy XML".into()),
+                groups: Vec::new(),
+                tags: std::collections::HashMap::new(),
+                metadata: std::collections::HashMap::new(),
+                location: None,
             }
         })
         .collect::<Vec<_>>();
@@ -495,6 +499,10 @@ fn build_local_station() -> Station {
         start_programs: Vec::new(),
         monitor_processes: Vec::new(),
         last_action: Some("Auto-discovered local station endpoint".to_string()),
+        groups: Vec::new(),
+        tags: std::collections::HashMap::new(),
+        metadata: std::collections::HashMap::new(),
+        location: None,
     }
 }
 
@@ -625,6 +633,10 @@ SavePathForWindows=C:\weather
             }],
             monitor_processes: vec!["proc1".into()],
             last_action: None,
+            groups: Vec::new(),
+            tags: std::collections::HashMap::new(),
+            metadata: std::collections::HashMap::new(),
+            location: None,
         }]);
 
         assert!(xml.contains("<指显工作站信息>"));
@@ -726,6 +738,10 @@ SavePathForWindows=C:\weather
                 start_programs: Vec::new(),
                 monitor_processes: Vec::new(),
                 last_action: None,
+                groups: Vec::new(),
+                tags: std::collections::HashMap::new(),
+                metadata: std::collections::HashMap::new(),
+                location: None,
             }],
             ..PersistedState::default()
         };

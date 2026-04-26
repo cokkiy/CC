@@ -75,6 +75,9 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
       setState(prev => ({
         ...prev,
         groups,
+        selectedGroup: prev.selectedGroup
+          ? groups.find((g) => g.id === prev.selectedGroup!.id) ?? null
+          : null,
         isLoading: false,
       }));
     } catch (err) {
@@ -88,55 +91,30 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
 
   const createGroup = useCallback(async (data: CreateGroupDTO) => {
     const group = await groupsApi.createGroup(data);
-    setState(prev => ({
-      ...prev,
-      groups: [...prev.groups, group],
-    }));
+    await loadGroups();
     return group;
-  }, []);
+  }, [loadGroups]);
 
   const updateGroup = useCallback(async (id: string, data: UpdateGroupDTO) => {
     const group = await groupsApi.updateGroup(id, data);
-    setState(prev => ({
-      ...prev,
-      groups: prev.groups.map(g => (g.id === id ? group : g)),
-      selectedGroup: prev.selectedGroup?.id === id ? group : prev.selectedGroup,
-    }));
+    await loadGroups();
     return group;
-  }, []);
+  }, [loadGroups]);
 
   const deleteGroup = useCallback(async (id: string) => {
     await groupsApi.deleteGroup(id);
-    setState(prev => ({
-      ...prev,
-      groups: prev.groups.filter(g => g.id !== id),
-      selectedGroup: prev.selectedGroup?.id === id ? null : prev.selectedGroup,
-    }));
-  }, []);
+    await loadGroups();
+  }, [loadGroups]);
 
   const addStationToGroup = useCallback(async (groupId: string, stationId: string) => {
     await groupsApi.addStationToGroup(groupId, stationId);
-    setState(prev => ({
-      ...prev,
-      groups: prev.groups.map(g =>
-        g.id === groupId
-          ? { ...g, station_ids: [...(g.station_ids || []), stationId] }
-          : g
-      ),
-    }));
-  }, []);
+    await loadGroups();
+  }, [loadGroups]);
 
   const removeStationFromGroup = useCallback(async (groupId: string, stationId: string) => {
     await groupsApi.removeStationFromGroup(groupId, stationId);
-    setState(prev => ({
-      ...prev,
-      groups: prev.groups.map(g =>
-        g.id === groupId
-          ? { ...g, station_ids: (g.station_ids || []).filter((id: string) => id !== stationId) }
-          : g
-      ),
-    }));
-  }, []);
+    await loadGroups();
+  }, [loadGroups]);
 
   const selectGroup = useCallback((group: StationGroup | null) => {
     setState(prev => ({ ...prev, selectedGroup: group }));

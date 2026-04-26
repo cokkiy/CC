@@ -53,6 +53,18 @@ interface GroupStatsResult {
   stationCount: number;
 }
 
+type RawStationGroup = Omit<StationGroup, 'station_ids'> & {
+  station_ids?: string[];
+  stationIds?: string[];
+};
+
+function normalizeStationGroup(group: RawStationGroup): StationGroup {
+  return {
+    ...group,
+    station_ids: group.station_ids ?? group.stationIds ?? [],
+  };
+}
+
 // ============================================
 // Groups API
 // ============================================
@@ -63,7 +75,8 @@ export const groupsApi = {
    */
   async loadGroups(): Promise<StationGroup[]> {
     try {
-      return await invoke<StationGroup[]>('load_groups');
+      const groups = await invoke<RawStationGroup[]>('load_groups');
+      return groups.map(normalizeStationGroup);
     } catch (error) {
       console.error('[GroupsApi] Failed to load groups:', error);
       throw error;
@@ -75,12 +88,13 @@ export const groupsApi = {
    */
   async createGroup(data: CreateGroupDTO): Promise<StationGroup> {
     try {
-      return await invoke<StationGroup>('create_group', { 
+      const group = await invoke<RawStationGroup>('create_group', {
         name: data.name, 
         description: data.description || '',
         tags: data.tags || [],
         station_ids: [],
       });
+      return normalizeStationGroup(group);
     } catch (error) {
       console.error('[GroupsApi] Failed to create group:', error);
       throw error;
@@ -92,13 +106,15 @@ export const groupsApi = {
    */
   async updateGroup(id: string, data: UpdateGroupDTO): Promise<StationGroup> {
     try {
-      return await invoke<StationGroup>('update_group', {
+      const group = await invoke<RawStationGroup>('update_group', {
         id,
         name: data.name || '',
         description: data.description || '',
         tags: data.tags || [],
         station_ids: data.stationIds || [],
+        stationIds: data.stationIds || [],
       });
+      return normalizeStationGroup(group);
     } catch (error) {
       console.error('[GroupsApi] Failed to update group:', error);
       throw error;
@@ -110,7 +126,7 @@ export const groupsApi = {
    */
   async deleteGroup(groupId: string): Promise<void> {
     try {
-      await invoke<string>('delete_group', { group_id: groupId });
+      await invoke<string>('delete_group', { group_id: groupId, groupId });
     } catch (error) {
       console.error('[GroupsApi] Failed to delete group:', error);
       throw error;
@@ -122,7 +138,13 @@ export const groupsApi = {
    */
   async addStationToGroup(groupId: string, stationId: string): Promise<StationGroup> {
     try {
-      return await invoke<StationGroup>('add_station_to_group', { group_id: groupId, station_id: stationId });
+      const group = await invoke<RawStationGroup>('add_station_to_group', {
+        group_id: groupId,
+        station_id: stationId,
+        groupId,
+        stationId,
+      });
+      return normalizeStationGroup(group);
     } catch (error) {
       console.error('[GroupsApi] Failed to add station to group:', error);
       throw error;
@@ -134,7 +156,13 @@ export const groupsApi = {
    */
   async removeStationFromGroup(groupId: string, stationId: string): Promise<StationGroup> {
     try {
-      return await invoke<StationGroup>('remove_station_from_group', { group_id: groupId, station_id: stationId });
+      const group = await invoke<RawStationGroup>('remove_station_from_group', {
+        group_id: groupId,
+        station_id: stationId,
+        groupId,
+        stationId,
+      });
+      return normalizeStationGroup(group);
     } catch (error) {
       console.error('[GroupsApi] Failed to remove station from group:', error);
       throw error;
@@ -146,7 +174,7 @@ export const groupsApi = {
    */
   async getStationsInGroup(groupId: string): Promise<string[]> {
     try {
-      return await invoke<string[]>('get_stations_in_group', { group_id: groupId });
+      return await invoke<string[]>('get_stations_in_group', { group_id: groupId, groupId });
     } catch (error) {
       console.error('[GroupsApi] Failed to get stations in group:', error);
       throw error;
@@ -158,7 +186,8 @@ export const groupsApi = {
    */
   async exportGroups(): Promise<StationGroup[]> {
     try {
-      return await invoke<StationGroup[]>('export_groups');
+      const groups = await invoke<RawStationGroup[]>('export_groups');
+      return groups.map(normalizeStationGroup);
     } catch (error) {
       console.error('[GroupsApi] Failed to export groups:', error);
       throw error;
@@ -170,8 +199,11 @@ export const groupsApi = {
    */
   async getGroupStats(): Promise<GroupStatsResult[]> {
     try {
-      const groups = await invoke<StationGroup[]>('get_group_stats');
-      return groups.map(g => ({ groupId: g.id, stationCount: g.station_ids?.length || 0 }));
+      const groups = await invoke<RawStationGroup[]>('get_group_stats');
+      return groups.map(g => {
+        const normalized = normalizeStationGroup(g);
+        return { groupId: normalized.id, stationCount: normalized.station_ids.length };
+      });
     } catch (error) {
       console.error('[GroupsApi] Failed to get group stats:', error);
       throw error;

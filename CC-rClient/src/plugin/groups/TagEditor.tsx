@@ -80,23 +80,28 @@ export const TagDefinitionList: React.FC<{
               <p>No tag definitions yet</p>
             ) : <p>No tags match your search</p>}
           </div>
-        ) : filteredTags.map(tag => (
-          <div key={tag.key} className={`tag-card ${selectedTag?.key === tag.key ? 'selected' : ''}`}>
+        ) : filteredTags.map(tag => {
+          const tagKey = tag.key || tag.id;
+          const tagLabel = tag.label || tag.name || tagKey;
+          const selectedTagKey = selectedTag?.key || selectedTag?.id;
+          return (
+          <div key={tagKey} className={`tag-card ${selectedTagKey === tagKey ? 'selected' : ''}`}>
             <div className="tag-card-header">
-              <span className="tag-key">{tag.key}</span>
-              <span className="tag-type">{tag.type}</span>
+              <span className="tag-key">{tagKey}</span>
+              <span className="tag-type">{tag.type || 'string'}</span>
             </div>
-            <div className="tag-card-label">{tag.label}</div>
+            <div className="tag-card-label">{tagLabel}</div>
             {tag.description && <div className="tag-card-desc">{tag.description}</div>}
             {tag.options && tag.options.length > 0 && (
               <div className="tag-options">{tag.options.join(', ')}</div>
             )}
             <div className="tag-card-actions">
+              <button className="tag-action-btn" onClick={() => onSelectTag(tag)}>Select</button>
               <button className="tag-action-btn" onClick={() => onEditTag(tag)}>Edit</button>
-              <button className="tag-action-btn delete" onClick={() => onDeleteTag(tag.key || tag.id)}>Delete</button>
+              <button className="tag-action-btn delete" onClick={() => onDeleteTag(tagKey)}>Delete</button>
             </div>
           </div>
-        ))}
+        )})}
       </div>
       <style>{`
         .tag-def-list { display: flex; flex-direction: column; height: 100%; }

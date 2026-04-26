@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -27,6 +28,20 @@ pub struct Station {
     pub start_programs: Vec<StartProgram>,
     pub monitor_processes: Vec<String>,
     pub last_action: Option<String>,
+    pub groups: Vec<String>,
+    pub tags: HashMap<String, String>,
+    pub metadata: HashMap<String, String>,
+    pub location: Option<Location>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct Location {
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub altitude: Option<f64>,
+    pub accuracy: Option<f64>,
+    pub address: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

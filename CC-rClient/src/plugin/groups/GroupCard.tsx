@@ -18,7 +18,7 @@ export interface GroupListProps {
   onSelectGroup: (group: StationGroup | null) => void;
   onEditGroup: (group: StationGroup) => void;
   onDeleteGroup: (groupId: string) => void;
-  onAddStation: (groupId: string, stationId: string) => void;
+  onAddStation: (groupId: string, stationId: string) => Promise<void>;
   onRemoveStation: (groupId: string, stationId: string) => void;
   onCreateGroup: () => void;
   onImport: (groups: StationGroup[]) => void;
@@ -32,7 +32,7 @@ export interface GroupCardProps {
   onSelect: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onAddStation: (stationId: string) => void;
+  onAddStation: (stationId: string) => Promise<void>;
   onRemoveStation: (stationId: string) => void;
 }
 
@@ -51,6 +51,13 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   onRemoveStation,
 }) => {
   const [showStationPicker, setShowStationPicker] = useState(false);
+  const [stationToAdd, setStationToAdd] = useState('');
+  const [isAddingStation, setIsAddingStation] = useState(false);
+  const [addNotice, setAddNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const clearNoticeLater = () => {
+    window.setTimeout(() => setAddNotice(null), 2200);
+  };
 
   // Get station objects for this group
   const groupStations = group.station_ids
@@ -135,23 +142,56 @@ export const GroupCard: React.FC<GroupCardProps> = ({
         </button>
       </div>
 
-      {showStationPicker && availableStations.length > 0 && (
+      {showStationPicker && (
         <div className="station-picker" onClick={(e) => e.stopPropagation()}>
-          <h4>Select Stations</h4>
-          <div className="station-list">
-            {availableStations.map(station => (
-              <label key={station.id} className="station-option">
-                <input
-                  type="checkbox"
-                  checked={(group.station_ids || []).includes(station.id)}
-                  onChange={() => handleStationToggle(station.id)}
-                />
-                <span>{station.name}</span>
-              </label>
-            ))}
-          </div>
+          <h4>Add Station To Group</h4>
+          {availableStations.length === 0 ? (
+            <p className="station-picker-empty">All stations are already assigned to this group.</p>
+          ) : (
+            <div className="station-picker-inline">
+              <select
+                value={stationToAdd}
+                onChange={(e) => setStationToAdd(e.target.value)}
+              >
+                <option value="">Select a station</option>
+                {availableStations.map((station) => (
+                  <option key={station.id} value={station.id}>
+                    {station.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!stationToAdd) return;
+                  const stationName = availableStations.find((station) => station.id === stationToAdd)?.name;
+                  setIsAddingStation(true);
+                  try {
+                    await onAddStation(stationToAdd);
+                    if (stationName) {
+                      setAddNotice({ type: 'success', message: `Added ${stationName}` });
+                      clearNoticeLater();
+                    }
+                    setStationToAdd('');
+                    setShowStationPicker(false);
+                  } catch (error) {
+                    const reason = error instanceof Error ? error.message : String(error);
+                    setAddNotice({ type: 'error', message: `Failed to add station: ${reason}` });
+                    clearNoticeLater();
+                  } finally {
+                    setIsAddingStation(false);
+                  }
+                }}
+                disabled={!stationToAdd || isAddingStation}
+              >
+                {isAddingStation ? 'Adding...' : 'Add'}
+              </button>
+            </div>
+          )}
         </div>
       )}
+
+      {addNotice ? <p className={`station-added-notice ${addNotice.type}`}>{addNotice.message}</p> : null}
 
       <style>{`
         .group-card {
@@ -352,6 +392,63 @@ export const GroupCard: React.FC<GroupCardProps> = ({
           margin: 0 0 8px;
           font-size: 0.85rem;
           color: var(--text-main);
+        }
+
+        .station-picker-empty {
+          margin: 0;
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+        }
+
+        .station-picker-inline {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+
+        .station-picker-inline select {
+          flex: 1;
+          min-width: 0;
+          padding: 6px 8px;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: var(--bg-main);
+          color: var(--text-main);
+          font-size: 0.82rem;
+        }
+
+        .station-picker-inline button {
+          padding: 6px 10px;
+          border: 1px solid var(--primary);
+          border-radius: 6px;
+          background: var(--primary);
+          color: white;
+          font-size: 0.78rem;
+          cursor: pointer;
+        }
+
+        .station-picker-inline button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .station-added-notice {
+          margin: 8px 0 0;
+          font-size: 0.75rem;
+          border-radius: 6px;
+          padding: 6px 8px;
+        }
+
+        .station-added-notice.success {
+          color: #0f5132;
+          background: #d1e7dd;
+          border: 1px solid #badbcc;
+        }
+
+        .station-added-notice.error {
+          color: #842029;
+          background: #f8d7da;
+          border: 1px solid #f5c2c7;
         }
 
         .station-list {

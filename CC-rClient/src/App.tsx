@@ -377,6 +377,12 @@ export default function App() {
     void loadSnapshot();
   }, []);
 
+  useEffect(() => {
+    if (activePage === "stations") {
+      void loadSnapshot();
+    }
+  }, [activePage]);
+
   const filteredStations = useMemo(() => {
     const lowered = search.trim().toLowerCase();
     let next = stations.filter((station) => {
@@ -395,7 +401,7 @@ export default function App() {
     if (groupFilter) {
       const group = groups.find((g) => g.id === groupFilter);
       if (group) {
-        next = next.filter((s) => group.stationIds.includes(s.id));
+        next = next.filter((s) => (group.stationIds || []).includes(s.id));
       }
     }
 
@@ -824,7 +830,8 @@ export default function App() {
         name: group.name,
         description: group.description,
         tags: group.tags,
-        stationIds: group.stationIds
+        stationIds: group.stationIds,
+        station_ids: group.stationIds,
       });
       setGroups((current) =>
         current.map((g) => (g.id === updated.id ? updated : g))
@@ -874,6 +881,87 @@ export default function App() {
 
   function patchPrograms(nextPrograms: StartProgram[]) {
     patchSelected({ startPrograms: nextPrograms });
+  }
+
+  async function patchSelectedGroups(nextGroupIds: string[]) {
+    if (!selectedStation) {
+      return;
+    }
+
+    const previousGroupIds = selectedStation.groups ?? [];
+    const uniqueGroupIds = Array.from(new Set(nextGroupIds));
+
+    patchSelected({ groups: uniqueGroupIds });
+
+    setGroups((current) =>
+      current.map((group) => {
+        const stationIds = group.stationIds ?? [];
+        const shouldContainStation = uniqueGroupIds.includes(group.id);
+        const alreadyContainsStation = stationIds.includes(selectedStation.id);
+
+        if (shouldContainStation && !alreadyContainsStation) {
+          return { ...group, stationIds: [...stationIds, selectedStation.id] };
+        }
+
+        if (!shouldContainStation && alreadyContainsStation) {
+          return {
+            ...group,
+            stationIds: stationIds.filter((id) => id !== selectedStation.id),
+          };
+        }
+
+        return group;
+      }),
+    );
+
+    try {
+      const previousSet = new Set(previousGroupIds);
+      const nextSet = new Set(uniqueGroupIds);
+
+      for (const groupId of uniqueGroupIds) {
+        if (!previousSet.has(groupId)) {
+          await invoke("add_station_to_group", {
+            group_id: groupId,
+            station_id: selectedStation.id,
+            groupId,
+            stationId: selectedStation.id,
+          });
+        }
+      }
+
+      for (const groupId of previousGroupIds) {
+        if (!nextSet.has(groupId)) {
+          await invoke("remove_station_from_group", {
+            group_id: groupId,
+            station_id: selectedStation.id,
+            groupId,
+            stationId: selectedStation.id,
+          });
+        }
+      }
+
+      await loadGroups();
+    } catch (error) {
+      setLog((current) => [
+        `Failed to sync station-group membership: ${String(error)}`,
+        ...current,
+      ]);
+    }
+  }
+
+  function patchSelectedTagValue(tagKey: string, value: string) {
+    if (!selectedStation) {
+      return;
+    }
+
+    const nextTags = { ...(selectedStation.tags ?? {}) };
+    if (!value.trim()) {
+      delete nextTags[tagKey];
+    } else {
+      nextTags[tagKey] = value;
+    }
+
+    patchSelected({ tags: nextTags });
   }
 
   const selectedIds = selectedStation ? [selectedStation.id] : [];
@@ -1309,6 +1397,101 @@ export default function App() {
                       }
                     />
                   </label>
+
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Group Membership</h3>
+                    </div>
+                    {groups.length === 0 ? (
+                      <p className="emptyInline">No groups defined yet. Create groups in the Groups page.</p>
+                    ) : (
+                      <div className="cardGrid">
+                        {groups.map((group) => {
+                          const checked = (selectedStation.groups ?? []).includes(group.id);
+                          return (
+                            <label key={group.id} className="checkField" style={{ alignSelf: 'end' }}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(event) => {
+                                  if (event.target.checked) {
+                                    void patchSelectedGroups([...(selectedStation.groups ?? []), group.id]);
+                                  } else {
+                                    void patchSelectedGroups((selectedStation.groups ?? []).filter((id) => id !== group.id));
+                                  }
+                                }}
+                              />
+                              <span>{group.name}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Station Tags</h3>
+                    </div>
+                    {tagDefinitions.length === 0 ? (
+                      <p className="emptyInline">No tag definitions yet. Create tags in the Tags page.</p>
+                    ) : (
+                      <div className="cardGrid">
+                        {tagDefinitions.map((definition) => {
+                          const tagKey = definition.key || definition.id;
+                          const tagLabel = definition.label || definition.name || tagKey;
+                          const currentValue = (selectedStation.tags ?? {})[tagKey] ?? '';
+
+                          if (definition.type === 'boolean') {
+                            return (
+                              <label className="field" key={tagKey}>
+                                <span>{tagLabel}</span>
+                                <select
+                                  value={currentValue}
+                                  onChange={(event) => patchSelectedTagValue(tagKey, event.target.value)}
+                                >
+                                  <option value="">Unset</option>
+                                  <option value="true">True</option>
+                                  <option value="false">False</option>
+                                </select>
+                              </label>
+                            );
+                          }
+
+                          if (definition.type === 'select' && definition.options && definition.options.length > 0) {
+                            return (
+                              <label className="field" key={tagKey}>
+                                <span>{tagLabel}</span>
+                                <select
+                                  value={currentValue}
+                                  onChange={(event) => patchSelectedTagValue(tagKey, event.target.value)}
+                                >
+                                  <option value="">Unset</option>
+                                  {definition.options.map((option) => (
+                                    <option key={option} value={option}>
+                                      {option}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            );
+                          }
+
+                          return (
+                            <label className="field" key={tagKey}>
+                              <span>{tagLabel}</span>
+                              <input
+                                type={definition.type === 'number' ? 'number' : 'text'}
+                                value={currentValue}
+                                onChange={(event) => patchSelectedTagValue(tagKey, event.target.value)}
+                                placeholder={`Value for ${tagLabel}`}
+                              />
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </section>
@@ -1623,7 +1806,7 @@ export default function App() {
         </GroupsProvider>
       ) : activePage === "tags" ? (
         <TagsProvider>
-          <TagsPage />
+          <TagsPage stations={stations} />
         </TagsProvider>
       ) : activePage === "scripts" ? (
         <ScriptProvider>

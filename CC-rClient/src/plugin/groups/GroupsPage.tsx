@@ -31,6 +31,12 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const pushNotice = (type: 'success' | 'error', message: string) => {
+    setNotice({ type, message });
+    window.setTimeout(() => setNotice(null), 2800);
+  };
 
   // Open editor for new group
   const handleCreateGroup = () => {
@@ -73,8 +79,10 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
     setIsLoading(true);
     try {
       await deleteGroup(groupId);
+      pushNotice('success', 'Group deleted successfully.');
     } catch (error) {
       console.error('[GroupsPage] Failed to delete group:', error);
+      pushNotice('error', `Failed to delete group: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +92,10 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
   const handleAddStationToGroup = async (groupId: string, stationId: string) => {
     try {
       await addStationToGroup(groupId, stationId);
+      pushNotice('success', 'Station added to group.');
     } catch (error) {
-      console.error('[GroupsPage] Failed to add station to group:', error);
+      pushNotice('error', `Failed to add station to group: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
     }
   };
 
@@ -93,8 +103,10 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
   const handleRemoveStationFromGroup = async (groupId: string, stationId: string) => {
     try {
       await removeStationFromGroup(groupId, stationId);
+      pushNotice('success', 'Station removed from group.');
     } catch (error) {
-      console.error('[GroupsPage] Failed to remove station from group:', error);
+      pushNotice('error', `Failed to remove station from group: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
     }
   };
 
@@ -138,6 +150,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
     <div className="groups-page-shell">
       <main className="grid gridGroupsMode groups-main-grid">
         <section className="panel groups-main-panel">
+          {notice ? <p className={`groups-notice ${notice.type}`}>{notice.message}</p> : null}
           <GroupList
             groups={groups}
             stations={stations}
@@ -181,6 +194,26 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
           padding: 0;
           overflow: hidden;
           min-height: calc(100vh - 64px - 48px);
+        }
+
+        .groups-notice {
+          margin: 12px 16px 0;
+          padding: 8px 10px;
+          border-radius: 8px;
+          font-size: 0.82rem;
+          border: 1px solid var(--border-color);
+        }
+
+        .groups-notice.success {
+          color: #0f5132;
+          background: #d1e7dd;
+          border-color: #badbcc;
+        }
+
+        .groups-notice.error {
+          color: #842029;
+          background: #f8d7da;
+          border-color: #f5c2c7;
         }
 
         .groups-layer {

@@ -6,6 +6,7 @@ use remote::{
     RemoteFileBrowserResult, StationRuntimeSnapshot, StationScreenCapture,
 };
 use storage::StateStore;
+use std::collections::HashMap;
 use tokio::sync::RwLock;
 use ws_bridge::MqttWsBridge;
 
@@ -255,11 +256,29 @@ fn update_group(id: String, name: String, description: String, tags: Vec<String>
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
     let group = snapshot.groups.iter_mut().find(|g| g.id == id)
         .ok_or_else(|| format!("No group found for id {id}"))?;
+
+    let previous_station_ids = group.station_ids.clone();
+
     group.name = name;
     group.description = description;
     group.tags = tags;
     group.station_ids = station_ids;
     let updated = group.clone();
+
+    // Keep reverse mapping in sync: station.groups must reflect group membership.
+    for station in &mut snapshot.stations {
+        let was_in_group = previous_station_ids.iter().any(|sid| sid == &station.id);
+        let is_in_group = updated.station_ids.iter().any(|sid| sid == &station.id);
+
+        if is_in_group && !station.groups.iter().any(|gid| gid == &id) {
+            station.groups.push(id.clone());
+        }
+
+        if was_in_group && !is_in_group {
+            station.groups.retain(|gid| gid != &id);
+        }
+    }
+
     StateStore::save_payload(PersistedState {
         stations: snapshot.stations,
         options: snapshot.options,
@@ -273,11 +292,25 @@ fn update_group(id: String, name: String, description: String, tags: Vec<String>
 #[tauri::command]
 fn delete_group(group_id: String) -> Result<String, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let removed_station_ids = snapshot
+        .groups
+        .iter()
+        .find(|g| g.id == group_id)
+        .map(|g| g.station_ids.clone())
+        .ok_or_else(|| format!("No group found for id {group_id}"))?;
+
     let initial_len = snapshot.groups.len();
     snapshot.groups.retain(|g| g.id != group_id);
     if snapshot.groups.len() == initial_len {
         return Err(format!("No group found for id {group_id}"));
     }
+
+    for station in &mut snapshot.stations {
+        if removed_station_ids.iter().any(|sid| sid == &station.id) {
+            station.groups.retain(|gid| gid != &group_id);
+        }
+    }
+
     StateStore::save_payload(PersistedState {
         stations: snapshot.stations,
         options: snapshot.options,
@@ -294,8 +327,18 @@ fn add_station_to_group(group_id: String, station_id: String) -> Result<StationG
     let group = snapshot.groups.iter_mut().find(|g| g.id == group_id)
         .ok_or_else(|| format!("No group found for id {group_id}"))?;
     if !group.station_ids.contains(&station_id) {
-        group.station_ids.push(station_id);
+        group.station_ids.push(station_id.clone());
     }
+
+    for station in &mut snapshot.stations {
+        if station.id == station_id {
+            if !station.groups.iter().any(|gid| gid == &group_id) {
+                station.groups.push(group_id.clone());
+            }
+            break;
+        }
+    }
+
     let updated = group.clone();
     StateStore::save_payload(PersistedState {
         stations: snapshot.stations,
@@ -313,6 +356,14 @@ fn remove_station_from_group(group_id: String, station_id: String) -> Result<Sta
     let group = snapshot.groups.iter_mut().find(|g| g.id == group_id)
         .ok_or_else(|| format!("No group found for id {group_id}"))?;
     group.station_ids.retain(|id| id != &station_id);
+
+    for station in &mut snapshot.stations {
+        if station.id == station_id {
+            station.groups.retain(|gid| gid != &group_id);
+            break;
+        }
+    }
+
     let updated = group.clone();
     StateStore::save_payload(PersistedState {
         stations: snapshot.stations,
@@ -413,6 +464,70 @@ fn delete_tag_definition(key: String) -> Result<String, String> {
 fn export_tag_definitions() -> Result<Vec<TagDefinition>, String> {
     let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
     Ok(snapshot.tags)
+}
+
+#[tauri::command]
+fn get_station_tags(station_id: String) -> Result<HashMap<String, String>, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let station = snapshot
+        .stations
+        .iter()
+        .find(|station| station.id == station_id)
+        .ok_or_else(|| format!("No station found for id {station_id}"))?;
+    Ok(station.tags.clone())
+}
+
+#[tauri::command]
+fn update_station_tags(
+    station_id: String,
+    tags: HashMap<String, String>,
+) -> Result<HashMap<String, String>, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let station = snapshot
+        .stations
+        .iter_mut()
+        .find(|station| station.id == station_id)
+        .ok_or_else(|| format!("No station found for id {station_id}"))?;
+
+    station.tags = tags.clone();
+
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+
+    Ok(tags)
+}
+
+#[tauri::command]
+fn batch_update_station_tags(
+    station_ids: Vec<String>,
+    tags: HashMap<String, String>,
+) -> Result<String, String> {
+    let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let mut updated = 0usize;
+
+    for station in &mut snapshot.stations {
+        if station_ids.iter().any(|id| id == &station.id) {
+            for (key, value) in &tags {
+                station.tags.insert(key.clone(), value.clone());
+            }
+            updated += 1;
+        }
+    }
+
+    StateStore::save_payload(PersistedState {
+        stations: snapshot.stations,
+        options: snapshot.options,
+        groups: snapshot.groups,
+        tags: snapshot.tags,
+    })
+    .map_err(|error| error.to_string())?;
+
+    Ok(format!("Updated tags for {updated} station(s)."))
 }
 
 #[tauri::command]
@@ -553,7 +668,73 @@ pub fn run() {
             update_tag_definition,
             delete_tag_definition,
             export_tag_definitions,
+            get_station_tags,
+            update_station_tags,
+            batch_update_station_tags,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::Station;
+
+    fn make_station(id: &str) -> Station {
+        Station {
+            id: id.to_string(),
+            name: format!("station-{id}"),
+            blocked: false,
+            network_interfaces: Vec::new(),
+            start_programs: Vec::new(),
+            monitor_processes: Vec::new(),
+            last_action: None,
+            groups: Vec::new(),
+            tags: HashMap::new(),
+            metadata: HashMap::new(),
+            location: None,
+        }
+    }
+
+    #[test]
+    fn update_group_syncs_station_reverse_membership() {
+        let mut station = make_station("s1");
+        station.groups.push("g1".to_string());
+
+        let mut group = StationGroup::new("g1");
+        group.id = "g1".to_string();
+        group.station_ids = vec!["s1".to_string()];
+
+        let previous_station_ids = group.station_ids.clone();
+        group.station_ids = Vec::new();
+
+        let mut stations = vec![station];
+        for target_station in &mut stations {
+            let was_in_group = previous_station_ids.iter().any(|sid| sid == &target_station.id);
+            let is_in_group = group.station_ids.iter().any(|sid| sid == &target_station.id);
+
+            if is_in_group && !target_station.groups.iter().any(|gid| gid == &group.id) {
+                target_station.groups.push(group.id.clone());
+            }
+
+            if was_in_group && !is_in_group {
+                target_station.groups.retain(|gid| gid != &group.id);
+            }
+        }
+
+        assert!(stations[0].groups.is_empty());
+    }
+
+    #[test]
+    fn add_station_to_group_syncs_station_reverse_membership() {
+        let mut station = make_station("s1");
+        let group_id = "g1".to_string();
+
+        if !station.groups.iter().any(|gid| gid == &group_id) {
+            station.groups.push(group_id.clone());
+        }
+
+        assert_eq!(station.groups, vec!["g1".to_string()]);
+    }
 }
