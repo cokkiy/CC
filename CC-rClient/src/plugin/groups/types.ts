@@ -67,6 +67,7 @@ export interface TagDefinition {
 }
 
 export interface CreateTagDTO {
+  key: string;          // used as Rust TagDefinition.id
   name: string;         // matches Rust create_tag_definition param
   description?: string;
   color?: string;

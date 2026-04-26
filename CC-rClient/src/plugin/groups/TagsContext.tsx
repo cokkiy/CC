@@ -154,6 +154,7 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
     for (const tag of tags) {
       try {
         await tagsApi.createTag({
+          key: tag.key || tag.id || 'unknown',
           name: tag.name || tag.label || tag.key || 'Unknown',
           type: tag.type,
           options: tag.options,

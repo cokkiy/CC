@@ -112,7 +112,7 @@ export const TagDefinitionList: React.FC<{
         .tag-btn { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 6px; background: transparent; color: var(--text-main); font-size: 0.82rem; cursor: pointer; }
         .tag-btn:hover { border-color: var(--primary); color: var(--primary); }
         .tag-btn.primary { background: var(--primary); border-color: var(--primary); color: white; }
-        .tag-cards { flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+        .tag-cards { flex: 1; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
         .tag-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; }
         .tag-card:hover { border-color: var(--primary); }
         .tag-card.selected { border-color: var(--primary); background: rgba(99,102,241,0.05); }
@@ -138,8 +138,8 @@ export const TagEditor: React.FC<TagEditorProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [key, setKey] = useState(tag?.key || '');
-  const [label, setLabel] = useState(tag?.label || '');
+  const [key, setKey] = useState(tag?.key || tag?.id || '');
+  const [label, setLabel] = useState(tag?.label || tag?.name || '');
   const [type, setType] = useState<TagValueType>(tag?.type || 'string');
   const [options, setOptions] = useState<string[]>(tag?.options || []);
   const [optionInput, setOptionInput] = useState('');
@@ -201,6 +201,7 @@ export const TagEditor: React.FC<TagEditorProps> = ({
     if (!validate()) return;
 
     onSave({
+      key: key.trim(),
       name: label.trim(),
       type,
       options: type === 'select' ? options : undefined,
@@ -298,7 +299,7 @@ export const TagEditor: React.FC<TagEditorProps> = ({
                   value={t.value}
                   checked={type === t.value}
                   onChange={() => setType(t.value)}
-                  disabled={isLoading}
+                  disabled={isLoading || !!tag}
                 />
                 <span className="type-label">{t.label}</span>
                 <span className="type-description">{t.description}</span>

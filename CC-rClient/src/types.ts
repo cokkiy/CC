@@ -148,6 +148,10 @@ export type TagDefinition = {
   name: string;
   description: string;
   color: string;
+  type?: 'string' | 'number' | 'boolean' | 'select';
+  options?: string[];
+  required?: boolean;
+  defaultValue?: string;
   created_at?: string;
   updated_at?: string;
   // UI aliases

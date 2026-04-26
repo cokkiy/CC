@@ -234,9 +234,15 @@ export const tagsApi = {
   async createTag(data: CreateTagDTO): Promise<TagDefinition> {
     try {
       return await invoke<TagDefinition>('create_tag_definition', {
+        key: data.key,
         name: data.name,
         description: data.description || '',
         color: data.color || '#3B82F6',
+        type: data.type || 'string',
+        options: data.options || [],
+        required: data.required || false,
+        default_value: data.defaultValue || null,
+        defaultValue: data.defaultValue || null,
       });
     } catch (error) {
       console.error('[TagsApi] Failed to create tag definition:', error);
@@ -251,9 +257,14 @@ export const tagsApi = {
     try {
       return await invoke<TagDefinition>('update_tag_definition', {
         id: key,
-        name: data.name,
+        name: data.name || '',
         description: data.description || '',
         color: data.color || '#3B82F6',
+        type: data.type,
+        options: data.options,
+        required: data.required,
+        default_value: data.defaultValue ?? null,
+        defaultValue: data.defaultValue ?? null,
       });
     } catch (error) {
       console.error('[TagsApi] Failed to update tag definition:', error);
@@ -311,7 +322,7 @@ export const stationTagsApi = {
    */
   async getStationTags(stationId: string): Promise<StationTags> {
     try {
-      return await invoke<StationTags>('get_station_tags', { station_id: stationId });
+      return await invoke<StationTags>('get_station_tags', { station_id: stationId, stationId });
     } catch (error) {
       console.error('[StationTagsApi] Failed to get station tags:', error);
       return {};
@@ -323,7 +334,7 @@ export const stationTagsApi = {
    */
   async updateStationTags(stationId: string, tags: StationTags): Promise<StationTags> {
     try {
-      return await invoke<StationTags>('update_station_tags', { station_id: stationId, tags });
+      return await invoke<StationTags>('update_station_tags', { station_id: stationId, stationId, tags });
     } catch (error) {
       console.error('[StationTagsApi] Failed to update station tags:', error);
       throw error;
@@ -338,7 +349,7 @@ export const stationTagsApi = {
     tags: Partial<StationTags>
   ): Promise<void> {
     try {
-      await invoke('batch_update_station_tags', { station_ids: stationIds, tags });
+      await invoke('batch_update_station_tags', { station_ids: stationIds, stationIds, tags });
     } catch (error) {
       console.error('[StationTagsApi] Failed to batch update station tags:', error);
       throw error;

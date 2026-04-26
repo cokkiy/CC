@@ -402,11 +402,38 @@ fn load_tag_definitions() -> Result<Vec<TagDefinition>, String> {
 }
 
 #[tauri::command]
-fn create_tag_definition(name: String, description: String, color: String) -> Result<TagDefinition, String> {
+fn create_tag_definition(
+    key: String,
+    name: String,
+    description: String,
+    color: String,
+    r#type: Option<String>,
+    options: Option<Vec<String>>,
+    required: Option<bool>,
+    default_value: Option<String>,
+) -> Result<TagDefinition, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    if key.trim().is_empty() {
+        return Err("Tag key is required".to_string());
+    }
+    if snapshot.tags.iter().any(|existing| existing.id == key) {
+        return Err(format!("Tag key '{key}' already exists"));
+    }
+
     let mut tag = TagDefinition::new(&name);
+    tag.id = key;
     tag.description = description;
     tag.color = color;
+    if let Some(next_type) = r#type {
+        tag.r#type = next_type;
+    }
+    if let Some(next_options) = options {
+        tag.options = next_options;
+    }
+    if let Some(next_required) = required {
+        tag.required = next_required;
+    }
+    tag.default_value = default_value;
     snapshot.tags.push(tag.clone());
     StateStore::save_payload(PersistedState {
         stations: snapshot.stations,
@@ -419,13 +446,32 @@ fn create_tag_definition(name: String, description: String, color: String) -> Re
 }
 
 #[tauri::command]
-fn update_tag_definition(id: String, name: String, description: String, color: String) -> Result<TagDefinition, String> {
+fn update_tag_definition(
+    id: String,
+    name: String,
+    description: String,
+    color: String,
+    r#type: Option<String>,
+    options: Option<Vec<String>>,
+    required: Option<bool>,
+    default_value: Option<String>,
+) -> Result<TagDefinition, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
     let tag = snapshot.tags.iter_mut().find(|t| t.id == id)
         .ok_or_else(|| format!("No tag found for id {id}"))?;
     tag.name = name;
     tag.description = description;
     tag.color = color;
+    if let Some(next_type) = r#type {
+        tag.r#type = next_type;
+    }
+    if let Some(next_options) = options {
+        tag.options = next_options;
+    }
+    if let Some(next_required) = required {
+        tag.required = next_required;
+    }
+    tag.default_value = default_value;
     tag.updated_at = chrono::Utc::now();
     let updated = tag.clone();
     StateStore::save_payload(PersistedState {

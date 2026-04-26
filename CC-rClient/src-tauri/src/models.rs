@@ -76,6 +76,18 @@ pub struct TagDefinition {
     pub description: String,
     /// Tag color (hex format, e.g., "#FF5733")
     pub color: String,
+    /// Tag value type: string, number, boolean, select
+    #[serde(default = "default_tag_value_type")]
+    pub r#type: String,
+    /// Options for select type
+    #[serde(default)]
+    pub options: Vec<String>,
+    /// Whether this tag is required
+    #[serde(default)]
+    pub required: bool,
+    /// Optional default value
+    #[serde(default)]
+    pub default_value: Option<String>,
     /// Creation timestamp
     pub created_at: DateTime<Utc>,
     /// Last update timestamp
@@ -91,10 +103,18 @@ impl TagDefinition {
             name: name.into(),
             description: String::new(),
             color: String::new(),
+            r#type: default_tag_value_type(),
+            options: Vec::new(),
+            required: false,
+            default_value: None,
             created_at: now,
             updated_at: now,
         }
     }
+}
+
+fn default_tag_value_type() -> String {
+    "string".to_string()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

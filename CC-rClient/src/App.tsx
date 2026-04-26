@@ -372,6 +372,8 @@ export default function App() {
   const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
   const [activeLayout, setActiveLayout] = useState<string>("default");
+  const [pendingStationTagValues, setPendingStationTagValues] = useState<Record<string, string>>({});
+  const [dirtyStationTagKeys, setDirtyStationTagKeys] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     void loadSnapshot();
@@ -430,6 +432,11 @@ export default function App() {
   const hasRuntimeData = Object.keys(runtimeByStation).length > 0;
   const hasActiveFilter = search.trim().length > 0 || Boolean(groupFilter) || Boolean(tagFilter);
   const filtersHideStations = stations.length > 0 && filteredStations.length === 0;
+
+  useEffect(() => {
+    setPendingStationTagValues({});
+    setDirtyStationTagKeys({});
+  }, [selectedStation?.id]);
 
   async function loadSnapshot() {
     setLoading(true);
@@ -949,7 +956,7 @@ export default function App() {
     }
   }
 
-  function patchSelectedTagValue(tagKey: string, value: string) {
+  async function patchSelectedTagValue(tagKey: string, value: string) {
     if (!selectedStation) {
       return;
     }
@@ -962,6 +969,34 @@ export default function App() {
     }
 
     patchSelected({ tags: nextTags });
+
+    try {
+      await invoke("update_station_tags", {
+        station_id: selectedStation.id,
+        stationId: selectedStation.id,
+        tags: nextTags,
+      });
+    } catch (error) {
+      setLog((current) => [
+        `Failed to persist station tags: ${String(error)}`,
+        ...current,
+      ]);
+    }
+  }
+
+  function updatePendingStationTagValue(tagKey: string, value: string) {
+    setPendingStationTagValues((current) => ({ ...current, [tagKey]: value }));
+    setDirtyStationTagKeys((current) => ({ ...current, [tagKey]: true }));
+  }
+
+  async function savePendingStationTagValue(tagKey: string) {
+    if (!selectedStation) {
+      return;
+    }
+
+    const nextValue = pendingStationTagValues[tagKey] ?? ((selectedStation.tags ?? {})[tagKey] ?? "");
+    await patchSelectedTagValue(tagKey, nextValue);
+    setDirtyStationTagKeys((current) => ({ ...current, [tagKey]: false }));
   }
 
   const selectedIds = selectedStation ? [selectedStation.id] : [];
@@ -1448,7 +1483,7 @@ export default function App() {
                                 <span>{tagLabel}</span>
                                 <select
                                   value={currentValue}
-                                  onChange={(event) => patchSelectedTagValue(tagKey, event.target.value)}
+                                  onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
                                 >
                                   <option value="">Unset</option>
                                   <option value="true">True</option>
@@ -1464,7 +1499,7 @@ export default function App() {
                                 <span>{tagLabel}</span>
                                 <select
                                   value={currentValue}
-                                  onChange={(event) => patchSelectedTagValue(tagKey, event.target.value)}
+                                  onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
                                 >
                                   <option value="">Unset</option>
                                   {definition.options.map((option) => (
@@ -1480,12 +1515,23 @@ export default function App() {
                           return (
                             <label className="field" key={tagKey}>
                               <span>{tagLabel}</span>
-                              <input
-                                type={definition.type === 'number' ? 'number' : 'text'}
-                                value={currentValue}
-                                onChange={(event) => patchSelectedTagValue(tagKey, event.target.value)}
-                                placeholder={`Value for ${tagLabel}`}
-                              />
+                              <div className="tagValueInlineEditor">
+                                <input
+                                  type={definition.type === 'number' ? 'number' : 'text'}
+                                  value={dirtyStationTagKeys[tagKey] ? (pendingStationTagValues[tagKey] ?? '') : currentValue}
+                                  onChange={(event) => updatePendingStationTagValue(tagKey, event.target.value)}
+                                  placeholder={`Value for ${tagLabel}`}
+                                />
+                                {dirtyStationTagKeys[tagKey] ? (
+                                  <button
+                                    type="button"
+                                    className="accent tagValueSaveButton"
+                                    onClick={() => void savePendingStationTagValue(tagKey)}
+                                  >
+                                    Save
+                                  </button>
+                                ) : null}
+                              </div>
                             </label>
                           );
                         })}
