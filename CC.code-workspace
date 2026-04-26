@@ -34,40 +34,6 @@
 			"**/.vexp/parent_workspace.json": true,
 			"**/.vexp/.gitignore": true,
 			"**/.vexp/.gitattributes": true
-		},
-		"chat.tools.terminal.autoApprove": {
-			"git checkout": true,
-			"/^bash -n scripts/start-all\\.sh$/": {
-				"approve": true,
-				"matchCommandLine": true
-			},
-			"cargo test": true,
-			"npm run build": true,
-			"git rev-parse": true,
-			"gh": true,
-			"true": true,
-			"git ls-remote": true
-		},
-		"mcp": {
-			"servers": {
-				"icogenie": {
-					"type": "stdio",
-					"command": "npx",
-					"args": [
-						"-y",
-						"@icogenie/mcp"
-					]
-				},
-				"nakkas": {
-					"type": "stdio",
-					"command": "npx",
-					"args": [
-						"-y",
-						"nakkas@latest"
-					]
-				}
-			},
-			"inputs": []
 		}
 	}
 }
