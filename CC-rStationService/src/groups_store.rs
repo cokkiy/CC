@@ -369,9 +369,7 @@ mod tests {
 
     #[test]
     fn test_station_group_crud() {
-        let db_path = temp_dir().join("station_group_test.db");
-        // Clean up any stale data from previous test runs
-        std::fs::remove_file(db_path.clone()).ok();
+        let db_path = temp_dir().join(format!("station_group_test_{}.db", Uuid::new_v4()));
         let store = StationGroupStore::new(db_path.clone()).unwrap();
 
         let mut group = StationGroup::new("Test Group");
@@ -407,9 +405,7 @@ mod tests {
 
     #[test]
     fn test_station_group_filter() {
-        let db_path = temp_dir().join("station_group_filter_test.db");
-        // Clean up any stale data from previous test runs
-        std::fs::remove_file(db_path.clone()).ok();
+        let db_path = temp_dir().join(format!("station_group_filter_test_{}.db", Uuid::new_v4()));
         let store = StationGroupStore::new(db_path.clone()).unwrap();
 
         // Create groups with different names
@@ -445,7 +441,7 @@ mod tests {
 
     #[test]
     fn test_station_group_stats() {
-        let db_path = temp_dir().join("station_group_stats_test.db");
+        let db_path = temp_dir().join(format!("station_group_stats_test_{}.db", Uuid::new_v4()));
         let store = StationGroupStore::new(db_path.clone()).unwrap();
 
         // Create groups with stations
