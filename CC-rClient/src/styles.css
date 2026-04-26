@@ -639,6 +639,25 @@ input:focus, select:focus, textarea:focus {
   grid-column: 1 / -1;
 }
 
+.tagValueInlineEditor {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tagValueInlineEditor input {
+  flex: 1;
+  min-width: 0;
+}
+
+.tagValueSaveButton {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .subHeader {
   display: flex;
   justify-content: space-between;
@@ -834,6 +853,14 @@ input:focus, select:focus, textarea:focus {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
+
+  .tagValueInlineEditor {
+    flex-wrap: wrap;
+  }
+
+  .tagValueSaveButton {
+    width: 100%;
+  }
 }
 
 /* ============================================
@@ -925,19 +952,194 @@ input:focus, select:focus, textarea:focus {
   gap: 0;
 }
 
-.tags-main-panel {
-  padding: 16px;
-  overflow-y: auto;
-  min-height: calc(100vh - 64px - 48px);
-}
-
 .tags-page-shell {
   position: relative;
   min-height: calc(100vh - 64px - 48px);
+  height: calc(100vh - 64px - 48px);
 }
 
 .tags-main-grid {
   height: 100%;
+  min-height: 0;
+}
+
+.tags-page-shell .tags-main-panel {
+  padding: 0;
+  overflow: auto;
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(320px, 38%) 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
+}
+
+.station-tags-editor {
+  border-left: 1px solid var(--border-color);
+  padding: 14px 16px;
+  background: transparent;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  max-height: none;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  overflow-x: hidden;
+}
+
+.station-tags-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.station-tags-header {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+}
+
+.station-tags-hint {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.station-tags-body {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding-right: 2px;
+}
+
+.station-tags-toolbar-bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-bottom: 2px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+  background: transparent;
+}
+
+.station-picker-row {
+  display: grid;
+  gap: 6px;
+  max-width: 380px;
+}
+
+.station-picker-row label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.station-picker-row select,
+.station-tag-field input,
+.station-tag-field select {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-main);
+  color: var(--text-main);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.station-tags-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+}
+
+.station-tags-notice {
+  margin: 0;
+  font-size: 0.84rem;
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.station-tags-notice.leaving {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.station-tags-notice.success {
+  color: #0f5132;
+  background: #d1e7dd;
+  border-color: #badbcc;
+}
+
+.station-tags-notice.error {
+  color: #842029;
+  background: #f8d7da;
+  border-color: #f5c2c7;
+}
+
+.station-tags-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.station-tag-field {
+  display: grid;
+  gap: 6px;
+}
+
+.station-tag-field label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.station-tags-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 2px;
+}
+
+.station-tags-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  min-height: 34px;
+}
+
+.station-tags-actions button.primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.station-tags-actions button.primary.unsaved {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.station-tags-actions button:disabled {
+  opacity: 0.88;
+  color: var(--text-secondary);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+.station-tags-actions button.primary:disabled {
+  background: color-mix(in srgb, var(--primary) 52%, var(--bg-main) 48%);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .tags-layer {
@@ -967,6 +1169,47 @@ input:focus, select:focus, textarea:focus {
   overflow: hidden;
 }
 
+/* Fallback styles for tag editor actions when component-level inline styles are unavailable. */
+.tags-modal-panel .editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tags-modal-panel .editor-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tags-modal-panel .btn-cancel,
+.tags-modal-panel .btn-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-size: 0.86rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tags-modal-panel .btn-cancel {
+  background: transparent;
+  color: var(--text-main);
+}
+
+.tags-modal-panel .btn-save {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
 .tags-main-layer {
   position: fixed;
   inset: 0;
@@ -992,6 +1235,38 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (max-width: 768px) {
+  .tags-page-shell .tags-main-panel {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .station-tags-editor {
+    border-left: 0;
+    border-top: 1px solid var(--border-color);
+    max-height: min(52vh, 460px);
+    padding: 12px;
+  }
+
+  .station-tags-toolbar-bottom {
+    margin-top: 8px;
+    padding-top: 8px;
+    bottom: -1px;
+  }
+
+  .station-tags-actions {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .station-tags-actions button {
+    width: 100%;
+  }
+
+  .station-tags-form {
+    grid-template-columns: 1fr;
+  }
+
   .tags-modal-panel {
     width: 100%;
     height: 100%;

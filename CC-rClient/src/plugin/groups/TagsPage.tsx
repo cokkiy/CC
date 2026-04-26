@@ -35,10 +35,32 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
   const [stats, setStats] = useState<Array<{ tagKey: string; tagLabel: string; tagValue: string; count: number }>>([]);
   const [selectedStationId, setSelectedStationId] = useState('');
   const [stationTags, setStationTags] = useState<Record<string, string>>({});
+  const [savedStationTags, setSavedStationTags] = useState<Record<string, string>>({});
   const [isStationTagsLoading, setIsStationTagsLoading] = useState(false);
   const [isStationTagsSaving, setIsStationTagsSaving] = useState(false);
   const [stationTagNotice, setStationTagNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isNoticeLeaving, setIsNoticeLeaving] = useState(false);
+
+  const normalizeTagMap = React.useCallback((tags: Record<string, string>): Record<string, string> => {
+    const normalized: Record<string, string> = {};
+    Object.entries(tags).forEach(([key, value]) => {
+      const trimmed = value.trim();
+      if (trimmed) {
+        normalized[key] = trimmed;
+      }
+    });
+    return normalized;
+  }, []);
+
+  const hasUnsavedChanges = React.useMemo(() => {
+    const current = normalizeTagMap(stationTags);
+    const saved = normalizeTagMap(savedStationTags);
+    const currentKeys = Object.keys(current);
+    const savedKeys = Object.keys(saved);
+
+    if (currentKeys.length !== savedKeys.length) return true;
+    return currentKeys.some((key) => saved[key] !== current[key]);
+  }, [stationTags, savedStationTags, normalizeTagMap]);
 
   // Load tag stats on mount
   React.useEffect(() => {
@@ -48,15 +70,21 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
   React.useEffect(() => {
     if (!selectedStationId || stations.length === 0) {
       setStationTags({});
+      setSavedStationTags({});
       return;
     }
 
     setIsStationTagsLoading(true);
     getStationTags(selectedStationId)
-      .then((tags) => setStationTags(tags || {}))
+      .then((tags) => {
+        const nextTags = tags || {};
+        setStationTags(nextTags);
+        setSavedStationTags(nextTags);
+      })
       .catch((error) => {
         console.error('[TagsPage] Failed to load station tags:', error);
         setStationTags({});
+        setSavedStationTags({});
         setStationTagNotice({ type: 'error', message: 'Failed to load station tags.' });
       })
       .finally(() => setIsStationTagsLoading(false));
@@ -189,8 +217,10 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
     setIsStationTagsSaving(true);
     setStationTagNotice(null);
     try {
-      const updated = await updateStationTags(selectedStationId, stationTags);
-      setStationTags(updated || {});
+      const updated = await updateStationTags(selectedStationId, normalizeTagMap(stationTags));
+      const normalizedUpdated = normalizeTagMap(updated || {});
+      setStationTags(normalizedUpdated);
+      setSavedStationTags(normalizedUpdated);
       setStationTagNotice({ type: 'success', message: 'Station tag values saved successfully.' });
     } catch (error) {
       console.error('[TagsPage] Failed to update station tags:', error);
@@ -198,6 +228,17 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
     } finally {
       setIsStationTagsSaving(false);
     }
+  };
+
+  const handleDiscardStationTagChanges = () => {
+    if (!selectedStationId) {
+      setStationTags({});
+      return;
+    }
+
+    setStationTagNotice(null);
+    setStationTags(savedStationTags);
+    setStationTagNotice({ type: 'success', message: 'Discarded local changes and restored saved values.' });
   };
 
   const handleApplyToAllStations = async () => {
@@ -209,13 +250,13 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
     setIsStationTagsSaving(true);
     setStationTagNotice(null);
     try {
-      let tagsToApply = stationTags;
+      let tagsToApply = normalizeTagMap(stationTags);
 
       if (selectedStationId && Object.keys(tagsToApply).length === 0) {
         const refreshed = await getStationTags(selectedStationId);
         if (refreshed && Object.keys(refreshed).length > 0) {
-          tagsToApply = refreshed;
-          setStationTags(refreshed);
+          tagsToApply = normalizeTagMap(refreshed);
+          setStationTags(tagsToApply);
         }
       }
 
@@ -223,6 +264,7 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
         stations.map((station) => station.id),
         tagsToApply,
       );
+      setSavedStationTags(tagsToApply);
       setStationTagNotice({ type: 'success', message: 'Tag values applied to all stations.' });
     } catch (error) {
       console.error('[TagsPage] Failed to batch update station tags:', error);
@@ -254,121 +296,126 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
               <span className="station-tags-hint">Define values for a specific station using the tag definitions above.</span>
             </div>
 
-            <div className="station-picker-row">
-              <label htmlFor="station-tag-picker">Station</label>
-              <select
-                id="station-tag-picker"
-                value={selectedStationId}
-                onChange={(event) => setSelectedStationId(event.target.value)}
-              >
-                <option value="">Select a station</option>
-                {stations.map((station) => (
-                  <option key={station.id} value={station.id}>
-                    {station.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {stationTagNotice ? (
-              <p
-                className={`station-tags-notice ${stationTagNotice.type} ${isNoticeLeaving ? 'leaving' : ''}`}
-                role={stationTagNotice.type === 'error' ? 'alert' : 'status'}
-              >
-                {stationTagNotice.message}
-              </p>
-            ) : null}
-
-            {!selectedStationId ? (
-              <p className="station-tags-empty">Select a station to edit its tag values.</p>
-            ) : isStationTagsLoading ? (
-              <p className="station-tags-empty">Loading station tags...</p>
-            ) : tagDefinitions.length === 0 ? (
-              <p className="station-tags-empty">Create at least one tag definition to start assigning values.</p>
-            ) : (
-              <div className="station-tags-form">
-                {tagDefinitions.map((definition) => {
-                  const tagKey = definition.key || definition.id;
-                  const tagLabel = definition.label || definition.name || tagKey;
-                  const currentValue = stationTags[tagKey] ?? '';
-
-                  if (definition.type === 'boolean') {
-                    return (
-                      <div className="station-tag-field" key={tagKey}>
-                        <label>{tagLabel}</label>
-                        <select
-                          value={currentValue}
-                          onChange={(event) => handleStationTagChange(tagKey, event.target.value)}
-                        >
-                          <option value="">Unset</option>
-                          <option value="true">True</option>
-                          <option value="false">False</option>
-                        </select>
-                      </div>
-                    );
-                  }
-
-                  if (definition.type === 'select' && definition.options && definition.options.length > 0) {
-                    return (
-                      <div className="station-tag-field" key={tagKey}>
-                        <label>{tagLabel}</label>
-                        <select
-                          value={currentValue}
-                          onChange={(event) => handleStationTagChange(tagKey, event.target.value)}
-                        >
-                          <option value="">Unset</option>
-                          {definition.options.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div className="station-tag-field" key={tagKey}>
-                      <label>{tagLabel}</label>
-                      <input
-                        type={definition.type === 'number' ? 'number' : 'text'}
-                        value={currentValue}
-                        onChange={(event) => handleStationTagChange(tagKey, event.target.value)}
-                        placeholder={`Value for ${tagLabel}`}
-                      />
-                    </div>
-                  );
-                })}
+            <div className="station-tags-body">
+              <div className="station-picker-row">
+                <label htmlFor="station-tag-picker">Station</label>
+                <select
+                  id="station-tag-picker"
+                  value={selectedStationId}
+                  onChange={(event) => setSelectedStationId(event.target.value)}
+                >
+                  <option value="">Select a station</option>
+                  {stations.map((station) => (
+                    <option key={station.id} value={station.id}>
+                      {station.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
 
-            <div className="station-tags-actions">
-              <button
-                type="button"
-                data-testid="station-tags-clear-btn"
-                onClick={() => setStationTags({})}
-                disabled={!selectedStationId || isStationTagsSaving}
-              >
-                Clear Local Values
-              </button>
-              <button
-                type="button"
-                data-testid="station-tags-apply-all-btn"
-                onClick={() => void handleApplyToAllStations()}
-                disabled={!selectedStationId || stations.length === 0 || isStationTagsSaving}
-              >
-                Apply To All Stations
-              </button>
-              <button
-                type="button"
-                data-testid="station-tags-save-btn"
-                className="primary"
-                onClick={() => void handleSaveStationTags()}
-                disabled={!selectedStationId || isStationTagsSaving}
-              >
-                {isStationTagsSaving ? 'Saving...' : 'Save Station Tags'}
-              </button>
+              {stationTagNotice ? (
+                <p
+                  className={`station-tags-notice ${stationTagNotice.type} ${isNoticeLeaving ? 'leaving' : ''}`}
+                  role={stationTagNotice.type === 'error' ? 'alert' : 'status'}
+                >
+                  {stationTagNotice.message}
+                </p>
+              ) : null}
+
+              {!selectedStationId ? (
+                <p className="station-tags-empty">Select a station to edit its tag values.</p>
+              ) : isStationTagsLoading ? (
+                <p className="station-tags-empty">Loading station tags...</p>
+              ) : tagDefinitions.length === 0 ? (
+                <p className="station-tags-empty">Create at least one tag definition to start assigning values.</p>
+              ) : (
+                <div className="station-tags-form">
+                  {tagDefinitions.map((definition) => {
+                    const tagKey = definition.key || definition.id;
+                    const tagLabel = definition.label || definition.name || tagKey;
+                    const currentValue = stationTags[tagKey] ?? '';
+
+                    if (definition.type === 'boolean') {
+                      return (
+                        <div className="station-tag-field" key={tagKey}>
+                          <label>{tagLabel}</label>
+                          <select
+                            value={currentValue}
+                            onChange={(event) => handleStationTagChange(tagKey, event.target.value)}
+                          >
+                            <option value="">Unset</option>
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                          </select>
+                        </div>
+                      );
+                    }
+
+                    if (definition.type === 'select' && definition.options && definition.options.length > 0) {
+                      return (
+                        <div className="station-tag-field" key={tagKey}>
+                          <label>{tagLabel}</label>
+                          <select
+                            value={currentValue}
+                            onChange={(event) => handleStationTagChange(tagKey, event.target.value)}
+                          >
+                            <option value="">Unset</option>
+                            {definition.options.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="station-tag-field" key={tagKey}>
+                        <label>{tagLabel}</label>
+                        <input
+                          type={definition.type === 'number' ? 'number' : 'text'}
+                          value={currentValue}
+                          onChange={(event) => handleStationTagChange(tagKey, event.target.value)}
+                          placeholder={`Value for ${tagLabel}`}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="station-tags-toolbar station-tags-toolbar-bottom">
+                <div className="station-tags-actions">
+                  <button
+                    type="button"
+                    data-testid="station-tags-discard-btn"
+                    onClick={handleDiscardStationTagChanges}
+                    disabled={!selectedStationId || isStationTagsSaving || !hasUnsavedChanges}
+                  >
+                    Discard Changes
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="station-tags-apply-all-btn"
+                    onClick={() => void handleApplyToAllStations()}
+                    disabled={!selectedStationId || stations.length === 0 || isStationTagsSaving}
+                  >
+                    Apply to All Stations
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="station-tags-save-btn"
+                    className={`primary ${hasUnsavedChanges ? 'unsaved' : ''}`}
+                    onClick={() => void handleSaveStationTags()}
+                    disabled={!selectedStationId || isStationTagsSaving || !hasUnsavedChanges}
+                  >
+                    {isStationTagsSaving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </div>
             </div>
+
           </div>
         </section>
       </main>
@@ -385,184 +432,6 @@ export const TagsPage: React.FC<TagsPageProps> = ({ stations }) => {
           </div>
         </div>
       )}
-
-      <style>{`
-        .tags-page-shell {
-          position: relative;
-          min-height: calc(100vh - 64px - 48px);
-          height: calc(100vh - 64px - 48px);
-        }
-
-        .tags-main-grid {
-          height: 100%;
-          min-height: 0;
-        }
-
-        .tags-main-panel {
-          padding: 0;
-          overflow: auto;
-          min-height: 0;
-          height: 100%;
-          display: grid;
-          grid-template-rows: 1fr auto;
-        }
-
-        .station-tags-editor {
-          border-top: 1px solid var(--border-color);
-          padding: 14px 16px;
-          background: color-mix(in srgb, var(--bg-card) 92%, #000 8%);
-          display: grid;
-          gap: 12px;
-          max-height: min(45vh, 420px);
-          overflow-y: auto;
-          overflow-x: hidden;
-        }
-
-        .station-tags-header h3 {
-          margin: 0;
-          font-size: 0.95rem;
-        }
-
-        .station-tags-hint {
-          font-size: 0.78rem;
-          color: var(--text-secondary);
-        }
-
-        .station-picker-row {
-          display: grid;
-          gap: 6px;
-          max-width: 380px;
-        }
-
-        .station-picker-row label {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-        }
-
-        .station-picker-row select,
-        .station-tag-field input,
-        .station-tag-field select {
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          background: var(--bg-main);
-          color: var(--text-main);
-          padding: 8px 10px;
-          font-size: 0.85rem;
-        }
-
-        .station-tags-empty {
-          margin: 0;
-          color: var(--text-secondary);
-          font-size: 0.84rem;
-        }
-
-        .station-tags-notice {
-          margin: 0;
-          font-size: 0.84rem;
-          border-radius: 8px;
-          padding: 8px 10px;
-          border: 1px solid var(--border-color);
-          opacity: 1;
-          transform: translateY(0);
-          transition: opacity 220ms ease, transform 220ms ease;
-        }
-
-        .station-tags-notice.leaving {
-          opacity: 0;
-          transform: translateY(-3px);
-        }
-
-        .station-tags-notice.success {
-          color: #0f5132;
-          background: #d1e7dd;
-          border-color: #badbcc;
-        }
-
-        .station-tags-notice.error {
-          color: #842029;
-          background: #f8d7da;
-          border-color: #f5c2c7;
-        }
-
-        .station-tags-form {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 10px;
-        }
-
-        .station-tag-field {
-          display: grid;
-          gap: 6px;
-        }
-
-        .station-tag-field label {
-          font-size: 0.78rem;
-          color: var(--text-secondary);
-        }
-
-        .station-tags-actions {
-          display: flex;
-          gap: 10px;
-          justify-content: flex-end;
-        }
-
-        .station-tags-actions button {
-          border: 1px solid var(--border-color);
-          background: transparent;
-          color: var(--text-main);
-          border-radius: 8px;
-          padding: 8px 12px;
-          font-size: 0.82rem;
-          cursor: pointer;
-        }
-
-        .station-tags-actions button.primary {
-          border-color: var(--primary);
-          background: var(--primary);
-          color: white;
-        }
-
-        .station-tags-actions button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .tags-layer {
-          position: fixed;
-          inset: 0;
-          background: rgba(11, 25, 44, 0.42);
-          backdrop-filter: blur(2px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1200;
-          padding: 24px;
-        }
-
-        .tags-layer-modal {
-          padding: 0;
-        }
-
-        .tags-modal-panel {
-          width: min(560px, 94vw);
-          height: auto;
-          max-height: 90vh;
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 14px;
-          box-shadow: 0 22px 56px rgba(8, 20, 38, 0.24);
-          overflow: hidden;
-        }
-
-        @media (max-width: 768px) {
-          .tags-modal-panel {
-            width: 100%;
-            height: 100%;
-            max-height: none;
-            border-radius: 0;
-          }
-        }
-      `}</style>
     </div>
   );
 };
