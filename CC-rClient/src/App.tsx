@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import topBanner from "../images/top_banner.png";
 import type {
   ActionResult,
   AppSnapshot,
@@ -26,6 +27,15 @@ import type {
   StationScreenCapture
 } from "./types";
 import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script";
+import { BatchProvider, useBatch } from "./plugin/batch";
+import { BatchPage } from "./plugin/batch/BatchPage";
+import { BatchUIProvider } from "./plugin/batch/BatchUIContext";
+import { LayoutPresetSelector } from "./plugin/components/LayoutManager";
+import { getAllLayoutPresets } from "./plugin/components/LayoutConfig";
+import { GroupsPage, TagsPage } from "./plugin/groups";
+import { GroupsProvider } from "./plugin/groups/GroupsContext";
+import { TagsProvider } from "./plugin/groups/TagsContext";
+import type { TagDefinition } from "./plugin/groups/types";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -41,7 +51,10 @@ const emptyStation = (): Station => ({
   networkInterfaces: [{ mac: "", ips: [""] }],
   startPrograms: [],
   monitorProcesses: [],
-  lastAction: null
+  lastAction: null,
+  groups: [],
+  tags: {},
+  metadata: {}
 });
 
 function CpuPie({ cpu }: { cpu: number }) {
@@ -107,14 +120,11 @@ function getStationVisualState(
   }
 
   const runtimeMessage = runtime.message.toLowerCase();
-  const lastAction = (station.lastAction ?? "").toLowerCase();
   const hasErrorSignal =
     runtimeMessage.includes("error") ||
     runtimeMessage.includes("failed") ||
     runtimeMessage.includes("unavailable") ||
-    runtimeMessage.includes("timeout") ||
-    lastAction.includes("error") ||
-    lastAction.includes("failed");
+    runtimeMessage.includes("timeout");
 
   if (hasErrorSignal) {
     return "error";
@@ -140,6 +150,61 @@ function ComputerStatusIcon({ state }: { state: StationVisualState }) {
         <path d="M7 19h10" />
       </svg>
     </span>
+  );
+}
+
+function CpuIcon() {
+  return (
+    <svg className="stationStatIconSvg" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="3" y="3" width="10" height="10" rx="1" fill="none" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="5.5" y="5.5" width="5" height="5" rx="0.5" />
+      <line x1="1" y1="5" x2="3" y2="5" stroke="currentColor" strokeWidth="1" />
+      <line x1="1" y1="8" x2="3" y2="8" stroke="currentColor" strokeWidth="1" />
+      <line x1="1" y1="11" x2="3" y2="11" stroke="currentColor" strokeWidth="1" />
+      <line x1="13" y1="5" x2="15" y2="5" stroke="currentColor" strokeWidth="1" />
+      <line x1="13" y1="8" x2="15" y2="8" stroke="currentColor" strokeWidth="1" />
+      <line x1="13" y1="11" x2="15" y2="11" stroke="currentColor" strokeWidth="1" />
+      <line x1="5" y1="1" x2="5" y2="3" stroke="currentColor" strokeWidth="1" />
+      <line x1="8" y1="1" x2="8" y2="3" stroke="currentColor" strokeWidth="1" />
+      <line x1="11" y1="1" x2="11" y2="3" stroke="currentColor" strokeWidth="1" />
+      <line x1="5" y1="13" x2="5" y2="15" stroke="currentColor" strokeWidth="1" />
+      <line x1="8" y1="13" x2="8" y2="15" stroke="currentColor" strokeWidth="1" />
+      <line x1="11" y1="13" x2="11" y2="15" stroke="currentColor" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function MemoryIcon() {
+  return (
+    <svg className="stationStatIconSvg" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="1" y="5" width="14" height="6" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="2.5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="7.5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="10" y="6.5" width="1.5" height="3" rx="0.2" />
+      <rect x="12.5" y="6.5" width="1.5" height="3" rx="0.2" />
+      <line x1="2.5" y1="11" x2="2.5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="5" y1="11" x2="5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="7.5" y1="11" x2="7.5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="10" y1="11" x2="10" y2="13" stroke="currentColor" strokeWidth="0.8" />
+      <line x1="12.5" y1="11" x2="12.5" y2="13" stroke="currentColor" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+function ProcessIcon() {
+  return (
+    <svg className="stationStatIconSvg" viewBox="0 0 16 16" fill="currentColor">
+      <rect x="1" y="2" width="14" height="3.5" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="1" y="6.2" width="14" height="3.5" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <rect x="1" y="10.4" width="14" height="3.5" rx="0.5" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <circle cx="2.8" cy="3.75" r="0.7" />
+      <circle cx="2.8" cy="7.95" r="0.7" />
+      <circle cx="2.8" cy="12.15" r="0.7" />
+      <line x1="4.5" y1="3.75" x2="12" y2="3.75" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+      <line x1="4.5" y1="7.95" x2="12" y2="7.95" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+      <line x1="4.5" y1="12.15" x2="9" y2="12.15" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -301,13 +366,24 @@ export default function App() {
   const [commandOutput, setCommandOutput] = useState<CommandExecutionResult | null>(null);
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
+  const [tagFilter, setTagFilter] = useState<string>("");
+  const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>([]);
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
-  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "messages" | "scripts">("stations");
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch">("stations");
   const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
+  const [activeLayout, setActiveLayout] = useState<string>("default");
+  const [pendingStationTagValues, setPendingStationTagValues] = useState<Record<string, string>>({});
+  const [dirtyStationTagKeys, setDirtyStationTagKeys] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     void loadSnapshot();
   }, []);
+
+  useEffect(() => {
+    if (activePage === "stations") {
+      void loadSnapshot();
+    }
+  }, [activePage]);
 
   const filteredStations = useMemo(() => {
     const lowered = search.trim().toLowerCase();
@@ -327,8 +403,13 @@ export default function App() {
     if (groupFilter) {
       const group = groups.find((g) => g.id === groupFilter);
       if (group) {
-        next = next.filter((s) => group.stationIds.includes(s.id));
+        next = next.filter((s) => (group.stationIds || []).includes(s.id));
       }
+    }
+
+    // Tag filter: show only stations with the selected tag
+    if (tagFilter) {
+      next = next.filter((s) => (s.tags || {}).hasOwnProperty(tagFilter));
     }
 
     return next.sort((left, right) => {
@@ -339,7 +420,7 @@ export default function App() {
       }
       return left.name.localeCompare(right.name, undefined, { numeric: true });
     });
-  }, [search, sortBy, stations, groupFilter, groups]);
+  }, [search, sortBy, stations, groupFilter, tagFilter, groups]);
 
   const selectedStation =
     filteredStations.find((station) => station.id === selectedId) ??
@@ -348,6 +429,14 @@ export default function App() {
   const selectedRuntime = selectedStation ? runtimeByStation[selectedStation.id] ?? null : null;
   const selectedBrowser = selectedStation ? browserByStation[selectedStation.id] ?? null : null;
   const selectedCapture = selectedStation ? captureByStation[selectedStation.id] ?? null : null;
+  const hasRuntimeData = Object.keys(runtimeByStation).length > 0;
+  const hasActiveFilter = search.trim().length > 0 || Boolean(groupFilter) || Boolean(tagFilter);
+  const filtersHideStations = stations.length > 0 && filteredStations.length === 0;
+
+  useEffect(() => {
+    setPendingStationTagValues({});
+    setDirtyStationTagKeys({});
+  }, [selectedStation?.id]);
 
   async function loadSnapshot() {
     setLoading(true);
@@ -357,6 +446,7 @@ export default function App() {
       setStations(next.stations);
       setOptions(next.options);
       setGroups(next.groups ?? []);
+      setTagDefinitions(next.tags ?? []);
       setSelectedId(next.stations[0]?.id ?? "");
       setLog((current) => [
         next.legacyImported
@@ -404,7 +494,7 @@ export default function App() {
   async function saveState() {
     setSaving(true);
     try {
-      const payload: PersistedState = { stations, options, groups };
+      const payload: PersistedState = { stations, options, groups, tags: tagDefinitions };
       const next = await invoke<AppSnapshot>("save_state", { payload });
       setSnapshot(next);
       setStations(next.stations);
@@ -721,6 +811,15 @@ export default function App() {
     }
   }
 
+  async function loadTagDefinitions() {
+    try {
+      const result = await invoke<TagDefinition[]>("load_tag_definitions");
+      setTagDefinitions(result);
+    } catch (error) {
+      setLog((current) => [`Failed to load tag definitions: ${String(error)}`, ...current]);
+    }
+  }
+
   async function createGroup(name: string) {
     try {
       const group = await invoke<StationGroup>("create_station_group", { name });
@@ -738,7 +837,8 @@ export default function App() {
         name: group.name,
         description: group.description,
         tags: group.tags,
-        stationIds: group.stationIds
+        stationIds: group.stationIds,
+        station_ids: group.stationIds,
       });
       setGroups((current) =>
         current.map((g) => (g.id === updated.id ? updated : g))
@@ -790,29 +890,131 @@ export default function App() {
     patchSelected({ startPrograms: nextPrograms });
   }
 
+  async function patchSelectedGroups(nextGroupIds: string[]) {
+    if (!selectedStation) {
+      return;
+    }
+
+    const previousGroupIds = selectedStation.groups ?? [];
+    const uniqueGroupIds = Array.from(new Set(nextGroupIds));
+
+    patchSelected({ groups: uniqueGroupIds });
+
+    setGroups((current) =>
+      current.map((group) => {
+        const stationIds = group.stationIds ?? [];
+        const shouldContainStation = uniqueGroupIds.includes(group.id);
+        const alreadyContainsStation = stationIds.includes(selectedStation.id);
+
+        if (shouldContainStation && !alreadyContainsStation) {
+          return { ...group, stationIds: [...stationIds, selectedStation.id] };
+        }
+
+        if (!shouldContainStation && alreadyContainsStation) {
+          return {
+            ...group,
+            stationIds: stationIds.filter((id) => id !== selectedStation.id),
+          };
+        }
+
+        return group;
+      }),
+    );
+
+    try {
+      const previousSet = new Set(previousGroupIds);
+      const nextSet = new Set(uniqueGroupIds);
+
+      for (const groupId of uniqueGroupIds) {
+        if (!previousSet.has(groupId)) {
+          await invoke("add_station_to_group", {
+            group_id: groupId,
+            station_id: selectedStation.id,
+            groupId,
+            stationId: selectedStation.id,
+          });
+        }
+      }
+
+      for (const groupId of previousGroupIds) {
+        if (!nextSet.has(groupId)) {
+          await invoke("remove_station_from_group", {
+            group_id: groupId,
+            station_id: selectedStation.id,
+            groupId,
+            stationId: selectedStation.id,
+          });
+        }
+      }
+
+      await loadGroups();
+    } catch (error) {
+      setLog((current) => [
+        `Failed to sync station-group membership: ${String(error)}`,
+        ...current,
+      ]);
+    }
+  }
+
+  async function patchSelectedTagValue(tagKey: string, value: string) {
+    if (!selectedStation) {
+      return;
+    }
+
+    const nextTags = { ...(selectedStation.tags ?? {}) };
+    if (!value.trim()) {
+      delete nextTags[tagKey];
+    } else {
+      nextTags[tagKey] = value;
+    }
+
+    patchSelected({ tags: nextTags });
+
+    try {
+      await invoke("update_station_tags", {
+        station_id: selectedStation.id,
+        stationId: selectedStation.id,
+        tags: nextTags,
+      });
+    } catch (error) {
+      setLog((current) => [
+        `Failed to persist station tags: ${String(error)}`,
+        ...current,
+      ]);
+    }
+  }
+
+  function updatePendingStationTagValue(tagKey: string, value: string) {
+    setPendingStationTagValues((current) => ({ ...current, [tagKey]: value }));
+    setDirtyStationTagKeys((current) => ({ ...current, [tagKey]: true }));
+  }
+
+  async function savePendingStationTagValue(tagKey: string) {
+    if (!selectedStation) {
+      return;
+    }
+
+    const nextValue = pendingStationTagValues[tagKey] ?? ((selectedStation.tags ?? {})[tagKey] ?? "");
+    await patchSelectedTagValue(tagKey, nextValue);
+    setDirtyStationTagKeys((current) => ({ ...current, [tagKey]: false }));
+  }
+
   const selectedIds = selectedStation ? [selectedStation.id] : [];
 
   return (
     <div className="shell">
-      <header className="hero">
-        <div>
-          <p className="eyebrow">CC Client Migration</p>
-          <h1>CC-rClient</h1>
-          <p className="lede">
-            Rust/Tauri replacement for the legacy Qt workstation console with
-            Rust-native state ownership, legacy import/export, Wake-on-LAN, and
-            direct gRPC control for the completed `CC-rStationService` actions.
-          </p>
-        </div>
-        <div className="heroCard">
-          <span>Stations</span>
-          <strong>{stations.length}</strong>
-          <span>Storage</span>
-          <code>{snapshot?.storagePath ?? "loading..."}</code>
+      <header className={`hero ${hasRuntimeData ? "hero--compact" : "hero--expanded"}`}>
+        <div className="heroBanner">
+          <img
+            src={topBanner}
+            alt="CC-rClient top banner"
+            className="heroBannerImage"
+          />
         </div>
       </header>
 
       <section className="toolbar">
+        {/* Navigation */}
         <button
           className={activePage === "stations" ? "accent" : ""}
           onClick={() => setActivePage("stations")}
@@ -835,24 +1037,58 @@ export default function App() {
           Groups
         </button>
         <button
+          className={activePage === "tags" ? "accent" : ""}
+          onClick={() => {
+            setActivePage("tags");
+            void loadTagDefinitions();
+          }}
+        >
+          Tags
+        </button>
+        <button
           className={activePage === "scripts" ? "accent" : ""}
           onClick={() => setActivePage("scripts")}
         >
           Scripts
         </button>
-        <button onClick={addStation}>Add Station</button>
+        <button
+          className={activePage === "batch" ? "accent" : ""}
+          onClick={() => setActivePage("batch")}
+        >
+          Batch
+        </button>
+
+        <div className="toolbar-divider" />
+
+        {/* Layout */}
+        <LayoutPresetSelector
+          currentPreset={activeLayout}
+          onSelectPreset={(preset) => {
+            setActiveLayout(preset);
+            console.log('[App] Layout changed to:', preset);
+          }}
+        />
+
+        <div className="toolbar-divider" />
+
+        {/* Station Actions */}
+        <button onClick={addStation}>+ Add</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
           Remove
         </button>
         <button onClick={() => void executeAction("power_on", selectedIds)} disabled={!selectedStation}>
           Power On
         </button>
-        <button onClick={() => void executeAction("block", selectedIds)} disabled={!selectedStation}>
-          Block
+        <button onClick={() => void executeAction("shutdown", selectedIds)} disabled={!selectedStation}>
+          Shutdown
         </button>
-        <button onClick={() => void executeAction("unblock", selectedIds)} disabled={!selectedStation}>
-          Unblock
+        <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
+          Reboot
         </button>
+
+        <div className="toolbar-divider" />
+
+        {/* App Control */}
         <button onClick={() => void executeAction("start_app", selectedIds)} disabled={!selectedStation}>
           Start App
         </button>
@@ -862,12 +1098,20 @@ export default function App() {
         <button onClick={() => void executeAction("exit_app", selectedIds)} disabled={!selectedStation}>
           Exit App
         </button>
-        <button onClick={() => void executeAction("shutdown", selectedIds)} disabled={!selectedStation}>
-          Shutdown
+
+        <div className="toolbar-divider" />
+
+        {/* Block Control */}
+        <button onClick={() => void executeAction("block", selectedIds)} disabled={!selectedStation}>
+          Block
         </button>
-        <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
-          Reboot
+        <button onClick={() => void executeAction("unblock", selectedIds)} disabled={!selectedStation}>
+          Unblock
         </button>
+
+        <div className="toolbar-divider" />
+
+        {/* Batch Actions */}
         <button onClick={() => void executeAction("batch_power_on", [])} disabled={stations.length === 0}>
           全部开机
         </button>
@@ -877,12 +1121,16 @@ export default function App() {
         <button onClick={() => void executeAction("batch_reboot", [])} disabled={stations.length === 0}>
           全部重启
         </button>
+
+        <div className="toolbar-divider" />
+
+        {/* System */}
         <button className="accent" onClick={() => void saveState()} disabled={saving}>
           {saving ? "Saving..." : "Save"}
         </button>
-        <button onClick={() => void exportLegacyFiles()}>Export Legacy</button>
+        <button onClick={() => void exportLegacyFiles()}>Export</button>
         <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
-          {remoteBusy === "batchCapture" ? "批量截图..." : "批量截图"}
+          {remoteBusy === "batchCapture" ? "截图中..." : "截图"}
         </button>
       </section>
 
@@ -915,6 +1163,17 @@ export default function App() {
                     ))}
                   </select>
                 )}
+                {tagDefinitions.length > 0 && (
+                  <select
+                    value={tagFilter}
+                    onChange={(event) => setTagFilter(event.target.value)}
+                  >
+                    <option value="">All Tags</option>
+                    {tagDefinitions.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -922,7 +1181,13 @@ export default function App() {
               {loading ? (
                 <p className="emptyState">Loading state…</p>
               ) : filteredStations.length === 0 ? (
-                <p className="emptyState">No stations match the current filter.</p>
+                <p className="emptyState">
+                  {filtersHideStations
+                    ? hasActiveFilter
+                      ? "Current search/group/tag filter is hiding all stations. Clear filters to show them."
+                      : "Stations exist but are currently hidden by filters."
+                    : "No stations configured yet. Add a station to begin."}
+                </p>
               ) : (
                 filteredStations.map((station) => {
                   const ip = station.networkInterfaces[0]?.ips[0] ?? "No IP";
@@ -957,16 +1222,36 @@ export default function App() {
                           Edit
                         </button>
                       </div>
-                      <span className="stationMeta">{ip}</span>
-                      <span className={`badge ${stationVisualState}`}>
-                        {stationVisualState === "ready"
-                          ? "Ready"
-                          : stationVisualState === "warning"
-                            ? "Warning"
-                            : stationVisualState === "error"
-                              ? "Error"
-                              : "Offline"}
-                      </span>
+                      <div className="stationMeta">
+                        <span className={`badge ${stationVisualState}`}>
+                          {stationVisualState === "ready"
+                            ? "Ready"
+                            : stationVisualState === "warning"
+                              ? "Warning"
+                              : stationVisualState === "error"
+                                ? "Error"
+                                : "Offline"}
+                        </span>
+                        {(runtimeByStation[station.id]) && (
+                          <span className="stationStats">
+                            <span className="stationStatItem" title="CPU">
+                              <CpuIcon />
+                              {runtimeByStation[station.id].cpu.toFixed(0)}%
+                            </span>
+                            <span className="stationStatItem" title="Memory">
+                              <MemoryIcon />
+                              {runtimeByStation[station.id].totalMemory > 0
+                                ? (runtimeByStation[station.id].currentMemory / runtimeByStation[station.id].totalMemory * 100).toFixed(0)
+                                : 0}%
+                            </span>
+                            <span className="stationStatItem" title="Processes">
+                              <ProcessIcon />
+                              {runtimeByStation[station.id].procCount}
+                            </span>
+                          </span>
+                        )}
+                        <span className="stationIp">{ip}</span>
+                      </div>
                     </div>
                   );
                 })
@@ -1147,6 +1432,112 @@ export default function App() {
                       }
                     />
                   </label>
+
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Group Membership</h3>
+                    </div>
+                    {groups.length === 0 ? (
+                      <p className="emptyInline">No groups defined yet. Create groups in the Groups page.</p>
+                    ) : (
+                      <div className="cardGrid">
+                        {groups.map((group) => {
+                          const checked = (selectedStation.groups ?? []).includes(group.id);
+                          return (
+                            <label key={group.id} className="checkField" style={{ alignSelf: 'end' }}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(event) => {
+                                  if (event.target.checked) {
+                                    void patchSelectedGroups([...(selectedStation.groups ?? []), group.id]);
+                                  } else {
+                                    void patchSelectedGroups((selectedStation.groups ?? []).filter((id) => id !== group.id));
+                                  }
+                                }}
+                              />
+                              <span>{group.name}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Station Tags</h3>
+                    </div>
+                    {tagDefinitions.length === 0 ? (
+                      <p className="emptyInline">No tag definitions yet. Create tags in the Tags page.</p>
+                    ) : (
+                      <div className="cardGrid">
+                        {tagDefinitions.map((definition) => {
+                          const tagKey = definition.key || definition.id;
+                          const tagLabel = definition.label || definition.name || tagKey;
+                          const currentValue = (selectedStation.tags ?? {})[tagKey] ?? '';
+
+                          if (definition.type === 'boolean') {
+                            return (
+                              <label className="field" key={tagKey}>
+                                <span>{tagLabel}</span>
+                                <select
+                                  value={currentValue}
+                                  onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
+                                >
+                                  <option value="">Unset</option>
+                                  <option value="true">True</option>
+                                  <option value="false">False</option>
+                                </select>
+                              </label>
+                            );
+                          }
+
+                          if (definition.type === 'select' && definition.options && definition.options.length > 0) {
+                            return (
+                              <label className="field" key={tagKey}>
+                                <span>{tagLabel}</span>
+                                <select
+                                  value={currentValue}
+                                  onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
+                                >
+                                  <option value="">Unset</option>
+                                  {definition.options.map((option) => (
+                                    <option key={option} value={option}>
+                                      {option}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            );
+                          }
+
+                          return (
+                            <label className="field" key={tagKey}>
+                              <span>{tagLabel}</span>
+                              <div className="tagValueInlineEditor">
+                                <input
+                                  type={definition.type === 'number' ? 'number' : 'text'}
+                                  value={dirtyStationTagKeys[tagKey] ? (pendingStationTagValues[tagKey] ?? '') : currentValue}
+                                  onChange={(event) => updatePendingStationTagValue(tagKey, event.target.value)}
+                                  placeholder={`Value for ${tagLabel}`}
+                                />
+                                {dirtyStationTagKeys[tagKey] ? (
+                                  <button
+                                    type="button"
+                                    className="accent tagValueSaveButton"
+                                    onClick={() => void savePendingStationTagValue(tagKey)}
+                                  >
+                                    Save
+                                  </button>
+                                ) : null}
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </section>
@@ -1456,215 +1847,13 @@ export default function App() {
           ) : null}
         </main>
       ) : activePage === "groups" ? (
-        <main className="grid">
-          <section className="panel detailPanel" style={{ flex: 1 }}>
-            <div className="panelHeader">
-              <h2>Device Groups</h2>
-              <span className="hint">Organize stations into groups with tags</span>
-            </div>
-
-            <div className="toolbar" style={{ marginBottom: "1rem" }}>
-              <button
-                onClick={() => {
-                  setEditingGroup({
-                    id: "",
-                    name: "",
-                    description: "",
-                    tags: [],
-                    stationIds: []
-                  });
-                }}
-              >
-                + New Group
-              </button>
-            </div>
-
-            {groups.length === 0 ? (
-              <p className="emptyInline">No groups yet. Create one to organize your stations.</p>
-            ) : (
-              <div className="logList">
-                {groups.map((group) => (
-                  <div key={group.id} className="stationCard">
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <strong className="stationName">{group.name}</strong>
-                        {group.description && (
-                          <span className="stationMeta" style={{ marginLeft: "0.5rem" }}>
-                            — {group.description}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <button
-                          onClick={() => setEditingGroup(group)}
-                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem" }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Delete group "${group.name}"?`)) {
-                              void deleteGroup(group.id);
-                            }
-                          }}
-                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem", color: "#d64545" }}
-                        >
-                          Delete
-                        </button>
-                        <button
-                          onClick={() => {
-                            setGroupFilter(group.id);
-                            setActivePage("stations");
-                          }}
-                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.8rem" }}
-                        >
-                          Filter Stations
-                        </button>
-                      </div>
-                    </div>
-                    {group.tags.length > 0 && (
-                      <div style={{ display: "flex", gap: "0.25rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
-                        {group.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            style={{
-                              background: "var(--accent, #1f9d55)",
-                              color: "#fff",
-                              padding: "0.1rem 0.4rem",
-                              borderRadius: "3px",
-                              fontSize: "0.7rem"
-                            }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="stationMeta" style={{ marginTop: "0.25rem" }}>
-                      {group.stationIds.length} station{group.stationIds.length !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {editingGroup && (
-            <section className="panel sidePanel">
-              <div className="panelHeader">
-                <h2>{editingGroup.id ? "Edit Group" : "New Group"}</h2>
-                <button
-                  onClick={() => setEditingGroup(null)}
-                  style={{ fontSize: "0.8rem", padding: "0.2rem 0.5rem" }}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="detailLayout">
-                <label className="field">
-                  <span>Group Name</span>
-                  <input
-                    type="text"
-                    value={editingGroup.name}
-                    onChange={(event) =>
-                      setEditingGroup((g) => g ? { ...g, name: event.target.value } : g)
-                    }
-                    placeholder="e.g. Guangzhou Office, Lab Devices"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Description</span>
-                  <input
-                    type="text"
-                    value={editingGroup.description}
-                    onChange={(event) =>
-                      setEditingGroup((g) => g ? { ...g, description: event.target.value } : g)
-                    }
-                    placeholder="Optional description"
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Tags (comma-separated)</span>
-                  <input
-                    type="text"
-                    value={editingGroup.tags.join(", ")}
-                    onChange={(event) =>
-                      setEditingGroup((g) =>
-                        g ? {
-                          ...g,
-                          tags: event.target.value
-                            .split(",")
-                            .map((t) => t.trim())
-                            .filter(Boolean)
-                        } : g
-                      )
-                    }
-                    placeholder="guangzhou, lab, production"
-                  />
-                </label>
-
-                <div className="collection">
-                  <div className="subHeader">
-                    <h3>Assign Stations ({editingGroup.stationIds.length})</h3>
-                  </div>
-                  {stations.length === 0 ? (
-                    <p className="emptyInline">No stations available.</p>
-                  ) : (
-                    <div className="logList">
-                      {stations.map((station) => {
-                        const checked = editingGroup.stationIds.includes(station.id);
-                        return (
-                          <label key={station.id} className="checkField">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={(event) => {
-                                setEditingGroup((g) => {
-                                  if (!g) return g;
-                                  return {
-                                    ...g,
-                                    stationIds: event.target.checked
-                                      ? [...g.stationIds, station.id]
-                                      : g.stationIds.filter((id) => id !== station.id)
-                                  };
-                                });
-                              }}
-                            />
-                            <span>{station.name}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                <div className="toolbar miniToolbar" style={{ marginTop: "1rem" }}>
-                  <button
-                    onClick={() => {
-                      if (!editingGroup.name.trim()) {
-                        setLog((current) => ["Group name is required.", ...current]);
-                        return;
-                      }
-                      if (editingGroup.id) {
-                        void updateGroup(editingGroup);
-                      } else {
-                        void createGroup(editingGroup.name.trim());
-                        setEditingGroup(null);
-                      }
-                    }}
-                    className="accent"
-                  >
-                    {editingGroup.id ? "Save Changes" : "Create Group"}
-                  </button>
-                  <button onClick={() => setEditingGroup(null)}>Cancel</button>
-                </div>
-              </div>
-            </section>
-          )}
-        </main>
+        <GroupsProvider>
+          <GroupsPage stations={stations} />
+        </GroupsProvider>
+      ) : activePage === "tags" ? (
+        <TagsProvider>
+          <TagsPage stations={stations} />
+        </TagsProvider>
       ) : activePage === "scripts" ? (
         <ScriptProvider>
           <ScriptsUIProvider>
@@ -1673,8 +1862,12 @@ export default function App() {
             />
           </ScriptsUIProvider>
         </ScriptProvider>
+      ) : activePage === "batch" ? (
+        <BatchProvider>
+          <BatchPage stations={stations} />
+        </BatchProvider>
       ) : (
-        <main className="grid">
+        <main className="grid gridSettingsMode">
           <section className="panel detailPanel">
             <div className="panelHeader">
               <h2>Client Options</h2>

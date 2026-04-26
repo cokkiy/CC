@@ -18,6 +18,10 @@ export type Station = {
   startPrograms: StartProgram[];
   monitorProcesses: string[];
   lastAction?: string | null;
+  groups: string[];
+  tags: Record<string, string>;
+  metadata: Record<string, string>;
+  location?: Location;
 };
 
 export type ClientOptions = {
@@ -31,6 +35,7 @@ export type PersistedState = {
   stations: Station[];
   options: ClientOptions;
   groups: StationGroup[];
+  tags: TagDefinition[];
 };
 
 export type AppSnapshot = PersistedState & {
@@ -130,12 +135,40 @@ export type CommandExecutionResult = {
   stderr: string;
 };
 
+export type Location = {
+  latitude?: number;
+  longitude?: number;
+  altitude?: number;
+  accuracy?: number;
+  address?: string;
+};
+
+export type TagDefinition = {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  type?: 'string' | 'number' | 'boolean' | 'select';
+  options?: string[];
+  required?: boolean;
+  defaultValue?: string;
+  created_at?: string;
+  updated_at?: string;
+  // UI aliases
+  label?: string;
+  key?: string;
+};
+
 export type StationGroup = {
   id: string;
   name: string;
   description: string;
   tags: string[];
   stationIds: string[];
+  // Optional UI fields
+  color?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type BatchCapture = {

@@ -1,4 +1,6 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -26,6 +28,20 @@ pub struct Station {
     pub start_programs: Vec<StartProgram>,
     pub monitor_processes: Vec<String>,
     pub last_action: Option<String>,
+    pub groups: Vec<String>,
+    pub tags: HashMap<String, String>,
+    pub metadata: HashMap<String, String>,
+    pub location: Option<Location>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct Location {
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub altitude: Option<f64>,
+    pub accuracy: Option<f64>,
+    pub address: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,12 +64,66 @@ impl Default for ClientOptions {
     }
 }
 
+/// A tag definition for categorizing stations.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TagDefinition {
+    /// Unique identifier
+    pub id: String,
+    /// Tag name
+    pub name: String,
+    /// Tag description
+    pub description: String,
+    /// Tag color (hex format, e.g., "#FF5733")
+    pub color: String,
+    /// Tag value type: string, number, boolean, select
+    #[serde(default = "default_tag_value_type")]
+    pub r#type: String,
+    /// Options for select type
+    #[serde(default)]
+    pub options: Vec<String>,
+    /// Whether this tag is required
+    #[serde(default)]
+    pub required: bool,
+    /// Optional default value
+    #[serde(default)]
+    pub default_value: Option<String>,
+    /// Creation timestamp
+    pub created_at: DateTime<Utc>,
+    /// Last update timestamp
+    pub updated_at: DateTime<Utc>,
+}
+
+impl TagDefinition {
+    /// Create a new tag definition
+    pub fn new(name: impl Into<String>) -> Self {
+        let now = Utc::now();
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            name: name.into(),
+            description: String::new(),
+            color: String::new(),
+            r#type: default_tag_value_type(),
+            options: Vec::new(),
+            required: false,
+            default_value: None,
+            created_at: now,
+            updated_at: now,
+        }
+    }
+}
+
+fn default_tag_value_type() -> String {
+    "string".to_string()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct PersistedState {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
     pub groups: Vec<StationGroup>,
+    pub tags: Vec<TagDefinition>,
 }
 
 impl Default for PersistedState {
@@ -62,6 +132,7 @@ impl Default for PersistedState {
             stations: Vec::new(),
             options: ClientOptions::default(),
             groups: Vec::new(),
+            tags: Vec::new(),
         }
     }
 }
@@ -72,6 +143,7 @@ pub struct AppSnapshot {
     pub stations: Vec<Station>,
     pub options: ClientOptions,
     pub groups: Vec<StationGroup>,
+    pub tags: Vec<TagDefinition>,
     pub storage_path: String,
     pub legacy_imported: bool,
 }

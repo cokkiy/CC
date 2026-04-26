@@ -168,10 +168,10 @@ impl WsServer {
 
     /// Broadcast telemetry to subscribed clients
     pub async fn broadcast_telemetry(&self, station_id: &str, data: &TelemetryBundle) {
-        let msg = match WsOutboundMessage::Telemetry {
+        let msg = match (WsOutboundMessage::Telemetry {
             station_id: station_id.to_string(),
             data: data.clone(),
-        }.to_json_string() {
+        }).to_json_string() {
             Ok(j) => j,
             Err(e) => {
                 error!("Failed to serialize telemetry message: {:?}", e);

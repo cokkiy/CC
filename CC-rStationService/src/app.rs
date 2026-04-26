@@ -64,6 +64,31 @@ pub async fn run(
         tokio::spawn(console_telemetry_task(Arc::clone(&state)));
     }
 
+    if state.mqtt_telemetry_enabled() {
+        let state_clone = Arc::clone(&state);
+        tokio::spawn(async move {
+            info!("MQTT telemetry publisher started");
+            let mut ticker = tokio::time::interval(Duration::from_secs(state_clone.interval_seconds()));
+            ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+            loop {
+                ticker.tick().await;
+
+                let (running, _) = state_clone.running_and_apps_state().await;
+                if let Err(error) = state_clone
+                    .publish_mqtt_telemetry_from_running_state(&running)
+                    .await
+                {
+                    warn!(error = %error, "failed to publish telemetry via MQTT");
+                }
+
+                let next_seconds = state_clone.interval_seconds().max(1);
+                ticker = tokio::time::interval(Duration::from_secs(next_seconds));
+                ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+            }
+        });
+    }
+
     // Start MQTT command listener if MQTT is enabled
     if state.mqtt_enabled() {
         if let Some(mqtt_client) = state.mqtt_client() {

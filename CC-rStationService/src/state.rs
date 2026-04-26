@@ -101,6 +101,10 @@ impl AppState {
         self.config.mqtt.enabled
     }
 
+    pub fn mqtt_telemetry_enabled(&self) -> bool {
+        self.config.mqtt.enabled && self.config.mqtt.telemetry_enabled
+    }
+
     pub fn listen_addr(&self) -> Result<SocketAddr> {
         self.config
             .control
@@ -282,24 +286,28 @@ impl AppState {
             .collect();
         let apps = AppsRunningStateEnvelope { items };
 
-        // Publish telemetry via MQTT if enabled
-        if let Some(mqtt_client) = &self.mqtt_client {
-            if self.config.mqtt.telemetry_enabled {
-                let interval_ms = (self.interval_seconds.load(Ordering::Relaxed) * 1000) as u32;
-                let telemetry_bundle = crate::mqtt::TelemetryBundle::from_station_state(&running, interval_ms);
-                
-                // Spawn async task to publish telemetry
-                let client = mqtt_client.clone();
-                let bundle = telemetry_bundle.clone();
-                tokio::spawn(async move {
-                    if let Err(e) = client.publish_telemetry(&bundle).await {
-                        tracing::error!("Failed to publish telemetry via MQTT: {:?}", e);
-                    }
-                });
-            }
+        (running, apps)
+    }
+
+    pub async fn publish_mqtt_telemetry_from_running_state(
+        &self,
+        running: &StationRunningState,
+    ) -> Result<()> {
+        if !self.mqtt_telemetry_enabled() {
+            return Ok(());
         }
 
-        (running, apps)
+        let Some(mqtt_client) = &self.mqtt_client else {
+            return Ok(());
+        };
+
+        let interval_ms = (self.interval_seconds.load(Ordering::Relaxed) * 1000) as u32;
+        let telemetry_bundle = crate::mqtt::TelemetryBundle::from_station_state(running, interval_ms);
+
+        mqtt_client
+            .publish_telemetry(&telemetry_bundle)
+            .await
+            .context("publish telemetry via MQTT")
     }
 
     pub fn all_process_info(&self) -> GetAllProcessInfoResponse {

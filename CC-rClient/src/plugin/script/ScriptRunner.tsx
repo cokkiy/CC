@@ -1446,6 +1446,234 @@ export const ScriptRunner: React.FC<ScriptRunnerProps> = ({
         .log-entry.log-warning .log-message {
           color: #fbbf24;
         }
+
+        /* Visual refresh: align Runner with Scripts redesigned style */
+        .script-runner {
+          background: var(--bg-card);
+          color: var(--text-main);
+        }
+
+        .runner-header {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          padding: 14px 18px;
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-color);
+          box-shadow: 0 10px 20px -18px rgba(11, 25, 44, 0.42);
+        }
+
+        .header-info h2 {
+          font-size: 1rem;
+          color: var(--text-main);
+        }
+
+        .script-type-badge {
+          background: rgba(45, 140, 240, 0.1);
+          border: 1px solid rgba(45, 140, 240, 0.22);
+          color: #1f4e89;
+        }
+
+        .btn-close {
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
+        }
+
+        .btn-close:hover {
+          background: rgba(45, 140, 240, 0.08);
+          color: var(--text-main);
+        }
+
+        .config-panel {
+          width: 420px;
+          border-right: 1px solid var(--border-color);
+          padding: 16px;
+          background: linear-gradient(180deg, rgba(244, 247, 249, 0.62) 0%, rgba(244, 247, 249, 0.95) 100%);
+        }
+
+        .execution-panel {
+          padding: 16px;
+          background: var(--bg-card);
+        }
+
+        .config-section {
+          margin-bottom: 14px;
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 12px;
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.04);
+        }
+
+        .config-section h3,
+        .results-section h3,
+        .log-section h3 {
+          margin: 0 0 10px;
+          font-size: 0.78rem;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+        }
+
+        .target-selector,
+        .advanced-options {
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+        }
+
+        .target-search {
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .target-search input,
+        .option-input,
+        .param-input,
+        .param-select {
+          background: #fff;
+          border: 1px solid var(--border-color);
+          color: var(--text-main);
+          border-radius: 8px;
+        }
+
+        .target-item:hover {
+          background: rgba(45, 140, 240, 0.08);
+        }
+
+        .target-id,
+        .target-count,
+        .param-description-text,
+        .option-label,
+        .option-hint {
+          color: var(--text-muted);
+        }
+
+        .script-preview {
+          background: #101b2f;
+          border-radius: 8px;
+          border: 1px solid #152744;
+        }
+
+        .execution-controls {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          padding: 10px 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          background: var(--bg-card);
+        }
+
+        .btn-execute,
+        .btn-cancel-execution {
+          min-height: 40px;
+          border-radius: 10px;
+        }
+
+        .results-section {
+          margin-top: 12px;
+          margin-bottom: 12px;
+        }
+
+        .result-tab {
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
+        }
+
+        .result-tab:hover,
+        .result-tab.active {
+          border-color: var(--primary);
+          color: var(--text-main);
+          background: rgba(45, 140, 240, 0.08);
+        }
+
+        .execution-result {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.05);
+        }
+
+        .result-header,
+        .result-footer {
+          border-color: var(--border-color);
+        }
+
+        .result-duration,
+        .result-footer {
+          color: var(--text-muted);
+        }
+
+        .output-section:first-child {
+          border-color: var(--border-color);
+        }
+
+        .output-header {
+          background: var(--bg-main);
+        }
+
+        .output-header h4 {
+          color: var(--text-muted);
+        }
+
+        .btn-copy,
+        .btn-close-result {
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
+          background: var(--bg-card);
+        }
+
+        .btn-copy:hover,
+        .btn-close-result:hover {
+          border-color: var(--primary);
+          color: var(--text-main);
+        }
+
+        .output-content.stdout {
+          background: #101b2f;
+          color: #d7e2f1;
+        }
+
+        .log-section {
+          height: 230px;
+        }
+
+        .execution-log {
+          background: #0f1728;
+          border: 1px solid #213553;
+          border-radius: 10px;
+        }
+
+        .log-entry {
+          border-bottom: 1px solid rgba(130, 162, 202, 0.15);
+        }
+
+        .log-message {
+          color: #d7e2f1;
+        }
+
+        @media (max-width: 1100px) {
+          .runner-body {
+            flex-direction: column;
+          }
+
+          .config-panel {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid var(--border-color);
+            max-height: 48vh;
+          }
+
+          .execution-panel {
+            padding-top: 12px;
+          }
+
+          .result-footer {
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
+          }
+        }
       `}</style>
     </div>
   );
