@@ -431,12 +431,16 @@ pub fn export_legacy_ini(options: &ClientOptions) -> String {
     let monitor_processes = options.monitor_processes.join("|");
 
     format!(
-    "Interval={interval}\nIsFirstTimeRun={first_run}\n[ControlAndMonitor]\nStartApps={start_apps}\nMonitorProc={monitor_processes}\n",
-    interval = options.interval,
-    first_run = if options.is_first_time_run { "true" } else { "false" },
-    start_apps = start_apps,
-    monitor_processes = monitor_processes,
-  )
+        "Interval={interval}\nIsFirstTimeRun={first_run}\n[ControlAndMonitor]\nStartApps={start_apps}\nMonitorProc={monitor_processes}\n",
+        interval = options.interval,
+        first_run = if options.is_first_time_run {
+            "true"
+        } else {
+            "false"
+        },
+        start_apps = start_apps,
+        monitor_processes = monitor_processes,
+    )
 }
 
 fn normalize_payload(mut payload: PersistedState) -> PersistedState {
@@ -553,10 +557,7 @@ fn ip_matches_localhost(raw: &str) -> bool {
         .or_else(|| trimmed.strip_prefix("https://"))
         .unwrap_or(trimmed.as_str());
 
-    let authority = without_scheme
-        .split('/')
-        .next()
-        .unwrap_or(without_scheme);
+    let authority = without_scheme.split('/').next().unwrap_or(without_scheme);
 
     if let Some(stripped) = authority.strip_prefix('[') {
         let host = stripped.split(']').next().unwrap_or_default();
@@ -717,11 +718,13 @@ SavePathForWindows=C:\weather
         assert!(inserted);
         assert_eq!(payload.stations.len(), 1);
         assert_eq!(payload.stations[0].id, LOCAL_STATION_ID);
-        assert!(payload.stations[0]
-            .network_interfaces
-            .iter()
-            .flat_map(|iface| iface.ips.iter())
-            .any(|ip| ip == "127.0.0.1:50051"));
+        assert!(
+            payload.stations[0]
+                .network_interfaces
+                .iter()
+                .flat_map(|iface| iface.ips.iter())
+                .any(|ip| ip == "127.0.0.1:50051")
+        );
     }
 
     #[test]

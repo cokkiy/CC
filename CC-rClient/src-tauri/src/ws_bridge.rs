@@ -1,5 +1,5 @@
 //! WebSocket bridge module for CC-rClient
-//! 
+//!
 //! This module implements WebSocket connection to CC-Aggregator
 //! and bridges between the Tauri frontend and MQTT message broker.
 
@@ -8,7 +8,7 @@ use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tauri::{AppHandle, Emitter};
-use tokio::sync::{mpsc, RwLock};
+use tokio::sync::{RwLock, mpsc};
 use tokio_tungstenite::{connect_async, tungstenite::Message};
 use tracing::{debug, error, info, warn};
 
@@ -18,10 +18,10 @@ use tracing::{debug, error, info, warn};
 pub enum WsClientMessage {
     #[serde(rename = "subscribe")]
     Subscribe { stations: Vec<String> },
-    
+
     #[serde(rename = "unsubscribe")]
     Unsubscribe { stations: Vec<String> },
-    
+
     #[serde(rename = "getStations")]
     GetStations,
 }
@@ -35,16 +35,16 @@ pub enum WsServerMessage {
         station_id: String,
         data: TelemetryBundle,
     },
-    
+
     #[serde(rename = "status")]
     Status {
         station_id: String,
         status: StationStatus,
     },
-    
+
     #[serde(rename = "stationList")]
     StationList { stations: Vec<String> },
-    
+
     #[serde(rename = "error")]
     Error { message: String },
 }
@@ -138,12 +138,14 @@ impl MqttWsBridge {
         {
             // Check if already connected or connecting
             let current_state = self.state.read().await;
-            if *current_state == ConnectionState::Connected || *current_state == ConnectionState::Connecting {
+            if *current_state == ConnectionState::Connected
+                || *current_state == ConnectionState::Connecting
+            {
                 info!("Already connected or connecting");
                 return Ok(());
             }
         }
-        
+
         // Set state to connecting
         {
             let mut state = self.state.write().await;
@@ -151,15 +153,15 @@ impl MqttWsBridge {
         }
 
         info!("Connecting to CC-Aggregator at: {}", self.aggregator_url);
-        
+
         let url = self.aggregator_url.clone();
         let app_handle = self.app_handle.clone();
         let state = self.state.clone();
-        
+
         // Create command channel
         let (tx, mut rx) = mpsc::channel::<BridgeCommand>(100);
         self.command_tx = Some(tx);
-        
+
         // Connect to aggregator
         match connect_async(&url).await {
             Ok((ws_stream, _)) => {
@@ -170,7 +172,7 @@ impl MqttWsBridge {
                 }
 
                 let (ws_write, mut read) = ws_stream.split();
-                
+
                 // Spawn task to handle commands - takes ownership of ws_write
                 let command_handle = tokio::spawn(async move {
                     let mut write = ws_write;
@@ -211,7 +213,7 @@ impl MqttWsBridge {
 
                 // Handle incoming messages
                 let app_handle_clone = app_handle.clone();
-                
+
                 while let Some(msg_result) = read.next().await {
                     match msg_result {
                         Ok(Message::Text(text)) => {
@@ -249,12 +251,12 @@ impl MqttWsBridge {
                     let mut s = state.write().await;
                     *s = ConnectionState::Disconnected;
                 }
-                
+
                 info!("WebSocket disconnected");
-                
+
                 // Emit disconnected event
                 let _ = app_handle.emit("ws-disconnected", ());
-                
+
                 Ok(())
             }
             Err(e) => {
@@ -273,18 +275,25 @@ impl MqttWsBridge {
     /// Handle incoming WebSocket message
     fn handle_message(text: &str, app_handle: &AppHandle) {
         debug!("Received WebSocket message: {}", text);
-        
+
         if let Ok(msg) = serde_json::from_str::<WsServerMessage>(text) {
             match msg {
                 WsServerMessage::Telemetry { station_id, data } => {
-                    info!("Received telemetry for station {}: {} values", station_id, data.values.len());
+                    info!(
+                        "Received telemetry for station {}: {} values",
+                        station_id,
+                        data.values.len()
+                    );
                     let payload = TelemetryEventPayload { station_id, data };
                     if let Err(e) = app_handle.emit("telemetry", payload) {
                         warn!("Failed to emit telemetry event: {:?}", e);
                     }
                 }
                 WsServerMessage::Status { station_id, status } => {
-                    info!("Received status for station {}: online={}", station_id, status.online);
+                    info!(
+                        "Received status for station {}: online={}",
+                        station_id, status.online
+                    );
                     let payload = StatusEventPayload { station_id, status };
                     if let Err(e) = app_handle.emit("station-status", payload) {
                         warn!("Failed to emit status event: {:?}", e);
@@ -318,13 +327,13 @@ impl MqttWsBridge {
                 }
             }
         }
-        
+
         info!("Subscribing to stations: {:?}", station_ids);
-        
+
         if let Some(tx) = &self.command_tx {
             tx.send(BridgeCommand::Subscribe(station_ids)).await?;
         }
-        
+
         Ok(())
     }
 
@@ -334,40 +343,40 @@ impl MqttWsBridge {
             let mut subscribed = self.subscribed_stations.write().await;
             subscribed.retain(|id| !station_ids.contains(id));
         }
-        
+
         info!("Unsubscribing from stations: {:?}", station_ids);
-        
+
         if let Some(tx) = &self.command_tx {
             tx.send(BridgeCommand::Unsubscribe(station_ids)).await?;
         }
-        
+
         Ok(())
     }
 
     /// Request station list
     pub async fn request_stations(&self) -> Result<()> {
         info!("Requesting station list");
-        
+
         if let Some(tx) = &self.command_tx {
             tx.send(BridgeCommand::GetStations).await?;
         }
-        
+
         Ok(())
     }
 
     /// Disconnect from the aggregator
     pub async fn disconnect(&self) -> Result<()> {
         info!("Disconnecting from aggregator");
-        
+
         if let Some(tx) = &self.command_tx {
             let _ = tx.send(BridgeCommand::Disconnect).await;
         }
-        
+
         {
             let mut state = self.state.write().await;
             *state = ConnectionState::Disconnected;
         }
-        
+
         Ok(())
     }
 }

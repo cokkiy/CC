@@ -12,14 +12,14 @@ use tonic::Request;
 
 use crate::control::{station_endpoints, station_label};
 use crate::grpc::cc::{
-    self, file_transfer_client::FileTransferClient, station_control_client::StationControlClient,
-    telemetry_client::TelemetryClient, telemetry_client_message, telemetry_server_message,
-    CaptureScreenRequest, DownloadRequest, Empty, ExecuteCommandRequest,
-    PathRef, RenameFileRequest, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
-    TelemetryClientMessage, UploadChunk,
+    self, CaptureScreenRequest, DownloadRequest, Empty, ExecuteCommandRequest, PathRef,
+    RenameFileRequest, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
+    TelemetryClientMessage, UploadChunk, file_transfer_client::FileTransferClient,
+    station_control_client::StationControlClient, telemetry_client::TelemetryClient,
+    telemetry_client_message, telemetry_server_message,
 };
 use crate::models::Station;
-use tracing::{debug};
+use tracing::debug;
 
 const FILE_CHUNK_SIZE: usize = 64 * 1024;
 
@@ -101,7 +101,7 @@ pub struct StationScreenCapture {
     pub data_url: String,
 }
 
- pub async fn fetch_station_runtime(
+pub async fn fetch_station_runtime(
     station: &Station,
     interval_seconds: i32,
 ) -> Result<StationRuntimeSnapshot, String> {
