@@ -71,7 +71,7 @@ impl ProcessMonitorPlugin {
             .iter()
             .map(|(pid, p)| {
                 let name = p.name().to_string_lossy().to_string();
-                let pid_val = pid.as_u64();
+                let pid_val = pid.as_u32() as u64;
                 let cpu_usage = if p.cpu_usage().is_nan() || p.cpu_usage() > 100.0 {
                     0.0
                 } else {
@@ -92,7 +92,7 @@ impl ProcessMonitorPlugin {
             .iter()
             .map(|(pid, p)| {
                 let name = p.name().to_string_lossy().to_string();
-                let pid_val = pid.as_u64();
+                let pid_val = pid.as_u32() as u64;
                 let memory = p.memory();
                 (name, pid_val, memory)
             })

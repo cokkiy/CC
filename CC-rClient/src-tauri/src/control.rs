@@ -5,10 +5,9 @@ use std::path::Path;
 use tonic::transport::Channel;
 
 use crate::grpc::cc::{
-    station_control_client::StationControlClient, AppStartParameter, AppStartingResult,
-    CloseAppRequest, Empty, GetAllProcessInfoResponse, RebootRequest, RestartAppRequest,
-    SetStateGatheringIntervalRequest,
-    ShutdownRequest, StartAppRequest,
+    AppStartParameter, AppStartingResult, CloseAppRequest, Empty, GetAllProcessInfoResponse,
+    RebootRequest, RestartAppRequest, SetStateGatheringIntervalRequest, ShutdownRequest,
+    StartAppRequest, station_control_client::StationControlClient,
 };
 use crate::models::{ActionResult, StartProgram, Station, StationAction};
 use crate::storage::StorageError;
@@ -23,7 +22,6 @@ const APP_CONTROL_RESULT_NOT_RUNNING: i32 = 4;
 const APP_CONTROL_RESULT_CLOSED: i32 = 5;
 const APP_CONTROL_RESULT_FAIL_TO_CLOSE: i32 = 6;
 const APP_CONTROL_RESULT_ERROR: i32 = 7;
-
 
 pub async fn execute_station_action(
     action: StationAction,
@@ -60,7 +58,10 @@ pub async fn execute_station_action(
         StationAction::BatchPowerOn | StationAction::BatchShutdown | StationAction::BatchReboot
     ) {
         execute_batch_action(&action, &target_indices, stations).await?
-    } else if matches!(action, StationAction::PowerOn | StationAction::Block | StationAction::Unblock) {
+    } else if matches!(
+        action,
+        StationAction::PowerOn | StationAction::Block | StationAction::Unblock
+    ) {
         execute_native_action(&action, &target_indices, stations)
             .map_err(|error| error.to_string())?
     } else {
@@ -153,26 +154,22 @@ async fn execute_batch_action(
         } else {
             let (mut client, endpoint) = connect_station(station).await?;
             match &single_action {
-                StationAction::Shutdown => {
-                    client
-                        .shutdown(ShutdownRequest {})
-                        .await
-                        .map(|_| {
-                            station.last_action = Some(format!("Shutdown requested via {endpoint}"));
-                            format!("Shutdown requested via {endpoint}")
-                        })
-                        .map_err(|e| format!("shutdown RPC failed via {endpoint}: {e}"))
-                }
-                StationAction::Reboot => {
-                    client
-                        .reboot(RebootRequest { force: false })
-                        .await
-                        .map(|_| {
-                            station.last_action = Some(format!("Reboot requested via {endpoint}"));
-                            format!("Reboot requested via {endpoint}")
-                        })
-                        .map_err(|e| format!("reboot RPC failed via {endpoint}: {e}"))
-                }
+                StationAction::Shutdown => client
+                    .shutdown(ShutdownRequest {})
+                    .await
+                    .map(|_| {
+                        station.last_action = Some(format!("Shutdown requested via {endpoint}"));
+                        format!("Shutdown requested via {endpoint}")
+                    })
+                    .map_err(|e| format!("shutdown RPC failed via {endpoint}: {e}")),
+                StationAction::Reboot => client
+                    .reboot(RebootRequest { force: false })
+                    .await
+                    .map(|_| {
+                        station.last_action = Some(format!("Reboot requested via {endpoint}"));
+                        format!("Reboot requested via {endpoint}")
+                    })
+                    .map_err(|e| format!("reboot RPC failed via {endpoint}: {e}")),
                 _ => unreachable!(),
             }
         };
@@ -299,7 +296,10 @@ async fn execute_remote_action_for_station(
             Err(format!("{} is handled locally.", action.label()))
         }
         StationAction::BatchPowerOn | StationAction::BatchShutdown | StationAction::BatchReboot => {
-            Err(format!("Batch action {} is handled in the batch dispatcher.", action.label()))
+            Err(format!(
+                "Batch action {} is handled in the batch dispatcher.",
+                action.label()
+            ))
         }
     }
 }
@@ -544,7 +544,6 @@ fn display_process_name(result: &AppStartingResult) -> String {
     }
 }
 
-
 pub(crate) fn station_label(station: &Station) -> &str {
     if station.name.trim().is_empty() {
         station.id.as_str()
@@ -560,9 +559,7 @@ pub async fn set_station_gathering_interval(
 ) -> Result<(), String> {
     let (mut client, endpoint) = connect_station(station).await?;
     client
-        .set_state_gathering_interval(SetStateGatheringIntervalRequest {
-            interval_seconds,
-        })
+        .set_state_gathering_interval(SetStateGatheringIntervalRequest { interval_seconds })
         .await
         .map_err(|e| format!("set_state_gathering_interval RPC via {endpoint}: {e}"))?;
     Ok(())

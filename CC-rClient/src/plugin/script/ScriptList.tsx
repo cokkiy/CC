@@ -380,13 +380,13 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Bar with Type Filter */}
         <div className="search-bar">
           <span className="search-icon">🔍</span>
           <input
             type="text"
             className="search-input"
-            placeholder="Search scripts by name, description, or tags..."
+            placeholder="Search scripts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -395,14 +395,14 @@ export const ScriptList: React.FC<ScriptListProps> = ({
               ×
             </button>
           )}
+          <div className="type-filter-inline">
+            <ScriptTypeFilter
+              selected={selectedType}
+              onChange={setSelectedType}
+              counts={countsByType}
+            />
+          </div>
         </div>
-
-        {/* Type Filter */}
-        <ScriptTypeFilter
-          selected={selectedType}
-          onChange={setSelectedType}
-          counts={countsByType}
-        />
 
         {/* Additional Filters */}
         <div className="filter-row">
@@ -540,38 +540,47 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           display: flex;
           flex-direction: column;
           height: 100%;
-          background: var(--bg-primary, #1a1a1a);
-          color: var(--text-primary, #e0e0e0);
+          background: transparent;
+          color: var(--text-main);
         }
 
         .list-header {
-          padding: 20px 24px;
-          background: var(--bg-secondary, #252525);
-          border-bottom: 1px solid var(--border-color, #333);
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          padding: 16px 20px 14px;
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-color);
+          box-shadow: 0 10px 20px -18px rgba(11, 25, 44, 0.4);
         }
 
         .header-top {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
+          align-items: flex-end;
+          gap: 12px;
+          margin-bottom: 14px;
+          flex-wrap: wrap;
         }
 
         .header-top h2 {
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--text-main);
         }
 
         .header-actions {
           display: flex;
           gap: 8px;
+          flex-wrap: wrap;
+          justify-content: flex-end;
         }
 
         .btn-import, .btn-export, .btn-create {
-          padding: 8px 16px;
-          border-radius: 6px;
-          font-size: 14px;
+          padding: 7px 12px;
+          border-radius: 8px;
+          font-size: 0.82rem;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
@@ -579,22 +588,24 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .btn-import {
           background: transparent;
-          border: 1px solid var(--border-color, #444);
-          color: var(--text-secondary, #a0a0a0);
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
         }
 
         .btn-import:hover {
-          background: var(--bg-hover, #333);
+          color: var(--text-main);
+          border-color: var(--primary);
         }
 
         .btn-export {
           background: transparent;
-          border: 1px solid var(--border-color, #444);
-          color: var(--text-secondary, #a0a0a0);
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
         }
 
         .btn-export:hover:not(:disabled) {
-          background: var(--bg-hover, #333);
+          color: var(--text-main);
+          border-color: var(--primary);
         }
 
         .btn-export:disabled {
@@ -603,95 +614,169 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .btn-create {
-          background: var(--accent-color, #3b82f6);
-          border: none;
+          background: var(--primary);
+          border: 1px solid var(--primary);
           color: white;
         }
 
         .btn-create:hover {
-          background: var(--accent-hover, #2563eb);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .search-bar {
           display: flex;
           align-items: center;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 8px;
-          padding: 0 12px;
-          margin-bottom: 16px;
+          gap: 10px;
+          background: linear-gradient(180deg, rgba(45, 140, 240, 0.05) 0%, rgba(45, 140, 240, 0.01) 100%);
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          padding: 8px 10px;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
         }
 
         .search-icon {
-          font-size: 16px;
-          margin-right: 8px;
+          font-size: 14px;
+          opacity: 0.65;
+          flex-shrink: 0;
         }
 
         .search-input {
           flex: 1;
-          padding: 10px 0;
+          min-width: 220px;
+          padding: 8px 2px;
           background: transparent;
           border: none;
-          color: var(--text-primary, #e0e0e0);
-          font-size: 14px;
+          color: var(--text-main);
+          font-size: 0.9rem;
           outline: none;
         }
 
         .search-input::placeholder {
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
         }
 
         .search-clear {
           background: none;
           border: none;
-          color: var(--text-muted, #666);
-          font-size: 20px;
+          color: var(--text-muted);
+          font-size: 16px;
           cursor: pointer;
           padding: 0;
           line-height: 1;
+          flex-shrink: 0;
         }
 
         .search-clear:hover {
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
+        }
+
+        .type-filter-inline {
+          display: flex;
+          gap: 4px;
+          flex-shrink: 1;
+          border-left: 1px solid var(--border-color);
+          padding-left: 10px;
+          margin-left: 4px;
+          max-width: 100%;
+          overflow-x: auto;
         }
 
         .script-type-filter {
           display: flex;
-          gap: 8px;
-          margin-bottom: 16px;
+          gap: 6px;
+          flex-wrap: nowrap;
+        }
+
+        .script-type-filter .filter-btn {
+          padding: 4px 10px;
+          font-size: 0.76rem;
+        }
+
+        .sort-controls {
+          display: flex;
+          align-items: center;
+          gap: 10px;
           flex-wrap: wrap;
+        }
+
+        .sort-label {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+        }
+
+        .sort-select {
+          padding: 6px 8px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          color: var(--text-main);
+          font-size: 0.8rem;
+          cursor: pointer;
+        }
+
+        .btn-sort-order {
+          padding: 6px 10px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          color: var(--text-main);
+          font-size: 0.85rem;
+          cursor: pointer;
+        }
+
+        .btn-sort-order:hover {
+          border-color: var(--primary);
+        }
+
+        .result-count {
+          margin-left: auto;
+          font-size: 0.8rem;
+          color: var(--text-muted);
+        }
+
+        .script-grid {
+          flex: 1;
+          overflow-y: auto;
+          padding: 18px;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 14px;
+          align-content: start;
+          background: linear-gradient(180deg, rgba(244, 247, 249, 0.6) 0%, rgba(244, 247, 249, 0.95) 100%);
         }
 
         .filter-btn {
           display: flex;
           align-items: center;
           gap: 6px;
-          padding: 6px 12px;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 20px;
-          color: var(--text-secondary, #a0a0a0);
-          font-size: 13px;
+          padding: 5px 10px;
+          background: transparent;
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          color: var(--text-muted);
+          font-size: 0.8rem;
           cursor: pointer;
           transition: all 0.2s;
         }
 
         .filter-btn:hover {
-          border-color: var(--accent-color, #3b82f6);
-          color: var(--text-primary, #e0e0e0);
+          border-color: var(--primary);
+          color: var(--text-main);
         }
 
         .filter-btn.active {
-          background: var(--accent-color, #3b82f6);
-          border-color: var(--accent-color, #3b82f6);
+          background: var(--primary);
+          border-color: var(--primary);
           color: white;
         }
 
         .filter-count {
           background: rgba(255, 255, 255, 0.2);
-          padding: 2px 6px;
-          border-radius: 10px;
-          font-size: 11px;
+          padding: 1px 5px;
+          border-radius: 8px;
+          font-size: 0.7rem;
         }
 
         .filter-row {
@@ -700,7 +785,7 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           align-items: center;
           margin-bottom: 12px;
           flex-wrap: wrap;
-          gap: 12px;
+          gap: 10px;
         }
 
         .filter-tags {
@@ -711,28 +796,28 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .filter-label {
-          font-size: 13px;
-          color: var(--text-muted, #666);
+          font-size: 0.8rem;
+          color: var(--text-muted);
         }
 
         .tag-filter-btn {
-          padding: 4px 10px;
+          padding: 3px 8px;
           background: transparent;
-          border: 1px solid var(--border-color, #444);
-          border-radius: 4px;
-          color: var(--text-secondary, #a0a0a0);
-          font-size: 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          color: var(--text-muted);
+          font-size: 0.75rem;
           cursor: pointer;
           transition: all 0.2s;
         }
 
         .tag-filter-btn:hover {
-          border-color: var(--accent-color, #3b82f6);
+          border-color: var(--primary);
         }
 
         .tag-filter-btn.active {
-          background: var(--accent-color, #3b82f6);
-          border-color: var(--accent-color, #3b82f6);
+          background: var(--primary);
+          border-color: var(--primary);
           color: white;
         }
 
@@ -745,8 +830,8 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 13px;
-          color: var(--text-secondary, #a0a0a0);
+          font-size: 0.8rem;
+          color: var(--text-muted);
           cursor: pointer;
         }
 
@@ -754,74 +839,42 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           cursor: pointer;
         }
 
-        .sort-controls {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .sort-label {
-          font-size: 13px;
-          color: var(--text-muted, #666);
-        }
-
-        .sort-select {
-          padding: 6px 10px;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
-          font-size: 13px;
-          cursor: pointer;
-        }
-
-        .btn-sort-order {
-          padding: 6px 10px;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
-          font-size: 14px;
-          cursor: pointer;
-        }
-
-        .btn-sort-order:hover {
-          border-color: var(--accent-color, #3b82f6);
-        }
-
-        .result-count {
-          margin-left: auto;
-          font-size: 13px;
-          color: var(--text-muted, #666);
-        }
-
-        .script-grid {
-          flex: 1;
-          overflow-y: auto;
-          padding: 24px;
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 16px;
-          align-content: start;
-        }
-
         .script-card {
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #333);
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
           border-radius: 12px;
-          padding: 16px;
+          padding: 14px;
           cursor: pointer;
           transition: all 0.2s;
           position: relative;
+          overflow: hidden;
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.05);
+        }
+
+        .script-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, var(--primary) 0%, #44b2ff 100%);
+          opacity: 0;
+          transition: opacity 0.2s;
         }
 
         .script-card:hover {
-          border-color: var(--accent-color, #3b82f6);
-          transform: translateY(-2px);
+          border-color: var(--primary);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 24px rgba(11, 25, 44, 0.12);
+        }
+
+        .script-card:hover::before {
+          opacity: 1;
         }
 
         .script-card.favorite {
-          border-color: #f59e0b;
+          border-color: var(--warning);
         }
 
         .card-header {
@@ -843,9 +896,9 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .card-title {
           margin: 0;
-          font-size: 16px;
+          font-size: 0.95rem;
           font-weight: 600;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
         }
 
         .template-badge {
@@ -877,8 +930,8 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .card-description {
           margin: 0 0 12px 0;
-          font-size: 13px;
-          color: var(--text-secondary, #a0a0a0);
+          font-size: 0.82rem;
+          color: var(--text-muted);
           line-height: 1.4;
           display: -webkit-box;
           -webkit-line-clamp: 2;
@@ -894,8 +947,8 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .tag {
-          background: var(--bg-primary, #1a1a1a);
-          color: var(--text-secondary, #a0a0a0);
+          background: rgba(45, 140, 240, 0.08);
+          color: #1f4e89;
           padding: 3px 8px;
           border-radius: 4px;
           font-size: 11px;
@@ -948,24 +1001,24 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .btn-edit {
-          background: var(--bg-primary, #1a1a1a);
-          color: var(--text-secondary, #a0a0a0);
-          border: 1px solid var(--border-color, #444);
+          background: var(--bg-main);
+          color: var(--text-muted);
+          border: 1px solid var(--border-color);
         }
 
         .btn-edit:hover {
-          border-color: var(--accent-color, #3b82f6);
-          color: var(--accent-color, #3b82f6);
+          border-color: var(--primary);
+          color: var(--primary);
         }
 
         .btn-menu {
-          background: var(--bg-primary, #1a1a1a);
-          color: var(--text-secondary, #a0a0a0);
-          border: 1px solid var(--border-color, #444);
+          background: var(--bg-main);
+          color: var(--text-muted);
+          border: 1px solid var(--border-color);
         }
 
         .btn-menu:hover {
-          border-color: var(--accent-color, #3b82f6);
+          border-color: var(--primary);
         }
 
         .dropdown-container {
@@ -977,13 +1030,13 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           top: 100%;
           right: 0;
           margin-top: 4px;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           padding: 4px;
           min-width: 140px;
           z-index: 100;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 10px 24px rgba(11, 25, 44, 0.16);
         }
 
         .dropdown-menu button {
@@ -991,7 +1044,7 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           padding: 8px 12px;
           background: transparent;
           border: none;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 13px;
           text-align: left;
           cursor: pointer;
@@ -1002,7 +1055,7 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .dropdown-menu button:hover {
-          background: var(--bg-hover, #333);
+          background: rgba(45, 140, 240, 0.08);
         }
 
         .dropdown-menu button.danger {
@@ -1012,9 +1065,9 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         .card-updated {
           margin-top: 12px;
           padding-top: 12px;
-          border-top: 1px solid var(--border-color, #333);
+          border-top: 1px solid var(--border-color);
           font-size: 11px;
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
         }
 
         .loading-state, .empty-state {
@@ -1043,7 +1096,7 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         .empty-state h3 {
           margin: 16px 0 8px;
           font-size: 18px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
         }
 
         .empty-state p {
@@ -1068,8 +1121,8 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .btn-clear-filters {
           background: transparent;
-          border: 1px solid var(--border-color, #444);
-          color: var(--text-secondary, #a0a0a0);
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
         }
 
         .btn-create-empty:hover {
@@ -1090,8 +1143,8 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .delete-confirm-dialog {
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #333);
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
           border-radius: 12px;
           padding: 24px;
           max-width: 400px;
@@ -1105,7 +1158,7 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .delete-confirm-dialog p {
           margin: 0 0 20px;
-          color: var(--text-secondary, #a0a0a0);
+          color: var(--text-muted);
         }
 
         .dialog-actions {
@@ -1117,9 +1170,9 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         .btn-cancel {
           padding: 10px 20px;
           background: transparent;
-          border: 1px solid var(--border-color, #444);
+          border: 1px solid var(--border-color);
           border-radius: 6px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 14px;
           cursor: pointer;
         }
@@ -1136,6 +1189,36 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .btn-delete:hover {
           background: #dc2626;
+        }
+
+        @media (max-width: 980px) {
+          .list-header {
+            padding: 14px;
+          }
+
+          .search-bar {
+            padding: 8px;
+          }
+
+          .search-input {
+            min-width: 150px;
+          }
+
+          .script-grid {
+            grid-template-columns: 1fr;
+            padding: 12px;
+          }
+
+          .type-filter-inline {
+            border-left: none;
+            padding-left: 0;
+            margin-left: 0;
+          }
+
+          .result-count {
+            margin-left: 0;
+            width: 100%;
+          }
         }
       `}</style>
     </div>

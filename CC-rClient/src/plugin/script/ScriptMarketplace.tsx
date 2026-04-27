@@ -1770,6 +1770,287 @@ export const ScriptMarketplace: React.FC<ScriptMarketplaceProps> = ({
           max-height: 150px;
           overflow-y: auto;
         }
+
+        /* Visual refresh: align Marketplace with Scripts redesigned style */
+        .script-marketplace {
+          background: var(--bg-card);
+          color: var(--text-main);
+        }
+
+        .marketplace-header {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          align-items: center;
+          padding: 14px 18px;
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-color);
+          box-shadow: 0 10px 20px -18px rgba(11, 25, 44, 0.4);
+        }
+
+        .header-info h2 {
+          font-size: 1.05rem;
+          color: var(--text-main);
+        }
+
+        .header-info p {
+          font-size: 0.82rem;
+          color: var(--text-muted);
+        }
+
+        .btn-close {
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
+        }
+
+        .btn-close:hover {
+          background: rgba(45, 140, 240, 0.08);
+          color: var(--text-main);
+        }
+
+        .success-message {
+          margin: 14px 18px;
+          background: rgba(25, 190, 107, 0.12);
+          border: 1px solid rgba(25, 190, 107, 0.5);
+          color: #14824a;
+        }
+
+        .tab-navigation {
+          padding: 0 18px;
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+          color: var(--text-muted);
+          border-bottom-width: 3px;
+        }
+
+        .tab-btn:hover {
+          color: var(--text-main);
+        }
+
+        .tab-btn.active {
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+          background: linear-gradient(180deg, rgba(244, 247, 249, 0.65) 0%, rgba(244, 247, 249, 1) 100%);
+          padding: 18px;
+        }
+
+        .import-tab,
+        .export-tab {
+          max-width: 780px;
+        }
+
+        .drop-zone,
+        .import-preview-summary,
+        .import-instructions,
+        .export-card,
+        .export-scripts-list {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.04);
+        }
+
+        .drop-zone {
+          border-style: dashed;
+          border-width: 2px;
+          border-color: rgba(45, 140, 240, 0.35);
+          border-radius: 14px;
+          background: linear-gradient(180deg, rgba(45, 140, 240, 0.04) 0%, rgba(45, 140, 240, 0.01) 100%);
+        }
+
+        .drop-zone:hover {
+          border-color: var(--primary);
+          background: linear-gradient(180deg, rgba(45, 140, 240, 0.08) 0%, rgba(45, 140, 240, 0.02) 100%);
+        }
+
+        .drop-zone-content h3,
+        .preview-summary-header h3,
+        .export-card h3 {
+          color: var(--text-main);
+        }
+
+        .drop-zone-content p,
+        .file-types,
+        .import-preview-summary p,
+        .import-instructions ol,
+        .export-card p,
+        .export-selection-section h4,
+        .no-scripts {
+          color: var(--text-muted);
+        }
+
+        .script-count,
+        .btn-import-now,
+        .btn-export-selected,
+        .btn-import {
+          background: var(--primary);
+          border: 1px solid var(--primary);
+        }
+
+        .btn-import-now:hover,
+        .btn-export-selected:hover,
+        .btn-import:hover:not(:disabled) {
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
+        }
+
+        .btn-preview-full,
+        .btn-retry,
+        .btn-cancel,
+        .btn-export,
+        .btn-link {
+          color: var(--text-muted);
+          border-color: var(--border-color);
+        }
+
+        .btn-preview-full,
+        .btn-cancel,
+        .btn-export {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+        }
+
+        .btn-preview-full:hover,
+        .btn-cancel:hover:not(:disabled),
+        .btn-export:hover:not(:disabled) {
+          border-color: var(--primary);
+          color: var(--text-main);
+        }
+
+        .btn-export {
+          color: #14824a;
+          border-color: rgba(25, 190, 107, 0.45);
+          background: rgba(25, 190, 107, 0.08);
+        }
+
+        .import-instructions h4,
+        .selection-header h4,
+        .field-group label {
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          font-size: 0.76rem;
+        }
+
+        .format-example,
+        .code-preview {
+          background: #101b2f;
+          border: 1px solid #152744;
+          border-radius: 8px;
+        }
+
+        .export-script-item {
+          border-color: var(--border-color);
+        }
+
+        .export-script-item:hover {
+          background: rgba(45, 140, 240, 0.08);
+        }
+
+        .export-script-item .script-type,
+        .script-meta,
+        .package-version,
+        .package-meta,
+        .existing-note,
+        .preview-meta,
+        .preview-description,
+        .selection-header h4,
+        .package-description {
+          color: var(--text-muted);
+        }
+
+        .scripts-list,
+        .metadata-form,
+        .script-preview,
+        .tag-input-container,
+        .field-group input,
+        .field-group textarea,
+        .field-group select {
+          background: var(--bg-main);
+          border-color: var(--border-color);
+          color: var(--text-main);
+        }
+
+        .tag,
+        .template-badge {
+          background: rgba(45, 140, 240, 0.1);
+          color: #1f4e89;
+          border: 1px solid rgba(45, 140, 240, 0.22);
+        }
+
+        .tag button {
+          color: #1f4e89;
+        }
+
+        .preview-header:hover {
+          background: rgba(45, 140, 240, 0.08);
+        }
+
+        .expand-icon {
+          color: var(--text-muted);
+        }
+
+        .modal-overlay {
+          background: rgba(11, 25, 44, 0.42);
+          backdrop-filter: blur(2px);
+        }
+
+        .import-modal,
+        .export-modal {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          box-shadow: 0 22px 56px rgba(8, 20, 38, 0.24);
+        }
+
+        .modal-header,
+        .modal-footer,
+        .package-info,
+        .import-summary,
+        .script-item {
+          border-color: var(--border-color);
+        }
+
+        @media (max-width: 900px) {
+          .marketplace-header {
+            padding: 12px;
+          }
+
+          .tab-navigation {
+            padding: 0 12px;
+          }
+
+          .tab-content {
+            padding: 12px;
+          }
+
+          .drop-zone {
+            padding: 22px 16px;
+          }
+
+          .preview-actions {
+            flex-direction: column;
+          }
+
+          .modal-body {
+            padding: 14px;
+          }
+
+          .modal-footer {
+            padding: 12px;
+            flex-direction: column-reverse;
+          }
+
+          .btn-cancel,
+          .btn-import,
+          .btn-export {
+            width: 100%;
+          }
+        }
       `}</style>
     </div>
   );

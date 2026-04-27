@@ -92,9 +92,9 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
   };
 
   return (
-    <>
-      <main className="grid">
-        <section className="panel" style={{ flex: 1 }}>
+    <div className="scripts-page-shell">
+      <main className="grid gridScriptsMode scripts-main-grid">
+        <section className="panel scripts-main-panel">
           <ScriptList
             scripts={scripts}
             onEditScript={handleEditScript}
@@ -123,20 +123,28 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
       </main>
 
       {editor.open && (
-        <ScriptEditor
-          script={editor.script ?? undefined}
-          onSave={handleSaveScript}
-          onCancel={handleCancelEdit}
-        />
+        <div className="scripts-layer scripts-layer-drawer" role="dialog" aria-modal="true">
+          <div className="scripts-drawer-panel">
+            <ScriptEditor
+              script={editor.script ?? undefined}
+              onSave={handleSaveScript}
+              onCancel={handleCancelEdit}
+            />
+          </div>
+        </div>
       )}
 
       {runner.open && runner.script && (
-        <ScriptRunner
-          script={runner.script}
-          targets={targets}
-          onExecute={handleRunScripts}
-          onCancel={handleCancelRun}
-        />
+        <div className="scripts-layer" role="dialog" aria-modal="true">
+          <div className="scripts-modal-panel">
+            <ScriptRunner
+              script={runner.script}
+              targets={targets}
+              onExecute={handleRunScripts}
+              onCancel={handleCancelRun}
+            />
+          </div>
+        </div>
       )}
 
       {marketplace.open && (
@@ -147,6 +155,78 @@ export const ScriptsPage: React.FC<ScriptsPageProps> = ({ stations }) => {
           onClose={closeMarketplace}
         />
       )}
-    </>
+
+      <style>{`
+        .scripts-page-shell {
+          position: relative;
+          min-height: calc(100vh - 64px - 48px);
+        }
+
+        .scripts-main-grid {
+          height: 100%;
+        }
+
+        .scripts-main-panel {
+          padding: 0;
+          overflow: hidden;
+          min-height: calc(100vh - 64px - 48px);
+        }
+
+        .scripts-layer {
+          position: fixed;
+          inset: 0;
+          background: rgba(11, 25, 44, 0.42);
+          backdrop-filter: blur(2px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1200;
+          padding: 24px;
+        }
+
+        .scripts-layer-drawer {
+          justify-content: flex-end;
+          padding: 0;
+        }
+
+        .scripts-drawer-panel {
+          width: min(980px, 94vw);
+          height: 100vh;
+          background: var(--bg-card);
+          border-left: 1px solid var(--border-color);
+          box-shadow: -18px 0 48px rgba(8, 20, 38, 0.24);
+        }
+
+        .scripts-modal-panel {
+          width: min(1320px, 96vw);
+          height: min(90vh, 920px);
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 14px;
+          box-shadow: 0 22px 56px rgba(8, 20, 38, 0.24);
+          overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+          .scripts-layer {
+            padding: 12px;
+          }
+
+          .scripts-layer-drawer {
+            padding: 0;
+          }
+
+          .scripts-drawer-panel {
+            width: 100vw;
+          }
+
+          .scripts-modal-panel {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+          }
+        }
+      `}</style>
+    </div>
   );
 };

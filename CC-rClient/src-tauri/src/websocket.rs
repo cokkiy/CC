@@ -1,5 +1,5 @@
 //! WebSocket bridge module for CC-rClient
-//! 
+//!
 //! This module implements WebSocket connection to CC-Aggregator
 //! and bridges between the Tauri frontend and MQTT message broker.
 
@@ -31,10 +31,10 @@ impl WebSocketClient {
     pub async fn connect(&self) -> Result<()> {
         let url = &self.aggregator_url;
         info!("Would connect to CC-Aggregator at: {}", url);
-        
+
         // TODO: Implement actual WebSocket connection
         debug!("WebSocket connection not yet implemented");
-        
+
         Ok(())
     }
 
@@ -63,28 +63,28 @@ impl WebSocketClient {
 pub enum WsMessage {
     #[serde(rename = "subscribe")]
     Subscribe { stations: Vec<String> },
-    
+
     #[serde(rename = "unsubscribe")]
     Unsubscribe { stations: Vec<String> },
-    
+
     #[serde(rename = "getStations")]
     GetStations,
-    
+
     #[serde(rename = "telemetry")]
     Telemetry {
         station_id: String,
         data: TelemetryBundle,
     },
-    
+
     #[serde(rename = "status")]
     Status {
         station_id: String,
         status: StationStatus,
     },
-    
+
     #[serde(rename = "stationList")]
     StationList { stations: Vec<String> },
-    
+
     #[serde(rename = "error")]
     Error { message: String },
 }

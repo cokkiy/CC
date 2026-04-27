@@ -24,6 +24,20 @@ cd ~/CC/scripts
 ./start-all.sh --status
 ```
 
+### 一键检查 MQTT 遥测链路
+
+```bash
+./check-mqtt-telemetry.sh
+```
+
+该脚本会订阅 `cc/+/telemetry` 主题并等待消息，用于确认业务遥测数据真的在流动。
+可选参数：
+
+```bash
+# 用 20 秒超时等待 3 条消息
+./check-mqtt-telemetry.sh 20 3
+```
+
 ### 停止所有组件
 
 在运行脚本的终端按 `Ctrl+C` 即可停止所有组件。
@@ -92,6 +106,22 @@ docker run -d --name mosquitto \
 ```bash
 # 检查端口占用
 ss -tlnp | grep -E '1883|50051|8080'
+```
+
+### 遥测链路无消息
+
+如果端口都正常但前端无数据，可先运行：
+
+```bash
+./check-mqtt-telemetry.sh
+```
+
+若失败，再检查：
+
+```bash
+tail -n 120 ~/CC/logs/rstationservice.log
+tail -n 120 ~/CC/logs/aggregator.log
+docker logs --tail 120 mosquitto
 ```
 
 ### 查看运行中的组件

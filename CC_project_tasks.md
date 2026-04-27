@@ -226,17 +226,17 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 **状态**: ✅ 全部完成 (2026-04-21 14:00)
 
 **验证结果**:
-- 后端测试: ✅ 55/59 通过，4个network_monitor测试标记为#[ignore]（需要实际网络I/O）
-- 前端构建: ✅ 通过 (vite build 185ms)
+- 后端回归测试: ✅ 76/76 通过，4个network_monitor测试标记为#[ignore]（全量80项，需实际网络I/O）
+- 前端构建: ✅ 通过 (vite build 203ms)
 - 前端组件: ScriptEditor, ScriptList, ScriptRunner, ScriptMarketplace, ScriptsPage全部就绪
 
-### 6.5 后端测试状态 ✅
-- **总测试数**: 69
-- **通过**: 65
+### 6.5 后端回归测试状态 ✅
+- **总测试数**: 80
+- **通过**: 76
 - **忽略**: 4 (network_monitor tests - 环境限制，需要实际网络接口)
 - **失败**: 0
 
-**重新验证 (2026-04-22):** 已无任何非忽略失败用例；网络相关测试仍按预期 #[ignore]。
+**重新验证 (2026-04-27):** `cargo test` 全量通过；批量相关10个用例全部通过，网络相关测试仍按预期 #[ignore]。
 
 ### 前端集成状态 ✅ (2026-04-21)
 - App.tsx Scripts tab已集成
@@ -316,15 +316,18 @@ POST   /api/scripts/{id}/favorite - 收藏/取消收藏
 
 ---
 
-## Phase 7: 批量操作支持系统 🚧 实现完成 (验证中)
+## Phase 7: 批量操作支持系统 ✅ 实现完成
 
 **目标**: 实现对多设备的批量操作能力
 
 **工期**: 4-5周
 
-**状态**: ✅ 后端+前端实现完成 (2026-04-22)
-- 后端测试: ✅ 65/69 通过 (4个network_monitor ignore)
-- 前端构建: ✅ 通过 (vite build 240ms)
+**状态**: ✅ 全部完成 (2026-04-24)
+- 批量相关测试: ✅ 10/10 通过
+- 后端回归覆盖: ✅ 已纳入全量回归测试，当前 76/76 通过 (4个network_monitor ignore)
+- 前端构建: ✅ 通过 (vite build 203ms)
+- 前端集成: ✅ App.tsx已集成Batch组件 (BatchPage, BatchUIContext)
+- 新增文件: BatchPage.tsx, BatchUIContext.tsx
 
 ### 实现文件
 **后端 (CC-rStationService)**:
@@ -340,6 +343,8 @@ POST   /api/scripts/{id}/favorite - 收藏/取消收藏
 - `src/plugin/batch/BatchEditor.tsx` - 任务编辑器
 - `src/plugin/batch/BatchRunner.tsx` - 执行界面
 - `src/plugin/batch/BatchResultsPanel.tsx` - 结果展示
+- `src/plugin/batch/BatchPage.tsx` - 容器组件
+- `src/plugin/batch/BatchUIContext.tsx` - UI状态管理
 
 ### 7.1 批量操作模型
 ```
@@ -490,6 +495,7 @@ AlertRule {
 - 2026-04-20 14:00: Phase 6 命令脚本管理系统启动，Codex完成前后端实现
 - 2026-04-20 17:21: 周一协调检查 - Phase 2.2/3.2构建验证通过
 - 2026-04-22 01:55: 状态确认 - Phase 6后端测试55/59通过(4个ignore,0失败)，Phase 7实现阶段启动
+- 2026-04-27 09:45: 状态确认 - Phase 6测试76/76通过(4个ignore,0失败)，Phase 7测试10/10通过，前端构建成功
 
 ---
 

@@ -8,7 +8,8 @@
 #   3. CC-Aggregator (MQTT to WebSocket data aggregator)
 #   4. CC-rClient (Tauri frontend application)
 #
-# Usage: ./start-all.sh
+# Usage: ./start-all.sh [debug|release] [--status]
+#   Default mode: debug
 #   Press Ctrl+C to stop all components
 # =================================================================
 
@@ -25,10 +26,13 @@ NC='\033[0m' # No Color
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Binaries
-STATIONSERVICE_BIN="$REPO_DIR/CC-rStationService/target/debug/cc-rstationservice"
-AGGREGATOR_BIN="$REPO_DIR/CC-Aggregator/target/debug/cc-aggregator"
-CLIENT_BIN="$REPO_DIR/CC-rClient/src-tauri/target/debug/cc-rclient"
+# Build mode (default: debug)
+BUILD_MODE="debug"
+
+# Binaries (resolved by mode)
+STATIONSERVICE_BIN=""
+AGGREGATOR_BIN=""
+CLIENT_BIN=""
 
 # Logs
 LOG_DIR="$REPO_DIR/logs"
@@ -91,6 +95,42 @@ is_mosquitto_running() {
 is_process_running() {
     local pid=$1
     kill -0 "$pid" 2>/dev/null
+}
+
+# Configure binary paths by build mode
+configure_binary_paths() {
+    STATIONSERVICE_BIN="$REPO_DIR/CC-rStationService/target/$BUILD_MODE/cc-rstationservice"
+    AGGREGATOR_BIN="$REPO_DIR/CC-Aggregator/target/$BUILD_MODE/cc-aggregator"
+    CLIENT_BIN="$REPO_DIR/CC-rClient/src-tauri/target/$BUILD_MODE/cc-rclient"
+}
+
+parse_args() {
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            debug|release)
+                BUILD_MODE="$arg"
+                ;;
+            --status)
+                # handled in main after binary path setup
+                ;;
+            -h|--help)
+                echo "Usage: ./start-all.sh [debug|release] [--status]"
+                echo ""
+                echo "Options:"
+                echo "  debug      Run debug binaries (default)"
+                echo "  release    Run release binaries"
+                echo "  --status   Show component status and exit"
+                echo "  -h, --help Show this help message"
+                exit 0
+                ;;
+            *)
+                log_error "Unknown argument: $arg"
+                echo "Usage: ./start-all.sh [debug|release] [--status]"
+                exit 1
+                ;;
+        esac
+    done
 }
 
 # =================================================================
@@ -158,7 +198,7 @@ start_mosquitto() {
     if docker run -d --name mosquitto \
         -p 1883:1883 -p 9001:9001 \
         eclipse-mosquitto:latest \
-        /mosquitto-no-auth.conf >/dev/null 2>&1; then
+        >/dev/null 2>&1; then
         sleep 2
         if check_mosquitto; then
             log_success "Mosquitto started via docker run"
@@ -181,7 +221,7 @@ start_stationservice() {
     # Check if binary exists
     if [[ ! -x "$STATIONSERVICE_BIN" ]]; then
         log_error "CC-rStationService binary not found or not executable: $STATIONSERVICE_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-rStationService && cargo build"
+        log_error "Please build the project first: cd $REPO_DIR/CC-rStationService && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
         return 1
     fi
     
@@ -218,7 +258,7 @@ start_aggregator() {
     # Check if binary exists
     if [[ ! -x "$AGGREGATOR_BIN" ]]; then
         log_error "CC-Aggregator binary not found or not executable: $AGGREGATOR_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-Aggregator && cargo build"
+        log_error "Please build the project first: cd $REPO_DIR/CC-Aggregator && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
         return 1
     fi
     
@@ -245,35 +285,41 @@ start_aggregator() {
 }
 
 start_client() {
-    log_info "Starting Vite frontend dev server..."
+    if [[ "$BUILD_MODE" == "debug" ]]; then
+        log_info "Starting Vite frontend dev server..."
+    else
+        log_info "Release mode detected, skipping Vite dev server"
+    fi
 
     # Check if binary exists
     if [[ ! -x "$CLIENT_BIN" ]]; then
         log_error "CC-rClient binary not found or not executable: $CLIENT_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-rClient/src-tauri && cargo build"
+        log_error "Please build the project first: cd $REPO_DIR/CC-rClient/src-tauri && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
         return 1
     fi
 
     # Create log directory
     mkdir -p "$LOG_DIR"
 
-    # Start the Vite dev server (required by the debug binary which loads from localhost:5173)
-    cd "$REPO_DIR/CC-rClient"
-    nohup npm run dev >"$VITE_LOG" 2>&1 &
-    VITE_PID=$!
+    if [[ "$BUILD_MODE" == "debug" ]]; then
+        # Debug binary loads frontend from localhost:5173
+        cd "$REPO_DIR/CC-rClient"
+        nohup npm run dev >"$VITE_LOG" 2>&1 &
+        VITE_PID=$!
 
-    # Wait for Vite to be ready
-    for i in $(seq 1 30); do
-        if is_port_listening $VITE_PORT; then
-            log_success "Vite dev server ready (PID: $VITE_PID, port $VITE_PORT)"
-            break
-        fi
-        sleep 0.5
-        if [[ $i -eq 30 ]]; then
-            log_error "Vite dev server failed to start. Check log: $VITE_LOG"
-            return 1
-        fi
-    done
+        # Wait for Vite to be ready
+        for i in $(seq 1 30); do
+            if is_port_listening $VITE_PORT; then
+                log_success "Vite dev server ready (PID: $VITE_PID, port $VITE_PORT)"
+                break
+            fi
+            sleep 0.5
+            if [[ $i -eq 30 ]]; then
+                log_error "Vite dev server failed to start. Check log: $VITE_LOG"
+                return 1
+            fi
+        done
+    fi
 
     log_info "Starting CC-rClient (Tauri application)..."
 
@@ -360,6 +406,8 @@ show_status() {
     echo "=========================================="
     echo "  CC Project - Component Status"
     echo "=========================================="
+    echo "  Build mode: $BUILD_MODE"
+    echo ""
     
     # Mosquitto
     if check_mosquitto; then
@@ -403,10 +451,15 @@ main() {
     echo ""
     
     # Check for --status flag
-    if [[ "${1:-}" == "--status" ]]; then
+    parse_args "$@"
+    configure_binary_paths
+
+    if [[ " $* " == *" --status "* ]]; then
         show_status
         exit 0
     fi
+
+    log_info "Using build mode: $BUILD_MODE"
     
     # Ensure log directory exists
     mkdir -p "$LOG_DIR"

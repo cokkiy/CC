@@ -534,7 +534,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         {/* Parameters Section */}
         <div className="editor-section">
           <div 
-            className="section-header"
+            className="section-header section-header-collapsible"
             onClick={() => setShowParameters(!showParameters)}
           >
             <h3>Parameters {parameters.length > 0 && `(${parameters.length})`}</h3>
@@ -616,23 +616,27 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           display: flex;
           flex-direction: column;
           height: 100%;
-          background: var(--bg-primary, #1a1a1a);
-          color: var(--text-primary, #e0e0e0);
+          background: var(--bg-card);
+          color: var(--text-main);
         }
 
         .editor-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 24px;
-          border-bottom: 1px solid var(--border-color, #333);
-          background: var(--bg-secondary, #252525);
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          padding: 14px 22px;
+          border-bottom: 1px solid var(--border-color);
+          background: var(--bg-card);
+          box-shadow: 0 10px 20px -18px rgba(11, 25, 44, 0.42);
         }
 
         .editor-header h2 {
           margin: 0;
-          font-size: 20px;
-          font-weight: 600;
+          font-size: 1.08rem;
+          font-weight: 700;
         }
 
         .editor-actions {
@@ -641,9 +645,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
 
         .btn-cancel, .btn-save {
-          padding: 8px 16px;
-          border-radius: 6px;
-          font-size: 14px;
+          padding: 8px 14px;
+          border-radius: 8px;
+          font-size: 0.84rem;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
@@ -651,22 +655,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
         .btn-cancel {
           background: transparent;
-          border: 1px solid var(--border-color, #444);
-          color: var(--text-secondary, #a0a0a0);
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
         }
 
         .btn-cancel:hover {
-          background: var(--bg-hover, #333);
+          border-color: var(--primary);
+          color: var(--text-main);
         }
 
         .btn-save {
-          background: var(--accent-color, #3b82f6);
-          border: none;
+          background: var(--primary);
+          border: 1px solid var(--primary);
           color: white;
         }
 
         .btn-save:hover:not(:disabled) {
-          background: var(--accent-hover, #2563eb);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .btn-save:disabled {
@@ -677,21 +683,31 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         .editor-body {
           flex: 1;
           overflow-y: auto;
-          padding: 24px;
+          padding: 18px 22px 24px;
+          display: grid;
+          gap: 16px;
+          align-content: start;
+          background: linear-gradient(180deg, rgba(244, 247, 249, 0.78) 0%, rgba(244, 247, 249, 1) 100%);
         }
 
         .editor-section {
-          margin-bottom: 24px;
-          padding: 20px;
-          background: var(--bg-secondary, #252525);
-          border-radius: 8px;
-          border: 1px solid var(--border-color, #333);
+          padding: 16px;
+          background: var(--bg-card);
+          border-radius: 12px;
+          border: 1px solid var(--border-color);
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.05);
         }
 
         .metadata-section {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px 16px;
+        }
+
+        .metadata-section .field-group:first-child,
+        .metadata-section .field-group:nth-child(2),
+        .metadata-section .field-group:last-child {
+          grid-column: 1 / -1;
         }
 
         .field-group {
@@ -702,8 +718,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
         .field-row {
           display: flex;
-          gap: 16px;
+          gap: 12px;
           align-items: flex-start;
+          grid-column: 1 / -1;
         }
 
         .field-row .field-group {
@@ -711,9 +728,11 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
 
         .field-label {
-          font-size: 13px;
+          font-size: 0.78rem;
           font-weight: 500;
-          color: var(--text-secondary, #a0a0a0);
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .field-label .required {
@@ -722,17 +741,17 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
         .field-input, .field-textarea, .field-select {
           padding: 10px 12px;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 6px;
-          color: var(--text-primary, #e0e0e0);
-          font-size: 14px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          color: var(--text-main);
+          font-size: 0.86rem;
           transition: border-color 0.2s;
         }
 
         .field-input:focus, .field-textarea:focus, .field-select:focus {
           outline: none;
-          border-color: var(--accent-color, #3b82f6);
+          border-color: var(--primary);
         }
 
         .field-input:disabled, .field-textarea:disabled, .field-select:disabled {
@@ -750,7 +769,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           align-items: center;
           gap: 8px;
           cursor: pointer;
-          padding-top: 24px;
+          padding-top: 28px;
         }
 
         .field-checkbox input {
@@ -760,14 +779,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
 
         .field-hint {
-          font-size: 12px;
-          color: var(--text-muted, #666);
+          font-size: 0.74rem;
+          color: var(--text-muted);
         }
 
         .tag-input-container {
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 6px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
           padding: 8px;
         }
 
@@ -781,9 +800,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          padding: 4px 8px;
-          background: var(--accent-color, #3b82f6);
-          color: white;
+          padding: 4px 9px;
+          background: rgba(45, 140, 240, 0.1);
+          color: #1f4e89;
+          border: 1px solid rgba(45, 140, 240, 0.2);
           border-radius: 4px;
           font-size: 12px;
         }
@@ -808,7 +828,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           min-width: 100px;
           background: transparent;
           border: none;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 14px;
           padding: 4px;
         }
@@ -821,19 +841,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           display: flex;
           justify-content: space-between;
           align-items: center;
-          cursor: pointer;
+          cursor: default;
           user-select: none;
+          margin-bottom: 4px;
+        }
+
+        .section-header-collapsible {
+          cursor: pointer;
         }
 
         .section-header h3 {
           margin: 0;
-          font-size: 16px;
+          font-size: 0.92rem;
           font-weight: 500;
         }
 
         .toggle-icon {
           font-size: 12px;
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
           transition: transform 0.2s;
         }
 
@@ -855,21 +880,22 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         .parameter-editor-header h4 {
           margin: 0;
           font-size: 14px;
-          color: var(--text-secondary, #a0a0a0);
+          color: var(--text-muted);
         }
 
         .btn-add-param {
           padding: 6px 12px;
-          background: var(--accent-color, #3b82f6);
-          border: none;
-          border-radius: 4px;
+          background: var(--primary);
+          border: 1px solid var(--primary);
+          border-radius: 6px;
           color: white;
-          font-size: 13px;
+          font-size: 12px;
           cursor: pointer;
         }
 
         .btn-add-param:hover {
-          background: var(--accent-hover, #2563eb);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .no-parameters {
@@ -887,44 +913,46 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
         .parameter-item {
           padding: 12px;
-          background: var(--bg-primary, #1a1a1a);
-          border: 1px solid var(--border-color, #444);
-          border-radius: 6px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
         }
 
         .parameter-row {
           display: flex;
           gap: 8px;
           align-items: center;
+          flex-wrap: wrap;
         }
 
         .param-name {
-          width: 120px;
+          width: 160px;
           padding: 6px 8px;
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #444);
+          background: #fff;
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 13px;
         }
 
         .param-type {
-          width: 100px;
+          width: 130px;
           padding: 6px 8px;
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #444);
+          background: #fff;
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 13px;
         }
 
         .param-default {
           flex: 1;
+          min-width: 220px;
           padding: 6px 8px;
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #444);
+          background: #fff;
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 13px;
         }
 
@@ -933,7 +961,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           align-items: center;
           gap: 4px;
           font-size: 12px;
-          color: var(--text-secondary, #a0a0a0);
+          color: var(--text-muted);
           cursor: pointer;
         }
 
@@ -941,9 +969,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           width: 28px;
           height: 28px;
           background: transparent;
-          border: 1px solid var(--border-color, #444);
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
           font-size: 18px;
           cursor: pointer;
           display: flex;
@@ -961,35 +989,39 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           display: flex;
           gap: 8px;
           margin-top: 8px;
+          flex-wrap: wrap;
         }
 
         .param-description {
           flex: 2;
+          min-width: 220px;
           padding: 6px 8px;
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #444);
+          background: #fff;
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 12px;
         }
 
         .param-validation {
           flex: 1;
+          min-width: 200px;
           padding: 6px 8px;
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #444);
+          background: #fff;
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 12px;
         }
 
         .param-options {
           flex: 1;
+          min-width: 220px;
           padding: 6px 8px;
-          background: var(--bg-secondary, #252525);
-          border: 1px solid var(--border-color, #444);
+          background: #fff;
+          border: 1px solid var(--border-color);
           border-radius: 4px;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-main);
           font-size: 12px;
         }
 
@@ -999,26 +1031,26 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
         .code-hints {
           font-size: 12px;
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
         }
 
         .code-hints code {
-          background: var(--bg-primary, #1a1a1a);
+          background: rgba(45, 140, 240, 0.08);
           padding: 2px 6px;
           border-radius: 3px;
-          color: var(--accent-color, #3b82f6);
+          color: var(--primary);
         }
 
         .code-editor-container {
-          border: 1px solid var(--border-color, #444);
-          border-radius: 6px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
           overflow: hidden;
         }
 
         .code-editor-wrapper {
           position: relative;
-          min-height: 300px;
-          max-height: 500px;
+          min-height: 360px;
+          max-height: 600px;
         }
 
         .syntax-highlighter {
@@ -1028,7 +1060,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           right: 0;
           bottom: 0;
           padding: 12px;
-          background: #1e1e1e;
+          background: #101b2f;
           color: #d4d4d4;
           font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
           font-size: 13px;
@@ -1050,8 +1082,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         .code-textarea {
           position: relative;
           width: 100%;
-          min-height: 300px;
-          max-height: 500px;
+          min-height: 360px;
+          max-height: 600px;
           padding: 12px;
           background: transparent;
           border: none;
@@ -1075,9 +1107,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
 
         .validation-section {
-          padding: 16px;
+          padding: 0;
           border-radius: 6px;
-          margin-top: 16px;
+          margin-top: 4px;
         }
 
         .validation-errors {
@@ -1136,6 +1168,32 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           padding: 12px;
           color: #22c55e;
           font-size: 14px;
+        }
+
+        @media (max-width: 920px) {
+          .editor-header {
+            padding: 12px;
+          }
+
+          .editor-actions {
+            gap: 8px;
+          }
+
+          .editor-body {
+            padding: 12px;
+          }
+
+          .metadata-section {
+            grid-template-columns: 1fr;
+          }
+
+          .field-row {
+            flex-direction: column;
+          }
+
+          .field-checkbox {
+            padding-top: 0;
+          }
         }
       `}</style>
     </div>
