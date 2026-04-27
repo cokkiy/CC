@@ -88,11 +88,14 @@ export const groupsApi = {
    */
   async createGroup(data: CreateGroupDTO): Promise<StationGroup> {
     try {
+      const stationIds = data.station_ids ?? [];
       const group = await invoke<RawStationGroup>('create_group', {
-        name: data.name, 
+        name: data.name,
         description: data.description || '',
-        tags: data.tags || [],
-        station_ids: [],
+        color: data.color || '#3b82f6',
+        icon: data.icon ?? null,
+        station_ids: stationIds,
+        stationIds,
       });
       return normalizeStationGroup(group);
     } catch (error) {
@@ -106,13 +109,15 @@ export const groupsApi = {
    */
   async updateGroup(id: string, data: UpdateGroupDTO): Promise<StationGroup> {
     try {
+      const stationIds = data.station_ids;
       const group = await invoke<RawStationGroup>('update_group', {
         id,
-        name: data.name || '',
+        name: data.name,
         description: data.description || '',
-        tags: data.tags || [],
-        station_ids: data.stationIds || [],
-        stationIds: data.stationIds || [],
+        color: data.color || '#3b82f6',
+        icon: data.icon ?? null,
+        station_ids: stationIds,
+        stationIds,
       });
       return normalizeStationGroup(group);
     } catch (error) {

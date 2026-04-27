@@ -822,7 +822,14 @@ export default function App() {
 
   async function createGroup(name: string) {
     try {
-      const group = await invoke<StationGroup>("create_station_group", { name });
+      const group = await invoke<StationGroup>("create_station_group", {
+        name,
+        description: "",
+        color: "#3b82f6",
+        icon: null,
+        station_ids: [],
+        stationIds: [],
+      });
       setGroups((current) => [...current, group]);
       setLog((current) => [`Group "${name}" created.`, ...current]);
     } catch (error) {
@@ -836,7 +843,8 @@ export default function App() {
         id: group.id,
         name: group.name,
         description: group.description,
-        tags: group.tags,
+        color: group.color ?? "#3b82f6",
+        icon: group.icon ?? null,
         stationIds: group.stationIds,
         station_ids: group.stationIds,
       });

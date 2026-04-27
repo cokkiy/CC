@@ -3,7 +3,7 @@
  * Part of Phase 8: Device Group and Tag System
  *
  * NOTE: Types are aligned with Rust backend models in CC-rClient/src-tauri/src/
- * - StationGroup: { id, name, description, tags, station_ids }
+ * - StationGroup: { id, name, description, color, icon?, station_ids }
  * - TagDefinition: { id, name, description, color, created_at, updated_at }
  */
 
@@ -15,11 +15,10 @@ export interface StationGroup {
   id: string;
   name: string;
   description: string;
-  tags: string[];        // tag definition IDs
+  color: string;
+  icon?: string;
   station_ids: string[]; // matches Rust field name
   // Optional UI fields
-  color?: string;
-  icon?: string;
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
@@ -30,16 +29,15 @@ export interface CreateGroupDTO {
   description?: string;
   color?: string;
   icon?: string;
-  tags?: string[];
+  station_ids?: string[];
 }
 
 export interface UpdateGroupDTO {
-  name?: string;
+  name: string;
   description?: string;
   color?: string;
   icon?: string;
-  tags?: string[];
-  stationIds?: string[];  // frontend uses camelCase
+  station_ids: string[];
 }
 
 // ============================================
@@ -103,7 +101,6 @@ export interface StationTagUpdate {
 
 export interface GroupFilter {
   search?: string;
-  tags?: string[];
   createdBy?: string;
 }
 

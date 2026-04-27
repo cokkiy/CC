@@ -3,7 +3,7 @@
  * Part of Phase 8: Device Group and Tag System
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { StationGroup, CreateGroupDTO, UpdateGroupDTO } from './types';
 
 export interface GroupEditorProps {
@@ -37,9 +37,15 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const [description, setDescription] = useState(group?.description || '');
   const [color, setColor] = useState(group?.color || GROUP_COLORS[0]);
   const [icon, setIcon] = useState(group?.icon || '');
-  const [tags, setTags] = useState<string[]>(group?.tags || []);
-  const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    setName(group?.name || '');
+    setDescription(group?.description || '');
+    setColor(group?.color || GROUP_COLORS[0]);
+    setIcon(group?.icon || '');
+    setErrors([]);
+  }, [group]);
 
   // Validate form
   const validate = useCallback((): boolean => {
@@ -61,35 +67,27 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
     return validationErrors.length === 0;
   }, [name, description]);
 
-  // Handle tag input
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const newTag = tagInput.trim();
-      if (newTag && !tags.includes(newTag)) {
-        setTags([...tags, newTag]);
-      }
-      setTagInput('');
-    } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
-      setTags(tags.slice(0, -1));
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-
   // Handle save
   const handleSave = () => {
     if (!validate()) return;
 
-    onSave({
+    const payload: CreateGroupDTO = {
       name: name.trim(),
       description: description.trim(),
       color,
       icon: icon.trim() || undefined,
-      tags,
-    });
+    };
+
+    if (group) {
+      const updatePayload: UpdateGroupDTO = {
+        ...payload,
+        station_ids: group.station_ids ?? [],
+      };
+      onSave(updatePayload);
+      return;
+    }
+
+    onSave(payload);
   };
 
   return (
@@ -192,40 +190,6 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               disabled={isLoading}
             />
             <span className="field-hint">Use an icon name from your icon library</span>
-          </div>
-        </div>
-
-        {/* Tags section */}
-        <div className="editor-section">
-          <div className="field-group">
-            <label className="field-label">Tags</label>
-            <div className="tag-input-container">
-              <div className="tags-list">
-                {tags.map((tag) => (
-                  <span key={tag} className="tag">
-                    {tag}
-                    <button
-                      type="button"
-                      className="tag-remove"
-                      onClick={() => removeTag(tag)}
-                      disabled={isLoading}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  className="tag-input"
-                  placeholder={tags.length === 0 ? 'Add tags...' : ''}
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagKeyDown}
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-            <span className="field-hint">Press Enter or comma to add a tag</span>
           </div>
         </div>
 
@@ -404,60 +368,6 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
         .color-swatch:disabled {
           opacity: 0.6;
           cursor: not-allowed;
-        }
-
-        .tag-input-container {
-          background: var(--bg-main);
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 8px;
-        }
-
-        .tags-list {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-        }
-
-        .tag {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 9px;
-          background: rgba(45, 140, 240, 0.1);
-          color: #1f4e89;
-          border: 1px solid rgba(45, 140, 240, 0.2);
-          border-radius: 4px;
-          font-size: 12px;
-        }
-
-        .tag-remove {
-          background: none;
-          border: none;
-          color: white;
-          cursor: pointer;
-          padding: 0;
-          font-size: 14px;
-          line-height: 1;
-          opacity: 0.8;
-        }
-
-        .tag-remove:hover {
-          opacity: 1;
-        }
-
-        .tag-input {
-          flex: 1;
-          min-width: 100px;
-          background: transparent;
-          border: none;
-          color: var(--text-main);
-          font-size: 14px;
-          padding: 4px;
-        }
-
-        .tag-input:focus {
-          outline: none;
         }
 
         .group-info {

@@ -61,7 +61,11 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
     setIsLoading(true);
     try {
       if (editingGroup) {
-        await updateGroup(editingGroup.id, data as UpdateGroupDTO);
+        const updatePayload: UpdateGroupDTO = {
+          ...data,
+          station_ids: ('station_ids' in data ? data.station_ids : undefined) ?? editingGroup.station_ids ?? [],
+        };
+        await updateGroup(editingGroup.id, updatePayload);
       } else {
         await createGroup(data as CreateGroupDTO);
       }
@@ -138,14 +142,6 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
       console.error('[GroupsPage] Failed to export groups:', error);
     }
   };
-
-  // Get station names for a group
-  const getStationNames = (stationIds: string[]): string[] => {
-    return stationIds
-      .map(id => stations.find(s => s.id === id)?.name)
-      .filter((name): name is string => !!name);
-  };
-
   return (
     <div className="groups-page-shell">
       <main className="grid gridGroupsMode groups-main-grid">
@@ -171,6 +167,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
         <div className="groups-layer groups-layer-drawer" role="dialog" aria-modal="true">
           <div className="groups-drawer-panel">
             <GroupEditor
+              key={editingGroup?.id ?? 'new-group'}
               group={editingGroup}
               onSave={handleSaveGroup}
               onCancel={handleCloseEditor}

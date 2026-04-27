@@ -163,10 +163,9 @@ export type StationGroup = {
   id: string;
   name: string;
   description: string;
-  tags: string[];
-  stationIds: string[];
-  // Optional UI fields
   color?: string;
+  icon?: string;
+  stationIds: string[];
   createdAt?: string;
   updatedAt?: string;
 };

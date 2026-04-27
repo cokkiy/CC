@@ -2,6 +2,10 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+fn default_group_color() -> String {
+    "#3b82f6".to_string()
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct NetworkInterface {
@@ -197,7 +201,9 @@ pub struct StationGroup {
     pub id: String,
     pub name: String,
     pub description: String,
-    pub tags: Vec<String>,
+    #[serde(default = "default_group_color")]
+    pub color: String,
+    pub icon: Option<String>,
     pub station_ids: Vec<String>,
 }
 
@@ -207,7 +213,8 @@ impl StationGroup {
             id: uuid::Uuid::new_v4().to_string(),
             name: name.to_string(),
             description: String::new(),
-            tags: Vec::new(),
+            color: default_group_color(),
+            icon: None,
             station_ids: Vec::new(),
         }
     }

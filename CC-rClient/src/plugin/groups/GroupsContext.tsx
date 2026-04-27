@@ -132,12 +132,6 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
       );
     }
 
-    if (filter.tags && filter.tags.length > 0) {
-      result = result.filter(g =>
-        filter.tags!.some(tag => g.tags.includes(tag))
-      );
-    }
-
     if (filter.createdBy) {
       result = result.filter(g => g.createdBy === filter.createdBy);
     }
@@ -160,7 +154,14 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
     const result = { imported: 0, skipped: 0, errors: [] as string[] };
     for (const group of groups) {
       try {
-        await groupsApi.createGroup({ name: group.name, description: group.description });
+        const importedGroup = group as StationGroup & { stationIds?: string[] };
+        await groupsApi.createGroup({
+          name: importedGroup.name,
+          description: importedGroup.description,
+          color: importedGroup.color,
+          icon: importedGroup.icon,
+          station_ids: importedGroup.station_ids ?? importedGroup.stationIds ?? [],
+        });
         result.imported++;
       } catch (err) {
         result.skipped++;

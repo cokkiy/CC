@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import type { StationGroup, CreateGroupDTO, UpdateGroupDTO } from './types';
+import type { StationGroup } from './types';
 import type { Station } from '../../types';
 
 // ============================================
@@ -105,9 +105,6 @@ export const GroupCard: React.FC<GroupCardProps> = ({
 
       <div className="group-stats">
         <span className="station-count">{(group.station_ids || []).length} stations</span>
-        {group.tags.length > 0 && (
-          <span className="tag-count">{group.tags.length} tags</span>
-        )}
       </div>
 
       <div className="group-stations">
@@ -298,7 +295,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
           color: var(--text-secondary);
         }
 
-        .station-count, .tag-count {
+        .station-count {
           display: flex;
           align-items: center;
           gap: 4px;

@@ -44,13 +44,9 @@ export type StationGroup = {
   id: string;
   name: string;
   description: string;
-  color: string;           // UI 显示颜色
-  icon?: string;           // 可选图标
-  tags: string[];          // 分组标签（用于筛选）
-  stationIds: string[];    // 组成员 ID
-  createdAt: number;
-  updatedAt: number;
-  createdBy: string;
+  color: string;           // 持久化的分组颜色
+  icon?: string;           // 持久化的可选图标
+  station_ids: string[];   // 组成员 ID（传输字段）
 };
 ```
 
@@ -123,6 +119,12 @@ interface TagsContextValue {
 
 ### 3.1 分组 API
 ```rust
+// Tauri 分组命令契约
+create_group(name, description, color, icon, station_ids?)
+update_group(id, name, description, color, icon, station_ids)
+create_station_group(name, description, color, icon, station_ids?)
+update_station_group(id, name, description, color, icon, station_ids)
+
 // 后端分组管理
 POST   /api/groups              - 创建分组
 GET    /api/groups               - 获取分组列表
