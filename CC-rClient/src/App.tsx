@@ -827,7 +827,6 @@ export default function App() {
         description: "",
         color: "#3b82f6",
         icon: null,
-        station_ids: [],
         stationIds: [],
       });
       setGroups((current) => [...current, group]);
@@ -846,7 +845,6 @@ export default function App() {
         color: group.color ?? "#3b82f6",
         icon: group.icon ?? null,
         stationIds: group.stationIds,
-        station_ids: group.stationIds,
       });
       setGroups((current) =>
         current.map((g) => (g.id === updated.id ? updated : g))

@@ -94,7 +94,6 @@ export const groupsApi = {
         description: data.description || '',
         color: data.color || '#3b82f6',
         icon: data.icon ?? null,
-        station_ids: stationIds,
         stationIds,
       });
       return normalizeStationGroup(group);
@@ -116,7 +115,6 @@ export const groupsApi = {
         description: data.description || '',
         color: data.color || '#3b82f6',
         icon: data.icon ?? null,
-        station_ids: stationIds,
         stationIds,
       });
       return normalizeStationGroup(group);
