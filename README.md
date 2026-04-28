@@ -129,6 +129,40 @@ This script starts:
 2. CC-rStationService (Workstation agent)
 3. CC-rClient (Desktop UI)
 
+### Step 2b: Start IoT Device Simulation
+
+Use the dedicated launcher when you want a lightweight MQTT broker plus `N` simulated
+`CC-rStationService` devices in Docker:
+
+```bash
+cd ~/CC
+./scripts/start-iot-sim.sh 20
+```
+
+Useful commands:
+
+```bash
+./scripts/start-iot-sim.sh --status
+./scripts/start-iot-sim.sh --stop
+./scripts/start-iot-sim.sh 20 --dry-run
+```
+
+Optional environment overrides:
+
+```bash
+BROKER_PORT=1884 STATE_INTERVAL_SECONDS=2 ./scripts/start-iot-sim.sh 50
+BUILD_MODE=debug ./scripts/start-iot-sim.sh 10
+REBUILD_BINARY=1 ./scripts/start-iot-sim.sh 20
+USE_HOST_BROKER=1 HOST_BROKER_HOST=host.docker.internal ./scripts/start-iot-sim.sh 20
+```
+
+This flow builds a small runtime image for `CC-rStationService`, starts one Mosquitto
+broker, then launches deterministic stations such as `iot-001`, `iot-002`, and so on.
+The Docker image is assembled from a host-built `cc-rstationservice` binary instead of
+recompiling Rust inside Docker, so simulator startup is much faster.
+If host port `1883` is already occupied, the launcher automatically reuses the existing
+host MQTT broker instead of trying to bind a second Mosquitto container.
+
 ### Step 3: Access the Application
 
 - Desktop Client: Launch CC-rClient application
@@ -181,6 +215,7 @@ Logs are stored in `~/CC/logs/`:
 - `aggregator.log` - Aggregator output
 - `rstationservice.log` - Station service output
 - `rclient.log` - Client output
+- `iot-sim/docker-compose.generated.yml` - Generated compose file for the Docker simulation
 
 ## Troubleshooting
 
@@ -210,6 +245,12 @@ If you see "Could not connect to localhost: Connection refused":
 ```bash
 cd CC-Aggregator && cargo build --release
 ./scripts/start-all.sh
+```
+
+### Stop IoT Simulation
+
+```bash
+./scripts/start-iot-sim.sh --stop
 ```
 
 ## License

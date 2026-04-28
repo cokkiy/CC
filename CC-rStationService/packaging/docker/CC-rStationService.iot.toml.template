@@ -1,0 +1,23 @@
+[service]
+service_name = "CC-rStationService"
+station_id = "__STATION_ID__"
+state_interval_seconds = __STATE_INTERVAL_SECONDS__
+watched_processes = []
+udp_display_target = "127.0.0.1:9008"
+launcher_proxy_path = ""
+
+[control]
+listen_addr = "0.0.0.0:50051"
+
+[agent]
+listen_addr = "127.0.0.1:50052"
+auth_token = "__AUTH_TOKEN__"
+preferred_display_index = 0
+
+[mqtt]
+enabled = true
+broker_host = "__BROKER_HOST__"
+broker_port = __BROKER_PORT__
+telemetry_enabled = true
+status_enabled = true
+

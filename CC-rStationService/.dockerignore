@@ -1,0 +1,7 @@
+target
+.git
+.gitignore
+packaging/windows
+packaging/linux
+test_*
+

@@ -9,7 +9,7 @@
 #   4. CC-rClient (Tauri frontend application)
 #
 # Usage: ./start-all.sh [debug|release] [--status]
-#   Default mode: debug
+#   Default mode: release
 #   Press Ctrl+C to stop all components
 # =================================================================
 
@@ -26,8 +26,8 @@ NC='\033[0m' # No Color
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Build mode (default: debug)
-BUILD_MODE="debug"
+# Build mode (default: release)
+BUILD_MODE="release"
 
 # Binaries (resolved by mode)
 STATIONSERVICE_BIN=""
@@ -40,6 +40,7 @@ STATIONSERVICE_LOG="$LOG_DIR/rstationservice.log"
 AGGREGATOR_LOG="$LOG_DIR/aggregator.log"
 VITE_LOG="$LOG_DIR/vite.log"
 CLIENT_LOG="$LOG_DIR/rclient.log"
+IOT_SIM_COMPOSE_FILE="$LOG_DIR/iot-sim/docker-compose.generated.yml"
 
 # Ports
 MQTT_PORT=1883
@@ -91,6 +92,14 @@ is_mosquitto_running() {
     docker ps --filter "name=mosquitto" --filter "status=running" -q | grep -q .
 }
 
+is_iot_sim_running() {
+    if [[ ! -f "$IOT_SIM_COMPOSE_FILE" ]]; then
+        return 1
+    fi
+
+    docker compose -p "cc-iot-sim" -f "$IOT_SIM_COMPOSE_FILE" ps --status running --services 2>/dev/null | grep -q .
+}
+
 # Check if a process with a specific PID is running
 is_process_running() {
     local pid=$1
@@ -102,6 +111,21 @@ configure_binary_paths() {
     STATIONSERVICE_BIN="$REPO_DIR/CC-rStationService/target/$BUILD_MODE/cc-rstationservice"
     AGGREGATOR_BIN="$REPO_DIR/CC-Aggregator/target/$BUILD_MODE/cc-aggregator"
     CLIENT_BIN="$REPO_DIR/CC-rClient/src-tauri/target/$BUILD_MODE/cc-rclient"
+}
+
+print_stop_commands() {
+    echo "Stop command:"
+    echo "  - ./scripts/stop-all.sh"
+
+    if is_iot_sim_running; then
+        echo "  - ./scripts/stop-all.sh --iot-sim"
+
+        if is_mosquitto_running; then
+            echo "  - ./scripts/stop-all.sh --iot-sim --broker"
+        fi
+    elif is_mosquitto_running; then
+        echo "  - ./scripts/stop-all.sh --broker"
+    fi
 }
 
 parse_args() {
@@ -118,8 +142,8 @@ parse_args() {
                 echo "Usage: ./start-all.sh [debug|release] [--status]"
                 echo ""
                 echo "Options:"
-                echo "  debug      Run debug binaries (default)"
-                echo "  release    Run release binaries"
+                echo "  debug      Run debug binaries"
+                echo "  release    Run release binaries (default)"
                 echo "  --status   Show component status and exit"
                 echo "  -h, --help Show this help message"
                 exit 0
@@ -517,6 +541,8 @@ main() {
     echo "  - Aggregator:     $AGGREGATOR_LOG"
     echo "  - Vite:           $VITE_LOG"
     echo "  - Client:         $CLIENT_LOG"
+    echo ""
+    print_stop_commands
     echo ""
     echo "Press Ctrl+C to stop all components."
     echo "=========================================="
