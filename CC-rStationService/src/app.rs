@@ -64,6 +64,26 @@ pub async fn run(
         tokio::spawn(console_telemetry_task(Arc::clone(&state)));
     }
 
+    if state.mqtt_status_enabled() {
+        let state_clone = Arc::clone(&state);
+        tokio::spawn(async move {
+            let Some(mqtt_client) = state_clone.mqtt_client().cloned() else {
+                return;
+            };
+
+            info!("MQTT status publisher started");
+
+            loop {
+                let status = crate::mqtt::StationStatus::online(state_clone.station_id().to_string());
+                if let Err(error) = mqtt_client.publish_status(&status).await {
+                    warn!(error = %error, "failed to publish MQTT status");
+                }
+
+                tokio::time::sleep(Duration::from_secs(state_clone.interval_seconds().max(1))).await;
+            }
+        });
+    }
+
     if state.mqtt_telemetry_enabled() {
         let state_clone = Arc::clone(&state);
         tokio::spawn(async move {

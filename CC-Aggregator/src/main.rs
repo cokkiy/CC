@@ -78,25 +78,25 @@ async fn main() -> Result<()> {
     
     // Create broadcast channel for MQTT messages
     let (mqtt_broadcast_tx, _) = broadcast::channel::<mqtt::MqttMessage>(1000);
-    let _mqtt_broadcast_tx_clone = mqtt_broadcast_tx.clone();
     
     // Create mpsc channel for the event loop
     let (tx, rx) = mpsc::channel::<mqtt::MqttMessage>(1000);
     
     // Start MQTT event poller - takes ownership of client
+    let mqtt_broadcast_tx_for_eventloop = mqtt_broadcast_tx.clone();
     let eventloop_handle = tokio::spawn(async move {
         let client = mqtt_client;
         let mut eventloop = client.into_eventloop();
+        let mqtt_broadcast_tx = mqtt_broadcast_tx_for_eventloop.clone();
         
         // Forward messages from mpsc to broadcast
-        let tx_clone = tx.clone();
         tokio::spawn(async move {
             let mut receiver = rx;
             loop {
                 match receiver.recv().await {
                     Some(msg) => {
-                        if tx_clone.send(msg).await.is_err() {
-                            break;
+                        if mqtt_broadcast_tx.send(msg).is_err() {
+                            info!("No active MQTT broadcast receivers");
                         }
                     }
                     None => {

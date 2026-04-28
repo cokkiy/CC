@@ -9,7 +9,6 @@ use remote::{
 };
 use std::collections::HashMap;
 use storage::StateStore;
-use tokio::sync::RwLock;
 use ws_bridge::MqttWsBridge;
 
 pub mod control;
@@ -20,8 +19,6 @@ pub mod storage;
 pub mod websocket;
 pub mod wol;
 pub mod ws_bridge;
-// Global WebSocket bridge instance - lazily initialized
-static WS_BRIDGE: RwLock<Option<MqttWsBridge>> = RwLock::const_new(None);
 
 fn normalize_group_color(color: String) -> String {
     let trimmed = color.trim();
@@ -757,6 +754,16 @@ async fn set_station_gathering_interval_for_ui(interval_seconds: i32) -> Result<
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .setup(|app| {
+            let app_handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                let mut bridge = MqttWsBridge::new(app_handle, "ws://127.0.0.1:8080");
+                if let Err(error) = bridge.start().await {
+                    eprintln!("failed to start MQTT websocket bridge: {error}");
+                }
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             load_state,
             save_state,

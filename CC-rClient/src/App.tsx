@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LineChart,
@@ -56,6 +57,85 @@ const emptyStation = (): Station => ({
   tags: {},
   metadata: {}
 });
+
+const MQTT_DISCOVERY_SOURCE = "mqtt";
+
+type MqttTelemetryValue = {
+  key: string;
+  v: number;
+};
+
+type MqttTelemetryBundle = {
+  ts: number;
+  station_id: string;
+  interval_ms: number;
+  values: MqttTelemetryValue[];
+};
+
+type MqttTelemetryEventPayload = {
+  station_id: string;
+  data: MqttTelemetryBundle;
+};
+
+type MqttStatusEventPayload = {
+  station_id: string;
+  status: {
+    station_id: string;
+    online: boolean;
+    last_seen: number;
+    version?: string | null;
+    alert?: string | null;
+  };
+};
+
+function isMqttDiscoveredStation(station: Station | null | undefined) {
+  return station?.metadata?.source === MQTT_DISCOVERY_SOURCE;
+}
+
+function createDiscoveredStation(stationId: string, metadata?: Record<string, string>): Station {
+  return {
+    id: stationId,
+    name: stationId,
+    blocked: false,
+    networkInterfaces: [],
+    startPrograms: [],
+    monitorProcesses: [],
+    lastAction: "Discovered via MQTT",
+    groups: [],
+    tags: {},
+    metadata: {
+      source: MQTT_DISCOVERY_SOURCE,
+      ...metadata,
+    },
+  };
+}
+
+function buildRuntimeFromMqttTelemetry(
+  stationId: string,
+  telemetry: MqttTelemetryBundle,
+): StationRuntimeSnapshot {
+  const valueByKey = new Map(telemetry.values.map((value) => [value.key, value.v]));
+  const currentMemoryMb = valueByKey.get("memory_used_mb") ?? 0;
+
+  return {
+    endpoint: `mqtt:${stationId}`,
+    stationId,
+    computerName: stationId,
+    osName: "",
+    osVersion: "",
+    totalMemory: 0,
+    currentMemory: Math.round(currentMemoryMb * 1024 * 1024),
+    cpu: valueByKey.get("cpu_usage_percent") ?? 0,
+    procCount: Math.round(valueByKey.get("process_count") ?? 0),
+    serviceVersion: "",
+    appLauncherVersion: "",
+    servicePath: "",
+    appLauncherPath: "",
+    appStates: [],
+    networkStats: [],
+    message: "Live MQTT telemetry",
+  };
+}
 
 function CpuPie({ cpu }: { cpu: number }) {
   const pct = Math.min(Math.max(cpu, 0), 100);
@@ -380,6 +460,104 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const unlistenFns: UnlistenFn[] = [];
+
+    const registerListeners = async () => {
+      const unlistenTelemetry = await listen<MqttTelemetryEventPayload>("telemetry", (event) => {
+        const { station_id: stationId, data } = event.payload;
+        const runtime = buildRuntimeFromMqttTelemetry(stationId, data);
+
+        setStations((current) => {
+          if (current.some((station) => station.id === stationId)) {
+            return current.map((station) =>
+              station.id === stationId
+                ? {
+                    ...station,
+                    metadata: {
+                      ...station.metadata,
+                      source: station.metadata.source || MQTT_DISCOVERY_SOURCE,
+                      mqttLastSeen: String(data.ts),
+                    },
+                  }
+                : station,
+            );
+          }
+
+          return [
+            createDiscoveredStation(stationId, {
+              mqttLastSeen: String(data.ts),
+            }),
+            ...current,
+          ];
+        });
+
+        setRuntimeByStation((current) => ({ ...current, [stationId]: runtime }));
+        setHistoryByStation((current) => {
+          const prev = current[stationId] ?? [];
+          const next = [
+            ...prev.slice(-(MAX_HISTORY - 1)),
+            {
+              cpu: runtime.cpu,
+              memory: runtime.currentMemory,
+              ts: Date.now(),
+              rxbps: 0,
+              txbps: 0,
+            },
+          ];
+          return { ...current, [stationId]: next };
+        });
+      });
+      unlistenFns.push(unlistenTelemetry);
+
+      const unlistenStatus = await listen<MqttStatusEventPayload>("station-status", (event) => {
+        const { station_id: stationId, status } = event.payload;
+
+        setStations((current) => {
+          const existing = current.find((station) => station.id === stationId);
+          if (!existing) {
+            return [
+              createDiscoveredStation(stationId, {
+                mqttOnline: String(status.online),
+                mqttLastSeen: String(status.last_seen),
+              }),
+              ...current,
+            ];
+          }
+
+          return current.map((station) =>
+            station.id === stationId
+              ? {
+                  ...station,
+                  metadata: {
+                    ...station.metadata,
+                    source: station.metadata.source || MQTT_DISCOVERY_SOURCE,
+                    mqttOnline: String(status.online),
+                    mqttLastSeen: String(status.last_seen),
+                  },
+                }
+              : station,
+          );
+        });
+
+        if (!status.online) {
+          setRuntimeByStation((current) => {
+            const next = { ...current };
+            delete next[stationId];
+            return next;
+          });
+        }
+      });
+      unlistenFns.push(unlistenStatus);
+    };
+
+    void registerListeners();
+
+    return () => {
+      unlistenFns.forEach((fn) => fn());
+    };
+  }, []);
+
+  useEffect(() => {
     if (activePage === "stations") {
       void loadSnapshot();
     }
@@ -478,7 +656,7 @@ export default function App() {
   }, [filteredStations]);
 
   useEffect(() => {
-    if (!selectedStation) {
+    if (!selectedStation || isMqttDiscoveredStation(selectedStation)) {
       return;
     }
 
