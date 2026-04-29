@@ -11,7 +11,7 @@ vi.mock('./TagsContext', () => ({
   useTags: () => mockUseTags(),
 }));
 
-describe('TagsPage station tag actions', () => {
+describe('TagsPage device tag actions', () => {
   const getEnabledByTestId = (testId: string) => {
     const candidates = screen.getAllByTestId(testId);
     const enabled = candidates.find((element) => !(element as HTMLButtonElement).disabled);
@@ -24,7 +24,7 @@ describe('TagsPage station tag actions', () => {
   const stations: Station[] = [
     {
       id: 's1',
-      name: 'Station 1',
+      name: 'Device 1',
       blocked: false,
       networkInterfaces: [],
       startPrograms: [],
@@ -36,7 +36,7 @@ describe('TagsPage station tag actions', () => {
     },
     {
       id: 's2',
-      name: 'Station 2',
+      name: 'Device 2',
       blocked: false,
       networkInterfaces: [],
       startPrograms: [],
@@ -87,11 +87,17 @@ describe('TagsPage station tag actions', () => {
     cleanup();
   });
 
+  const selectSingleDevice = async (user: ReturnType<typeof userEvent.setup>, deviceName: string) => {
+    await user.click(screen.getByRole('button', { name: /select devices/i }));
+    await user.click(screen.getByRole('checkbox', { name: new RegExp(`select ${deviceName}`, 'i') }));
+    await user.click(screen.getByRole('button', { name: /apply selection/i }));
+  };
+
   it('saves station tags and shows success notice', async () => {
     const user = userEvent.setup();
     render(<TagsPage stations={stations} />);
 
-    await user.selectOptions(screen.getByLabelText('Station'), 's1');
+    await selectSingleDevice(user, 'Device 1');
 
     const inputs = await screen.findAllByPlaceholderText('Value for Environment');
     for (const input of inputs) {
@@ -106,7 +112,7 @@ describe('TagsPage station tag actions', () => {
       expect(updateStationTags).toHaveBeenCalledWith('s1', { env: 'prod' });
     });
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Station tag values saved successfully.');
+    expect(await screen.findByRole('status')).toHaveTextContent('Device tag values saved successfully.');
   });
 
   it('applies current station tags to all stations', async () => {
@@ -121,7 +127,7 @@ describe('TagsPage station tag actions', () => {
     const user = userEvent.setup();
     render(<TagsPage stations={stations} />);
 
-    await user.selectOptions(screen.getByLabelText('Station'), 's1');
+    await selectSingleDevice(user, 'Device 1');
 
     await user.click(getEnabledByTestId('station-tags-apply-all-btn'));
 
@@ -129,6 +135,6 @@ describe('TagsPage station tag actions', () => {
       expect(batchSpy).toHaveBeenCalledWith(['s1', 's2'], { env: 'staging' });
     });
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Tag values applied to all stations.');
+    expect(await screen.findByRole('status')).toHaveTextContent('Tag values applied to all devices.');
   });
 });
