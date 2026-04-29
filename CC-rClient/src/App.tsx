@@ -12,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import topBanner from "../images/top_banner.png";
+import topBannerSmall from "../images/top_banner_samll.png";
 import type {
   ActionResult,
   AppSnapshot,
@@ -37,6 +38,24 @@ import { GroupsPage, TagsPage } from "./plugin/groups";
 import { GroupsProvider } from "./plugin/groups/GroupsContext";
 import { TagsProvider } from "./plugin/groups/TagsContext";
 import type { TagDefinition } from "./plugin/groups/types";
+import {
+  deriveTagValueOptions,
+  filterStations,
+  getPrimaryIp,
+  getStationGroupNames,
+  getStationRuntimeSummary,
+  getStationStatusLabel,
+  getStationTagSummary,
+  getTagDefinitionKey,
+  getTagDefinitionLabel,
+  type StationSortDirection,
+  type StationSortBy,
+  type StationViewMode,
+} from "./stations-browser";
+
+const STATION_VIEW_MODE_STORAGE_KEY = "cc-rclient.station-view-mode";
+const STATION_LIST_COLUMNS_STORAGE_KEY = "cc-rclient.station-list-columns";
+const STATION_GRID_COLUMNS_STORAGE_KEY = "cc-rclient.station-grid-columns";
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -47,7 +66,7 @@ const emptyOptions: ClientOptions = {
 
 const emptyStation = (): Station => ({
   id: crypto.randomUUID(),
-  name: "New Station",
+  name: "New Device",
   blocked: false,
   networkInterfaces: [{ mac: "", ips: [""] }],
   startPrograms: [],
@@ -187,6 +206,40 @@ function formatBytes(value: number) {
     index += 1;
   }
   return `${next.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+}
+
+function clampBrowserColumns(value: number, fallback: number) {
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+
+  return Math.min(5, Math.max(1, Math.round(value)));
+}
+
+function readStoredViewMode(): StationViewMode {
+  if (typeof window === "undefined") {
+    return "list";
+  }
+
+  const stored = window.localStorage.getItem(STATION_VIEW_MODE_STORAGE_KEY);
+  if (stored === "list" || stored === "grid" || stored === "split") {
+    return stored;
+  }
+
+  return "list";
+}
+
+function readStoredColumns(storageKey: string, fallback: number) {
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+
+  const stored = window.localStorage.getItem(storageKey);
+  if (!stored) {
+    return fallback;
+  }
+
+  return clampBrowserColumns(Number(stored), fallback);
 }
 
 type StationVisualState = "ready" | "warning" | "error" | "offline";
@@ -418,13 +471,368 @@ function NetworkTrafficChart({
   );
 }
 
+type StationDetailTab = "overview" | "edit";
+
+interface StationBrowserPanelProps {
+  filteredStations: Station[];
+  totalStationCount: number;
+  groups: StationGroup[];
+  tagDefinitions: TagDefinition[];
+  runtimeByStation: Record<string, StationRuntimeSnapshot>;
+  loading: boolean;
+  selectedId: string;
+  search: string;
+  sortBy: StationSortBy;
+  sortDirection: StationSortDirection;
+  groupFilter: string;
+  tagKeyFilter: string;
+  tagValueFilter: string;
+  tagValueOptions: string[];
+  viewMode: StationViewMode;
+  listColumns: number;
+  gridColumns: number;
+  hasActiveFilter: boolean;
+  filtersHideStations: boolean;
+  selectedStationHiddenByFilters: boolean;
+  onSearchChange: (value: string) => void;
+  onSortChange: (value: StationSortBy) => void;
+  onSortDirectionChange: (value: StationSortDirection) => void;
+  onGroupFilterChange: (value: string) => void;
+  onTagKeyFilterChange: (value: string) => void;
+  onTagValueFilterChange: (value: string) => void;
+  onViewModeChange: (value: StationViewMode) => void;
+  onListColumnsChange: (value: number) => void;
+  onGridColumnsChange: (value: number) => void;
+  onSelectStation: (stationId: string) => void;
+  onEditStation: (stationId: string) => void;
+  onClearFilters: () => void;
+}
+
+function StationBrowserPanel({
+  filteredStations,
+  totalStationCount,
+  groups,
+  tagDefinitions,
+  runtimeByStation,
+  loading,
+  selectedId,
+  search,
+  sortBy,
+  sortDirection,
+  groupFilter,
+  tagKeyFilter,
+  tagValueFilter,
+  tagValueOptions,
+  viewMode,
+  listColumns,
+  gridColumns,
+  hasActiveFilter,
+  filtersHideStations,
+  selectedStationHiddenByFilters,
+  onSearchChange,
+  onSortChange,
+  onSortDirectionChange,
+  onGroupFilterChange,
+  onTagKeyFilterChange,
+  onTagValueFilterChange,
+  onViewModeChange,
+  onListColumnsChange,
+  onGridColumnsChange,
+  onSelectStation,
+  onEditStation,
+  onClearFilters,
+}: StationBrowserPanelProps) {
+  const activeTagDefinition =
+    tagDefinitions.find((definition) => getTagDefinitionKey(definition) === tagKeyFilter) ?? null;
+
+  return (
+    <aside className="panel stationsBrowserPanel">
+      <div className="stationsBrowserHeader">
+        <div className="panelHeader stationsBrowserTitleRow">
+          <div>
+            <h2>Devices</h2>
+            <p className="stationsBrowserCount">
+              Showing {filteredStations.length} of {totalStationCount} devices
+            </p>
+          </div>
+          <div className="stationsViewToggle" role="group" aria-label="Device view mode">
+            {(["list", "grid", "split"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                className={viewMode === mode ? "accent" : ""}
+                onClick={() => onViewModeChange(mode)}
+                aria-pressed={viewMode === mode}
+              >
+                {mode === "list" ? "List" : mode === "grid" ? "Grid" : "Split"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="stationsFilterBar">
+          <input
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search name, MAC, or IP"
+            aria-label="Search stations"
+          />
+          <div className="stationsSortControls">
+            <select
+              value={sortBy}
+              onChange={(event) => onSortChange(event.target.value as StationSortBy)}
+              aria-label="Sort devices"
+            >
+              <option value="name">Sort: Name</option>
+              <option value="ip">Sort: IP</option>
+              <option value="group">Sort: Group</option>
+              <option value="tag">Sort: Tag</option>
+            </select>
+            <button
+              type="button"
+              className="stationsSortDirectionButton"
+              onClick={() => onSortDirectionChange(sortDirection === "asc" ? "desc" : "asc")}
+              aria-label={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
+              title={sortDirection === "asc" ? "Ascending order" : "Descending order"}
+            >
+              <span
+                className={`stationsSortDirectionIcon stationsSortDirectionIcon--${sortDirection}`}
+                aria-hidden="true"
+              >
+                ↑
+              </span>
+            </button>
+          </div>
+          <select
+            value={groupFilter}
+            onChange={(event) => onGroupFilterChange(event.target.value)}
+            aria-label="Filter by group"
+          >
+            <option value="">All Groups</option>
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={tagKeyFilter}
+            onChange={(event) => onTagKeyFilterChange(event.target.value)}
+            aria-label="Filter by tag"
+          >
+            <option value="">All Tags</option>
+            {tagDefinitions.map((definition) => (
+              <option key={definition.id} value={getTagDefinitionKey(definition)}>
+                {getTagDefinitionLabel(definition)}
+              </option>
+            ))}
+          </select>
+          {activeTagDefinition ? (
+            activeTagDefinition.type === "boolean" ? (
+              <select
+                value={tagValueFilter}
+                onChange={(event) => onTagValueFilterChange(event.target.value)}
+                aria-label="Filter by tag value"
+              >
+                <option value="">Any Value</option>
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            ) : activeTagDefinition.type === "select" && activeTagDefinition.options?.length ? (
+              <select
+                value={tagValueFilter}
+                onChange={(event) => onTagValueFilterChange(event.target.value)}
+                aria-label="Filter by tag value"
+              >
+                <option value="">Any Value</option>
+                {Array.from(new Set([...(activeTagDefinition.options ?? []), ...tagValueOptions])).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <>
+                <input
+                  list="station-tag-values"
+                  value={tagValueFilter}
+                  onChange={(event) => onTagValueFilterChange(event.target.value)}
+                  placeholder="Tag value"
+                  aria-label="Filter by tag value"
+                />
+                <datalist id="station-tag-values">
+                  {tagValueOptions.map((value) => (
+                    <option key={value} value={value} />
+                  ))}
+                </datalist>
+              </>
+            )
+          ) : null}
+          <button type="button" onClick={onClearFilters} disabled={!hasActiveFilter}>
+            Clear Filters
+          </button>
+        </div>
+
+        <p className="stationsSortHint">
+          Group sorts by the first assigned group; tag sorts by the selected tag value when available.
+        </p>
+
+        <div className="stationsBrowserMetaRow">
+          <span>
+            {viewMode === "grid" || viewMode === "list" ? (
+              <span className="stationsColumnSelector">
+                <span className="stationsColumnSelectorLabel">Columns:</span>
+                {[1, 2, 3, 4, 5].map((cols) => (
+                  <button
+                    key={cols}
+                    type="button"
+                    className={`stationsColumnBtn ${
+                      (viewMode === "grid" ? gridColumns : listColumns) === cols ? "accent" : ""
+                    }`}
+                    onClick={() =>
+                      viewMode === "grid" ? onGridColumnsChange(cols) : onListColumnsChange(cols)
+                    }
+                    aria-pressed={(viewMode === "grid" ? gridColumns : listColumns) === cols}
+                  >
+                    {cols}
+                  </button>
+                ))}
+              </span>
+            ) : viewMode === "split" ? (
+              "Split workspace"
+            ) : (
+              "Dense device list"
+            )}
+          </span>
+          {selectedStationHiddenByFilters ? (
+            <span className="stationsHiddenSelectionNotice">
+              Selected station is hidden by current filters.
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      <div
+        className={`stationBrowser stationBrowser--${viewMode}`}
+        style={
+          viewMode === "grid"
+            ? { gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }
+            : viewMode === "list"
+              ? { gridTemplateColumns: `repeat(${listColumns}, minmax(0, 1fr))` }
+              : undefined
+        }
+      >
+        {loading ? (
+          <p className="emptyState">Loading state…</p>
+        ) : filteredStations.length === 0 ? (
+          <p className="emptyState">
+            {filtersHideStations
+              ? hasActiveFilter
+                ? "Current search, group, or tag filters are hiding all stations."
+                : "Devices exist but are currently hidden by filters."
+              : "No devices configured yet. Add a device to begin."}
+          </p>
+        ) : (
+          filteredStations.map((station) => {
+            const stationVisualState = getStationVisualState(
+              station,
+              runtimeByStation[station.id] ?? null,
+            );
+            const groupNames = getStationGroupNames(station, groups);
+            const tagSummary = getStationTagSummary(station, tagDefinitions);
+            const runtimeSummary = getStationRuntimeSummary(runtimeByStation[station.id] ?? null);
+
+            return (
+              <div
+                key={station.id}
+                className={[
+                  "stationCard",
+                  "stationBrowserItem",
+                  viewMode === "list" || viewMode === "split" ? "stationBrowserRow" : "stationBrowserGridCard",
+                  station.id === selectedId ? "selected" : "",
+                ].join(" ")}
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelectStation(station.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectStation(station.id);
+                  }
+                }}
+              >
+                <div className="stationCardTopRow">
+                  <div className="stationCardIdentity">
+                    <ComputerStatusIcon state={stationVisualState} />
+                    <div className="stationIdentityText">
+                      <span className="stationName">{station.name || "Unnamed Device"}</span>
+                      <span className="stationIp">{getPrimaryIp(station)}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="stationEditButton"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onEditStation(station.id);
+                    }}
+                    aria-label={`Edit ${station.name || "station"}`}
+                  >
+                    Edit
+                  </button>
+                </div>
+
+                <div className="stationMeta stationMeta--stacked">
+                  <span className={`badge ${stationVisualState}`}>
+                    {getStationStatusLabel(stationVisualState)}
+                  </span>
+                  {runtimeSummary.length > 0 ? (
+                    <span className="stationStats">
+                      {runtimeSummary.map((item) => (
+                        <span key={item} className="stationStatItem">
+                          {item}
+                        </span>
+                      ))}
+                    </span>
+                  ) : null}
+                </div>
+
+                {groupNames.length > 0 ? (
+                  <div className="stationMeta stationMetaChips">
+                    {groupNames.slice(0, viewMode === "grid" ? 2 : 3).map((groupName) => (
+                      <span key={groupName} className="stationFilterChip">
+                        {groupName}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+
+                {tagSummary.length > 0 ? (
+                  <div className="stationMeta stationMetaChips">
+                    {tagSummary.slice(0, viewMode === "grid" ? 2 : 3).map((entry) => (
+                      <span key={entry} className="stationFilterChip stationFilterChip--muted">
+                        {entry}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </aside>
+  );
+}
+
 export default function App() {
   const [snapshot, setSnapshot] = useState<AppSnapshot | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
   const [options, setOptions] = useState<ClientOptions>(emptyOptions);
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "ip">("name");
+  const [sortBy, setSortBy] = useState<StationSortBy>("name");
+  const [sortDirection, setSortDirection] = useState<StationSortDirection>("asc");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState<string[]>([]);
@@ -446,14 +854,30 @@ export default function App() {
   const [commandOutput, setCommandOutput] = useState<CommandExecutionResult | null>(null);
   const [groups, setGroups] = useState<StationGroup[]>([]);
   const [groupFilter, setGroupFilter] = useState<string>("");
-  const [tagFilter, setTagFilter] = useState<string>("");
+  const [tagKeyFilter, setTagKeyFilter] = useState<string>("");
+  const [tagValueFilter, setTagValueFilter] = useState<string>("");
   const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>([]);
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
   const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch">("stations");
-  const [isEditingStationDetail, setIsEditingStationDetail] = useState(false);
+  const [viewMode, setViewMode] = useState<StationViewMode>(() => readStoredViewMode());
+  const [listColumns, setListColumns] = useState(() => readStoredColumns(STATION_LIST_COLUMNS_STORAGE_KEY, 2));
+  const [gridColumns, setGridColumns] = useState(() => readStoredColumns(STATION_GRID_COLUMNS_STORAGE_KEY, 3));
+  const [detailTab, setDetailTab] = useState<StationDetailTab>("overview");
   const [activeLayout, setActiveLayout] = useState<string>("default");
   const [pendingStationTagValues, setPendingStationTagValues] = useState<Record<string, string>>({});
   const [dirtyStationTagKeys, setDirtyStationTagKeys] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    window.localStorage.setItem(STATION_VIEW_MODE_STORAGE_KEY, viewMode);
+  }, [viewMode]);
+
+  useEffect(() => {
+    window.localStorage.setItem(STATION_LIST_COLUMNS_STORAGE_KEY, String(listColumns));
+  }, [listColumns]);
+
+  useEffect(() => {
+    window.localStorage.setItem(STATION_GRID_COLUMNS_STORAGE_KEY, String(gridColumns));
+  }, [gridColumns]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -564,41 +988,23 @@ export default function App() {
   }, [activePage]);
 
   const filteredStations = useMemo(() => {
-    const lowered = search.trim().toLowerCase();
-    let next = stations.filter((station) => {
-      if (!lowered) {
-        return true;
-      }
-      const allIps = station.networkInterfaces.flatMap((ni) => ni.ips);
-      return (
-        station.name.toLowerCase().includes(lowered) ||
-        station.networkInterfaces.some((ni) => ni.mac.toLowerCase().includes(lowered)) ||
-        allIps.some((ip) => ip.toLowerCase().includes(lowered))
-      );
+    return filterStations({
+      stations,
+      search,
+      sortBy,
+      sortDirection,
+      groupId: groupFilter,
+      tagKey: tagKeyFilter,
+      tagValue: tagValueFilter,
+      groups,
+      tagDefinitions,
     });
+  }, [groupFilter, groups, search, sortBy, sortDirection, stations, tagDefinitions, tagKeyFilter, tagValueFilter]);
 
-    // Group filter: show only stations in the selected group
-    if (groupFilter) {
-      const group = groups.find((g) => g.id === groupFilter);
-      if (group) {
-        next = next.filter((s) => (group.stationIds || []).includes(s.id));
-      }
-    }
-
-    // Tag filter: show only stations with the selected tag
-    if (tagFilter) {
-      next = next.filter((s) => (s.tags || {}).hasOwnProperty(tagFilter));
-    }
-
-    return next.sort((left, right) => {
-      if (sortBy === "ip") {
-        const leftIp = left.networkInterfaces[0]?.ips[0] ?? "";
-        const rightIp = right.networkInterfaces[0]?.ips[0] ?? "";
-        return leftIp.localeCompare(rightIp, undefined, { numeric: true });
-      }
-      return left.name.localeCompare(right.name, undefined, { numeric: true });
-    });
-  }, [search, sortBy, stations, groupFilter, tagFilter, groups]);
+  const tagValueOptions = useMemo(
+    () => deriveTagValueOptions(stations, tagKeyFilter),
+    [stations, tagKeyFilter],
+  );
 
   const selectedStation =
     filteredStations.find((station) => station.id === selectedId) ??
@@ -608,8 +1014,18 @@ export default function App() {
   const selectedBrowser = selectedStation ? browserByStation[selectedStation.id] ?? null : null;
   const selectedCapture = selectedStation ? captureByStation[selectedStation.id] ?? null : null;
   const hasRuntimeData = Object.keys(runtimeByStation).length > 0;
-  const hasActiveFilter = search.trim().length > 0 || Boolean(groupFilter) || Boolean(tagFilter);
+  const hasStationMessage = Object.values(runtimeByStation).some(
+    (runtime) => runtime.message.trim().length > 0,
+  );
+  const hasActiveFilter =
+    search.trim().length > 0 ||
+    Boolean(groupFilter) ||
+    Boolean(tagKeyFilter) ||
+    Boolean(tagValueFilter);
   const filtersHideStations = stations.length > 0 && filteredStations.length === 0;
+  const selectedStationHiddenByFilters =
+    Boolean(selectedStation) &&
+    filteredStations.every((station) => station.id !== selectedStation?.id);
 
   useEffect(() => {
     setPendingStationTagValues({});
@@ -1049,7 +1465,8 @@ export default function App() {
     setStations((current) => [station, ...current]);
     setSelectedId(station.id);
     setActivePage("stations");
-    setIsEditingStationDetail(true);
+    setDetailTab("edit");
+    setViewMode("split");
   }
 
   function removeSelectedStation() {
@@ -1060,7 +1477,7 @@ export default function App() {
       current.filter((station) => station.id !== selectedStation.id)
     );
     setSelectedId("");
-    setIsEditingStationDetail(false);
+    setDetailTab("overview");
   }
 
   function patchSelected(patch: Partial<Station>) {
@@ -1185,14 +1602,43 @@ export default function App() {
 
   const selectedIds = selectedStation ? [selectedStation.id] : [];
 
+  function selectStation(stationId: string) {
+    setSelectedId(stationId);
+    setDetailTab("overview");
+  }
+
+  function editStation(stationId: string) {
+    setSelectedId(stationId);
+    setDetailTab("edit");
+    setViewMode("split");
+  }
+
+  function clearStationFilters() {
+    setSearch("");
+    setGroupFilter("");
+    setTagKeyFilter("");
+    setTagValueFilter("");
+  }
+
   return (
     <div className="shell">
       <header className={`hero ${hasRuntimeData ? "hero--compact" : "hero--expanded"}`}>
-        <div className="heroBanner">
+        <div
+          className={`heroBanner ${hasStationMessage ? "heroBanner--smallVisible" : "heroBanner--largeVisible"}`}
+          role="img"
+          aria-label="CC-rClient top banner"
+        >
           <img
             src={topBanner}
-            alt="CC-rClient top banner"
-            className="heroBannerImage"
+            alt=""
+            aria-hidden="true"
+            className="heroBannerImage heroBannerImage--large"
+          />
+          <img
+            src={topBannerSmall}
+            alt=""
+            aria-hidden="true"
+            className="heroBannerImage heroBannerImage--small"
           />
         </div>
       </header>
@@ -1203,7 +1649,7 @@ export default function App() {
           className={activePage === "stations" ? "accent" : ""}
           onClick={() => setActivePage("stations")}
         >
-          Stations
+          Devices
         </button>
         <button
           className={activePage === "settings" ? "accent" : ""}
@@ -1255,7 +1701,7 @@ export default function App() {
 
         <div className="toolbar-divider" />
 
-        {/* Station Actions */}
+        {/* Device Actions */}
         <button onClick={addStation}>+ Add</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
           Remove
@@ -1319,444 +1765,376 @@ export default function App() {
       </section>
 
       {activePage === "stations" ? (
-        <main className={`grid ${isEditingStationDetail ? "gridDetailMode" : "gridRuntimeMode"}`}>
-          <aside className="panel stationPanel">
-            <div className="panelHeader">
-              <h2>Stations</h2>
-              <div className="panelControls">
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Filter by name, MAC, or IP"
-                />
-                <select
-                  value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value as "name" | "ip")}
-                >
-                  <option value="name">Sort: Name</option>
-                  <option value="ip">Sort: IP</option>
-                </select>
-                {groups.length > 0 && (
-                  <select
-                    value={groupFilter}
-                    onChange={(event) => setGroupFilter(event.target.value)}
-                  >
-                    <option value="">All Groups</option>
-                    {groups.map((g) => (
-                      <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                  </select>
-                )}
-                {tagDefinitions.length > 0 && (
-                  <select
-                    value={tagFilter}
-                    onChange={(event) => setTagFilter(event.target.value)}
-                  >
-                    <option value="">All Tags</option>
-                    {tagDefinitions.map((t) => (
-                      <option key={t.id} value={t.id}>{t.name}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            </div>
+        <main className={`stationsWorkspace stationsWorkspace--${viewMode}`}>
+          <StationBrowserPanel
+            filteredStations={filteredStations}
+            totalStationCount={stations.length}
+            groups={groups}
+            tagDefinitions={tagDefinitions}
+            runtimeByStation={runtimeByStation}
+            loading={loading}
+            selectedId={selectedId}
+            search={search}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            groupFilter={groupFilter}
+            tagKeyFilter={tagKeyFilter}
+            tagValueFilter={tagValueFilter}
+            tagValueOptions={tagValueOptions}
+            viewMode={viewMode}
+            listColumns={listColumns}
+            hasActiveFilter={hasActiveFilter}
+            filtersHideStations={filtersHideStations}
+            selectedStationHiddenByFilters={selectedStationHiddenByFilters}
+            onSearchChange={setSearch}
+            onSortChange={setSortBy}
+            onSortDirectionChange={setSortDirection}
+            onGroupFilterChange={setGroupFilter}
+            onTagKeyFilterChange={(value) => {
+              setTagKeyFilter(value);
+              setTagValueFilter("");
+            }}
+            onTagValueFilterChange={setTagValueFilter}
+            onViewModeChange={setViewMode}
+            onListColumnsChange={setListColumns}
+            gridColumns={gridColumns}
+            onGridColumnsChange={setGridColumns}
+            onSelectStation={selectStation}
+            onEditStation={editStation}
+            onClearFilters={clearStationFilters}
+          />
 
-            <div className="stationList">
-              {loading ? (
-                <p className="emptyState">Loading state…</p>
-              ) : filteredStations.length === 0 ? (
-                <p className="emptyState">
-                  {filtersHideStations
-                    ? hasActiveFilter
-                      ? "Current search/group/tag filter is hiding all stations. Clear filters to show them."
-                      : "Stations exist but are currently hidden by filters."
-                    : "No stations configured yet. Add a station to begin."}
-                </p>
-              ) : (
-                filteredStations.map((station) => {
-                  const ip = station.networkInterfaces[0]?.ips[0] ?? "No IP";
-                  const stationVisualState = getStationVisualState(
-                    station,
-                    runtimeByStation[station.id] ?? null
-                  );
-                  return (
-                    <div
-                      key={station.id}
-                      className={`stationCard ${station.id === selectedId ? "selected" : ""}`}
-                      onClick={() => {
-                        setSelectedId(station.id);
-                        setIsEditingStationDetail(false);
-                      }}
-                    >
-                      <div className="stationCardTopRow">
-                        <div className="stationCardIdentity">
-                          <ComputerStatusIcon state={stationVisualState} />
-                          <span className="stationName">{station.name || "Unnamed Station"}</span>
-                        </div>
-                        <button
-                          type="button"
-                          className="stationEditButton"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setSelectedId(station.id);
-                            setIsEditingStationDetail(true);
-                          }}
-                          aria-label={`Edit ${station.name || "station"}`}
-                        >
-                          Edit
-                        </button>
-                      </div>
-                      <div className="stationMeta">
-                        <span className={`badge ${stationVisualState}`}>
-                          {stationVisualState === "ready"
-                            ? "Ready"
-                            : stationVisualState === "warning"
-                              ? "Warning"
-                              : stationVisualState === "error"
-                                ? "Error"
-                                : "Offline"}
-                        </span>
-                        {(runtimeByStation[station.id]) && (
-                          <span className="stationStats">
-                            <span className="stationStatItem" title="CPU">
-                              <CpuIcon />
-                              {runtimeByStation[station.id].cpu.toFixed(0)}%
-                            </span>
-                            <span className="stationStatItem" title="Memory">
-                              <MemoryIcon />
-                              {runtimeByStation[station.id].totalMemory > 0
-                                ? (runtimeByStation[station.id].currentMemory / runtimeByStation[station.id].totalMemory * 100).toFixed(0)
-                                : 0}%
-                            </span>
-                            <span className="stationStatItem" title="Processes">
-                              <ProcessIcon />
-                              {runtimeByStation[station.id].procCount}
-                            </span>
-                          </span>
-                        )}
-                        <span className="stationIp">{ip}</span>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </aside>
-
-          {isEditingStationDetail ? (
-            <section className="panel detailPanel detailPanelExpanded">
-              <div className="panelHeader">
-                <h2>Station Detail</h2>
+          <section className="panel stationsDetailPanel">
+            <div className="panelHeader stationsDetailHeader">
+              <div>
+                <h2>{detailTab === "edit" ? "Device Editor" : "Runtime & Tools"}</h2>
                 {selectedStation ? (
                   <span className="hint">
                     {selectedStation.id}
                     {selectedStation.lastAction ? ` | ${selectedStation.lastAction}` : ""}
                   </span>
-                ) : null}
+                ) : (
+                  <span className="hint">Select a device to inspect or edit it.</span>
+                )}
               </div>
+              <div className="stationsDetailTabs" role="tablist" aria-label="Device detail mode">
+                <button
+                  type="button"
+                  className={detailTab === "overview" ? "accent" : ""}
+                  onClick={() => setDetailTab("overview")}
+                  aria-pressed={detailTab === "overview"}
+                >
+                  Overview
+                </button>
+                <button
+                  type="button"
+                  className={detailTab === "edit" ? "accent" : ""}
+                  onClick={() => setDetailTab("edit")}
+                  aria-pressed={detailTab === "edit"}
+                  disabled={!selectedStation}
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
 
-              {!selectedStation ? (
-                <p className="emptyState">Select or create a station to edit it.</p>
-              ) : (
-                <div className="detailLayout">
+            {selectedStationHiddenByFilters ? (
+              <p className="stationsHiddenSelectionNotice stationsHiddenSelectionNotice--panel">
+                The selected device is outside the current filter results. Clear filters or pick a visible device.
+              </p>
+            ) : null}
+
+            {!selectedStation ? (
+              <p className="emptyState">Select or create a device to continue.</p>
+            ) : detailTab === "edit" ? (
+              <div className="detailLayout">
+                <div className="subHeader">
+                  <h3>Edit Device</h3>
+                  <button type="button" onClick={() => setDetailTab("overview")}>
+                    Back to Overview
+                  </button>
+                </div>
+
+                <label className="field">
+                  <span>Name</span>
+                  <input
+                    value={selectedStation.name}
+                    onChange={(event) => patchSelected({ name: event.target.value })}
+                  />
+                </label>
+
+                <div className="collection">
                   <div className="subHeader">
-                    <h3>Edit Station</h3>
-                    <button type="button" onClick={() => setIsEditingStationDetail(false)}>
-                      Close
-                    </button>
-                  </div>
-
-                  <label className="field">
-                    <span>Name</span>
-                    <input
-                      value={selectedStation.name}
-                      onChange={(event) => patchSelected({ name: event.target.value })}
-                    />
-                  </label>
-
-                  <div className="collection">
-                    <div className="subHeader">
-                      <h3>Network Interfaces</h3>
-                      <button
-                        onClick={() =>
-                          patchSelected({
-                            networkInterfaces: [
-                              ...selectedStation.networkInterfaces,
-                              { mac: "", ips: [""] }
-                            ]
-                          })
-                        }
-                      >
-                        Add NIC
-                      </button>
-                    </div>
-                    {selectedStation.networkInterfaces.map((ni, index) => (
-                      <div key={`${selectedStation.id}-ni-${index}`} className="cardGrid">
-                        <label className="field">
-                          <span>MAC</span>
-                          <input
-                            value={ni.mac}
-                            onChange={(event) => {
-                              const next = [...selectedStation.networkInterfaces];
-                              next[index] = { ...ni, mac: event.target.value };
-                              patchSelected({ networkInterfaces: next });
-                            }}
-                          />
-                        </label>
-                        <label className="field wide">
-                          <span>IPs</span>
-                          <input
-                            value={ni.ips.join(", ")}
-                            onChange={(event) => {
-                              const next = [...selectedStation.networkInterfaces];
-                              next[index] = {
-                                ...ni,
-                                ips: event.target.value
-                                  .split(",")
-                                  .map((value) => value.trim())
-                                  .filter(Boolean)
-                              };
-                              patchSelected({ networkInterfaces: next });
-                            }}
-                          />
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="collection">
-                    <div className="subHeader">
-                      <h3>Startup Programs</h3>
-                      <button
-                        onClick={() =>
-                          patchPrograms([
-                            ...selectedStation.startPrograms,
-                            {
-                              path: "",
-                              arguments: "",
-                              processName: "",
-                              allowMultiInstance: false
-                            }
-                          ])
-                        }
-                      >
-                        Add Program
-                      </button>
-                    </div>
-                    {selectedStation.startPrograms.length === 0 ? (
-                      <p className="emptyInline">No station-specific startup programs.</p>
-                    ) : (
-                      selectedStation.startPrograms.map((program, index) => (
-                        <div key={`${selectedStation.id}-program-${index}`} className="programCard">
-                          <label className="field wide">
-                            <span>Path</span>
-                            <input
-                              value={program.path}
-                              onChange={(event) => {
-                                const next = [...selectedStation.startPrograms];
-                                next[index] = { ...program, path: event.target.value };
-                                patchPrograms(next);
-                              }}
-                            />
-                          </label>
-                          <label className="field">
-                            <span>Arguments</span>
-                            <input
-                              value={program.arguments}
-                              onChange={(event) => {
-                                const next = [...selectedStation.startPrograms];
-                                next[index] = { ...program, arguments: event.target.value };
-                                patchPrograms(next);
-                              }}
-                            />
-                          </label>
-                          <label className="field">
-                            <span>Process Name</span>
-                            <input
-                              value={program.processName}
-                              onChange={(event) => {
-                                const next = [...selectedStation.startPrograms];
-                                next[index] = { ...program, processName: event.target.value };
-                                patchPrograms(next);
-                              }}
-                            />
-                          </label>
-                          <label className="checkField">
-                            <input
-                              type="checkbox"
-                              checked={program.allowMultiInstance}
-                              onChange={(event) => {
-                                const next = [...selectedStation.startPrograms];
-                                next[index] = {
-                                  ...program,
-                                  allowMultiInstance: event.target.checked
-                                };
-                                patchPrograms(next);
-                              }}
-                            />
-                            <span>Allow multi-instance</span>
-                          </label>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <label className="field">
-                    <span>Monitor Processes</span>
-                    <textarea
-                      rows={5}
-                      value={selectedStation.monitorProcesses.join("\n")}
-                      onChange={(event) =>
+                    <h3>Network Interfaces</h3>
+                    <button
+                      onClick={() =>
                         patchSelected({
-                          monitorProcesses: event.target.value
-                            .split("\n")
-                            .map((value) => value.trim())
-                            .filter(Boolean)
+                          networkInterfaces: [
+                            ...selectedStation.networkInterfaces,
+                            { mac: "", ips: [""] }
+                          ]
                         })
                       }
-                    />
-                  </label>
-
-                  <div className="collection">
-                    <div className="subHeader">
-                      <h3>Group Membership</h3>
-                    </div>
-                    {groups.length === 0 ? (
-                      <p className="emptyInline">No groups defined yet. Create groups in the Groups page.</p>
-                    ) : (
-                      <div className="cardGrid">
-                        {groups.map((group) => {
-                          const checked = (selectedStation.groups ?? []).includes(group.id);
-                          return (
-                            <label key={group.id} className="checkField" style={{ alignSelf: 'end' }}>
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={(event) => {
-                                  if (event.target.checked) {
-                                    void patchSelectedGroups([...(selectedStation.groups ?? []), group.id]);
-                                  } else {
-                                    void patchSelectedGroups((selectedStation.groups ?? []).filter((id) => id !== group.id));
-                                  }
-                                }}
-                              />
-                              <span>{group.name}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    )}
+                    >
+                      Add NIC
+                    </button>
                   </div>
-
-                  <div className="collection">
-                    <div className="subHeader">
-                      <h3>Station Tags</h3>
+                  {selectedStation.networkInterfaces.map((ni, index) => (
+                    <div key={`${selectedStation.id}-ni-${index}`} className="cardGrid">
+                      <label className="field">
+                        <span>MAC</span>
+                        <input
+                          value={ni.mac}
+                          onChange={(event) => {
+                            const next = [...selectedStation.networkInterfaces];
+                            next[index] = { ...ni, mac: event.target.value };
+                            patchSelected({ networkInterfaces: next });
+                          }}
+                        />
+                      </label>
+                      <label className="field wide">
+                        <span>IPs</span>
+                        <input
+                          value={ni.ips.join(", ")}
+                          onChange={(event) => {
+                            const next = [...selectedStation.networkInterfaces];
+                            next[index] = {
+                              ...ni,
+                              ips: event.target.value
+                                .split(",")
+                                .map((value) => value.trim())
+                                .filter(Boolean)
+                            };
+                            patchSelected({ networkInterfaces: next });
+                          }}
+                        />
+                      </label>
                     </div>
-                    {tagDefinitions.length === 0 ? (
-                      <p className="emptyInline">No tag definitions yet. Create tags in the Tags page.</p>
-                    ) : (
-                      <div className="cardGrid">
-                        {tagDefinitions.map((definition) => {
-                          const tagKey = definition.key || definition.id;
-                          const tagLabel = definition.label || definition.name || tagKey;
-                          const currentValue = (selectedStation.tags ?? {})[tagKey] ?? '';
+                  ))}
+                </div>
 
-                          if (definition.type === 'boolean') {
-                            return (
-                              <label className="field" key={tagKey}>
-                                <span>{tagLabel}</span>
-                                <select
-                                  value={currentValue}
-                                  onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
-                                >
-                                  <option value="">Unset</option>
-                                  <option value="true">True</option>
-                                  <option value="false">False</option>
-                                </select>
-                              </label>
-                            );
+                <div className="collection">
+                  <div className="subHeader">
+                    <h3>Startup Programs</h3>
+                    <button
+                      onClick={() =>
+                        patchPrograms([
+                          ...selectedStation.startPrograms,
+                          {
+                            path: "",
+                            arguments: "",
+                            processName: "",
+                            allowMultiInstance: false
                           }
+                        ])
+                      }
+                    >
+                      Add Program
+                    </button>
+                  </div>
+                  {selectedStation.startPrograms.length === 0 ? (
+                    <p className="emptyInline">No station-specific startup programs.</p>
+                  ) : (
+                    selectedStation.startPrograms.map((program, index) => (
+                      <div key={`${selectedStation.id}-program-${index}`} className="programCard">
+                        <label className="field wide">
+                          <span>Path</span>
+                          <input
+                            value={program.path}
+                            onChange={(event) => {
+                              const next = [...selectedStation.startPrograms];
+                              next[index] = { ...program, path: event.target.value };
+                              patchPrograms(next);
+                            }}
+                          />
+                        </label>
+                        <label className="field">
+                          <span>Arguments</span>
+                          <input
+                            value={program.arguments}
+                            onChange={(event) => {
+                              const next = [...selectedStation.startPrograms];
+                              next[index] = { ...program, arguments: event.target.value };
+                              patchPrograms(next);
+                            }}
+                          />
+                        </label>
+                        <label className="field">
+                          <span>Process Name</span>
+                          <input
+                            value={program.processName}
+                            onChange={(event) => {
+                              const next = [...selectedStation.startPrograms];
+                              next[index] = { ...program, processName: event.target.value };
+                              patchPrograms(next);
+                            }}
+                          />
+                        </label>
+                        <label className="checkField">
+                          <input
+                            type="checkbox"
+                            checked={program.allowMultiInstance}
+                            onChange={(event) => {
+                              const next = [...selectedStation.startPrograms];
+                              next[index] = {
+                                ...program,
+                                allowMultiInstance: event.target.checked
+                              };
+                              patchPrograms(next);
+                            }}
+                          />
+                          <span>Allow multi-instance</span>
+                        </label>
+                      </div>
+                    ))
+                  )}
+                </div>
 
-                          if (definition.type === 'select' && definition.options && definition.options.length > 0) {
-                            return (
-                              <label className="field" key={tagKey}>
-                                <span>{tagLabel}</span>
-                                <select
-                                  value={currentValue}
-                                  onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
-                                >
-                                  <option value="">Unset</option>
-                                  {definition.options.map((option) => (
-                                    <option key={option} value={option}>
-                                      {option}
-                                    </option>
-                                  ))}
-                                </select>
-                              </label>
-                            );
-                          }
+                <label className="field">
+                  <span>Monitor Processes</span>
+                  <textarea
+                    rows={5}
+                    value={selectedStation.monitorProcesses.join("\n")}
+                    onChange={(event) =>
+                      patchSelected({
+                        monitorProcesses: event.target.value
+                          .split("\n")
+                          .map((value) => value.trim())
+                          .filter(Boolean)
+                      })
+                    }
+                  />
+                </label>
 
+                <div className="collection">
+                  <div className="subHeader">
+                    <h3>Group Membership</h3>
+                  </div>
+                  {groups.length === 0 ? (
+                    <p className="emptyInline">No groups defined yet. Create groups in the Groups page.</p>
+                  ) : (
+                    <div className="cardGrid">
+                      {groups.map((group) => {
+                        const checked = (selectedStation.groups ?? []).includes(group.id);
+                        return (
+                          <label key={group.id} className="checkField" style={{ alignSelf: "end" }}>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(event) => {
+                                if (event.target.checked) {
+                                  void patchSelectedGroups([...(selectedStation.groups ?? []), group.id]);
+                                } else {
+                                  void patchSelectedGroups((selectedStation.groups ?? []).filter((id) => id !== group.id));
+                                }
+                              }}
+                            />
+                            <span>{group.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="collection">
+                  <div className="subHeader">
+                    <h3>Device Tags</h3>
+                  </div>
+                  {tagDefinitions.length === 0 ? (
+                    <p className="emptyInline">No tag definitions yet. Create tags in the Tags page.</p>
+                  ) : (
+                    <div className="cardGrid">
+                      {tagDefinitions.map((definition) => {
+                        const tagKey = definition.key || definition.id;
+                        const tagLabel = definition.label || definition.name || tagKey;
+                        const currentValue = (selectedStation.tags ?? {})[tagKey] ?? "";
+
+                        if (definition.type === "boolean") {
                           return (
                             <label className="field" key={tagKey}>
                               <span>{tagLabel}</span>
-                              <div className="tagValueInlineEditor">
-                                <input
-                                  type={definition.type === 'number' ? 'number' : 'text'}
-                                  value={dirtyStationTagKeys[tagKey] ? (pendingStationTagValues[tagKey] ?? '') : currentValue}
-                                  onChange={(event) => updatePendingStationTagValue(tagKey, event.target.value)}
-                                  placeholder={`Value for ${tagLabel}`}
-                                />
-                                {dirtyStationTagKeys[tagKey] ? (
-                                  <button
-                                    type="button"
-                                    className="accent tagValueSaveButton"
-                                    onClick={() => void savePendingStationTagValue(tagKey)}
-                                  >
-                                    Save
-                                  </button>
-                                ) : null}
-                              </div>
+                              <select
+                                value={currentValue}
+                                onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
+                              >
+                                <option value="">Unset</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                              </select>
                             </label>
                           );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                        }
+
+                        if (definition.type === "select" && definition.options && definition.options.length > 0) {
+                          return (
+                            <label className="field" key={tagKey}>
+                              <span>{tagLabel}</span>
+                              <select
+                                value={currentValue}
+                                onChange={(event) => void patchSelectedTagValue(tagKey, event.target.value)}
+                              >
+                                <option value="">Unset</option>
+                                {definition.options.map((option) => (
+                                  <option key={option} value={option}>
+                                    {option}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          );
+                        }
+
+                        return (
+                          <label className="field" key={tagKey}>
+                            <span>{tagLabel}</span>
+                            <div className="tagValueInlineEditor">
+                              <input
+                                type={definition.type === "number" ? "number" : "text"}
+                                value={dirtyStationTagKeys[tagKey] ? (pendingStationTagValues[tagKey] ?? "") : currentValue}
+                                onChange={(event) => updatePendingStationTagValue(tagKey, event.target.value)}
+                                placeholder={`Value for ${tagLabel}`}
+                              />
+                              {dirtyStationTagKeys[tagKey] ? (
+                                <button
+                                  type="button"
+                                  className="accent tagValueSaveButton"
+                                  onClick={() => void savePendingStationTagValue(tagKey)}
+                                >
+                                  Save
+                                </button>
+                              ) : null}
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </section>
-          ) : null}
-
-          {!isEditingStationDetail ? (
-            <section className="panel sidePanel sidePanelExpanded">
-            <div className="panelHeader">
-              <h2>Runtime & Tools</h2>
-              <span className="hint">Station live data, screen capture, and remote files</span>
-            </div>
-
-            <div className="collection">
-              <div className="subHeader">
-                <h3>Runtime</h3>
-                <button
-                  onClick={() => void refreshRuntime(selectedStation?.id, true)}
-                  disabled={!selectedStation || runtimeLoadingId === selectedStation.id}
-                >
-                  {runtimeLoadingId === selectedStation?.id ? "Refreshing..." : "Refresh"}
-                </button>
               </div>
-              {!selectedStation ? (
-                <p className="emptyInline">Select a station to view live runtime data.</p>
-              ) : !selectedRuntime ? (
-                <p className="emptyInline">No live runtime data loaded yet.</p>
-              ) : (
-                <div className="programCard">
+            ) : (
+              <>
+                <div className="collection">
+                  <div className="subHeader">
+                    <h3>Runtime</h3>
+                    <button
+                      onClick={() => void refreshRuntime(selectedStation?.id, true)}
+                      disabled={!selectedStation || runtimeLoadingId === selectedStation.id}
+                    >
+                      {runtimeLoadingId === selectedStation?.id ? "Refreshing..." : "Refresh"}
+                    </button>
+                  </div>
+                  {!selectedRuntime ? (
+                    <p className="emptyInline">No live runtime data loaded yet.</p>
+                  ) : (
+                    <div className="programCard">
                   <div className="statsGrid">
                     <div className="statTile">
                       <span>Endpoint</span>
                       <strong>{selectedRuntime.endpoint}</strong>
                     </div>
                     <div className="statTile">
-                      <span>Remote Station ID</span>
+                      <span>Remote Device ID</span>
                       <strong>{selectedRuntime.stationId || "n/a"}</strong>
                     </div>
                     <CpuPie cpu={selectedRuntime.cpu} />
@@ -1829,11 +2207,11 @@ export default function App() {
                       ))
                     )}
                   </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div className="collection">
+                <div className="collection">
               <div className="subHeader">
                 <h3>Screen Capture</h3>
                 <button onClick={() => void captureScreen()} disabled={!selectedStation || remoteBusy === "capture"}>
@@ -1850,9 +2228,9 @@ export default function App() {
                   <img className="capturePreview" src={selectedCapture.dataUrl} alt="Remote station capture" />
                 </div>
               )}
-            </div>
+                </div>
 
-            <div className="collection">
+                <div className="collection">
               <div className="subHeader">
                 <h3>Batch Captures ({batchCaptures.length})</h3>
                 <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
@@ -1878,7 +2256,7 @@ export default function App() {
                             className="captureThumbImg"
                             onClick={() => {
                               setSelectedId(capture.stationId);
-                              setIsEditingStationDetail(false);
+                              setDetailTab("overview");
                             }}
                             title={`${capture.stationName} · ${capture.endpoint} · ${formatBytes(capture.byteLen)}`}
                           />
@@ -1889,9 +2267,9 @@ export default function App() {
                   ))}
                 </div>
               )}
-            </div>
+                </div>
 
-            <div className="collection">
+                <div className="collection">
               <div className="subHeader">
                 <h3>Remote Command</h3>
                 <button onClick={() => void executeRemoteCommand()} disabled={!selectedStation || remoteBusy === "command"}>
@@ -1936,9 +2314,9 @@ export default function App() {
                   ) : null}
                 </div>
               ) : null}
-            </div>
+                </div>
 
-            <div className="collection">
+                <div className="collection">
               <div className="subHeader">
                 <h3>Remote Files</h3>
                 <button onClick={() => void browseRemote()} disabled={!selectedStation || remoteBusy === "browse"}>
@@ -2009,9 +2387,9 @@ export default function App() {
                   )}
                 </div>
               )}
-            </div>
+                </div>
 
-            <div className="collection">
+                <div className="collection">
               <div className="subHeader">
                 <h3>Action Log</h3>
               </div>
@@ -2026,9 +2404,10 @@ export default function App() {
                   ))
                 )}
               </div>
-            </div>
+                </div>
+              </>
+            )}
           </section>
-          ) : null}
         </main>
       ) : activePage === "groups" ? (
         <GroupsProvider>
@@ -2093,7 +2472,7 @@ export default function App() {
                         }
                       }}
                     >
-                      Save to Stations
+                      Save to Devices
                     </button>
                   </div>
                 </label>
