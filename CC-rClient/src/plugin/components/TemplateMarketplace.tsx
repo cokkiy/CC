@@ -1607,24 +1607,211 @@ export function downloadTemplate(template: UITemplatePackage): void {
   URL.revokeObjectURL(url);
 }
 
-/**
- * Read a template from a JSON file
- */
-export function readTemplateFromFile(file: File): Promise<UITemplatePackage> {
+async function readTextFile(file: File): Promise<string> {
+  if (typeof file.text === 'function') {
+    return file.text();
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const template = JSON.parse(content) as UITemplatePackage;
-        resolve(template);
-      } catch (err) {
-        reject(new Error('Invalid template file format'));
-      }
-    };
+    reader.onload = () => resolve(String(reader.result ?? ''));
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsText(file);
   });
+}
+
+async function readBinaryFile(file: File): Promise<ArrayBuffer> {
+  if (typeof file.arrayBuffer === 'function') {
+    return file.arrayBuffer();
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+type ZipEntry = {
+  compressionMethod: number;
+  compressedData: Uint8Array;
+};
+
+function decodeZipText(bytes: Uint8Array): string {
+  return new TextDecoder().decode(bytes);
+}
+
+function getPreviewMimeType(path: string): string | null {
+  const lower = path.toLowerCase();
+
+  if (lower.endsWith('.png')) return 'image/png';
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+  if (lower.endsWith('.webp')) return 'image/webp';
+
+  return null;
+}
+
+function readUInt16(view: DataView, offset: number) {
+  return view.getUint16(offset, true);
+}
+
+function readUInt32(view: DataView, offset: number) {
+  return view.getUint32(offset, true);
+}
+
+async function inflateDeflateRaw(bytes: Uint8Array): Promise<Uint8Array> {
+  if (typeof DecompressionStream === 'undefined') {
+    throw new Error('ZIP deflate import is not supported in this runtime');
+  }
+
+  const normalizedBytes = new Uint8Array(bytes.byteLength);
+  normalizedBytes.set(bytes);
+  const decompressed = new Blob([normalizedBytes.buffer]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  const buffer = await new Response(decompressed).arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
+async function inflateZipEntry(entry: ZipEntry): Promise<Uint8Array> {
+  if (entry.compressionMethod === 0) {
+    return entry.compressedData;
+  }
+
+  if (entry.compressionMethod === 8) {
+    return inflateDeflateRaw(entry.compressedData);
+  }
+
+  throw new Error(`Unsupported ZIP compression method: ${entry.compressionMethod}`);
+}
+
+async function parseZipEntries(buffer: ArrayBuffer): Promise<Map<string, Uint8Array>> {
+  const bytes = new Uint8Array(buffer);
+  const view = new DataView(buffer);
+  let eocdOffset = -1;
+
+  for (let offset = bytes.length - 22; offset >= Math.max(0, bytes.length - 65557); offset -= 1) {
+    if (readUInt32(view, offset) === 0x06054b50) {
+      eocdOffset = offset;
+      break;
+    }
+  }
+
+  if (eocdOffset < 0) {
+    throw new Error('Invalid ZIP file: missing end of central directory');
+  }
+
+  const entryCount = readUInt16(view, eocdOffset + 10);
+  const centralDirectoryOffset = readUInt32(view, eocdOffset + 16);
+  const entries = new Map<string, Uint8Array>();
+  let cursor = centralDirectoryOffset;
+
+  for (let index = 0; index < entryCount; index += 1) {
+    if (readUInt32(view, cursor) !== 0x02014b50) {
+      throw new Error('Invalid ZIP file: corrupt central directory');
+    }
+
+    const compressionMethod = readUInt16(view, cursor + 10);
+    const compressedSize = readUInt32(view, cursor + 20);
+    const fileNameLength = readUInt16(view, cursor + 28);
+    const extraLength = readUInt16(view, cursor + 30);
+    const commentLength = readUInt16(view, cursor + 32);
+    const localHeaderOffset = readUInt32(view, cursor + 42);
+    const entryName = decodeZipText(bytes.slice(cursor + 46, cursor + 46 + fileNameLength));
+
+    if (!entryName.endsWith('/')) {
+      if (readUInt32(view, localHeaderOffset) !== 0x04034b50) {
+        throw new Error(`Invalid ZIP file: corrupt local header for ${entryName}`);
+      }
+
+      const localNameLength = readUInt16(view, localHeaderOffset + 26);
+      const localExtraLength = readUInt16(view, localHeaderOffset + 28);
+      const dataStart = localHeaderOffset + 30 + localNameLength + localExtraLength;
+      const compressedData = bytes.slice(dataStart, dataStart + compressedSize);
+      const inflated = await inflateZipEntry({ compressionMethod, compressedData });
+      entries.set(entryName, inflated);
+    }
+
+    cursor += 46 + fileNameLength + extraLength + commentLength;
+  }
+
+  return entries;
+}
+
+function findZipEntry(entries: Map<string, Uint8Array>, targetName: string): Uint8Array | null {
+  for (const [name, content] of entries.entries()) {
+    if (name === targetName || name.endsWith(`/${targetName}`)) {
+      return content;
+    }
+  }
+
+  return null;
+}
+
+async function parseTemplateZip(file: File): Promise<UITemplatePackage> {
+  const entries = await parseZipEntries(await readBinaryFile(file));
+  const templateJson = findZipEntry(entries, 'template.json');
+
+  if (!templateJson) {
+    throw new Error('ZIP template package must include template.json');
+  }
+
+  let template: UITemplatePackage;
+  try {
+    template = JSON.parse(decodeZipText(templateJson)) as UITemplatePackage;
+  } catch {
+    throw new Error('Invalid template.json in ZIP package');
+  }
+
+  const previewEntries = Array.from(entries.entries())
+    .filter(([name]) => name.includes('/preview/') || name.startsWith('preview/'))
+    .map(([name, content]) => {
+      const mimeType = getPreviewMimeType(name);
+      if (!mimeType) {
+        return null;
+      }
+
+      let binary = '';
+      content.forEach((value) => {
+        binary += String.fromCharCode(value);
+      });
+
+      return {
+        type: 'thumbnail' as const,
+        url: `data:${mimeType};base64,${btoa(binary)}`,
+        alt: name.split('/').pop() || 'Preview image',
+      };
+    })
+    .filter((value): value is NonNullable<typeof value> => value !== null);
+
+  if (previewEntries.length > 0) {
+    template.preview = previewEntries;
+  }
+
+  template.bundle = {
+    ...(template.bundle ?? {}),
+    format: 'zip',
+    needsExtraction: false,
+  };
+
+  return template;
+}
+
+/**
+ * Read a template from a JSON or ZIP file
+ */
+export async function readTemplateFromFile(file: File): Promise<UITemplatePackage> {
+  const lowerName = file.name.toLowerCase();
+
+  if (lowerName.endsWith('.zip')) {
+    return parseTemplateZip(file);
+  }
+
+  try {
+    const content = await readTextFile(file);
+    return JSON.parse(content) as UITemplatePackage;
+  } catch {
+    throw new Error('Invalid template file format');
+  }
 }
 
 // ============================================

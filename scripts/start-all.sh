@@ -38,7 +38,6 @@ CLIENT_BIN=""
 LOG_DIR="$REPO_DIR/logs"
 STATIONSERVICE_LOG="$LOG_DIR/rstationservice.log"
 AGGREGATOR_LOG="$LOG_DIR/aggregator.log"
-VITE_LOG="$LOG_DIR/vite.log"
 CLIENT_LOG="$LOG_DIR/rclient.log"
 IOT_SIM_COMPOSE_FILE="$LOG_DIR/iot-sim/docker-compose.generated.yml"
 
@@ -46,12 +45,10 @@ IOT_SIM_COMPOSE_FILE="$LOG_DIR/iot-sim/docker-compose.generated.yml"
 MQTT_PORT=1883
 STATIONSERVICE_PORT=50051
 AGGREGATOR_PORT=8080
-VITE_PORT=5173
 
 # PIDs (empty means not started by this script)
 STATIONSERVICE_PID=""
 AGGREGATOR_PID=""
-VITE_PID=""
 CLIENT_PID=""
 
 # =================================================================
@@ -309,11 +306,7 @@ start_aggregator() {
 }
 
 start_client() {
-    if [[ "$BUILD_MODE" == "debug" ]]; then
-        log_info "Starting Vite frontend dev server..."
-    else
-        log_info "Release mode detected, skipping Vite dev server"
-    fi
+    log_info "Using bundled frontend assets from CC-rClient/dist"
 
     # Check if binary exists
     if [[ ! -x "$CLIENT_BIN" ]]; then
@@ -325,24 +318,10 @@ start_client() {
     # Create log directory
     mkdir -p "$LOG_DIR"
 
-    if [[ "$BUILD_MODE" == "debug" ]]; then
-        # Debug binary loads frontend from localhost:5173
-        cd "$REPO_DIR/CC-rClient"
-        nohup npm run dev >"$VITE_LOG" 2>&1 &
-        VITE_PID=$!
-
-        # Wait for Vite to be ready
-        for i in $(seq 1 30); do
-            if is_port_listening $VITE_PORT; then
-                log_success "Vite dev server ready (PID: $VITE_PID, port $VITE_PORT)"
-                break
-            fi
-            sleep 0.5
-            if [[ $i -eq 30 ]]; then
-                log_error "Vite dev server failed to start. Check log: $VITE_LOG"
-                return 1
-            fi
-        done
+    if [[ ! -f "$REPO_DIR/CC-rClient/dist/index.html" ]]; then
+        log_error "Bundled frontend assets are missing: $REPO_DIR/CC-rClient/dist/index.html"
+        log_error "Please build them first: cd $REPO_DIR/CC-rClient && npm run build"
+        return 1
     fi
 
     log_info "Starting CC-rClient (Tauri application)..."
@@ -385,15 +364,6 @@ stop_aggregator() {
     fi
 }
 
-stop_vite() {
-    if [[ -n "$VITE_PID" ]] && is_process_running "$VITE_PID"; then
-        log_info "Stopping Vite dev server (PID: $VITE_PID)..."
-        kill "$VITE_PID" 2>/dev/null || true
-        wait "$VITE_PID" 2>/dev/null || true
-        log_success "Vite dev server stopped"
-    fi
-}
-
 stop_client() {
     if [[ -n "$CLIENT_PID" ]] && is_process_running "$CLIENT_PID"; then
         log_info "Stopping CC-rClient (PID: $CLIENT_PID)..."
@@ -413,7 +383,6 @@ cleanup() {
     
     # Stop in reverse order
     stop_client
-    stop_vite
     stop_aggregator
     stop_stationservice
     
@@ -458,7 +427,6 @@ show_status() {
     echo "Log files:"
     echo "  StationService: $STATIONSERVICE_LOG"
     echo "  Aggregator:     $AGGREGATOR_LOG"
-    echo "  Vite:           $VITE_LOG"
     echo "  Client:         $CLIENT_LOG"
     echo "=========================================="
 }

@@ -45,7 +45,19 @@ definitions. `CC-rClient` now targets the Rust gRPC surface exposed by
 ```bash
 npm install
 npm run build
-npm run tauri build -- --debug
+npm run tauri:build:debug
+```
+
+Run the desktop app with bundled local UI assets instead of the Vite dev server:
+
+```bash
+npm run desktop:run
+```
+
+Use the Vite server only for frontend development:
+
+```bash
+npm run tauri:dev
 ```
 
 Local end-to-end service + UI test:
