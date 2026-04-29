@@ -203,7 +203,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 <span className="info-value">{group.createdAt ? new Date(group.createdAt).toLocaleString() : 'N/A'}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Stations</span>
+                <span className="info-label">Devices</span>
                 <span className="info-value">{group.station_ids?.length || 0}</span>
               </div>
             </div>
