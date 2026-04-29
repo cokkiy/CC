@@ -12,7 +12,7 @@ import {
   Legend,
 } from "recharts";
 import topBanner from "../images/top_banner.png";
-import topBannerSmall from "../images/top_banner_samll.png";
+import topBannerSmall from "../images/top_banner_small.png";
 import type {
   ActionResult,
   AppSnapshot,

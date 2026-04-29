@@ -308,20 +308,35 @@ start_aggregator() {
 start_client() {
     log_info "Using bundled frontend assets from CC-rClient/dist"
 
+    if [[ ! -f "$REPO_DIR/CC-rClient/dist/index.html" ]]; then
+        log_info "Bundled frontend assets are missing. Building CC-rClient/dist..."
+        cd "$REPO_DIR/CC-rClient"
+        npm run build
+    fi
+
     # Check if binary exists
     if [[ ! -x "$CLIENT_BIN" ]]; then
         log_error "CC-rClient binary not found or not executable: $CLIENT_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-rClient/src-tauri && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
-        return 1
+        log_info "Building CC-rClient $BUILD_MODE binary..."
+        cd "$REPO_DIR/CC-rClient/src-tauri"
+        if [[ "$BUILD_MODE" == "release" ]]; then
+            cargo build --release
+        else
+            cargo build
+        fi
     fi
 
     # Create log directory
     mkdir -p "$LOG_DIR"
 
-    if [[ ! -f "$REPO_DIR/CC-rClient/dist/index.html" ]]; then
-        log_error "Bundled frontend assets are missing: $REPO_DIR/CC-rClient/dist/index.html"
-        log_error "Please build them first: cd $REPO_DIR/CC-rClient && npm run build"
-        return 1
+    if [[ "$REPO_DIR/CC-rClient/dist/index.html" -nt "$CLIENT_BIN" ]]; then
+        log_info "Frontend assets are newer than CC-rClient binary. Rebuilding bundled binary..."
+        cd "$REPO_DIR/CC-rClient/src-tauri"
+        if [[ "$BUILD_MODE" == "release" ]]; then
+            cargo build --release
+        else
+            cargo build
+        fi
     fi
 
     log_info "Starting CC-rClient (Tauri application)..."
@@ -501,13 +516,11 @@ main() {
     echo "  - Mosquitto:     localhost:$MQTT_PORT (MQTT)"
     echo "  - StationService: localhost:$STATIONSERVICE_PORT (gRPC control)"
     echo "  - Aggregator:    localhost:$AGGREGATOR_PORT (WebSocket)"
-    echo "  - Vite:          localhost:$VITE_PORT (frontend dev server)"
-    echo "  - Client:        Tauri GUI window"
+    echo "  - Client:        Tauri GUI window (bundled CC-rClient/dist assets)"
     echo ""
     echo "Log files:"
     echo "  - StationService: $STATIONSERVICE_LOG"
     echo "  - Aggregator:     $AGGREGATOR_LOG"
-    echo "  - Vite:           $VITE_LOG"
     echo "  - Client:         $CLIENT_LOG"
     echo ""
     print_stop_commands
