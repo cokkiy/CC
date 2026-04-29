@@ -34,6 +34,7 @@ interface GroupsContextValue extends GroupsContextState {
   // Station membership
   addStationToGroup: (groupId: string, stationId: string) => Promise<void>;
   removeStationFromGroup: (groupId: string, stationId: string) => Promise<void>;
+  batchAddStationsToGroup: (groupId: string, stationIds: string[]) => Promise<void>;
 
   // Selection
   selectGroup: (group: StationGroup | null) => void;
@@ -116,6 +117,14 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
     await loadGroups();
   }, [loadGroups]);
 
+  const batchAddStationsToGroup = useCallback(async (groupId: string, stationIds: string[]) => {
+    // Add all stations in parallel for efficiency
+    await Promise.all(
+      stationIds.map(stationId => groupsApi.addStationToGroup(groupId, stationId))
+    );
+    await loadGroups();
+  }, [loadGroups]);
+
   const selectGroup = useCallback((group: StationGroup | null) => {
     setState(prev => ({ ...prev, selectedGroup: group }));
   }, []);
@@ -188,6 +197,7 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
     deleteGroup,
     addStationToGroup,
     removeStationFromGroup,
+    batchAddStationsToGroup,
     selectGroup,
     filterGroups,
     importGroups,

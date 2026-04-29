@@ -1,5 +1,5 @@
 /**
- * GroupsPage - Main container for Station Group Management UI
+ * GroupsPage - Main container for Device Group Management UI
  * Part of Phase 8: Device Group and Tag System
  */
 
@@ -23,6 +23,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
     deleteGroup,
     addStationToGroup,
     removeStationFromGroup,
+    batchAddStationsToGroup,
     selectGroup,
     importGroups,
     exportGroups,
@@ -96,9 +97,9 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
   const handleAddStationToGroup = async (groupId: string, stationId: string) => {
     try {
       await addStationToGroup(groupId, stationId);
-      pushNotice('success', 'Station added to group.');
+      pushNotice('success', 'Device added to group.');
     } catch (error) {
-      pushNotice('error', `Failed to add station to group: ${error instanceof Error ? error.message : String(error)}`);
+      pushNotice('error', `Failed to add device to group: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   };
@@ -107,9 +108,9 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
   const handleRemoveStationFromGroup = async (groupId: string, stationId: string) => {
     try {
       await removeStationFromGroup(groupId, stationId);
-      pushNotice('success', 'Station removed from group.');
+      pushNotice('success', 'Device removed from group.');
     } catch (error) {
-      pushNotice('error', `Failed to remove station from group: ${error instanceof Error ? error.message : String(error)}`);
+      pushNotice('error', `Failed to remove device from group: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   };
@@ -159,6 +160,7 @@ export const GroupsPage: React.FC<GroupsPageProps> = ({ stations }) => {
             onCreateGroup={handleCreateGroup}
             onImport={handleImportGroups}
             onExport={handleExportGroups}
+            onBatchAddStations={batchAddStationsToGroup}
           />
         </section>
       </main>

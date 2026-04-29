@@ -1,5 +1,5 @@
 /**
- * GroupCard - Station Group Card and List Components
+ * GroupCard - Device Group Card and List Components
  * Part of Phase 8: Device Group and Tag System
  */
 
@@ -23,6 +23,8 @@ export interface GroupListProps {
   onCreateGroup: () => void;
   onImport: (groups: StationGroup[]) => void;
   onExport: () => void;
+  /** Batch add multiple stations to a group */
+  onBatchAddStations?: (groupId: string, stationIds: string[]) => Promise<void>;
 }
 
 export interface GroupCardProps {
@@ -34,6 +36,8 @@ export interface GroupCardProps {
   onDelete: () => void;
   onAddStation: (stationId: string) => Promise<void>;
   onRemoveStation: (stationId: string) => void;
+  /** Batch add multiple stations at once */
+  onBatchAddStations?: (stationIds: string[]) => Promise<void>;
 }
 
 // ============================================
@@ -49,11 +53,15 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   onDelete,
   onAddStation,
   onRemoveStation,
+  onBatchAddStations,
 }) => {
   const [showStationPicker, setShowStationPicker] = useState(false);
-  const [stationToAdd, setStationToAdd] = useState('');
-  const [isAddingStation, setIsAddingStation] = useState(false);
   const [addNotice, setAddNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  // Multi-device selection state
+  const [selectedStationIds, setSelectedStationIds] = useState<string[]>([]);
+  // Filter state for device search (name or IP)
+  const [deviceFilter, setDeviceFilter] = useState('');
+  const [isBatchAdding, setIsBatchAdding] = useState(false);
 
   const clearNoticeLater = () => {
     window.setTimeout(() => setAddNotice(null), 2200);
@@ -67,12 +75,74 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   // Get available stations (not in this group)
   const availableStations = stations.filter(s => !(group.station_ids || []).includes(s.id));
 
-  const handleStationToggle = (stationId: string) => {
-    if ((group.station_ids || []).includes(stationId)) {
-      onRemoveStation(stationId);
+  // Get first IP from station's network interfaces
+  const getStationIp = (station: Station): string | undefined => {
+    return station.networkInterfaces?.[0]?.ips?.[0];
+  };
+
+  // Filter available stations by name or IP
+  const filteredAvailableStations = availableStations.filter(s => {
+    if (!deviceFilter.trim()) return true;
+    const query = deviceFilter.toLowerCase();
+    const ip = getStationIp(s);
+    return (
+      s.name.toLowerCase().includes(query) ||
+      (ip && ip.toLowerCase().includes(query))
+    );
+  });
+
+  // Toggle selection of a station in multi-select mode
+  const handleMultiSelectToggle = (stationId: string) => {
+    setSelectedStationIds(prev =>
+      prev.includes(stationId)
+        ? prev.filter(id => id !== stationId)
+        : [...prev, stationId]
+    );
+  };
+
+  // Select/deselect all filtered stations
+  const handleSelectAllToggle = () => {
+    const filteredIds = filteredAvailableStations.map(s => s.id);
+    const allSelected = filteredIds.every(id => selectedStationIds.includes(id));
+    if (allSelected) {
+      setSelectedStationIds(prev => prev.filter(id => !filteredIds.includes(id)));
     } else {
-      onAddStation(stationId);
+      setSelectedStationIds(prev => [...new Set([...prev, ...filteredIds])]);
     }
+  };
+
+  // Batch add selected stations
+  const handleBatchAdd = async () => {
+    if (selectedStationIds.length === 0) return;
+    setIsBatchAdding(true);
+    try {
+      if (onBatchAddStations) {
+        await onBatchAddStations(selectedStationIds);
+      } else {
+        // Fallback: add stations one by one
+        for (const stationId of selectedStationIds) {
+          await onAddStation(stationId);
+        }
+      }
+      setAddNotice({ type: 'success', message: `Added ${selectedStationIds.length} device(s)` });
+      clearNoticeLater();
+      setSelectedStationIds([]);
+      setDeviceFilter('');
+      setShowStationPicker(false);
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      setAddNotice({ type: 'error', message: `Failed to add devices: ${reason}` });
+      clearNoticeLater();
+    } finally {
+      setIsBatchAdding(false);
+    }
+  };
+
+  // Reset selection when closing picker
+  const handleClosePicker = () => {
+    setShowStationPicker(false);
+    setSelectedStationIds([]);
+    setDeviceFilter('');
   };
 
   return (
@@ -104,7 +174,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
       </div>
 
       <div className="group-stats">
-        <span className="station-count">{(group.station_ids || []).length} stations</span>
+        <span className="station-count">{(group.station_ids || []).length} devices</span>
       </div>
 
       <div className="group-stations">
@@ -126,7 +196,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
             )}
           </div>
         ) : (
-          <span className="no-stations">No stations assigned</span>
+          <span className="no-stations">No devices assigned</span>
         )}
       </div>
 
@@ -135,55 +205,88 @@ export const GroupCard: React.FC<GroupCardProps> = ({
           className="add-station-btn"
           onClick={(e) => { e.stopPropagation(); setShowStationPicker(!showStationPicker); }}
         >
-          {showStationPicker ? 'Cancel' : '+ Add Station'}
+          {showStationPicker ? 'Cancel' : '+ Add Devices'}
         </button>
       </div>
 
       {showStationPicker && (
-        <div className="station-picker" onClick={(e) => e.stopPropagation()}>
-          <h4>Add Station To Group</h4>
+        <div className="station-picker multi-select" onClick={(e) => e.stopPropagation()}>
+          <h4>Add Devices To Group</h4>
+          <p className="station-picker-hint">Filter by device name or IP, then add several devices at once.</p>
           {availableStations.length === 0 ? (
-            <p className="station-picker-empty">All stations are already assigned to this group.</p>
+            <p className="station-picker-empty">All devices are already assigned to this group.</p>
           ) : (
-            <div className="station-picker-inline">
-              <select
-                value={stationToAdd}
-                onChange={(e) => setStationToAdd(e.target.value)}
-              >
-                <option value="">Select a station</option>
-                {availableStations.map((station) => (
-                  <option key={station.id} value={station.id}>
-                    {station.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!stationToAdd) return;
-                  const stationName = availableStations.find((station) => station.id === stationToAdd)?.name;
-                  setIsAddingStation(true);
-                  try {
-                    await onAddStation(stationToAdd);
-                    if (stationName) {
-                      setAddNotice({ type: 'success', message: `Added ${stationName}` });
-                      clearNoticeLater();
-                    }
-                    setStationToAdd('');
-                    setShowStationPicker(false);
-                  } catch (error) {
-                    const reason = error instanceof Error ? error.message : String(error);
-                    setAddNotice({ type: 'error', message: `Failed to add station: ${reason}` });
-                    clearNoticeLater();
-                  } finally {
-                    setIsAddingStation(false);
-                  }
-                }}
-                disabled={!stationToAdd || isAddingStation}
-              >
-                {isAddingStation ? 'Adding...' : 'Add'}
-              </button>
-            </div>
+            <>
+              {/* Filter input */}
+              <div className="device-filter">
+                <input
+                  type="text"
+                  placeholder="Filter by Name or IP..."
+                  value={deviceFilter}
+                  onChange={(e) => setDeviceFilter(e.target.value)}
+                  className="filter-input"
+                />
+              </div>
+
+              {/* Select all / selection info */}
+              <div className="selection-bar">
+                <label className="select-all-label">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all filtered devices"
+                    checked={filteredAvailableStations.length > 0 && filteredAvailableStations.every(s => selectedStationIds.includes(s.id))}
+                    onChange={handleSelectAllToggle}
+                    disabled={filteredAvailableStations.length === 0}
+                  />
+                  <span>Select All{deviceFilter && ` (${filteredAvailableStations.length})`}</span>
+                </label>
+                {selectedStationIds.length > 0 && (
+                  <span className="selection-count">{selectedStationIds.length} selected</span>
+                )}
+              </div>
+
+              {/* Device list with checkboxes */}
+              <div className="device-list">
+                {filteredAvailableStations.length === 0 ? (
+                  <p className="no-results">No devices match your filter</p>
+                ) : (
+                  filteredAvailableStations.map(station => {
+                    const stationIp = getStationIp(station);
+                    return (
+                      <label key={station.id} className="device-option">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${station.name}`}
+                          checked={selectedStationIds.includes(station.id)}
+                          onChange={() => handleMultiSelectToggle(station.id)}
+                        />
+                        <span className="device-name">{station.name}</span>
+                        {stationIp && <span className="device-ip">{stationIp}</span>}
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="station-picker-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={handleClosePicker}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="batch-add-btn"
+                  onClick={handleBatchAdd}
+                  disabled={selectedStationIds.length === 0 || isBatchAdding}
+                >
+                  {isBatchAdding ? 'Adding...' : `Add Selected (${selectedStationIds.length})`}
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -299,6 +402,12 @@ export const GroupCard: React.FC<GroupCardProps> = ({
           display: flex;
           align-items: center;
           gap: 4px;
+        }
+
+        .station-picker-hint {
+          margin: -4px 0 12px;
+          font-size: 0.78rem;
+          color: var(--text-secondary);
         }
 
         .group-stations {
@@ -470,6 +579,173 @@ export const GroupCard: React.FC<GroupCardProps> = ({
         .station-option input {
           cursor: pointer;
         }
+
+        /* Multi-select station picker styles */
+        .station-picker.multi-select {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          margin-top: 8px;
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          z-index: 10;
+          min-width: 280px;
+        }
+
+        .station-picker.multi-select h4 {
+          margin: 0 0 10px;
+          font-size: 0.88rem;
+          color: var(--text-main);
+          font-weight: 600;
+        }
+
+        .device-filter {
+          margin-bottom: 10px;
+        }
+
+        .device-filter .filter-input {
+          width: 100%;
+          padding: 7px 10px;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: var(--bg-main);
+          color: var(--text-main);
+          font-size: 0.82rem;
+          box-sizing: border-box;
+        }
+
+        .device-filter .filter-input:focus {
+          outline: none;
+          border-color: var(--primary);
+        }
+
+        .device-filter .filter-input::placeholder {
+          color: var(--text-secondary);
+        }
+
+        .selection-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 6px 0;
+          border-bottom: 1px solid var(--border-color);
+          margin-bottom: 8px;
+        }
+
+        .select-all-label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.8rem;
+          color: var(--text-main);
+          cursor: pointer;
+        }
+
+        .select-all-label input {
+          cursor: pointer;
+        }
+
+        .selection-count {
+          font-size: 0.75rem;
+          color: var(--primary);
+          font-weight: 500;
+        }
+
+        .device-list {
+          max-height: 180px;
+          overflow-y: auto;
+          margin-bottom: 10px;
+        }
+
+        .device-option {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 7px 6px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.82rem;
+          transition: background 0.15s;
+        }
+
+        .device-option:hover {
+          background: var(--bg-main);
+        }
+
+        .device-option input {
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .device-option .device-name {
+          flex: 1;
+          color: var(--text-main);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .device-option .device-ip {
+          font-size: 0.72rem;
+          color: var(--text-secondary);
+          flex-shrink: 0;
+        }
+
+        .no-results {
+          padding: 12px;
+          text-align: center;
+          color: var(--text-secondary);
+          font-size: 0.8rem;
+          margin: 0;
+        }
+
+        .station-picker-actions {
+          display: flex;
+          gap: 8px;
+          justify-content: flex-end;
+          padding-top: 8px;
+          border-top: 1px solid var(--border-color);
+        }
+
+        .station-picker-actions .cancel-btn {
+          padding: 6px 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: transparent;
+          color: var(--text-secondary);
+          font-size: 0.78rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .station-picker-actions .cancel-btn:hover {
+          border-color: var(--text-secondary);
+          color: var(--text-main);
+        }
+
+        .station-picker-actions .batch-add-btn {
+          padding: 6px 14px;
+          border: 1px solid var(--primary);
+          border-radius: 6px;
+          background: var(--primary);
+          color: white;
+          font-size: 0.78rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .station-picker-actions .batch-add-btn:hover:not(:disabled) {
+          opacity: 0.9;
+        }
+
+        .station-picker-actions .batch-add-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
       `}</style>
     </div>
   );
@@ -491,6 +767,7 @@ export const GroupList: React.FC<GroupListProps> = ({
   onCreateGroup,
   onImport,
   onExport,
+  onBatchAddStations,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -569,6 +846,7 @@ export const GroupList: React.FC<GroupListProps> = ({
                 onDelete={() => onDeleteGroup(group.id)}
                 onAddStation={(stationId) => onAddStation(group.id, stationId)}
                 onRemoveStation={(stationId) => onRemoveStation(group.id, stationId)}
+                onBatchAddStations={onBatchAddStations ? (stationIds) => onBatchAddStations(group.id, stationIds) : undefined}
               />
             ))}
           </div>
