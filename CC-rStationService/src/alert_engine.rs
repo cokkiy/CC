@@ -507,27 +507,80 @@ impl AlertEngine {
         let mut triggering_metrics = Vec::new();
 
         for (idx, condition) in rule.conditions.iter().enumerate() {
-            for point in &telemetry_data.data_points {
-                if !condition.matches_metric(&point.metric_name) {
-                    continue;
-                }
+            let matching_points: Vec<_> = telemetry_data
+                .data_points
+                .iter()
+                .filter(|point| {
+                    condition.matches_metric(&point.metric_name) && condition.matches_labels(&point.labels)
+                })
+                .collect();
 
-                if !condition.matches_labels(&point.labels) {
-                    continue;
-                }
+            if matching_points.is_empty() {
+                continue;
+            }
 
-                // Apply aggregation (simplified - just use latest value)
-                let value = point.value;
+            let aggregation = format!("{:?}", &condition.aggregation);
 
-                if condition.evaluate_point(value) {
-                    matched_conditions.push(idx);
-                    triggering_metrics.push(EvaluatedMetric {
+            let aggregated_metric = match aggregation.as_str() {
+                "Latest" => matching_points
+                    .iter()
+                    .max_by_key(|point| point.timestamp)
+                    .map(|point| EvaluatedMetric {
                         metric_name: point.metric_name.clone(),
-                        value,
+                        value: point.value,
                         labels: point.labels.clone(),
                         timestamp: point.timestamp,
-                    });
+                    }),
+                "Min" => matching_points
+                    .iter()
+                    .min_by(|a, b| {
+                        a.value
+                            .partial_cmp(&b.value)
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                    })
+                    .map(|point| EvaluatedMetric {
+                        metric_name: point.metric_name.clone(),
+                        value: point.value,
+                        labels: point.labels.clone(),
+                        timestamp: point.timestamp,
+                    }),
+                "Max" => matching_points
+                    .iter()
+                    .max_by(|a, b| {
+                        a.value
+                            .partial_cmp(&b.value)
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                    })
+                    .map(|point| EvaluatedMetric {
+                        metric_name: point.metric_name.clone(),
+                        value: point.value,
+                        labels: point.labels.clone(),
+                        timestamp: point.timestamp,
+                    }),
+                "Avg" | "Average" => {
+                    let representative_point = matching_points
+                        .iter()
+                        .max_by_key(|point| point.timestamp);
+                    let avg = matching_points.iter().map(|point| point.value).sum::<f64>()
+                        / matching_points.len() as f64;
+
+                    representative_point.map(|point| EvaluatedMetric {
+                        metric_name: point.metric_name.clone(),
+                        value: avg,
+                        labels: point.labels.clone(),
+                        timestamp: point.timestamp,
+                    })
                 }
+                _ => None,
+            };
+
+            let Some(metric) = aggregated_metric else {
+                continue;
+            };
+
+            if condition.evaluate_point(metric.value) {
+                matched_conditions.push(idx);
+                triggering_metrics.push(metric);
             }
         }
 
