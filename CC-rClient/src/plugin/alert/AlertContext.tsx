@@ -342,7 +342,6 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
     if (!dryRun) {
       await invoke('append_alert_history', {
         entry: historyEntry,
-        ruleId: existingRule.id,
         rule_id: existingRule.id,
       });
       updateHistoryState([historyEntry, ...historyRef.current].slice(0, 500));
