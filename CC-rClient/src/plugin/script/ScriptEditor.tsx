@@ -224,7 +224,7 @@ const ParameterEditor: React.FC<ParameterEditorProps> = ({ parameters, onChange 
 export interface ScriptEditorProps {
   script?: CommandScript;
   initialContent?: string;
-  onSave: (script: Partial<CommandScript>) => void;
+  onSave: (script: Partial<CommandScript>) => Promise<void> | void;
   onCancel: () => void;
   readOnly?: boolean;
 }
@@ -246,6 +246,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const [isTemplate, setIsTemplate] = useState(script?.isTemplate || false);
   const [validation, setValidation] = useState<ScriptValidationResult | null>(null);
   const [showParameters, setShowParameters] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
@@ -392,27 +394,36 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   };
 
   // Handle save
-  const handleSave = () => {
+  const handleSave = async () => {
     const result = validateScript();
     if (!result.valid) {
       setValidation(result);
       return;
     }
 
-    onSave({
-      id: script?.id,
-      name: name.trim(),
-      description: description.trim(),
-      scriptType,
-      content,
-      parameters,
-      tags,
-      isTemplate,
-      version: script?.version || 1,
-      createdBy: script?.createdBy || 'current-user',
-      createdAt: script?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      await Promise.resolve(onSave({
+        id: script?.id,
+        name: name.trim(),
+        description: description.trim(),
+        scriptType,
+        content,
+        parameters,
+        tags,
+        isTemplate,
+        version: script?.version || 1,
+        createdBy: script?.createdBy || 'current-user',
+        createdAt: script?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }));
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Failed to save script');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -431,9 +442,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             type="button" 
             className="btn-save"
             onClick={handleSave}
-            disabled={!validation?.valid || readOnly}
+            disabled={!validation?.valid || readOnly || isSaving}
           >
-            {script ? 'Update Script' : 'Create Script'}
+            {isSaving ? 'Saving...' : script ? 'Update Script' : 'Create Script'}
           </button>
         </div>
       </div>
@@ -579,6 +590,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         {/* Validation Messages */}
         {validation && (
           <div className="validation-section">
+            {saveError && (
+              <div className="validation-errors">
+                <h4>Save Failed</h4>
+                <ul>
+                  <li>{saveError}</li>
+                </ul>
+              </div>
+            )}
+
             {validation.errors.length > 0 && (
               <div className="validation-errors">
                 <h4>Errors</h4>

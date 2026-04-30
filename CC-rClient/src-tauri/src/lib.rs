@@ -20,21 +20,26 @@ use remote::{
     browse_station_files, capture_station_screen, download_station_file, execute_station_command,
     fetch_station_runtime, rename_station_file, upload_station_file,
 };
+use script_ops::{
+    cancel_script_execution, delete_script, execute_script, export_script_package,
+    get_available_targets, get_script_history, import_script_package, load_scripts, save_script,
+    validate_script,
+};
 use std::collections::HashMap;
 use storage::StateStore;
 use ws_bridge::MqttWsBridge;
 
+pub mod alert_ops;
+pub mod batch_ops;
 pub mod control;
 pub mod grpc;
 pub mod models;
 pub mod remote;
+pub mod script_ops;
 pub mod storage;
 pub mod websocket;
 pub mod wol;
 pub mod ws_bridge;
-pub mod batch_ops;
-pub mod alert_ops;
-
 fn normalize_group_color(color: String) -> String {
     let trimmed = color.trim();
     if trimmed.is_empty() {
@@ -835,6 +840,16 @@ pub fn run() {
             export_batch_package,
             duplicate_batch_task,
             toggle_batch_task_favorite,
+            load_scripts,
+            save_script,
+            delete_script,
+            validate_script,
+            execute_script,
+            cancel_script_execution,
+            import_script_package,
+            export_script_package,
+            get_available_targets,
+            get_script_history,
             load_alert_rules,
             save_alert_rule,
             delete_alert_rule,
