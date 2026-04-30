@@ -19,6 +19,20 @@ import type {
   ValidateTaskResult,
 } from './types';
 import { DEFAULT_EXECUTION_POLICY } from './types';
+import type { CommandScript } from '../script/types';
+import type { StationGroup } from '../groups/types';
+
+function mapScriptParametersToBatchParameters(script: CommandScript): BatchTaskParameter[] {
+  return (script.parameters || []).map((parameter) => ({
+    name: parameter.name,
+    paramType: parameter.paramType,
+    defaultValue: parameter.defaultValue,
+    required: parameter.required,
+    validation: parameter.validation,
+    description: parameter.description,
+    options: parameter.options,
+  }));
+}
 
 // ============================================
 // Target Selector Component
@@ -27,6 +41,7 @@ import { DEFAULT_EXECUTION_POLICY } from './types';
 interface TargetSelectorEditorProps {
   selector: TargetSelector;
   targets: BatchTarget[];
+  groups: StationGroup[];
   onChange: (selector: TargetSelector) => void;
   showPreview?: boolean;
   disabled?: boolean;
@@ -35,6 +50,7 @@ interface TargetSelectorEditorProps {
 const TargetSelectorEditor: React.FC<TargetSelectorEditorProps> = ({
   selector,
   targets,
+  groups,
   onChange,
   showPreview = true,
   disabled = false,
@@ -49,11 +65,10 @@ const TargetSelectorEditor: React.FC<TargetSelectorEditorProps> = ({
     { key: 'filter', label: 'Filter Expression', icon: '🔍' },
   ];
 
-  const availableGroups = useMemo(() => {
-    const groups = new Set<string>();
-    targets.forEach(t => t.group && groups.add(t.group));
-    return Array.from(groups).sort();
-  }, [targets]);
+  const availableGroups = useMemo(
+    () => [...groups].sort((left, right) => left.name.localeCompare(right.name)),
+    [groups],
+  );
 
   const availableTags = useMemo(() => {
     const tags = new Set<string>();
@@ -103,7 +118,11 @@ const TargetSelectorEditor: React.FC<TargetSelectorEditorProps> = ({
         setPreviewCount(targets.length);
         break;
       case 'group':
-        setPreviewCount(targets.filter(t => t.group && selector.groups?.includes(t.group)).length);
+        setPreviewCount(
+          targets.filter((target) =>
+            selector.groups?.some((groupId) => target.groups?.includes(groupId)),
+          ).length,
+        );
         break;
       case 'tag':
         setPreviewCount(targets.filter(t => t.tags && selector.tags?.some(tag => t.tags && tag in t.tags)).length);
@@ -156,14 +175,14 @@ const TargetSelectorEditor: React.FC<TargetSelectorEditorProps> = ({
                 <p className="no-groups">No groups available</p>
               ) : (
                 availableGroups.map(group => (
-                  <label key={group} className="group-item">
+                  <label key={group.id} className="group-item">
                     <input
                       type="checkbox"
-                      checked={selector.groups?.includes(group) || false}
-                      onChange={() => handleGroupToggle(group)}
+                      checked={selector.groups?.includes(group.id) || false}
+                      onChange={() => handleGroupToggle(group.id)}
                       disabled={disabled}
                     />
-                    <span>{group}</span>
+                    <span>{group.name}</span>
                   </label>
                 ))
               )}
@@ -535,6 +554,8 @@ const ParameterEditor: React.FC<ParameterEditorProps> = ({ parameters, onChange,
 export interface BatchTaskEditorProps {
   task?: BatchTask;
   targets: BatchTarget[];
+  groups: StationGroup[];
+  scripts: CommandScript[];
   onSave: (task: Partial<BatchTask>) => void;
   onCancel: () => void;
   onValidate?: (task: Partial<BatchTask>) => Promise<ValidateTaskResult>;
@@ -544,6 +565,8 @@ export interface BatchTaskEditorProps {
 export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
   task,
   targets,
+  groups,
+  scripts,
   onSave,
   onCancel,
   onValidate,
@@ -562,8 +585,42 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
   );
   const [tags, setTags] = useState<string[]>(task?.tags || []);
   const [tagInput, setTagInput] = useState('');
+  const [selectedScriptId, setSelectedScriptId] = useState('');
+  const [scriptSearchQuery, setScriptSearchQuery] = useState('');
   const [validation, setValidation] = useState<ValidateTaskResult | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const selectedScript = useMemo(
+    () => scripts.find((script) => script.id === selectedScriptId) ?? null,
+    [scripts, selectedScriptId],
+  );
+
+  const filteredScripts = useMemo(() => {
+    const query = scriptSearchQuery.trim().toLowerCase();
+    if (!query) {
+      return scripts;
+    }
+
+    return scripts.filter((script) => script.name.toLowerCase().includes(query));
+  }, [scriptSearchQuery, scripts]);
+
+  React.useEffect(() => {
+    if (taskType !== 'script') {
+      return;
+    }
+
+    if (selectedScriptId) {
+      return;
+    }
+
+    const matchedScript = scripts.find((script) => script.content === content);
+    if (matchedScript) {
+      setSelectedScriptId(matchedScript.id);
+      if ((!task?.parameters || task.parameters.length === 0) && parameters.length === 0) {
+        setParameters(mapScriptParametersToBatchParameters(matchedScript));
+      }
+    }
+  }, [content, parameters.length, scripts, selectedScriptId, task?.parameters, taskType]);
 
   // Task types
   const taskTypes: { key: BatchTaskType; label: string; icon: string }[] = [
@@ -589,6 +646,10 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
 
     if (needsContent && !content.trim()) {
       errors.push('Task content is required');
+    }
+
+    if (taskType === 'script' && !selectedScriptId && !content.trim()) {
+      errors.push('Select a script to run');
     }
 
     if (taskType === 'watch_processes' && content.trim() && !content.includes(',') && !content.includes('\n')) {
@@ -640,7 +701,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
         name: name.trim(),
         description: description.trim(),
         taskType,
-        content,
+        content: taskType === 'script' ? (selectedScript?.content ?? content) : content,
         parameters,
         targetSelector,
         executionPolicy,
@@ -657,7 +718,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       name: name.trim(),
       description: description.trim(),
       taskType,
-      content,
+      content: taskType === 'script' ? (selectedScript?.content ?? content) : content,
       parameters,
       targetSelector,
       executionPolicy,
@@ -672,16 +733,31 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
   };
 
   return (
-    <div className="batch-task-editor modal-overlay">
-      <div className="modal-content editor-modal">
-        <div className="editor-header">
-          <h2>{task ? 'Edit Batch Task' : 'Create New Batch Task'}</h2>
-          <button className="btn-close" onClick={onCancel} disabled={readOnly}>×</button>
+    <div className="batch-task-editor">
+      <div className="editor-header">
+        <h2>{task ? 'Edit Batch Task' : 'Create New Batch Task'}</h2>
+        <div className="editor-actions">
+          <button
+            type="button"
+            className="btn-cancel"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn-save"
+            onClick={handleSave}
+            disabled={!validation?.valid || readOnly}
+          >
+            {task ? 'Update Task' : 'Create Task'}
+          </button>
         </div>
+      </div>
 
-        <div className="editor-body">
+      <div className="editor-body">
           {/* Basic Info Section */}
-          <div className="editor-section basic-section">
+          <div className="editor-section metadata-section">
             <div className="field-group">
               <label className="field-label">
                 Task Name <span className="required">*</span>
@@ -733,6 +809,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
             <TargetSelectorEditor
               selector={targetSelector}
               targets={targets}
+              groups={groups}
               onChange={setTargetSelector}
               disabled={readOnly}
             />
@@ -741,22 +818,76 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
           {/* Content Editor Section */}
           <div className="editor-section content-section">
             <h3>Task Content</h3>
-            <textarea
-              className="content-editor"
-              placeholder={
-                taskType === 'power_on' ? 'Wake-on-LAN does not require extra content.' :
-                taskType === 'shutdown' ? 'Shutdown uses the station control RPC and does not require extra content.' :
-                taskType === 'reboot' ? 'Reboot uses the station control RPC and does not require extra content.' :
-                taskType === 'start_app' ? 'Start App uses each station’s configured startup programs.' :
-                taskType === 'command' ? 'Enter command to execute...' :
-                taskType === 'watch_processes' ? 'Enter process names separated by commas or new lines...' :
-                'Enter script content...'
-              }
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              disabled={readOnly}
-              rows={10}
-            />
+            {taskType === 'script' ? (
+              <div className="script-selector">
+                <div className="field-group">
+                  <input
+                    type="text"
+                    className="field-input"
+                    placeholder="Search scripts by name..."
+                    value={scriptSearchQuery}
+                    onChange={(e) => setScriptSearchQuery(e.target.value)}
+                    disabled={readOnly}
+                  />
+                </div>
+
+                <div className="script-selector-list">
+                  {filteredScripts.length === 0 ? (
+                    <div className="script-selector-empty">
+                      {scripts.length === 0 ? 'No scripts available yet. Create one on the Scripts page first.' : 'No scripts match the current filter.'}
+                    </div>
+                  ) : (
+                    filteredScripts.map((script) => (
+                      <button
+                        key={script.id}
+                        type="button"
+                      className={`script-option ${selectedScriptId === script.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedScriptId(script.id);
+                        setContent(script.content);
+                        setParameters(mapScriptParametersToBatchParameters(script));
+                      }}
+                      disabled={readOnly}
+                    >
+                        <div className="script-option-header">
+                          <strong>{script.name}</strong>
+                          <span>{script.scriptType}</span>
+                        </div>
+                        <p>{script.description || 'No description'}</p>
+                      </button>
+                    ))
+                  )}
+                </div>
+
+                {selectedScript ? (
+                  <div className="script-selection-summary">
+                    <span className="summary-label">Selected script:</span>
+                    <strong>{selectedScript.name}</strong>
+                    <span className="summary-type">{selectedScript.scriptType}</span>
+                  </div>
+                ) : content.trim() ? (
+                  <div className="script-selection-summary script-selection-summary--legacy">
+                    This task currently contains saved script content that is not linked to an existing script. Select a script above to relink it.
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <textarea
+                className="content-editor"
+                placeholder={
+                  taskType === 'power_on' ? 'Wake-on-LAN does not require extra content.' :
+                  taskType === 'shutdown' ? 'Shutdown uses the station control RPC and does not require extra content.' :
+                  taskType === 'reboot' ? 'Reboot uses the station control RPC and does not require extra content.' :
+                  taskType === 'start_app' ? 'Start App uses each station’s configured startup programs.' :
+                  taskType === 'command' ? 'Enter command to execute...' :
+                  'Enter process names separated by commas or new lines...'
+                }
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                disabled={readOnly}
+                rows={10}
+              />
+            )}
           </div>
 
           {/* Parameters Section */}
@@ -821,39 +952,568 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
 
           {/* Validation Messages */}
           {validation && !validation.valid && (
-            <div className="validation-errors">
-              {validation.errors.map((error: string, i: number) => (
-                <div key={i} className="error-message">⚠️ {error}</div>
-              ))}
+            <div className="validation-section">
+              <div className="validation-errors">
+                <h4>Errors</h4>
+                <ul>
+                  {validation.errors.map((error: string, i: number) => (
+                    <li key={i}>{error}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
           {validation && validation.warnings.length > 0 && (
-            <div className="validation-warnings">
-              {validation.warnings.map((warning: string, i: number) => (
-                <div key={i} className="warning-message">⚡ {warning}</div>
-              ))}
+            <div className="validation-section">
+              <div className="validation-warnings">
+                <h4>Warnings</h4>
+                <ul>
+                  {validation.warnings.map((warning: string, i: number) => (
+                    <li key={i}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
-        </div>
-
-        <div className="editor-footer">
-          <button
-            type="button"
-            className="btn-cancel"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="btn-save"
-            onClick={handleSave}
-            disabled={!validation?.valid || readOnly}
-          >
-            {task ? 'Update Task' : 'Create Task'}
-          </button>
-        </div>
       </div>
+
+      <style>{`
+        .batch-task-editor {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          background: var(--bg-card);
+          color: var(--text-main);
+        }
+
+        .editor-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          padding: 14px 22px;
+          border-bottom: 1px solid var(--border-color);
+          background: var(--bg-card);
+          box-shadow: 0 10px 20px -18px rgba(11, 25, 44, 0.42);
+        }
+
+        .editor-header h2 {
+          margin: 0;
+          font-size: 1.08rem;
+          font-weight: 700;
+        }
+
+        .editor-actions {
+          display: flex;
+          gap: 12px;
+        }
+
+        .btn-cancel, .btn-save {
+          padding: 8px 14px;
+          border-radius: 8px;
+          font-size: 0.84rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-cancel {
+          background: transparent;
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
+        }
+
+        .btn-cancel:hover {
+          border-color: var(--primary);
+          color: var(--text-main);
+        }
+
+        .btn-save {
+          background: var(--primary);
+          border: 1px solid var(--primary);
+          color: white;
+        }
+
+        .btn-save:hover:not(:disabled) {
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
+        }
+
+        .btn-save:disabled,
+        .btn-add-param:disabled,
+        .task-type-btn:disabled,
+        .selector-tab:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .editor-body {
+          flex: 1;
+          overflow-y: auto;
+          padding: 18px 22px 24px;
+          display: grid;
+          gap: 16px;
+          align-content: start;
+          background: linear-gradient(180deg, rgba(244, 247, 249, 0.78) 0%, rgba(244, 247, 249, 1) 100%);
+        }
+
+        .editor-section {
+          padding: 16px;
+          background: var(--bg-card);
+          border-radius: 12px;
+          border: 1px solid var(--border-color);
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.05);
+        }
+
+        .editor-section h3 {
+          margin: 0 0 14px;
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+
+        .metadata-section {
+          display: grid;
+          gap: 14px;
+        }
+
+        .field-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .field-label,
+        .section-label {
+          font-size: 0.78rem;
+          font-weight: 500;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        .required {
+          color: #ef4444;
+        }
+
+        .field-input,
+        .field-textarea,
+        .content-editor,
+        .batch-size-input,
+        .device-ids-input,
+        .filter-expr-input,
+        .param-name,
+        .param-type,
+        .param-default,
+        .param-description,
+        .param-options,
+        .retry-count input,
+        .retry-delay input,
+        .timeout-input input {
+          width: 100%;
+          padding: 10px 12px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          color: var(--text-main);
+          font-size: 0.86rem;
+          transition: border-color 0.2s;
+        }
+
+        .field-input:focus,
+        .field-textarea:focus,
+        .content-editor:focus,
+        .batch-size-input:focus,
+        .device-ids-input:focus,
+        .filter-expr-input:focus,
+        .param-name:focus,
+        .param-type:focus,
+        .param-default:focus,
+        .param-description:focus,
+        .param-options:focus,
+        .retry-count input:focus,
+        .retry-delay input:focus,
+        .timeout-input input:focus {
+          outline: none;
+          border-color: var(--primary);
+        }
+
+        .field-textarea,
+        .content-editor,
+        .device-ids-input {
+          resize: vertical;
+        }
+
+        .task-type-selector,
+        .selector-type-tabs,
+        .mode-selector {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .task-type-btn,
+        .selector-tab,
+        .mode-option {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          background: var(--bg-main);
+          color: var(--text-muted);
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 0.83rem;
+        }
+
+        .task-type-btn.active,
+        .selector-tab.active,
+        .mode-option.selected {
+          background: var(--primary);
+          border-color: var(--primary);
+          color: white;
+        }
+
+        .selector-tab input,
+        .mode-option input {
+          display: none;
+        }
+
+        .selector-content,
+        .policy-section + .policy-section,
+        .parameter-editor {
+          margin-top: 14px;
+        }
+
+        .group-list,
+        .tag-list,
+        .status-filter,
+        .parameters-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .group-item,
+        .tag-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 10px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          background: var(--bg-main);
+          cursor: pointer;
+        }
+
+        .selector-preview,
+        .mode-description,
+        .input-hint {
+          margin-top: 10px;
+          font-size: 0.74rem;
+          color: var(--text-muted);
+        }
+
+        .preview-count,
+        .threshold-value {
+          font-weight: 600;
+          color: var(--text-main);
+          margin-left: 6px;
+        }
+
+        .policy-row,
+        .threshold-input,
+        .timeout-input,
+        .retry-input,
+        .parameter-row,
+        .parameter-advanced,
+        .tags-list {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .script-selector {
+          display: grid;
+          gap: 14px;
+        }
+
+        .script-selector-list {
+          display: grid;
+          gap: 10px;
+          max-height: 320px;
+          overflow-y: auto;
+          padding-right: 4px;
+        }
+
+        .script-option {
+          display: grid;
+          gap: 6px;
+          text-align: left;
+          padding: 12px 14px;
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          background: var(--bg-main);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .script-option:hover {
+          border-color: var(--primary);
+        }
+
+        .script-option.active {
+          border-color: var(--primary);
+          background: rgba(45, 140, 240, 0.08);
+          box-shadow: inset 0 0 0 1px rgba(45, 140, 240, 0.18);
+        }
+
+        .script-option-header {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .script-option-header strong {
+          font-size: 0.88rem;
+          color: var(--text-main);
+        }
+
+        .script-option-header span,
+        .summary-type {
+          font-size: 0.74rem;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: var(--text-muted);
+        }
+
+        .script-option p {
+          margin: 0;
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          line-height: 1.4;
+        }
+
+        .script-selector-empty,
+        .script-selection-summary {
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-main);
+          font-size: 0.8rem;
+          color: var(--text-muted);
+        }
+
+        .script-selection-summary {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .summary-label {
+          color: var(--text-muted);
+        }
+
+        .script-selection-summary--legacy {
+          background: rgba(234, 179, 8, 0.1);
+          border-color: #eab308;
+          color: #a16207;
+        }
+
+        .checkbox-label,
+        .param-required {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--text-main);
+          cursor: pointer;
+        }
+
+        .retry-count,
+        .retry-delay {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-width: 220px;
+        }
+
+        .retry-count label,
+        .retry-delay label {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          white-space: nowrap;
+        }
+
+        .parameter-editor-header,
+        .section-toggle {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          gap: 12px;
+        }
+
+        .section-toggle {
+          border: none;
+          background: transparent;
+          padding: 0;
+          cursor: pointer;
+          font-size: 0.92rem;
+          font-weight: 600;
+          color: var(--text-main);
+        }
+
+        .toggle-icon {
+          color: var(--text-muted);
+        }
+
+        .btn-add-param,
+        .btn-remove-param {
+          padding: 6px 12px;
+          border-radius: 8px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-main);
+          color: var(--text-main);
+          cursor: pointer;
+        }
+
+        .btn-add-param {
+          background: var(--primary);
+          border-color: var(--primary);
+          color: white;
+        }
+
+        .parameter-item {
+          width: 100%;
+          padding: 12px;
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+        }
+
+        .btn-remove-param,
+        .tag-remove {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          padding: 0;
+        }
+
+        .tags-input-container {
+          background: var(--bg-main);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 8px;
+        }
+
+        .tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 9px;
+          background: rgba(45, 140, 240, 0.1);
+          color: #1f4e89;
+          border: 1px solid rgba(45, 140, 240, 0.2);
+          border-radius: 4px;
+          font-size: 12px;
+        }
+
+        .tag-input {
+          flex: 1;
+          min-width: 120px;
+          background: transparent;
+          border: none;
+          color: var(--text-main);
+          font-size: 14px;
+          padding: 4px;
+        }
+
+        .tag-input:focus {
+          outline: none;
+        }
+
+        .validation-section {
+          padding: 0;
+          border-radius: 6px;
+        }
+
+        .validation-errors,
+        .validation-warnings {
+          border-radius: 10px;
+          padding: 12px 14px;
+        }
+
+        .validation-errors {
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid #ef4444;
+        }
+
+        .validation-warnings {
+          background: rgba(234, 179, 8, 0.1);
+          border: 1px solid #eab308;
+        }
+
+        .validation-errors h4,
+        .validation-warnings h4 {
+          margin: 0 0 8px;
+          font-size: 0.84rem;
+        }
+
+        .validation-errors h4,
+        .validation-errors li {
+          color: #ef4444;
+        }
+
+        .validation-warnings h4,
+        .validation-warnings li {
+          color: #a16207;
+        }
+
+        .validation-errors ul,
+        .validation-warnings ul {
+          margin: 0;
+          padding-left: 18px;
+        }
+
+        .validation-errors li,
+        .validation-warnings li {
+          font-size: 0.8rem;
+          margin: 4px 0;
+        }
+
+        @media (max-width: 920px) {
+          .editor-header {
+            padding: 12px;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .editor-actions {
+            width: 100%;
+          }
+
+          .editor-actions > button {
+            flex: 1;
+          }
+
+          .editor-body {
+            padding: 12px;
+          }
+
+          .retry-count,
+          .retry-delay {
+            min-width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 };

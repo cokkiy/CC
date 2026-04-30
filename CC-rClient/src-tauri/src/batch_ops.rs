@@ -251,7 +251,8 @@ pub struct GetBatchHistoryResult {
 }
 
 fn cc_client_dir() -> Result<PathBuf, String> {
-    let home = dirs::home_dir().ok_or_else(|| "Unable to resolve the user home directory.".to_string())?;
+    let home =
+        dirs::home_dir().ok_or_else(|| "Unable to resolve the user home directory.".to_string())?;
     let path = home.join(".CC-rClient");
     fs::create_dir_all(&path).map_err(|error| format!("create {}: {error}", path.display()))?;
     Ok(path)
@@ -272,7 +273,8 @@ where
     if !path.exists() {
         return Ok(Vec::new());
     }
-    let raw = fs::read_to_string(path).map_err(|error| format!("read {}: {error}", path.display()))?;
+    let raw =
+        fs::read_to_string(path).map_err(|error| format!("read {}: {error}", path.display()))?;
     serde_json::from_str(&raw).map_err(|error| format!("parse {}: {error}", path.display()))
 }
 
@@ -280,7 +282,8 @@ fn write_json_vec<T>(path: &PathBuf, items: &[T]) -> Result<(), String>
 where
     T: Serialize,
 {
-    let raw = serde_json::to_string_pretty(items).map_err(|error| format!("serialize {}: {error}", path.display()))?;
+    let raw = serde_json::to_string_pretty(items)
+        .map_err(|error| format!("serialize {}: {error}", path.display()))?;
     fs::write(path, raw).map_err(|error| format!("write {}: {error}", path.display()))
 }
 
@@ -308,30 +311,79 @@ fn normalize_task(task: BatchTaskDraft, existing: Option<&BatchTask>) -> BatchTa
     let now = now_iso();
     let base = existing.cloned();
     BatchTask {
-        id: task.id.or_else(|| base.as_ref().map(|item| item.id.clone())).unwrap_or_else(|| Uuid::new_v4().to_string()),
-        name: task.name.or_else(|| base.as_ref().map(|item| item.name.clone())).unwrap_or_default(),
-        description: task.description.or_else(|| base.as_ref().and_then(|item| item.description.clone())),
-        task_type: task.task_type.or_else(|| base.as_ref().map(|item| item.task_type.clone())).unwrap_or_else(|| "command".to_string()),
-        target_selector: task.target_selector.or_else(|| base.as_ref().map(|item| item.target_selector.clone())).unwrap_or_default(),
-        content: task.content.or_else(|| base.as_ref().map(|item| item.content.clone())).unwrap_or_default(),
-        parameters: task.parameters.or_else(|| base.as_ref().map(|item| item.parameters.clone())).unwrap_or_default(),
-        execution_policy: task.execution_policy.or_else(|| base.as_ref().map(|item| item.execution_policy.clone())).unwrap_or_default(),
-        created_by: task.created_by.or_else(|| base.as_ref().map(|item| item.created_by.clone())).unwrap_or_else(|| "current-user".to_string()),
-        created_at: task.created_at.or_else(|| base.as_ref().map(|item| item.created_at.clone())).unwrap_or_else(|| now.clone()),
+        id: task
+            .id
+            .or_else(|| base.as_ref().map(|item| item.id.clone()))
+            .unwrap_or_else(|| Uuid::new_v4().to_string()),
+        name: task
+            .name
+            .or_else(|| base.as_ref().map(|item| item.name.clone()))
+            .unwrap_or_default(),
+        description: task
+            .description
+            .or_else(|| base.as_ref().and_then(|item| item.description.clone())),
+        task_type: task
+            .task_type
+            .or_else(|| base.as_ref().map(|item| item.task_type.clone()))
+            .unwrap_or_else(|| "command".to_string()),
+        target_selector: task
+            .target_selector
+            .or_else(|| base.as_ref().map(|item| item.target_selector.clone()))
+            .unwrap_or_default(),
+        content: task
+            .content
+            .or_else(|| base.as_ref().map(|item| item.content.clone()))
+            .unwrap_or_default(),
+        parameters: task
+            .parameters
+            .or_else(|| base.as_ref().map(|item| item.parameters.clone()))
+            .unwrap_or_default(),
+        execution_policy: task
+            .execution_policy
+            .or_else(|| base.as_ref().map(|item| item.execution_policy.clone()))
+            .unwrap_or_default(),
+        created_by: task
+            .created_by
+            .or_else(|| base.as_ref().map(|item| item.created_by.clone()))
+            .unwrap_or_else(|| "current-user".to_string()),
+        created_at: task
+            .created_at
+            .or_else(|| base.as_ref().map(|item| item.created_at.clone()))
+            .unwrap_or_else(|| now.clone()),
         updated_at: task.updated_at.unwrap_or(now),
-        status: task.status.or_else(|| base.as_ref().map(|item| item.status.clone())).unwrap_or_else(|| "draft".to_string()),
-        version: task.version.or_else(|| base.as_ref().map(|item| item.version + 1)).unwrap_or(1),
-        usage_count: task.usage_count.or_else(|| base.as_ref().map(|item| item.usage_count)).unwrap_or(0),
-        last_run_at: task.last_run_at.or_else(|| base.as_ref().and_then(|item| item.last_run_at.clone())),
-        is_favorite: task.is_favorite.or_else(|| base.as_ref().map(|item| item.is_favorite)).unwrap_or(false),
-        tags: task.tags.or_else(|| base.as_ref().map(|item| item.tags.clone())).unwrap_or_default(),
+        status: task
+            .status
+            .or_else(|| base.as_ref().map(|item| item.status.clone()))
+            .unwrap_or_else(|| "draft".to_string()),
+        version: task
+            .version
+            .or_else(|| base.as_ref().map(|item| item.version + 1))
+            .unwrap_or(1),
+        usage_count: task
+            .usage_count
+            .or_else(|| base.as_ref().map(|item| item.usage_count))
+            .unwrap_or(0),
+        last_run_at: task
+            .last_run_at
+            .or_else(|| base.as_ref().and_then(|item| item.last_run_at.clone())),
+        is_favorite: task
+            .is_favorite
+            .or_else(|| base.as_ref().map(|item| item.is_favorite))
+            .unwrap_or(false),
+        tags: task
+            .tags
+            .or_else(|| base.as_ref().map(|item| item.tags.clone()))
+            .unwrap_or_default(),
     }
 }
 
 fn validate_task(task: &BatchTaskDraft) -> ValidateTaskResult {
     let mut errors = Vec::new();
     let mut warnings = Vec::new();
-    let task_type = task.task_type.clone().unwrap_or_else(|| "command".to_string());
+    let task_type = task
+        .task_type
+        .clone()
+        .unwrap_or_else(|| "command".to_string());
     let name = task.name.as_deref().unwrap_or("").trim();
     let content = task.content.as_deref().unwrap_or("").trim();
 
@@ -339,10 +391,7 @@ fn validate_task(task: &BatchTaskDraft) -> ValidateTaskResult {
         errors.push("Task name is required".to_string());
     }
 
-    let needs_content = matches!(
-        task_type.as_str(),
-        "command" | "script" | "watch_processes"
-    );
+    let needs_content = matches!(task_type.as_str(), "command" | "script" | "watch_processes");
 
     if needs_content && content.is_empty() {
         errors.push("Task content is required".to_string());
@@ -372,7 +421,14 @@ fn resolve_targets_from_snapshot(
             "group" => selector
                 .groups
                 .as_ref()
-                .map(|groups| groups.iter().any(|group_id| station.groups.iter().any(|station_group| station_group == group_id)))
+                .map(|groups| {
+                    groups.iter().any(|group_id| {
+                        station
+                            .groups
+                            .iter()
+                            .any(|station_group| station_group == group_id)
+                    })
+                })
                 .unwrap_or(false),
             "tag" => selector
                 .tags
@@ -385,9 +441,11 @@ fn resolve_targets_from_snapshot(
                 .map(|ids| ids.iter().any(|id| id == &station.id))
                 .unwrap_or(false),
             "filter" => match selector.filter_expr.as_deref().map(str::trim) {
-                Some(expr) if !expr.is_empty() => station.name.contains(expr)
-                    || station.id.contains(expr)
-                    || station.groups.iter().any(|group| group.contains(expr)),
+                Some(expr) if !expr.is_empty() => {
+                    station.name.contains(expr)
+                        || station.id.contains(expr)
+                        || station.groups.iter().any(|group| group.contains(expr))
+                }
                 _ => false,
             },
             _ => false,
@@ -400,12 +458,22 @@ fn resolve_targets_from_snapshot(
             let matches_groups = filters
                 .groups
                 .as_ref()
-                .map(|groups| groups.is_empty() || groups.iter().any(|group| station.groups.iter().any(|station_group| station_group == group)))
+                .map(|groups| {
+                    groups.is_empty()
+                        || groups.iter().any(|group| {
+                            station
+                                .groups
+                                .iter()
+                                .any(|station_group| station_group == group)
+                        })
+                })
                 .unwrap_or(true);
             let matches_tags = filters
                 .tags
                 .as_ref()
-                .map(|tags| tags.is_empty() || tags.iter().any(|tag| station.tags.contains_key(tag)))
+                .map(|tags| {
+                    tags.is_empty() || tags.iter().any(|tag| station.tags.contains_key(tag))
+                })
                 .unwrap_or(true);
             let matches_status = filters
                 .status
@@ -437,7 +505,11 @@ fn to_batch_target(station: &Station) -> BatchTarget {
     }
 }
 
-fn render_content(content: &str, parameters: &HashMap<String, String>, defaults: &[BatchTaskParameter]) -> String {
+fn render_content(
+    content: &str,
+    parameters: &HashMap<String, String>,
+    defaults: &[BatchTaskParameter],
+) -> String {
     let mut rendered = content.to_string();
     let mut merged = HashMap::new();
     for item in defaults {
@@ -482,22 +554,42 @@ async fn execute_one_target(
             match task.task_type.as_str() {
                 "power_on" => {
                     let mut stations = vec![station.clone()];
-                    let result = execute_station_action(StationAction::PowerOn, vec![station.id.clone()], &mut stations).await?;
+                    let result = execute_station_action(
+                        StationAction::PowerOn,
+                        vec![station.id.clone()],
+                        &mut stations,
+                    )
+                    .await?;
                     Ok((Some(result.message), None, Some(0), "success".to_string()))
                 }
                 "shutdown" => {
                     let mut stations = vec![station.clone()];
-                    let result = execute_station_action(StationAction::Shutdown, vec![station.id.clone()], &mut stations).await?;
+                    let result = execute_station_action(
+                        StationAction::Shutdown,
+                        vec![station.id.clone()],
+                        &mut stations,
+                    )
+                    .await?;
                     Ok((Some(result.message), None, Some(0), "success".to_string()))
                 }
                 "reboot" => {
                     let mut stations = vec![station.clone()];
-                    let result = execute_station_action(StationAction::Reboot, vec![station.id.clone()], &mut stations).await?;
+                    let result = execute_station_action(
+                        StationAction::Reboot,
+                        vec![station.id.clone()],
+                        &mut stations,
+                    )
+                    .await?;
                     Ok((Some(result.message), None, Some(0), "success".to_string()))
                 }
                 "start_app" => {
                     let mut stations = vec![station.clone()];
-                    let result = execute_station_action(StationAction::StartApp, vec![station.id.clone()], &mut stations).await?;
+                    let result = execute_station_action(
+                        StationAction::StartApp,
+                        vec![station.id.clone()],
+                        &mut stations,
+                    )
+                    .await?;
                     Ok((Some(result.message), None, Some(0), "success".to_string()))
                 }
                 "watch_processes" => {
@@ -514,14 +606,27 @@ async fn execute_one_target(
                     Ok((Some(message), None, Some(0), "success".to_string()))
                 }
                 "command" | "script" => {
-                    let command_result = execute_station_command(&station, &rendered, timeout_secs as i32).await?;
-                    let status = if command_result.exit_code == 0 { "success" } else { "failed" }.to_string();
-                    let error = if command_result.exit_code == 0 || command_result.stderr.trim().is_empty() {
+                    let command_result =
+                        execute_station_command(&station, &rendered, timeout_secs as i32).await?;
+                    let status = if command_result.exit_code == 0 {
+                        "success"
+                    } else {
+                        "failed"
+                    }
+                    .to_string();
+                    let error = if command_result.exit_code == 0
+                        || command_result.stderr.trim().is_empty()
+                    {
                         None
                     } else {
                         Some(command_result.stderr.clone())
                     };
-                    Ok((Some(command_result.stdout), error, Some(command_result.exit_code), status))
+                    Ok((
+                        Some(command_result.stdout),
+                        error,
+                        Some(command_result.exit_code),
+                        status,
+                    ))
                 }
                 other => Err(format!("Unsupported batch task type: {other}")),
             }
@@ -641,7 +746,11 @@ async fn execute_batch_task_internal(
                 remaining.len().min(step)
             };
             let chunk = remaining.drain(..chunk_size).collect::<Vec<_>>();
-            let limit = if mode == "parallel" { chunk.len().max(1) } else { chunk_size.max(1) };
+            let limit = if mode == "parallel" {
+                chunk.len().max(1)
+            } else {
+                chunk_size.max(1)
+            };
             let mut chunk_results = execute_chunk(task, chunk, parameters.clone(), limit).await;
             results.append(&mut chunk_results);
 
@@ -658,7 +767,9 @@ async fn execute_batch_task_internal(
                             completed_at: Some(now_iso()),
                             duration_ms: Some(0),
                             output: None,
-                            error: Some("Skipped after circuit breaker threshold was exceeded".to_string()),
+                            error: Some(
+                                "Skipped after circuit breaker threshold was exceeded".to_string(),
+                            ),
                             exit_code: None,
                             retry_attempt: Some(0),
                         });
@@ -680,12 +791,18 @@ async fn execute_batch_task_internal(
         }
     }
 
-    let success_count = results.iter().filter(|result| result.status == "success").count();
+    let success_count = results
+        .iter()
+        .filter(|result| result.status == "success")
+        .count();
     let failure_count = results
         .iter()
         .filter(|result| matches!(result.status.as_str(), "failed" | "timeout"))
         .count();
-    let skipped_count = results.iter().filter(|result| result.status == "skipped").count();
+    let skipped_count = results
+        .iter()
+        .filter(|result| result.status == "skipped")
+        .count();
     let status = if failure_count == 0 {
         "completed".to_string()
     } else if success_count == 0 {
@@ -848,12 +965,8 @@ pub async fn execute_batch_task(
             .collect::<Vec<_>>()
     };
 
-    let mut result = execute_batch_task_internal(
-        &task,
-        selected_stations,
-        parameters.unwrap_or_default(),
-    )
-    .await;
+    let mut result =
+        execute_batch_task_internal(&task, selected_stations, parameters.unwrap_or_default()).await;
     result.failure_rate = Some(failure_rate(&result.results));
 
     tasks[index].status = result.status.clone();
@@ -902,7 +1015,8 @@ pub async fn execute_batch(
     };
     let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
     let stations = resolve_targets_from_snapshot(&snapshot.stations, &task.target_selector, None);
-    let mut result = execute_batch_task_internal(&task, stations, parameters.unwrap_or_default()).await;
+    let mut result =
+        execute_batch_task_internal(&task, stations, parameters.unwrap_or_default()).await;
     result.failure_rate = Some(failure_rate(&result.results));
     Ok(ExecuteBatchTaskResult { execution: result })
 }

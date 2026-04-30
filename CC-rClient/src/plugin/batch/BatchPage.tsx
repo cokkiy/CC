@@ -3,11 +3,15 @@
  * Part of Phase 7: Frontend Integration
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useBatch } from './BatchContext';
 import { useBatchUI } from './BatchUIContext';
 import { BatchTaskList, BatchTaskEditor, BatchTaskRunner } from './index';
 import type { BatchTask, BatchTarget, BatchTaskFilter, BatchTaskImportResult, BatchTaskPackage } from './types';
+import { scriptHost } from '../script/ScriptHost';
+import type { CommandScript } from '../script/types';
+import { groupsApi } from '../groups/api';
+import type { StationGroup } from '../groups/types';
 import type { Station } from '../../types';
 
 export interface BatchPageProps {
@@ -15,6 +19,8 @@ export interface BatchPageProps {
 }
 
 export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
+  const [scripts, setScripts] = useState<CommandScript[]>([]);
+  const [groups, setGroups] = useState<StationGroup[]>([]);
   const {
     tasks,
     saveTask,
@@ -36,6 +42,38 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
     closeRunner,
   } = useBatchUI();
 
+  useEffect(() => {
+    let mounted = true;
+
+    const loadSupportingData = async () => {
+      try {
+        const [, loadedGroups] = await Promise.all([
+          scriptHost.init().then(() => scriptHost.loadAll()),
+          groupsApi.loadGroups(),
+        ]);
+        if (mounted) {
+          setScripts(scriptHost.getAllScripts());
+          setGroups(loadedGroups);
+        }
+      } catch (error) {
+        console.error('[BatchPage] Failed to load supporting selector data:', error);
+      }
+    };
+
+    void loadSupportingData();
+
+    const unsubscribe = scriptHost.on('scripts:loaded', () => {
+      if (mounted) {
+        setScripts(scriptHost.getAllScripts());
+      }
+    });
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, []);
+
   // Convert stations to targets for BatchTaskRunner
   // Convert stations to batch targets
   const targets: BatchTarget[] = stations.map(s => ({ 
@@ -43,6 +81,7 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
     name: s.name, 
     status: s.blocked ? 'offline' as const : 'online' as const,
     group: s.groups[0],
+    groups: s.groups,
     tags: s.tags,
   }));
 
@@ -87,9 +126,9 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
   };
 
   return (
-    <>
-      <main className="grid">
-        <section className="panel" style={{ flex: 1 }}>
+    <div className="scripts-page-shell">
+      <main className="grid gridScriptsMode scripts-main-grid">
+        <section className="panel scripts-main-panel">
           <BatchTaskList
             tasks={tasks}
             onSelectTask={(task) => openEditor(task)}
@@ -103,22 +142,148 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
       </main>
 
       {editor.open && (
-        <BatchTaskEditor
-          task={editor.task ?? undefined}
-          targets={targets}
-          onSave={handleSaveTask}
-          onCancel={handleCancelEdit}
-        />
+        <div className="scripts-layer scripts-layer-drawer" role="dialog" aria-modal="true">
+          <div className="scripts-drawer-panel">
+            <BatchTaskEditor
+              task={editor.task ?? undefined}
+              targets={targets}
+              groups={groups}
+              scripts={scripts}
+              onSave={handleSaveTask}
+              onCancel={handleCancelEdit}
+            />
+          </div>
+        </div>
       )}
 
       {runner.open && runner.task && (
-        <BatchTaskRunner
-          task={runner.task}
-          targets={targets}
-          onExecute={handleRunBatch}
-          onCancel={handleCancelRun}
-        />
+        <div className="scripts-layer" role="dialog" aria-modal="true">
+          <div className="scripts-modal-panel">
+            <BatchTaskRunner
+              task={runner.task}
+              targets={targets}
+              onExecute={handleRunBatch}
+              onCancel={handleCancelRun}
+            />
+          </div>
+        </div>
       )}
-    </>
+
+      <style>{`
+        .scripts-page-shell {
+          position: relative;
+          min-height: calc(100vh - 64px - 48px);
+        }
+
+        .scripts-main-grid {
+          height: 100%;
+        }
+
+        .scripts-main-panel {
+          padding: 0;
+          overflow: hidden;
+          min-height: calc(100vh - 64px - 48px);
+        }
+
+        .scripts-layer {
+          position: fixed;
+          inset: 0;
+          background: rgba(11, 25, 44, 0.42);
+          backdrop-filter: blur(2px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1200;
+          padding: 24px;
+        }
+
+        .scripts-layer-drawer {
+          justify-content: flex-end;
+          padding: 0;
+        }
+
+        .scripts-drawer-panel {
+          width: min(980px, 94vw);
+          height: 100vh;
+          background: var(--bg-card);
+          border-left: 1px solid var(--border-color);
+          box-shadow: -18px 0 48px rgba(8, 20, 38, 0.24);
+        }
+
+        .scripts-drawer-panel .batch-task-editor.modal-overlay {
+          position: static;
+          inset: auto;
+          background: transparent;
+          padding: 0;
+          height: 100%;
+          display: flex;
+        }
+
+        .scripts-drawer-panel .batch-task-editor .modal-content.editor-modal {
+          width: 100%;
+          max-width: none;
+          max-height: none;
+          height: 100%;
+          margin: 0;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        .scripts-modal-panel {
+          width: min(1320px, 96vw);
+          height: min(90vh, 920px);
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 14px;
+          box-shadow: 0 22px 56px rgba(8, 20, 38, 0.24);
+          overflow: hidden;
+        }
+
+        .scripts-modal-panel .batch-task-runner.modal-overlay {
+          position: static;
+          inset: auto;
+          background: transparent;
+          padding: 0;
+          height: 100%;
+          display: flex;
+        }
+
+        .scripts-modal-panel .batch-task-runner .modal-content.runner-modal {
+          width: 100%;
+          max-width: none;
+          max-height: none;
+          height: 100%;
+          margin: 0;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+          .scripts-layer {
+            padding: 12px;
+          }
+
+          .scripts-layer-drawer {
+            padding: 0;
+          }
+
+          .scripts-drawer-panel {
+            width: 100vw;
+          }
+
+          .scripts-modal-panel {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+          }
+        }
+      `}</style>
+    </div>
   );
 };

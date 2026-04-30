@@ -452,21 +452,11 @@ export const BatchTaskList: React.FC<BatchTaskListProps> = ({
 
   // Handle duplicate
   const handleDuplicate = (task: BatchTask) => {
-    const duplicate: BatchTask = {
-      ...task,
-      id: `batch-${Date.now()}`,
-      name: `${task.name} (Copy)`,
-      isFavorite: false,
-      usageCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      status: 'draft',
-    };
-    onDuplicateTask?.(duplicate);
+    onDuplicateTask?.(task);
   };
 
   return (
-    <div className="batch-task-list">
+    <div className="script-list batch-task-list">
       {/* Header */}
       <div className="list-header">
         <div className="header-top">

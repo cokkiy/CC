@@ -51,6 +51,7 @@ export interface BatchTarget {
   id: string;
   name: string;
   group?: string;
+  groups?: string[];
   tags?: Record<string, string>;
   status: 'online' | 'offline' | 'busy' | 'unknown';
   lastSeen?: string;

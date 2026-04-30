@@ -691,7 +691,7 @@ export const ScriptRunner: React.FC<ScriptRunnerProps> = ({
           <div className="execution-controls">
             {!isExecuting ? (
               <button
-                className="btn-execute"
+                className="btn-runner-execute"
                 onClick={handleExecute}
                 disabled={selectedTargets.length === 0 || readOnly}
               >
@@ -1094,7 +1094,7 @@ export const ScriptRunner: React.FC<ScriptRunnerProps> = ({
           margin-bottom: 20px;
         }
 
-        .btn-execute, .btn-cancel-execution {
+        .btn-runner-execute, .btn-cancel-execution {
           padding: 12px 24px;
           border-radius: 8px;
           font-size: 14px;
@@ -1102,18 +1102,23 @@ export const ScriptRunner: React.FC<ScriptRunnerProps> = ({
           cursor: pointer;
           transition: all 0.2s;
           border: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          white-space: nowrap;
         }
 
-        .btn-execute {
+        .btn-runner-execute {
           background: #22c55e;
           color: white;
         }
 
-        .btn-execute:hover:not(:disabled) {
+        .btn-runner-execute:hover:not(:disabled) {
           background: #16a34a;
         }
 
-        .btn-execute:disabled {
+        .btn-runner-execute:disabled {
           opacity: 0.5;
           cursor: not-allowed;
         }
@@ -1563,7 +1568,7 @@ export const ScriptRunner: React.FC<ScriptRunnerProps> = ({
           background: var(--bg-card);
         }
 
-        .btn-execute,
+        .btn-runner-execute,
         .btn-cancel-execution {
           min-height: 40px;
           border-radius: 10px;

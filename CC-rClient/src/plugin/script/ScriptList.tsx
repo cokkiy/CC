@@ -54,7 +54,10 @@ const ScriptCard: React.FC<ScriptCardProps> = ({
   };
 
   return (
-    <div className={`script-card ${script.isFavorite ? 'favorite' : ''}`} onClick={() => onSelect(script)}>
+    <div
+      className={`script-card ${script.isFavorite ? 'favorite' : ''} ${showMenu ? 'menu-open' : ''}`}
+      onClick={() => onSelect(script)}
+    >
       <div className="card-header">
         <div className="card-title-row">
           <span className="script-type-icon">{getScriptTypeIcon(script.scriptType)}</span>
@@ -870,8 +873,12 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           cursor: pointer;
           transition: all 0.2s;
           position: relative;
-          overflow: hidden;
+          overflow: visible;
           box-shadow: 0 8px 20px rgba(11, 25, 44, 0.05);
+        }
+
+        .script-card.menu-open {
+          z-index: 40;
         }
 
         .script-card::before {
