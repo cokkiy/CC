@@ -58,6 +58,14 @@ CC (Central Control) is a unified management platform for workstations and IoT d
 - **Phase 4: Data Flow Testing** - MQTT + WebSocket integration
 - **Phase 5: Fix Verification** - Bug fixes and validation
 - **Phase 6: Command Script Management** - Script execution system
+- **Phase 7: Batch Operations** - Multi-target batch task creation, execution, and result tracking
+- **Phase 9: Alert Rules** - Real-time alert rule management and station-side alert evaluation
+
+### Operations Features
+
+- **Script Management** - Create, edit, filter, and execute reusable shell scripts
+- **Batch Task Management** - Create reusable batch tasks, select saved scripts, run tasks against saved targets, and inspect execution results
+- **Alert Rule Management** - Create alert rules from templates, execute rule checks, and review alert history
 
 ### Plugin System (5 Built-in Plugins)
 
@@ -79,10 +87,16 @@ CC (Central Control) is a unified management platform for workstations and IoT d
 ├── CC-rClient/           # Tauri desktop client (React + TypeScript)
 │   ├── src/              # Frontend source
 │   │   ├── plugin/       # Plugin system
+│   │   │   ├── script/   # Script management UI
+│   │   │   ├── batch/    # Batch task UI
+│   │   │   └── alert/    # Alert rule UI
 │   │   └── App.tsx       # Main application
 │   └── src-tauri/       # Rust backend
 │       └── src/
 │           ├── ws_bridge.rs    # WebSocket client
+│           ├── script_ops.rs   # Script commands
+│           ├── batch_ops.rs    # Batch task commands
+│           ├── alert_ops.rs    # Alert rule commands
 │           └── lib.rs           # Tauri commands
 ├── CC-Aggregator/       # Data aggregator (MQTT → WebSocket)
 │   ├── src/
@@ -91,6 +105,8 @@ CC (Central Control) is a unified management platform for workstations and IoT d
 │   │   └── config.rs    # Configuration
 │   └── CC-Aggregator.toml
 ├── CC-rStationService/  # Workstation agent
+│   ├── src/
+│   │   └── alert_engine.rs # Station-side alert evaluation
 │   └── ...
 ├── scripts/              # Startup scripts
 │   └── start-all.sh     # One-click start
