@@ -588,17 +588,19 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         </div>
 
         {/* Validation Messages */}
+        {saveError && (
+          <div className="validation-section">
+            <div className="validation-errors">
+              <h4>Save Failed</h4>
+              <ul>
+                <li>{saveError}</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
         {validation && (
           <div className="validation-section">
-            {saveError && (
-              <div className="validation-errors">
-                <h4>Save Failed</h4>
-                <ul>
-                  <li>{saveError}</li>
-                </ul>
-              </div>
-            )}
-
             {validation.errors.length > 0 && (
               <div className="validation-errors">
                 <h4>Errors</h4>
