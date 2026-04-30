@@ -382,25 +382,54 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         {/* Search Bar with Type Filter */}
         <div className="search-bar">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search scripts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="search-clear" onClick={() => setSearchQuery('')}>
-              ×
+          <div className="search-field">
+            <div className="search-input-wrap">
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search scripts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button className="search-clear" onClick={() => setSearchQuery('')}>
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className="type-filter-inline">
+              <ScriptTypeFilter
+                selected={selectedType}
+                onChange={setSelectedType}
+                counts={countsByType}
+              />
+            </div>
+          </div>
+
+          <div className="sort-controls">
+            <span className="sort-label">Sort by:</span>
+            <select
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            >
+              <option value="updated">Last Updated</option>
+              <option value="name">Name</option>
+              <option value="usage">Usage Count</option>
+              <option value="created">Date Created</option>
+            </select>
+            <button
+              className="btn-sort-order"
+              onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+              title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+            >
+              {sortOrder === 'asc' ? '↑' : '↓'}
             </button>
-          )}
-          <div className="type-filter-inline">
-            <ScriptTypeFilter
-              selected={selectedType}
-              onChange={setSelectedType}
-              counts={countsByType}
-            />
+            <span className="result-count">
+              {filteredScripts.length} of {scripts.length} scripts
+            </span>
           </div>
         </div>
 
@@ -439,30 +468,6 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           </div>
         </div>
 
-        {/* Sort Controls */}
-        <div className="sort-controls">
-          <span className="sort-label">Sort by:</span>
-          <select
-            className="sort-select"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          >
-            <option value="updated">Last Updated</option>
-            <option value="name">Name</option>
-            <option value="usage">Usage Count</option>
-            <option value="created">Date Created</option>
-          </select>
-          <button
-            className="btn-sort-order"
-            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-            title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-          >
-            {sortOrder === 'asc' ? '↑' : '↓'}
-          </button>
-          <span className="result-count">
-            {filteredScripts.length} of {scripts.length} scripts
-          </span>
-        </div>
       </div>
 
       {/* Script Grid */}
@@ -628,12 +633,28 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           display: flex;
           align-items: center;
           gap: 10px;
+          margin-bottom: 12px;
+          flex-wrap: nowrap;
+        }
+
+        .search-field {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1 1 auto;
+          min-width: 220px;
           background: linear-gradient(180deg, rgba(45, 140, 240, 0.05) 0%, rgba(45, 140, 240, 0.01) 100%);
           border: 1px solid var(--border-color);
           border-radius: 10px;
           padding: 8px 10px;
-          margin-bottom: 12px;
-          flex-wrap: wrap;
+        }
+
+        .search-input-wrap {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1 1 0;
+          min-width: 0;
         }
 
         .search-icon {
@@ -644,7 +665,7 @@ export const ScriptList: React.FC<ScriptListProps> = ({
 
         .search-input {
           flex: 1;
-          min-width: 220px;
+          min-width: 0;
           padding: 8px 2px;
           background: transparent;
           border: none;
@@ -675,10 +696,10 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         .type-filter-inline {
           display: flex;
           gap: 4px;
-          flex-shrink: 1;
+          flex-shrink: 0;
           border-left: 1px solid var(--border-color);
           padding-left: 10px;
-          margin-left: 4px;
+          margin-left: auto;
           max-width: 100%;
           overflow-x: auto;
         }
@@ -699,6 +720,8 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           align-items: center;
           gap: 10px;
           flex-wrap: wrap;
+          margin-left: auto;
+          flex-shrink: 0;
         }
 
         .sort-label {
@@ -731,9 +754,9 @@ export const ScriptList: React.FC<ScriptListProps> = ({
         }
 
         .result-count {
-          margin-left: auto;
           font-size: 0.8rem;
           color: var(--text-muted);
+          white-space: nowrap;
         }
 
         .script-grid {
@@ -1197,11 +1220,21 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           }
 
           .search-bar {
-            padding: 8px;
+            gap: 8px;
+            flex-wrap: wrap;
+          }
+
+          .search-field {
+            flex-basis: 100%;
+            min-width: 0;
+          }
+
+          .search-input-wrap {
+            flex-basis: 100%;
           }
 
           .search-input {
-            min-width: 150px;
+            min-width: 0;
           }
 
           .script-grid {
@@ -1216,7 +1249,6 @@ export const ScriptList: React.FC<ScriptListProps> = ({
           }
 
           .result-count {
-            margin-left: 0;
             width: 100%;
           }
         }
