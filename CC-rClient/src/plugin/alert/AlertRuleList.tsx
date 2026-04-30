@@ -261,12 +261,16 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
                   </td>
                   <td className="col-name">
                     <div className="rule-name-cell">
-                      <span
+                      <button
+                        type="button"
                         className={`favorite-btn ${rule.isFavorite ? 'active' : ''}`}
                         onClick={() => onToggleFavorite(rule.id)}
+                        aria-pressed={rule.isFavorite}
+                        aria-label={`${rule.isFavorite ? 'Unfavorite' : 'Favorite'} alert rule ${rule.name}`}
+                        title={rule.isFavorite ? 'Unfavorite alert rule' : 'Favorite alert rule'}
                       >
                         {rule.isFavorite ? '★' : '☆'}
-                      </span>
+                      </button>
                       <span className="rule-name">{rule.name}</span>
                     </div>
                   </td>
