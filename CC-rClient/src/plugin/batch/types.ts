@@ -8,7 +8,14 @@
 // ============================================
 
 // Task type enum
-export type BatchTaskType = 'command' | 'script' | 'config' | 'file_transfer' | 'upgrade' | 'reboot';
+export type BatchTaskType =
+  | 'power_on'
+  | 'shutdown'
+  | 'reboot'
+  | 'start_app'
+  | 'command'
+  | 'watch_processes'
+  | 'script';
 
 // Target selector type enum
 export type TargetSelectorType = 'all' | 'group' | 'tag' | 'device_ids' | 'filter';
@@ -44,6 +51,7 @@ export interface BatchTarget {
   id: string;
   name: string;
   group?: string;
+  groups?: string[];
   tags?: Record<string, string>;
   status: 'online' | 'offline' | 'busy' | 'unknown';
   lastSeen?: string;

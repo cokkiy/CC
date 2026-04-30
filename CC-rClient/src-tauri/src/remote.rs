@@ -651,3 +651,23 @@ pub async fn execute_station_command(
     })
     .await
 }
+
+pub async fn set_station_watching_apps(
+    station: &Station,
+    process_names: Vec<String>,
+) -> Result<String, String> {
+    with_station_endpoint(station, move |endpoint| {
+        let process_names = process_names.clone();
+        async move {
+            let mut client = StationControlClient::connect(endpoint.clone())
+                .await
+                .map_err(|error| format!("connect station control via {endpoint}: {error}"))?;
+            client
+                .set_watching_app(SetWatchingAppRequest { process_names })
+                .await
+                .map_err(|error| format!("set watching apps via {endpoint}: {error}"))?;
+            Ok(format!("Updated watched processes via {endpoint}."))
+        }
+    })
+    .await
+}

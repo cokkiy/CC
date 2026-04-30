@@ -95,7 +95,7 @@ export const batchApi = {
    */
   async deleteTask(taskId: string): Promise<void> {
     try {
-      await invoke<DeleteBatchTaskResult>('delete_batch_task', { task_id: taskId });
+      await invoke<DeleteBatchTaskResult>('delete_batch_task', { taskId });
     } catch (error) {
       console.error('[BatchApi] Failed to delete task:', error);
       throw error;
@@ -112,7 +112,7 @@ export const batchApi = {
   ): Promise<BatchExecutionResult> {
     try {
       const result = await invoke<ExecuteBatchTaskResult>('execute_batch_task', {
-        task_id: taskId,
+        taskId,
         targets,
         parameters,
       });
@@ -135,10 +135,10 @@ export const batchApi = {
   ): Promise<BatchExecutionResult> {
     try {
       const result = await invoke<ExecuteBatchTaskResult>('execute_batch', {
-        task_type: taskType,
+        taskType,
         content,
-        target_selector: targetSelector,
-        execution_policy: executionPolicy,
+        targetSelector,
+        executionPolicy,
         parameters,
       });
       return result.execution;
@@ -153,7 +153,7 @@ export const batchApi = {
    */
   async cancelExecution(executionId: string): Promise<void> {
     try {
-      await invoke('cancel_batch_execution', { execution_id: executionId });
+      await invoke('cancel_batch_execution', { executionId });
     } catch (error) {
       console.error('[BatchApi] Failed to cancel execution:', error);
       throw error;
@@ -165,7 +165,7 @@ export const batchApi = {
    */
   async pauseExecution(executionId: string): Promise<void> {
     try {
-      await invoke('pause_batch_execution', { execution_id: executionId });
+      await invoke('pause_batch_execution', { executionId });
     } catch (error) {
       console.error('[BatchApi] Failed to pause execution:', error);
       throw error;
@@ -177,7 +177,7 @@ export const batchApi = {
    */
   async resumeExecution(executionId: string): Promise<void> {
     try {
-      await invoke('resume_batch_execution', { execution_id: executionId });
+      await invoke('resume_batch_execution', { executionId });
     } catch (error) {
       console.error('[BatchApi] Failed to resume execution:', error);
       throw error;
@@ -207,7 +207,7 @@ export const batchApi = {
   async getExecutionStatus(executionId: string): Promise<GetExecutionStatusResult> {
     try {
       const result = await invoke<GetExecutionStatusResult>('get_batch_execution_status', {
-        execution_id: executionId,
+        executionId,
       });
       return result;
     } catch (error) {
@@ -287,7 +287,7 @@ export const batchApi = {
   ): Promise<BatchTaskPackage> {
     try {
       const result = await invoke<{ package: BatchTaskPackage }>('export_batch_package', {
-        task_ids: taskIds,
+        taskIds,
         metadata,
       });
       return result.package;
@@ -303,7 +303,7 @@ export const batchApi = {
   async duplicateTask(taskId: string): Promise<BatchTask> {
     try {
       const result = await invoke<SaveBatchTaskResult>('duplicate_batch_task', {
-        task_id: taskId,
+        taskId,
       });
       return result.task;
     } catch (error) {
@@ -317,7 +317,7 @@ export const batchApi = {
    */
   async toggleFavorite(taskId: string): Promise<void> {
     try {
-      await invoke('toggle_batch_task_favorite', { task_id: taskId });
+      await invoke('toggle_batch_task_favorite', { taskId });
     } catch (error) {
       console.error('[BatchApi] Failed to toggle favorite:', error);
       throw error;

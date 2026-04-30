@@ -1,4 +1,5 @@
 pub mod agent;
+pub mod alert_engine;
 pub mod app;
 pub mod batch;
 pub mod batch_store;

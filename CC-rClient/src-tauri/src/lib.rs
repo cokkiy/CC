@@ -1,3 +1,16 @@
+use alert_ops::{
+    acknowledge_alert, append_alert_history, delete_alert_rule, duplicate_alert_rule,
+    export_alert_rules, get_alert_available_targets, get_alert_history, get_alert_stats,
+    get_alert_templates, import_alert_rules, load_alert_rules, preview_alert_targets,
+    resolve_alert, save_alert_rule, toggle_alert_rule, validate_alert_rule,
+};
+use batch_ops::{
+    cancel_batch_execution, delete_batch_task, duplicate_batch_task, execute_batch,
+    execute_batch_task, export_batch_package, get_batch_execution_status, get_batch_history,
+    get_batch_targets, import_batch_package, load_batch_tasks, pause_batch_execution,
+    preview_batch_targets, resume_batch_execution, save_batch_task, toggle_batch_task_favorite,
+    validate_batch_task,
+};
 use control::{execute_station_action, set_station_gathering_interval};
 use models::{
     ActionResult, AppSnapshot, PersistedState, Station, StationAction, StationGroup, TagDefinition,
@@ -7,19 +20,26 @@ use remote::{
     browse_station_files, capture_station_screen, download_station_file, execute_station_command,
     fetch_station_runtime, rename_station_file, upload_station_file,
 };
+use script_ops::{
+    cancel_script_execution, delete_script, execute_script, export_script_package,
+    get_available_targets, get_script_history, import_script_package, load_scripts, save_script,
+    validate_script,
+};
 use std::collections::HashMap;
 use storage::StateStore;
 use ws_bridge::MqttWsBridge;
 
+pub mod alert_ops;
+pub mod batch_ops;
 pub mod control;
 pub mod grpc;
 pub mod models;
 pub mod remote;
+pub mod script_ops;
 pub mod storage;
 pub mod websocket;
 pub mod wol;
 pub mod ws_bridge;
-
 fn normalize_group_color(color: String) -> String {
     let trimmed = color.trim();
     if trimmed.is_empty() {
@@ -803,6 +823,49 @@ pub fn run() {
             get_station_tags,
             update_station_tags,
             batch_update_station_tags,
+            load_batch_tasks,
+            save_batch_task,
+            delete_batch_task,
+            execute_batch_task,
+            execute_batch,
+            cancel_batch_execution,
+            pause_batch_execution,
+            resume_batch_execution,
+            get_batch_targets,
+            get_batch_execution_status,
+            get_batch_history,
+            validate_batch_task,
+            preview_batch_targets,
+            import_batch_package,
+            export_batch_package,
+            duplicate_batch_task,
+            toggle_batch_task_favorite,
+            load_scripts,
+            save_script,
+            delete_script,
+            validate_script,
+            execute_script,
+            cancel_script_execution,
+            import_script_package,
+            export_script_package,
+            get_available_targets,
+            get_script_history,
+            load_alert_rules,
+            save_alert_rule,
+            delete_alert_rule,
+            toggle_alert_rule,
+            duplicate_alert_rule,
+            get_alert_history,
+            get_alert_stats,
+            validate_alert_rule,
+            preview_alert_targets,
+            import_alert_rules,
+            export_alert_rules,
+            acknowledge_alert,
+            resolve_alert,
+            get_alert_templates,
+            get_alert_available_targets,
+            append_alert_history,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -29,6 +29,7 @@ import type {
   StationScreenCapture
 } from "./types";
 import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script";
+import { AlertProvider, AlertRulesPage, AlertUIProvider } from "./plugin/alert";
 import { BatchProvider, useBatch } from "./plugin/batch";
 import { BatchPage } from "./plugin/batch/BatchPage";
 import { BatchUIProvider } from "./plugin/batch/BatchUIContext";
@@ -154,6 +155,21 @@ function buildRuntimeFromMqttTelemetry(
     networkStats: [],
     message: "Live MQTT telemetry",
   };
+}
+
+function emitAlertRuntimeUpdate(station: Station, runtime: StationRuntimeSnapshot) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("cc-alert-runtime", {
+      detail: {
+        station,
+        runtime,
+      },
+    }),
+  );
 }
 
 function CpuPie({ cpu }: { cpu: number }) {
@@ -828,6 +844,7 @@ function StationBrowserPanel({
 export default function App() {
   const [snapshot, setSnapshot] = useState<AppSnapshot | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
+  const stationsRef = useRef<Station[]>([]);
   const [options, setOptions] = useState<ClientOptions>(emptyOptions);
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
@@ -858,7 +875,7 @@ export default function App() {
   const [tagValueFilter, setTagValueFilter] = useState<string>("");
   const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>([]);
   const [editingGroup, setEditingGroup] = useState<StationGroup | null>(null);
-  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch">("stations");
+  const [activePage, setActivePage] = useState<"stations" | "settings" | "groups" | "tags" | "messages" | "scripts" | "batch" | "alerts">("stations");
   const [viewMode, setViewMode] = useState<StationViewMode>(() => readStoredViewMode());
   const [listColumns, setListColumns] = useState(() => readStoredColumns(STATION_LIST_COLUMNS_STORAGE_KEY, 2));
   const [gridColumns, setGridColumns] = useState(() => readStoredColumns(STATION_GRID_COLUMNS_STORAGE_KEY, 3));
@@ -880,6 +897,10 @@ export default function App() {
   }, [gridColumns]);
 
   useEffect(() => {
+    stationsRef.current = stations;
+  }, [stations]);
+
+  useEffect(() => {
     void loadSnapshot();
   }, []);
 
@@ -890,6 +911,12 @@ export default function App() {
       const unlistenTelemetry = await listen<MqttTelemetryEventPayload>("telemetry", (event) => {
         const { station_id: stationId, data } = event.payload;
         const runtime = buildRuntimeFromMqttTelemetry(stationId, data);
+        const existingStation = stationsRef.current.find((station) => station.id === stationId) ?? null;
+        const alertStation =
+          existingStation
+          ?? createDiscoveredStation(stationId, {
+            mqttLastSeen: String(data.ts),
+          });
 
         setStations((current) => {
           if (current.some((station) => station.id === stationId)) {
@@ -930,6 +957,7 @@ export default function App() {
           ];
           return { ...current, [stationId]: next };
         });
+        emitAlertRuntimeUpdate(alertStation, runtime);
       });
       unlistenFns.push(unlistenTelemetry);
 
@@ -1142,6 +1170,12 @@ export default function App() {
         intervalSeconds: Math.max(options.interval, 1)
       });
       setRuntimeByStation((current) => ({ ...current, [targetId]: runtime }));
+      const runtimeStation =
+        stations.find((station) => station.id === targetId)
+        ?? (selectedStation?.id === targetId ? selectedStation : null);
+      if (runtimeStation) {
+        emitAlertRuntimeUpdate(runtimeStation, runtime);
+      }
       setHistoryByStation((current) => {
         const prev = current[targetId] ?? [];
         const totalRx = runtime.networkStats.reduce((s, n) => s + n.bytesReceivedPerSec, 0);
@@ -1621,6 +1655,7 @@ export default function App() {
   }
 
   return (
+    <AlertProvider>
     <div className="shell">
       <header className={`hero ${hasRuntimeData ? "hero--compact" : "hero--expanded"}`}>
         <div
@@ -1686,6 +1721,12 @@ export default function App() {
           onClick={() => setActivePage("batch")}
         >
           Batch
+        </button>
+        <button
+          className={activePage === "alerts" ? "accent" : ""}
+          onClick={() => setActivePage("alerts")}
+        >
+          Alerts
         </button>
 
         <div className="toolbar-divider" />
@@ -2427,8 +2468,14 @@ export default function App() {
         </ScriptProvider>
       ) : activePage === "batch" ? (
         <BatchProvider>
-          <BatchPage stations={stations} />
+          <BatchUIProvider>
+            <BatchPage stations={stations} />
+          </BatchUIProvider>
         </BatchProvider>
+      ) : activePage === "alerts" ? (
+        <AlertUIProvider>
+          <AlertRulesPage stations={stations} />
+        </AlertUIProvider>
       ) : (
         <main className="grid gridSettingsMode">
           <section className="panel detailPanel">
@@ -2559,5 +2606,6 @@ export default function App() {
         </main>
       )}
     </div>
+    </AlertProvider>
   );
 }

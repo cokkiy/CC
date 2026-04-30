@@ -217,7 +217,7 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 
 ---
 
-## Phase 6: 命令脚本管理系统 ✅ 完成
+## Phase 6: 命令脚本管理系统 ✅ 全部完成
 
 **目标**: 实现控制命令和脚本的持久化、模板化、导入导出、收藏和编辑功能
 
@@ -316,17 +316,18 @@ POST   /api/scripts/{id}/favorite - 收藏/取消收藏
 
 ---
 
-## Phase 7: 批量操作支持系统 ✅ 实现完成
+## Phase 7: 批量操作支持系统 ：部分完成
 
 **目标**: 实现对多设备的批量操作能力
 
 **工期**: 4-5周
 
-**状态**: ✅ 全部完成 (2026-04-24)
-- 批量相关测试: ✅ 10/10 通过
-- 后端回归覆盖: ✅ 已纳入全量回归测试，当前 76/76 通过 (4个network_monitor ignore)
-- 前端构建: ✅ 通过 (vite build 203ms)
-- 前端集成: ✅ App.tsx已集成Batch组件 (BatchPage, BatchUIContext)
+**状态**:
+- 整合分散在不同页面上的批量操作
+- 批量操作包括批量开机、重启、打开指定程序、设置需监控的进程、批量更新、批量执行脚本
+- 后端构建:
+- 前端构建:
+- 前端集成:
 - 新增文件: BatchPage.tsx, BatchUIContext.tsx
 
 ### 实现文件
@@ -426,6 +427,32 @@ ExecutionPolicy {
 - `src/plugin/groups/TagsContext.tsx` - 标签状态管理
 
 ---
+## Phase 9: 告警规则引擎 🚧 进行中
+
+**目标**: 实现基于遥测数据的实时告警能力
+
+**工期**: 3-4周
+
+**状态**: 🚧 进行中 (2026-04-29)
+- 后端: alert_engine.rs 已创建，编译通过
+- 前端: 组件框架已创建 (types.ts, api.ts, AlertContext.tsx, AlertUIContext.tsx, AlertRulesPage.tsx, AlertRuleList.tsx, AlertRuleEditor.tsx, AlertRuleRunner.tsx, AlertHistoryPanel.tsx, AlertTemplates.tsx)
+- 前端构建: 通过 (vite build 183ms)
+
+### 9.1 告警模型
+```
+AlertRule {
+    id: UUID
+    name: String
+    condition: AlertCondition
+    severity: enum[info, warning, error, critical]
+    scope: Scope
+    actions: Vec<AlertAction>
+    enabled: bool
+    cooldown_secs: u32
+}
+```
+
+---
 
 
 ## Phase 10: Client UI Moderate ✅ 完成
@@ -449,37 +476,6 @@ ExecutionPolicy {
 - 支持按名称/IP过滤
 - 支持批量选择和标签值设置
 
-### 10.5 本地UI模板与非Vite运行 ✅
-- start-all.sh 使用 CC-rClient/dist 打包资源，不再启动 localhost:5173
-- TemplateMarketplace.tsx 支持导入本地 JSON/ZIP UI模板包
-
-## Phase 9: 告警规则引擎 🚧 进行中
-
-**目标**: 实现基于遥测数据的实时告警能力
-
-**工期**: 3-4周
-
-**状态**: 🚧 进行中 (2026-04-29)
-- 后端: alert_engine.rs 已创建，编译通过 ✅
-- 前端: 组件框架已创建 (types.ts, api.ts, AlertContext.tsx, AlertUIContext.tsx, AlertRulesPage.tsx, AlertRuleList.tsx, AlertRuleEditor.tsx, AlertRuleRunner.tsx, AlertHistoryPanel.tsx, AlertTemplates.tsx)
-- 前端构建: ✅ 通过 (vite build 183ms)
-- TypeScript修复: ✅ 7个错误已修复
-
-### 9.1 告警模型
-```
-AlertRule {
-    id: UUID
-    name: String
-    condition: AlertCondition
-    severity: enum[info, warning, error, critical]
-    scope: Scope
-    actions: Vec<AlertAction>
-    enabled: bool
-    cooldown_secs: u32
-}
-```
-
----
 
 ## Phase 11: 权限与审计系统 📋
 
@@ -487,12 +483,12 @@ AlertRule {
 
 **工期**: 3-4周
 
-### 10.1 权限模型 (RBAC)
+### 11.1 权限模型 (RBAC)
 - User: 用户账号
 - Role: 角色
 - Permission: 资源-操作-范围
 
-### 10.2 高危操作保护
+### 11.2 高危操作保护
 - 二次确认
 - 审批流
 - 执行窗口限制
