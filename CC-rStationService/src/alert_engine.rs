@@ -172,7 +172,12 @@ pub enum LogicalOp {
 pub struct DurationRequirement {
     /// Minimum duration in seconds the condition must be true
     pub for_seconds: u64,
-    /// Percentage of samples that must exceed threshold (0.0-1.0)
+    /// Percentage of samples that must exceed threshold (0.0-1.0).
+    ///
+    /// Note: this field is currently serialized/deserialized but ignored during
+    /// evaluation. It is retained for forward compatibility and should not be
+    /// relied on for alerting behavior until sampling/rolling-window support is
+    /// implemented.
     #[serde(default = "default_min_percentage")]
     pub min_percentage: f64,
 }
