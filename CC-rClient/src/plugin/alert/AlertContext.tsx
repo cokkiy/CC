@@ -505,16 +505,16 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
   }, [saveRule]);
 
   const toggleRuleStatus = useCallback(async (ruleId: string) => {
-    await alertApi.toggleAlertRule(ruleId);
-    updateRulesState(
-      rulesRef.current.map((rule) =>
-        rule.id === ruleId
-          ? { ...rule, status: rule.status === 'enabled' ? 'disabled' : 'enabled' }
-          : rule,
-      ),
-    );
-    void loadStats();
-  }, [loadStats, updateRulesState]);
+    const rule = rulesRef.current.find((currentRule) => currentRule.id === ruleId);
+    if (!rule) {
+      throw new Error(`Alert rule ${ruleId} not found`);
+    }
+
+    await saveRule({
+      ...rule,
+      status: rule.status === 'enabled' ? 'disabled' : 'enabled',
+    });
+  }, [saveRule]);
 
   const testRule = useCallback(async (ruleId: string, targetIds: string[]) => {
     await executeRule({

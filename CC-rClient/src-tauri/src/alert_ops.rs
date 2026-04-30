@@ -257,7 +257,8 @@ pub struct PreviewTargetsResult {
 }
 
 fn cc_client_dir() -> Result<PathBuf, String> {
-    let home = dirs::home_dir().ok_or_else(|| "Unable to resolve the user home directory.".to_string())?;
+    let home =
+        dirs::home_dir().ok_or_else(|| "Unable to resolve the user home directory.".to_string())?;
     let path = home.join(".CC-rClient");
     fs::create_dir_all(&path).map_err(|error| format!("create {}: {error}", path.display()))?;
     Ok(path)
@@ -278,7 +279,8 @@ where
     if !path.exists() {
         return Ok(Vec::new());
     }
-    let raw = fs::read_to_string(path).map_err(|error| format!("read {}: {error}", path.display()))?;
+    let raw =
+        fs::read_to_string(path).map_err(|error| format!("read {}: {error}", path.display()))?;
     serde_json::from_str(&raw).map_err(|error| format!("parse {}: {error}", path.display()))
 }
 
@@ -286,7 +288,8 @@ fn write_json_vec<T>(path: &PathBuf, items: &[T]) -> Result<(), String>
 where
     T: Serialize,
 {
-    let raw = serde_json::to_string_pretty(items).map_err(|error| format!("serialize {}: {error}", path.display()))?;
+    let raw = serde_json::to_string_pretty(items)
+        .map_err(|error| format!("serialize {}: {error}", path.display()))?;
     fs::write(path, raw).map_err(|error| format!("write {}: {error}", path.display()))
 }
 
@@ -314,25 +317,77 @@ fn normalize_rule(rule: AlertRuleDraft, existing: Option<&AlertRule>) -> AlertRu
     let now = now_iso();
     let base = existing.cloned();
     AlertRule {
-        id: rule.id.or_else(|| base.as_ref().map(|item| item.id.clone())).unwrap_or_else(|| Uuid::new_v4().to_string()),
-        name: rule.name.or_else(|| base.as_ref().map(|item| item.name.clone())).unwrap_or_default(),
-        description: rule.description.or_else(|| base.as_ref().and_then(|item| item.description.clone())),
-        condition_group: rule.condition_group.or_else(|| base.as_ref().map(|item| item.condition_group.clone())).unwrap_or_default(),
-        target_selector: rule.target_selector.or_else(|| base.as_ref().map(|item| item.target_selector.clone())).unwrap_or_default(),
-        severity: rule.severity.or_else(|| base.as_ref().map(|item| item.severity.clone())).unwrap_or_else(|| "warning".to_string()),
-        status: rule.status.or_else(|| base.as_ref().map(|item| item.status.clone())).unwrap_or_else(|| "enabled".to_string()),
-        cooldown_secs: rule.cooldown_secs.or_else(|| base.as_ref().map(|item| item.cooldown_secs)).unwrap_or(300),
-        max_triggers_per_hour: rule.max_triggers_per_hour.or_else(|| base.as_ref().and_then(|item| item.max_triggers_per_hour)),
-        actions: rule.actions.or_else(|| base.as_ref().map(|item| item.actions.clone())).unwrap_or_default(),
-        is_template: rule.is_template.or_else(|| base.as_ref().map(|item| item.is_template)).unwrap_or(false),
-        is_favorite: rule.is_favorite.or_else(|| base.as_ref().map(|item| item.is_favorite)).unwrap_or(false),
-        tags: rule.tags.or_else(|| base.as_ref().map(|item| item.tags.clone())).unwrap_or_default(),
-        created_by: rule.created_by.or_else(|| base.as_ref().map(|item| item.created_by.clone())).unwrap_or_else(|| "current-user".to_string()),
-        created_at: rule.created_at.or_else(|| base.as_ref().map(|item| item.created_at.clone())).unwrap_or_else(|| now.clone()),
+        id: rule
+            .id
+            .or_else(|| base.as_ref().map(|item| item.id.clone()))
+            .unwrap_or_else(|| Uuid::new_v4().to_string()),
+        name: rule
+            .name
+            .or_else(|| base.as_ref().map(|item| item.name.clone()))
+            .unwrap_or_default(),
+        description: rule
+            .description
+            .or_else(|| base.as_ref().and_then(|item| item.description.clone())),
+        condition_group: rule
+            .condition_group
+            .or_else(|| base.as_ref().map(|item| item.condition_group.clone()))
+            .unwrap_or_default(),
+        target_selector: rule
+            .target_selector
+            .or_else(|| base.as_ref().map(|item| item.target_selector.clone()))
+            .unwrap_or_default(),
+        severity: rule
+            .severity
+            .or_else(|| base.as_ref().map(|item| item.severity.clone()))
+            .unwrap_or_else(|| "warning".to_string()),
+        status: rule
+            .status
+            .or_else(|| base.as_ref().map(|item| item.status.clone()))
+            .unwrap_or_else(|| "enabled".to_string()),
+        cooldown_secs: rule
+            .cooldown_secs
+            .or_else(|| base.as_ref().map(|item| item.cooldown_secs))
+            .unwrap_or(300),
+        max_triggers_per_hour: rule
+            .max_triggers_per_hour
+            .or_else(|| base.as_ref().and_then(|item| item.max_triggers_per_hour)),
+        actions: rule
+            .actions
+            .or_else(|| base.as_ref().map(|item| item.actions.clone()))
+            .unwrap_or_default(),
+        is_template: rule
+            .is_template
+            .or_else(|| base.as_ref().map(|item| item.is_template))
+            .unwrap_or(false),
+        is_favorite: rule
+            .is_favorite
+            .or_else(|| base.as_ref().map(|item| item.is_favorite))
+            .unwrap_or(false),
+        tags: rule
+            .tags
+            .or_else(|| base.as_ref().map(|item| item.tags.clone()))
+            .unwrap_or_default(),
+        created_by: rule
+            .created_by
+            .or_else(|| base.as_ref().map(|item| item.created_by.clone()))
+            .unwrap_or_else(|| "current-user".to_string()),
+        created_at: rule
+            .created_at
+            .or_else(|| base.as_ref().map(|item| item.created_at.clone()))
+            .unwrap_or_else(|| now.clone()),
         updated_at: rule.updated_at.unwrap_or(now),
-        version: rule.version.or_else(|| base.as_ref().map(|item| item.version + 1)).unwrap_or(1),
-        usage_count: rule.usage_count.or_else(|| base.as_ref().map(|item| item.usage_count)).unwrap_or(0),
-        last_triggered_at: rule.last_triggered_at.or_else(|| base.as_ref().and_then(|item| item.last_triggered_at.clone())),
+        version: rule
+            .version
+            .or_else(|| base.as_ref().map(|item| item.version + 1))
+            .unwrap_or(1),
+        usage_count: rule
+            .usage_count
+            .or_else(|| base.as_ref().map(|item| item.usage_count))
+            .unwrap_or(0),
+        last_triggered_at: rule.last_triggered_at.or_else(|| {
+            base.as_ref()
+                .and_then(|item| item.last_triggered_at.clone())
+        }),
     }
 }
 
@@ -355,7 +410,9 @@ fn validate_rule(rule: &AlertRuleDraft) -> AlertRuleValidationResult {
 
     if let Some(actions) = &rule.actions {
         if actions.is_empty() {
-            warnings.push("No alert actions are configured; the rule will only write history".to_string());
+            warnings.push(
+                "No alert actions are configured; the rule will only write history".to_string(),
+            );
         }
     }
 
@@ -372,7 +429,14 @@ fn station_matches_selector(station: &Station, selector: &AlertTargetSelector) -
         "group" => selector
             .groups
             .as_ref()
-            .map(|groups| groups.iter().any(|group_id| station.groups.iter().any(|station_group| station_group == group_id)))
+            .map(|groups| {
+                groups.iter().any(|group_id| {
+                    station
+                        .groups
+                        .iter()
+                        .any(|station_group| station_group == group_id)
+                })
+            })
             .unwrap_or(false),
         "tag" => selector
             .tags
@@ -385,9 +449,11 @@ fn station_matches_selector(station: &Station, selector: &AlertTargetSelector) -
             .map(|ids| ids.iter().any(|id| id == &station.id))
             .unwrap_or(false),
         "filter" => match selector.filter_expr.as_deref().map(str::trim) {
-            Some(expr) if !expr.is_empty() => station.id.contains(expr)
-                || station.name.contains(expr)
-                || station.groups.iter().any(|group| group.contains(expr)),
+            Some(expr) if !expr.is_empty() => {
+                station.id.contains(expr)
+                    || station.name.contains(expr)
+                    || station.groups.iter().any(|group| group.contains(expr))
+            }
             _ => false,
         },
         _ => false,
@@ -604,29 +670,49 @@ pub fn get_alert_history(
     let mut history = load_history_entries()?;
     if let Some(filters) = filters {
         history.retain(|entry| {
-            let rule_match = filters.rule_id.as_ref().map(|rule_id| &entry.rule_id == rule_id).unwrap_or(true);
-            let target_match = filters.target_id.as_ref().map(|target_id| &entry.target_id == target_id).unwrap_or(true);
+            let rule_match = filters
+                .rule_id
+                .as_ref()
+                .map(|rule_id| &entry.rule_id == rule_id)
+                .unwrap_or(true);
+            let target_match = filters
+                .target_id
+                .as_ref()
+                .map(|target_id| &entry.target_id == target_id)
+                .unwrap_or(true);
             let severity_match = filters
                 .severity
                 .as_ref()
-                .map(|values| values.is_empty() || values.iter().any(|value| value == &entry.severity))
+                .map(|values| {
+                    values.is_empty() || values.iter().any(|value| value == &entry.severity)
+                })
                 .unwrap_or(true);
             let status_match = filters
                 .status
                 .as_ref()
-                .map(|values| values.is_empty() || values.iter().any(|value| value == &entry.status))
+                .map(|values| {
+                    values.is_empty() || values.iter().any(|value| value == &entry.status)
+                })
                 .unwrap_or(true);
             let from_match = filters
                 .date_from
                 .as_ref()
                 .and_then(|value| parse_date(value))
-                .map(|from| parse_date(&entry.triggered_at).map(|entry_date| entry_date >= from).unwrap_or(false))
+                .map(|from| {
+                    parse_date(&entry.triggered_at)
+                        .map(|entry_date| entry_date >= from)
+                        .unwrap_or(false)
+                })
                 .unwrap_or(true);
             let to_match = filters
                 .date_to
                 .as_ref()
                 .and_then(|value| parse_date(value))
-                .map(|to| parse_date(&entry.triggered_at).map(|entry_date| entry_date <= to).unwrap_or(false))
+                .map(|to| {
+                    parse_date(&entry.triggered_at)
+                        .map(|entry_date| entry_date <= to)
+                        .unwrap_or(false)
+                })
                 .unwrap_or(true);
             rule_match && target_match && severity_match && status_match && from_match && to_match
         });
@@ -646,7 +732,11 @@ pub fn get_alert_stats() -> Result<GetAlertStatsResult, String> {
     let today = Utc::now().date_naive();
     let triggered_today = history
         .iter()
-        .filter(|entry| parse_date(&entry.triggered_at).map(|date| date.date_naive() == today).unwrap_or(false))
+        .filter(|entry| {
+            parse_date(&entry.triggered_at)
+                .map(|date| date.date_naive() == today)
+                .unwrap_or(false)
+        })
         .count();
     let critical_alerts = history
         .iter()
@@ -688,7 +778,9 @@ pub fn validate_alert_rule(rule: AlertRuleDraft) -> Result<AlertRuleValidationRe
 }
 
 #[command]
-pub fn preview_alert_targets(selector: AlertTargetSelector) -> Result<PreviewTargetsResult, String> {
+pub fn preview_alert_targets(
+    selector: AlertTargetSelector,
+) -> Result<PreviewTargetsResult, String> {
     let targets = resolve_targets(&selector)?;
     Ok(PreviewTargetsResult {
         total: targets.len(),
@@ -820,7 +912,10 @@ pub fn get_alert_templates() -> Result<GetAlertTemplatesResult, String> {
 }
 
 #[command]
-pub fn append_alert_history(entry: AlertHistoryEntry, rule_id: Option<String>) -> Result<AlertHistoryEntry, String> {
+pub fn append_alert_history(
+    entry: AlertHistoryEntry,
+    rule_id: Option<String>,
+) -> Result<AlertHistoryEntry, String> {
     let mut history = load_history_entries()?;
     history.push(entry.clone());
     if history.len() > 500 {

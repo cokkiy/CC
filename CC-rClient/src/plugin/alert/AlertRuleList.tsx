@@ -181,33 +181,31 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="list-filters">
-        <div className="filter-group">
-          <label>Severity:</label>
-          <select
-            value={severityFilter}
-            onChange={(e) => setSeverityFilter(e.target.value as AlertSeverity | 'all')}
-          >
-            <option value="all">All</option>
-            <option value="critical">Critical</option>
-            <option value="warning">Warning</option>
-            <option value="info">Info</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Status:</label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'enabled' | 'disabled')}
-          >
-            <option value="all">All</option>
-            <option value="enabled">Enabled</option>
-            <option value="disabled">Disabled</option>
-          </select>
+          <div className="filter-group">
+            <label htmlFor="alert-severity-filter">Severity</label>
+            <select
+              id="alert-severity-filter"
+              value={severityFilter}
+              onChange={(e) => setSeverityFilter(e.target.value as AlertSeverity | 'all')}
+            >
+              <option value="all">All</option>
+              <option value="critical">Critical</option>
+              <option value="warning">Warning</option>
+              <option value="info">Info</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label htmlFor="alert-status-filter">Status</label>
+            <select
+              id="alert-status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'enabled' | 'disabled')}
+            >
+              <option value="all">All</option>
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -279,14 +277,24 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
                   </td>
                   <td className="col-condition">{formatCondition(rule)}</td>
                   <td className="col-status">
-                    <label className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        checked={rule.status === 'enabled'}
-                        onChange={() => onToggleStatus(rule.id)}
-                      />
-                      <span className="toggle-slider"></span>
-                    </label>
+                    <div className="status-cell">
+                      <span className={`status-label ${rule.status === 'enabled' ? 'status-label-enabled' : 'status-label-disabled'}`}>
+                        {rule.status === 'enabled' ? 'Enabled' : 'Disabled'}
+                      </span>
+                      <button
+                        type="button"
+                        className={`status-switch ${rule.status === 'enabled' ? 'is-enabled' : 'is-disabled'}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleStatus(rule.id);
+                        }}
+                        aria-label={`Set ${rule.name} ${rule.status === 'enabled' ? 'disabled' : 'enabled'}`}
+                        aria-pressed={rule.status === 'enabled'}
+                        title={rule.status === 'enabled' ? 'Disable alert rule' : 'Enable alert rule'}
+                      >
+                        <span className="status-switch-thumb" />
+                      </button>
+                    </div>
                   </td>
                   <td className="col-last-triggered">{formatLastTriggered(rule)}</td>
                   <td className="col-actions">
@@ -354,16 +362,23 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
           align-items: center;
           padding: 16px;
           border-bottom: 1px solid var(--border-color);
+          gap: 12px;
+          flex-wrap: wrap;
         }
 
         .toolbar-left {
           display: flex;
           gap: 8px;
+          flex-wrap: wrap;
         }
 
         .toolbar-right {
           display: flex;
-          gap: 8px;
+          gap: 12px;
+          align-items: center;
+          flex: 1;
+          justify-content: flex-end;
+          flex-wrap: wrap;
         }
 
         .search-input {
@@ -372,21 +387,14 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
           border-radius: 6px;
           background: var(--bg-input);
           color: var(--text-primary);
-          width: 240px;
-        }
-
-        .list-filters {
-          display: flex;
-          gap: 16px;
-          padding: 12px 16px;
-          border-bottom: 1px solid var(--border-color);
-          background: var(--bg-hover);
+          width: min(280px, 100%);
         }
 
         .filter-group {
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-shrink: 0;
         }
 
         .filter-group label {
@@ -400,6 +408,17 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
           border-radius: 4px;
           background: var(--bg-input);
           color: var(--text-primary);
+        }
+
+        @media (max-width: 900px) {
+          .toolbar-right {
+            justify-content: flex-start;
+            width: 100%;
+          }
+
+          .search-input {
+            flex: 1 1 220px;
+          }
         }
 
         .list-table-container {
@@ -460,7 +479,7 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
         }
 
         .col-status {
-          width: 80px;
+          width: 140px;
         }
 
         .col-last-triggered {
@@ -520,42 +539,81 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
           height: 22px;
         }
 
-        .toggle-switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
+        .status-cell {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
         }
 
-        .toggle-slider {
-          position: absolute;
+        .status-label {
+          font-size: 12px;
+          font-weight: 600;
+          line-height: 1;
+        }
+
+        .status-label-enabled {
+          color: #15803d;
+        }
+
+        .status-label-disabled {
+          color: var(--text-muted);
+        }
+
+        .status-switch {
+          position: relative;
+          width: 40px;
+          height: 22px;
+          padding: 0;
+          border-radius: 999px;
+          border: 1px solid var(--border-color);
+          background: rgba(148, 163, 184, 0.18);
           cursor: pointer;
+          transition: background 0.2s, border-color 0.2s;
+        }
+
+        .status-switch.is-disabled {
+          background: rgba(148, 163, 184, 0.18);
+          border-color: var(--border-color);
+        }
+
+        .status-switch.is-enabled {
+          background: rgba(25, 190, 107, 0.22);
+          border-color: rgba(25, 190, 107, 0.42);
+        }
+
+        .status-switch:hover {
+          background: rgba(148, 163, 184, 0.24);
+          border-color: var(--border-color);
+          transform: none;
+          box-shadow: none;
+          color: transparent;
+        }
+
+        .status-switch.is-enabled:hover {
+          background: rgba(25, 190, 107, 0.28);
+          border-color: rgba(25, 190, 107, 0.5);
+        }
+
+        .status-switch-thumb {
+          position: absolute;
           top: 0;
           left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: var(--bg-disabled);
-          transition: 0.3s;
-          border-radius: 22px;
-        }
-
-        .toggle-slider:before {
-          position: absolute;
-          content: "";
           height: 16px;
           width: 16px;
-          left: 3px;
-          bottom: 3px;
-          background-color: white;
-          transition: 0.3s;
+          margin: 2px;
+          background: var(--bg-card);
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+          transition: transform 0.2s ease;
           border-radius: 50%;
         }
 
-        .toggle-switch input:checked + .toggle-slider {
-          background-color: var(--color-success);
+        .status-switch.is-enabled .status-switch-thumb {
+          transform: translateX(18px);
         }
 
-        .toggle-switch input:checked + .toggle-slider:before {
-          transform: translateX(18px);
+        .status-switch:focus-visible {
+          outline: 2px solid rgba(45, 140, 240, 0.35);
+          outline-offset: 2px;
         }
 
         .action-buttons {
@@ -604,29 +662,34 @@ export const AlertRuleList: React.FC<AlertRuleListProps> = ({
 
         .btn {
           padding: 8px 16px;
-          border: none;
+          border: 1px solid transparent;
           border-radius: 6px;
           cursor: pointer;
           font-weight: 500;
-          transition: background 0.2s;
+          transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
 
         .btn-primary {
-          background: var(--color-primary);
+          background: var(--primary);
+          border-color: var(--primary);
           color: white;
+          -webkit-text-fill-color: white;
         }
 
         .btn-primary:hover {
-          background: var(--color-primary-dark);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .btn-secondary {
-          background: var(--bg-hover);
+          background: transparent;
+          border-color: var(--border-color);
           color: var(--text-primary);
         }
 
         .btn-secondary:hover {
-          background: var(--bg-disabled);
+          background: var(--bg-hover);
+          border-color: var(--primary);
         }
       `}</style>
     </div>

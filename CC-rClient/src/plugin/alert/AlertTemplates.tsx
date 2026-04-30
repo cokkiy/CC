@@ -208,7 +208,7 @@ export const AlertTemplates: React.FC<AlertTemplatesProps> = ({ onImport, onClos
         .alert-templates {
           position: fixed;
           inset: 0;
-          background: var(--bg-primary);
+          background: var(--bg-main);
           z-index: 1300;
           display: flex;
           flex-direction: column;
@@ -236,6 +236,14 @@ export const AlertTemplates: React.FC<AlertTemplatesProps> = ({ onImport, onClos
           padding: 0;
           line-height: 1;
           color: var(--text-secondary);
+          -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .btn-close:hover {
+          background: transparent;
+          border-color: transparent;
+          color: var(--text-main);
+          -webkit-text-fill-color: var(--text-main);
         }
 
         .templates-toolbar {
@@ -299,17 +307,21 @@ export const AlertTemplates: React.FC<AlertTemplatesProps> = ({ onImport, onClos
           cursor: pointer;
           text-align: left;
           font-size: 14px;
-          color: var(--text-primary);
+          color: var(--text-main);
+          -webkit-text-fill-color: var(--text-main);
           transition: background 0.2s;
         }
 
         .category-btn:hover {
           background: var(--bg-hover);
+          color: var(--text-main);
+          -webkit-text-fill-color: var(--text-main);
         }
 
         .category-btn.active {
-          background: var(--color-primary);
+          background: var(--primary);
           color: white;
+          -webkit-text-fill-color: white;
         }
 
         .category-icon {
@@ -337,7 +349,7 @@ export const AlertTemplates: React.FC<AlertTemplatesProps> = ({ onImport, onClos
         }
 
         .template-card:hover {
-          border-color: var(--color-primary);
+          border-color: var(--primary);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
@@ -385,30 +397,38 @@ export const AlertTemplates: React.FC<AlertTemplatesProps> = ({ onImport, onClos
 
         .btn {
           padding: 8px 16px;
-          border: none;
+          border: 1px solid transparent;
           border-radius: 6px;
           cursor: pointer;
           font-weight: 500;
           font-size: 14px;
-          transition: background 0.2s;
+          transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
 
         .btn-primary {
-          background: var(--color-primary);
+          background: var(--primary);
+          border-color: var(--primary);
           color: white;
+          -webkit-text-fill-color: white;
         }
 
         .btn-primary:hover {
-          background: var(--color-primary-dark);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .btn-secondary {
-          background: var(--bg-hover);
-          color: var(--text-primary);
+          background: transparent;
+          border-color: var(--border-color);
+          color: var(--text-main);
+          -webkit-text-fill-color: var(--text-main);
         }
 
         .btn-secondary:hover {
-          background: var(--bg-disabled);
+          background: var(--bg-hover);
+          border-color: var(--primary);
+          color: var(--text-main);
+          -webkit-text-fill-color: var(--text-main);
         }
 
         .btn-sm {
@@ -429,7 +449,7 @@ export const AlertTemplates: React.FC<AlertTemplatesProps> = ({ onImport, onClos
         }
 
         .error-state {
-          color: var(--color-danger);
+          color: var(--error);
         }
       `}</style>
     </div>

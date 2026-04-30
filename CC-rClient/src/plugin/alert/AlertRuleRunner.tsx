@@ -3,12 +3,19 @@
  * Part of Phase 9: Alert Rules Management System
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import type { AlertRule, AlertExecutionContext, AlertExecutionResult, AlertTargetResult } from './types';
 
 export interface AlertRuleRunnerProps {
   rule: AlertRule;
-  targets: Array<{ id: string; name: string; status?: string }>;
+  targets: Array<{
+    id: string;
+    name: string;
+    status?: string;
+    ips?: string[];
+    groups?: string[];
+    tags?: Record<string, string>;
+  }>;
   onExecute: (context: AlertExecutionContext) => Promise<AlertExecutionResult>;
   onTest: (ruleId: string, targetIds: string[]) => Promise<void>;
   onCancel: () => void;
@@ -26,6 +33,7 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
 }) => {
   // Run mode
   const [mode, setMode] = useState<RunMode>('test');
+  const [targetFilter, setTargetFilter] = useState('');
 
   // Selected targets for execution
   const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>(() => {
@@ -44,6 +52,30 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
   // Execution result
   const [result, setResult] = useState<AlertExecutionResult | null>(null);
 
+  const filteredTargets = useMemo(() => {
+    const query = targetFilter.trim().toLowerCase();
+    if (!query) {
+      return targets;
+    }
+
+    return targets.filter((target) => {
+      const tagTerms = Object.entries(target.tags || {}).flatMap(([key, value]) =>
+        value ? [key, `${key}:${value}`, value] : [key]
+      );
+      const searchTerms = [
+        target.name,
+        ...(target.ips || []),
+        ...(target.groups || []),
+        ...tagTerms,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return searchTerms.includes(query);
+    });
+  }, [targetFilter, targets]);
+
   // Toggle target selection
   const toggleTarget = (targetId: string) => {
     setSelectedTargetIds((prev) =>
@@ -55,12 +87,13 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
 
   // Select all targets
   const selectAllTargets = () => {
-    setSelectedTargetIds(targets.map((t) => t.id));
+    setSelectedTargetIds((prev) => Array.from(new Set([...prev, ...filteredTargets.map((t) => t.id)])));
   };
 
   // Deselect all targets
   const deselectAllTargets = () => {
-    setSelectedTargetIds([]);
+    const filteredIds = new Set(filteredTargets.map((t) => t.id));
+    setSelectedTargetIds((prev) => prev.filter((id) => !filteredIds.has(id)));
   };
 
   // Handle test run
@@ -193,7 +226,21 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
         {/* Target Selection */}
         <section className="runner-section">
           <div className="section-header">
-            <h3>Select Targets ({selectedTargetIds.length} selected)</h3>
+            <div className="section-header-main">
+              <h3>Select Targets ({selectedTargetIds.length} selected)</h3>
+              <div className="target-filter-bar">
+                <input
+                  type="text"
+                  className="target-filter-input"
+                  placeholder="Filter targets by name, IP, group, or tag"
+                  value={targetFilter}
+                  onChange={(e) => setTargetFilter(e.target.value)}
+                />
+                <span className="target-filter-count">
+                  {filteredTargets.length} of {targets.length} shown
+                </span>
+              </div>
+            </div>
             <div className="target-actions">
               <button className="btn-link" onClick={selectAllTargets}>Select All</button>
               <button className="btn-link" onClick={deselectAllTargets}>Deselect All</button>
@@ -201,7 +248,7 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
           </div>
 
           <div className="target-grid">
-            {targets.map((target) => (
+            {filteredTargets.map((target) => (
               <label
                 key={target.id}
                 className={`target-card ${selectedTargetIds.includes(target.id) ? 'selected' : ''}`}
@@ -213,6 +260,23 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
                 />
                 <div className="target-info">
                   <span className="target-name">{target.name}</span>
+                  {target.ips && target.ips.length > 0 && (
+                    <span className="target-meta">
+                      IP: {target.ips.join(', ')}
+                    </span>
+                  )}
+                  {target.groups && target.groups.length > 0 && (
+                    <span className="target-meta">
+                      Groups: {target.groups.join(', ')}
+                    </span>
+                  )}
+                  {target.tags && Object.keys(target.tags).length > 0 && (
+                    <span className="target-meta">
+                      Tags: {Object.entries(target.tags)
+                        .map(([key, value]) => `${key}:${value}`)
+                        .join(', ')}
+                    </span>
+                  )}
                   <span className={`target-status status-${target.status || 'unknown'}`}>
                     {target.status || 'unknown'}
                   </span>
@@ -220,6 +284,10 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
               </label>
             ))}
           </div>
+
+          {filteredTargets.length === 0 && (
+            <p className="empty-filter-state">No targets match the current filter.</p>
+          )}
 
           {selectedTargetIds.length === 0 && (
             <p className="error-hint">Please select at least one target to run the alert.</p>
@@ -355,6 +423,14 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
           padding: 0;
           line-height: 1;
           color: var(--text-secondary);
+          -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .btn-close:hover {
+          background: transparent;
+          border-color: transparent;
+          color: var(--text-main);
+          -webkit-text-fill-color: var(--text-main);
         }
 
         .runner-content {
@@ -382,13 +458,14 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
         }
 
         .mode-btn:hover {
-          border-color: var(--color-primary);
+          border-color: var(--primary);
         }
 
         .mode-btn.active {
-          border-color: var(--color-primary);
-          background: var(--color-primary);
+          border-color: var(--primary);
+          background: var(--primary);
           color: white;
+          -webkit-text-fill-color: white;
         }
 
         .info-box {
@@ -425,10 +502,22 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
           justify-content: space-between;
           align-items: center;
           margin-bottom: 12px;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .section-header-main {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1 1 420px;
+          min-width: 0;
+          flex-wrap: wrap;
         }
 
         .section-header h3 {
           margin: 0;
+          flex-shrink: 0;
         }
 
         .target-actions {
@@ -436,10 +525,34 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
           gap: 12px;
         }
 
+        .target-filter-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+          flex: 1 1 320px;
+          min-width: min(100%, 320px);
+        }
+
+        .target-filter-input {
+          flex: 1 1 320px;
+          min-width: 240px;
+          padding: 10px 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          background: var(--bg-input);
+          color: var(--text-primary);
+        }
+
+        .target-filter-count {
+          font-size: 12px;
+          color: var(--text-secondary);
+        }
+
         .btn-link {
           background: none;
           border: none;
-          color: var(--color-primary);
+          color: var(--primary);
           cursor: pointer;
           font-size: 13px;
           padding: 0;
@@ -497,7 +610,7 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
         }
 
         .target-card.selected {
-          border-color: var(--color-primary);
+          border-color: var(--primary);
           background: rgba(59, 130, 246, 0.05);
         }
 
@@ -510,11 +623,20 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
         .target-info {
           display: flex;
           flex-direction: column;
+          min-width: 0;
         }
 
         .target-name {
           font-size: 14px;
           font-weight: 500;
+        }
+
+        .target-meta {
+          font-size: 12px;
+          color: var(--text-secondary);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .target-status {
@@ -538,6 +660,13 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
           margin: 8px 0 0 0;
           font-size: 13px;
           color: var(--color-danger);
+        }
+
+        .empty-filter-state {
+          margin: 8px 0 0 0;
+          font-size: 13px;
+          color: var(--text-secondary);
+          font-style: italic;
         }
 
         .results-section {
@@ -631,12 +760,12 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
 
         .btn {
           padding: 10px 20px;
-          border: none;
+          border: 1px solid transparent;
           border-radius: 6px;
           cursor: pointer;
           font-weight: 500;
           font-size: 14px;
-          transition: background 0.2s;
+          transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
 
         .btn:disabled {
@@ -645,21 +774,29 @@ export const AlertRuleRunner: React.FC<AlertRuleRunnerProps> = ({
         }
 
         .btn-primary {
-          background: var(--color-primary);
+          background: var(--primary);
+          border-color: var(--primary);
           color: white;
+          -webkit-text-fill-color: white;
         }
 
         .btn-primary:hover:not(:disabled) {
-          background: var(--color-primary-dark);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .btn-secondary {
-          background: var(--bg-hover);
+          background: transparent;
+          border-color: var(--border-color);
           color: var(--text-primary);
+          -webkit-text-fill-color: var(--text-primary);
         }
 
         .btn-secondary:hover:not(:disabled) {
-          background: var(--bg-disabled);
+          background: var(--bg-hover);
+          border-color: var(--primary);
+          color: var(--text-primary);
+          -webkit-text-fill-color: var(--text-primary);
         }
 
         .badge {

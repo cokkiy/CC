@@ -222,10 +222,17 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
     <div className="alert-rule-editor">
       <div className="editor-header">
         <h2>{isNew ? 'Create Alert Rule' : 'Edit Alert Rule'}</h2>
-        <button className="btn-close" onClick={onCancel}>×</button>
+        <div className="editor-actions">
+          <button type="button" className="btn btn-secondary" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+            {isNew ? 'Create Alert Rule' : 'Save Changes'}
+          </button>
+        </div>
       </div>
 
-      <div className="editor-content">
+      <div className="editor-body">
         {/* Basic Info Section */}
         <section className="editor-section">
           <h3>Basic Information</h3>
@@ -641,71 +648,75 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
         </section>
       </div>
 
-      <div className="editor-footer">
-        <button type="button" className="btn btn-secondary" onClick={onCancel}>
-          Cancel
-        </button>
-        <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-          {isNew ? 'Create Alert Rule' : 'Save Changes'}
-        </button>
-      </div>
-
       <style>{`
         .alert-rule-editor {
           display: flex;
           flex-direction: column;
           height: 100%;
+          background: var(--bg-card);
+          color: var(--text-main);
         }
 
         .editor-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 20px 24px;
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          padding: 14px 22px;
           border-bottom: 1px solid var(--border-color);
+          background: var(--bg-card);
+          box-shadow: 0 10px 20px -18px rgba(11, 25, 44, 0.42);
         }
 
         .editor-header h2 {
           margin: 0;
-          font-size: 18px;
+          font-size: 1.08rem;
+          font-weight: 700;
         }
 
-        .btn-close {
-          background: none;
-          border: none;
-          font-size: 24px;
-          cursor: pointer;
-          padding: 0;
-          line-height: 1;
-          color: var(--text-secondary);
+        .editor-actions {
+          display: flex;
+          gap: 12px;
         }
 
-        .editor-content {
+        .editor-body {
           flex: 1;
           overflow-y: auto;
-          padding: 24px;
+          padding: 18px 22px 24px;
+          display: grid;
+          gap: 16px;
+          align-content: start;
+          background: linear-gradient(180deg, rgba(244, 247, 249, 0.78) 0%, rgba(244, 247, 249, 1) 100%);
         }
 
         .editor-section {
-          margin-bottom: 32px;
+          margin: 0;
+          padding: 16px;
+          background: var(--bg-card);
+          border-radius: 12px;
+          border: 1px solid var(--border-color);
+          box-shadow: 0 8px 20px rgba(11, 25, 44, 0.05);
         }
 
         .editor-section h3 {
-          margin: 0 0 16px 0;
-          font-size: 16px;
-          color: var(--text-primary);
+          margin: 0 0 14px 0;
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: var(--text-main);
         }
 
         .section-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 16px;
+          margin-bottom: 14px;
         }
 
         .section-hint {
-          font-size: 13px;
-          color: var(--text-secondary);
+          font-size: 0.74rem;
+          color: var(--text-muted);
           margin: -8px 0 16px 0;
         }
 
@@ -716,9 +727,11 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
         .form-group label {
           display: block;
           margin-bottom: 6px;
-          font-size: 13px;
+          font-size: 0.78rem;
           font-weight: 500;
-          color: var(--text-secondary);
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .form-group input[type="text"],
@@ -727,23 +740,33 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
         .form-group textarea,
         .form-group select {
           width: 100%;
-          padding: 8px 12px;
+          padding: 10px 12px;
           border: 1px solid var(--border-color);
-          border-radius: 6px;
-          background: var(--bg-input);
-          color: var(--text-primary);
-          font-size: 14px;
+          border-radius: 8px;
+          background: var(--bg-main);
+          color: var(--text-main);
+          font-size: 0.86rem;
+          transition: border-color 0.2s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus,
+        .form-group input[type="url"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+          outline: none;
+          border-color: var(--primary);
         }
 
         .form-group input.error {
-          border-color: var(--color-danger);
+          border-color: #ef4444;
         }
 
         .error-text {
           display: block;
           margin-top: 4px;
           font-size: 12px;
-          color: var(--color-danger);
+          color: #ef4444;
         }
 
         .form-row {
@@ -774,11 +797,13 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
         .tag {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          padding: 4px 8px;
-          background: var(--bg-hover);
+          gap: 6px;
+          padding: 4px 9px;
+          background: rgba(45, 140, 240, 0.1);
+          color: #1f4e89;
+          border: 1px solid rgba(45, 140, 240, 0.2);
           border-radius: 4px;
-          font-size: 13px;
+          font-size: 12px;
         }
 
         .tag button {
@@ -788,7 +813,7 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
           padding: 0;
           font-size: 14px;
           line-height: 1;
-          color: var(--text-secondary);
+          color: #1f4e89;
         }
 
         .logic-toggle {
@@ -799,21 +824,24 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
 
         .logic-toggle label {
           margin: 0;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .logic-toggle button {
-          padding: 6px 12px;
+          padding: 8px 12px;
           border: 1px solid var(--border-color);
-          border-radius: 4px;
-          background: var(--bg-input);
+          border-radius: 8px;
+          background: var(--bg-main);
           cursor: pointer;
-          font-size: 12px;
+          font-size: 0.78rem;
+          color: var(--text-muted);
         }
 
         .logic-toggle button.active {
-          background: var(--color-primary);
+          background: var(--primary);
           color: white;
-          border-color: var(--color-primary);
+          border-color: var(--primary);
         }
 
         .conditions-list,
@@ -827,9 +855,9 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
         .condition-card,
         .action-card {
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: 10px;
           padding: 16px;
-          background: var(--bg-card);
+          background: var(--bg-main);
         }
 
         .condition-header,
@@ -842,34 +870,38 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
 
         .condition-number,
         .action-header span {
-          font-size: 13px;
+          font-size: 0.78rem;
           font-weight: 600;
-          color: var(--text-secondary);
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .btn-icon {
-          padding: 4px 8px;
-          border: none;
-          background: transparent;
+          padding: 6px 10px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-card);
           cursor: pointer;
-          border-radius: 4px;
+          border-radius: 8px;
           font-size: 14px;
         }
 
         .btn-icon:hover {
-          background: var(--bg-hover);
+          border-color: var(--primary);
         }
 
         .btn-icon.btn-danger:hover {
           background: rgba(239, 68, 68, 0.1);
+          border-color: #ef4444;
         }
 
         .target-selector {
           border: 1px solid var(--border-color);
-          border-radius: 6px;
+          border-radius: 8px;
           padding: 12px;
           max-height: 200px;
           overflow-y: auto;
+          background: var(--bg-main);
         }
 
         .target-list {
@@ -888,12 +920,12 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
         }
 
         .target-item:hover {
-          background: var(--bg-hover);
+          background: rgba(45, 140, 240, 0.08);
         }
 
         .hint {
           font-size: 12px;
-          color: var(--text-secondary);
+          color: var(--text-muted);
           font-style: italic;
           margin: 8px 0 0 0;
         }
@@ -905,40 +937,63 @@ export const AlertRuleEditor: React.FC<AlertRuleEditorProps> = ({
           cursor: pointer;
         }
 
-        .editor-footer {
-          display: flex;
-          justify-content: flex-end;
-          gap: 12px;
-          padding: 16px 24px;
-          border-top: 1px solid var(--border-color);
-        }
-
         .btn {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 6px;
+          padding: 8px 14px;
+          border: 1px solid transparent;
+          border-radius: 8px;
           cursor: pointer;
           font-weight: 500;
-          font-size: 14px;
-          transition: background 0.2s;
+          font-size: 0.84rem;
+          transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
 
         .btn-primary {
-          background: var(--color-primary);
+          background: var(--primary);
+          border-color: var(--primary);
           color: white;
+          -webkit-text-fill-color: white;
         }
 
         .btn-primary:hover {
-          background: var(--color-primary-dark);
+          background: var(--primary-hover);
+          border-color: var(--primary-hover);
         }
 
         .btn-secondary {
-          background: var(--bg-hover);
-          color: var(--text-primary);
+          background: transparent;
+          border-color: var(--border-color);
+          color: var(--text-muted);
         }
 
         .btn-secondary:hover {
-          background: var(--bg-disabled);
+          background: transparent;
+          border-color: var(--primary);
+          color: var(--text-main);
+        }
+
+        @media (max-width: 920px) {
+          .editor-header {
+            padding: 12px;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .editor-actions {
+            width: 100%;
+          }
+
+          .editor-actions > button {
+            flex: 1;
+          }
+
+          .editor-body {
+            padding: 12px;
+          }
+
+          .form-row {
+            flex-direction: column;
+            gap: 0;
+          }
         }
       `}</style>
     </div>

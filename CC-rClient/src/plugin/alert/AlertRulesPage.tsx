@@ -48,6 +48,9 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
     id: s.id,
     name: s.name,
     status: s.blocked ? 'blocked' : 'ready',
+    ips: s.networkInterfaces.flatMap((network) => network.ips).filter(Boolean),
+    groups: s.groups,
+    tags: s.tags,
   }));
 
   // AlertRuleList handlers
@@ -99,9 +102,9 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
   };
 
   return (
-    <div className="alerts-page-shell">
-      <main className="grid gridAlertsMode alerts-main-grid">
-        <section className="panel alerts-main-panel">
+    <div className="scripts-page-shell">
+      <main className="grid gridScriptsMode scripts-main-grid">
+        <section className="panel scripts-main-panel">
           <AlertRuleList
             rules={rules}
             onEditRule={handleEditRule}
@@ -118,8 +121,8 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
 
       {/* Editor Drawer - slides in from right */}
       {editor.open && (
-        <div className="alerts-layer alerts-layer-drawer" role="dialog" aria-modal="true">
-          <div className="alerts-drawer-panel">
+        <div className="scripts-layer scripts-layer-drawer" role="dialog" aria-modal="true">
+          <div className="scripts-drawer-panel">
             <AlertRuleEditor
               rule={editor.rule ?? undefined}
               targets={targets}
@@ -133,8 +136,8 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
 
       {/* Runner Modal - centered overlay */}
       {runner.open && runner.rule && (
-        <div className="alerts-layer" role="dialog" aria-modal="true">
-          <div className="alerts-modal-panel">
+        <div className="scripts-layer" role="dialog" aria-modal="true">
+          <div className="scripts-modal-panel">
             <AlertRuleRunner
               rule={runner.rule}
               targets={targets}
@@ -165,22 +168,22 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
       )}
 
       <style>{`
-        .alerts-page-shell {
+        .scripts-page-shell {
           position: relative;
           min-height: calc(100vh - 64px - 48px);
         }
 
-        .alerts-main-grid {
+        .scripts-main-grid {
           height: 100%;
         }
 
-        .alerts-main-panel {
+        .scripts-main-panel {
           padding: 0;
           overflow: hidden;
           min-height: calc(100vh - 64px - 48px);
         }
 
-        .alerts-layer {
+        .scripts-layer {
           position: fixed;
           inset: 0;
           background: rgba(11, 25, 44, 0.42);
@@ -192,12 +195,12 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
           padding: 24px;
         }
 
-        .alerts-layer-drawer {
+        .scripts-layer-drawer {
           justify-content: flex-end;
           padding: 0;
         }
 
-        .alerts-drawer-panel {
+        .scripts-drawer-panel {
           width: min(980px, 94vw);
           height: 100vh;
           background: var(--bg-card);
@@ -205,7 +208,7 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
           box-shadow: -18px 0 48px rgba(8, 20, 38, 0.24);
         }
 
-        .alerts-modal-panel {
+        .scripts-modal-panel {
           width: min(1320px, 96vw);
           height: min(90vh, 920px);
           background: var(--bg-card);
@@ -216,19 +219,19 @@ export const AlertRulesPage: React.FC<AlertRulesPageProps> = ({ stations }) => {
         }
 
         @media (max-width: 1024px) {
-          .alerts-layer {
+          .scripts-layer {
             padding: 12px;
           }
 
-          .alerts-layer-drawer {
+          .scripts-layer-drawer {
             padding: 0;
           }
 
-          .alerts-drawer-panel {
+          .scripts-drawer-panel {
             width: 100vw;
           }
 
-          .alerts-modal-panel {
+          .scripts-modal-panel {
             width: 100%;
             height: 100%;
             border-radius: 0;
