@@ -700,11 +700,12 @@ export const BatchTaskRunner: React.FC<BatchTaskRunnerProps> = ({
           <div className="task-info-section">
             <div className="task-name-row">
               <span className="task-type-icon">
+                {task.taskType === 'power_on' && '⚡'}
+                {task.taskType === 'shutdown' && '⏻'}
+                {task.taskType === 'start_app' && '🚀'}
                 {task.taskType === 'command' && '💻'}
+                {task.taskType === 'watch_processes' && '👁'}
                 {task.taskType === 'script' && '📜'}
-                {task.taskType === 'config' && '⚙️'}
-                {task.taskType === 'file_transfer' && '📁'}
-                {task.taskType === 'upgrade' && '⬆️'}
                 {task.taskType === 'reboot' && '🔄'}
               </span>
               <h3>{task.name}</h3>

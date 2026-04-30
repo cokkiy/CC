@@ -2427,7 +2427,9 @@ export default function App() {
         </ScriptProvider>
       ) : activePage === "batch" ? (
         <BatchProvider>
-          <BatchPage stations={stations} />
+          <BatchUIProvider>
+            <BatchPage stations={stations} />
+          </BatchUIProvider>
         </BatchProvider>
       ) : (
         <main className="grid gridSettingsMode">

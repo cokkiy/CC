@@ -48,12 +48,13 @@ const BatchTaskCard: React.FC<BatchTaskCardProps> = ({
 
   const getTaskTypeIcon = (type: BatchTaskType) => {
     const icons: Record<BatchTaskType, string> = {
-      command: '💻',
-      script: '📜',
-      config: '⚙️',
-      file_transfer: '📁',
-      upgrade: '⬆️',
+      power_on: '⚡',
+      shutdown: '⏻',
       reboot: '🔄',
+      start_app: '🚀',
+      command: '💻',
+      watch_processes: '👁',
+      script: '📜',
     };
     return icons[type] || '📄';
   };
@@ -232,12 +233,13 @@ interface BatchTypeFilterProps {
 const BatchTypeFilter: React.FC<BatchTypeFilterProps> = ({ selected, onChange, counts }) => {
   const types: { key: BatchTaskType | 'all'; label: string; icon: string }[] = [
     { key: 'all', label: 'All', icon: '📂' },
-    { key: 'command', label: 'Command', icon: '💻' },
-    { key: 'script', label: 'Script', icon: '📜' },
-    { key: 'config', label: 'Config', icon: '⚙️' },
-    { key: 'file_transfer', label: 'File', icon: '📁' },
-    { key: 'upgrade', label: 'Upgrade', icon: '⬆️' },
+    { key: 'power_on', label: 'Power On', icon: '⚡' },
+    { key: 'shutdown', label: 'Shutdown', icon: '⏻' },
     { key: 'reboot', label: 'Reboot', icon: '🔄' },
+    { key: 'start_app', label: 'Start App', icon: '🚀' },
+    { key: 'command', label: 'Command', icon: '💻' },
+    { key: 'watch_processes', label: 'Watch', icon: '👁' },
+    { key: 'script', label: 'Script', icon: '📜' },
   ];
 
   return (

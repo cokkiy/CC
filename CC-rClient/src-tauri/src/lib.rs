@@ -1,3 +1,10 @@
+use batch_ops::{
+    cancel_batch_execution, delete_batch_task, duplicate_batch_task, execute_batch,
+    execute_batch_task, export_batch_package, get_batch_execution_status, get_batch_history,
+    get_batch_targets, import_batch_package, load_batch_tasks, pause_batch_execution,
+    preview_batch_targets, resume_batch_execution, save_batch_task, toggle_batch_task_favorite,
+    validate_batch_task,
+};
 use control::{execute_station_action, set_station_gathering_interval};
 use models::{
     ActionResult, AppSnapshot, PersistedState, Station, StationAction, StationGroup, TagDefinition,
@@ -19,6 +26,7 @@ pub mod storage;
 pub mod websocket;
 pub mod wol;
 pub mod ws_bridge;
+pub mod batch_ops;
 
 fn normalize_group_color(color: String) -> String {
     let trimmed = color.trim();
@@ -803,6 +811,23 @@ pub fn run() {
             get_station_tags,
             update_station_tags,
             batch_update_station_tags,
+            load_batch_tasks,
+            save_batch_task,
+            delete_batch_task,
+            execute_batch_task,
+            execute_batch,
+            cancel_batch_execution,
+            pause_batch_execution,
+            resume_batch_execution,
+            get_batch_targets,
+            get_batch_execution_status,
+            get_batch_history,
+            validate_batch_task,
+            preview_batch_targets,
+            import_batch_package,
+            export_batch_package,
+            duplicate_batch_task,
+            toggle_batch_task_favorite,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

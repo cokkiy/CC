@@ -42,8 +42,8 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
     id: s.id, 
     name: s.name, 
     status: s.blocked ? 'offline' as const : 'online' as const,
-    group: undefined,
-    tags: undefined,
+    group: s.groups[0],
+    tags: s.tags,
   }));
 
   // BatchTaskList handlers

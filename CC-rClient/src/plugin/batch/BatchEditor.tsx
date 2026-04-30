@@ -567,12 +567,13 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
 
   // Task types
   const taskTypes: { key: BatchTaskType; label: string; icon: string }[] = [
-    { key: 'command', label: 'Command', icon: '💻' },
-    { key: 'script', label: 'Script', icon: '📜' },
-    { key: 'config', label: 'Config', icon: '⚙️' },
-    { key: 'file_transfer', label: 'File Transfer', icon: '📁' },
-    { key: 'upgrade', label: 'Upgrade', icon: '⬆️' },
+    { key: 'power_on', label: 'Power On', icon: '⚡' },
+    { key: 'shutdown', label: 'Shutdown', icon: '⏻' },
     { key: 'reboot', label: 'Reboot', icon: '🔄' },
+    { key: 'start_app', label: 'Start App', icon: '🚀' },
+    { key: 'command', label: 'Command', icon: '💻' },
+    { key: 'watch_processes', label: 'Watch Processes', icon: '👁' },
+    { key: 'script', label: 'Script', icon: '📜' },
   ];
 
   // Validate task
@@ -584,12 +585,14 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       errors.push('Task name is required');
     }
 
-    if (!content.trim()) {
+    const needsContent = taskType === 'command' || taskType === 'script' || taskType === 'watch_processes';
+
+    if (needsContent && !content.trim()) {
       errors.push('Task content is required');
     }
 
-    if (taskType === 'file_transfer' && !content.includes(':')) {
-      warnings.push('File transfer content should specify source:destination paths');
+    if (taskType === 'watch_processes' && content.trim() && !content.includes(',') && !content.includes('\n')) {
+      warnings.push('Multiple watched processes are usually separated by commas or new lines');
     }
 
     return {
@@ -741,12 +744,13 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
             <textarea
               className="content-editor"
               placeholder={
+                taskType === 'power_on' ? 'Wake-on-LAN does not require extra content.' :
+                taskType === 'shutdown' ? 'Shutdown uses the station control RPC and does not require extra content.' :
+                taskType === 'reboot' ? 'Reboot uses the station control RPC and does not require extra content.' :
+                taskType === 'start_app' ? 'Start App uses each station’s configured startup programs.' :
                 taskType === 'command' ? 'Enter command to execute...' :
-                taskType === 'script' ? 'Enter script content...' :
-                taskType === 'config' ? 'Enter configuration content...' :
-                taskType === 'file_transfer' ? 'Enter source:destination paths...' :
-                taskType === 'upgrade' ? 'Enter upgrade package path or command...' :
-                'Enter reboot command or parameters...'
+                taskType === 'watch_processes' ? 'Enter process names separated by commas or new lines...' :
+                'Enter script content...'
               }
               value={content}
               onChange={(e) => setContent(e.target.value)}
