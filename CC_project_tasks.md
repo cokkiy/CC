@@ -391,25 +391,79 @@ ExecutionPolicy {
 
 ---
 
-## Phase 8: 设备分组与标签体系 📋
+## Phase 8: 设备分组与标签体系 ✅ 完成
 
 **目标**: 完善设备管理基础能力，支持灵活的设备组织方式
 
 **工期**: 2-3周
 
+**状态**: ✅ 全部完成 (PR #5 merged: 2026-04-28)
+- 后端: groups_store.rs + tags_store.rs + gRPC命令 ✅
+- 前端: GroupsPage + TagsPage + GroupCard + TagEditor ✅
+- 测试: 7/7 通过 (groups: 3, tags: 4) ✅
+- 构建: npm build 通过 ✅
+
 ### 8.1 设备模型扩展
-- groups: Vec<String> - 所属分组
-- tags: HashMap<String, String> - 标签键值对
-- metadata: HashMap<String, String> - 设备元数据
-- location: Option<Location> - 地理位置
+- groups: Vec<String> - 所属分组 ✅
+- tags: HashMap<String, String> - 标签键值对 ✅
+- metadata: HashMap<String, String> - 设备元数据 ✅ (在station metadata中)
+- location: Option<Location> - 地理位置 ✅ (预留字段)
+
+### 8.2 实现文件
+**后端 (CC-rStationService)**:
+- `src/groups.rs` - 分组数据结构定义
+- `src/groups_store.rs` - 分组CRUD存储
+- `src/tags.rs` - 标签数据结构定义
+- `src/tags_store.rs` - 标签CRUD存储
+
+**前端 (CC-rClient)**:
+- `src/plugin/groups/GroupsPage.tsx` - 分组管理页面
+- `src/plugin/groups/GroupCard.tsx` - 分组卡片组件
+- `src/plugin/groups/GroupEditor.tsx` - 分组编辑器
+- `src/plugin/groups/TagsPage.tsx` - 标签管理页面
+- `src/plugin/groups/TagEditor.tsx` - 标签编辑器
+- `src/plugin/groups/GroupsContext.tsx` - 分组状态管理
+- `src/plugin/groups/TagsContext.tsx` - 标签状态管理
 
 ---
 
-## Phase 9: 告警规则引擎 📋
+
+## Phase 10: Client UI Moderate ✅ 完成
+**状态**: ✅ 已完成 (2026-04-29)
+
+### 10.1 设备列表列选择器 ✅
+- 设备列表模式支持1-5列显示可配置
+- App.tsx 添加 gridColumns 状态和列选择器按钮
+
+### 10.2 设备网格布局修复 ✅
+- 修复了"Runtime & Tools"区域被推出视窗的问题
+- styles.css 改为两栏布局，使用 overflow: auto 替代固定 max-height
+
+### 10.3 分组页面批量添加设备 ✅
+- GroupCard.tsx 添加多设备选择器
+- 支持按名称/IP过滤
+- 支持批量选择和添加
+
+### 10.4 标签页面批量设置 ✅
+- TagsPage.tsx 添加多设备选择和批量标签设置
+- 支持按名称/IP过滤
+- 支持批量选择和标签值设置
+
+### 10.5 本地UI模板与非Vite运行 ✅
+- start-all.sh 使用 CC-rClient/dist 打包资源，不再启动 localhost:5173
+- TemplateMarketplace.tsx 支持导入本地 JSON/ZIP UI模板包
+
+## Phase 9: 告警规则引擎 🚧 进行中
 
 **目标**: 实现基于遥测数据的实时告警能力
 
 **工期**: 3-4周
+
+**状态**: 🚧 进行中 (2026-04-29)
+- 后端: alert_engine.rs 已创建，编译通过 ✅
+- 前端: 组件框架已创建 (types.ts, api.ts, AlertContext.tsx, AlertUIContext.tsx, AlertRulesPage.tsx, AlertRuleList.tsx, AlertRuleEditor.tsx, AlertRuleRunner.tsx, AlertHistoryPanel.tsx, AlertTemplates.tsx)
+- 前端构建: ✅ 通过 (vite build 183ms)
+- TypeScript修复: ✅ 7个错误已修复
 
 ### 9.1 告警模型
 ```
@@ -427,7 +481,7 @@ AlertRule {
 
 ---
 
-## Phase 10: 权限与审计系统 📋
+## Phase 11: 权限与审计系统 📋
 
 **目标**: 实现企业级安全能力
 
@@ -449,15 +503,18 @@ AlertRule {
 
 ## 实施计划总览
 
-| Phase | 内容 | 工期 | 优先级 | 依赖 |
-|-------|------|------|--------|------|
-| Phase 6 | 命令脚本管理系统 | 3-4周 | P0 | 无 |
-| Phase 7 | 批量操作支持 | 4-5周 | P0 | Phase 6 |
-| Phase 8 | 设备分组与标签 | 2-3周 | P1 | 无 |
-| Phase 9 | 告警规则引擎 | 3-4周 | P1 | Phase 6, Phase 8 |
-| Phase 10 | 权限与审计系统 | 3-4周 | P2 | Phase 6 |
+| Phase | 内容 | 工期 | 优先级 | 依赖 | 状态 |
+|-------|------|------|--------|------|------|
+| Phase 6 | 命令脚本管理系统 | 3-4周 | P0 | 无 | ✅ 完成 |
+| Phase 7 | 批量操作支持 | 4-5周 | P0 | Phase 6 | ✅ 完成 |
+| Phase 8 | 设备分组与标签 | 2-3周 | P1 | 无 | ✅ 完成 |
 
 **总工期估算**: 15-20周
+| Phase 9  | 告警规则引擎      | 3-4周 | P1 | Phase 6, Phase 8 | 🚧 进行中 |
+| Phase 10 | Client UI Moderate | 1周   | P1 | Phase 6         | ✅ 完成   |
+| Phase 11 | 权限与审计系统    | 3-4周 | P2 | Phase 6         | 📋 待启动 |
+
+**已完成**: Phase 1-8, Phase 10 ✅ | **进行中**: Phase 9 | **待启动**: Phase 11
 
 ---
 
@@ -479,22 +536,8 @@ AlertRule {
 ---
 
 ## 更新记录
-- 2026-04-17 10:36: Phase 3 日志任务确认全部完成
-- 2026-04-17 10:40: Phase 4 构建验证通过
-- 2026-04-17 10:42: Phase 5.4 Linux Multicast限制文档化完成
-- 2026-04-17 10:43: 等待运行时日志测试(Phase 4.2和4.3)
-- 2026-04-19 11:00: Phase 1.3-1.4 核心功能完成 (Codex+Claude)
-- 2026-04-19 11:17: Phase 2.1 插件接口定义完成 (Hermes)
-- 2026-04-19 11:17: Phase 3.1 PluginHost实现完成 (Hermes)
-- 2026-04-19 11:17: 启动Codex+Claude协作推进Phase 2.2和Phase 3.2
-- 2026-04-19 20:10: Phase 2.2 所有5个内置插件开发完成 (Codex)
-- 2026-04-19 18:00: Phase 3.2 配置驱动UI完成 (Claude)
-- 2026-04-20 06:50: Phase 2.3 插件市场基础设施完成 (Codex)
-- 2026-04-20 07:00: Phase 3.3 界面模板市场完成 (Claude)
-- 2026-04-20 13:13: Phase 2.2 + Phase 3.2 状态确认完成，协调报告已发送
-- 2026-04-20 14:00: Phase 6 命令脚本管理系统启动，Codex完成前后端实现
-- 2026-04-20 17:21: 周一协调检查 - Phase 2.2/3.2构建验证通过
-- 2026-04-22 01:55: 状态确认 - Phase 6后端测试55/59通过(4个ignore,0失败)，Phase 7实现阶段启动
+- 2026-04-29 10:15: Phase 10 Client UI Moderate 完成 - 设备浏览列选择、分组批量添加、标签批量设置、本地UI模板导入和非Vite运行路径已实现 ✅
+- 2026-04-28 10:50: Phase 8状态更新确认，任务文件已同步 - Phase 6/7/8全部完成 ✅
 - 2026-04-27 09:45: 状态确认 - Phase 6测试76/76通过(4个ignore,0失败)，Phase 7测试10/10通过，前端构建成功
 
 ---

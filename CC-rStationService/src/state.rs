@@ -105,6 +105,10 @@ impl AppState {
         self.config.mqtt.enabled && self.config.mqtt.telemetry_enabled
     }
 
+    pub fn mqtt_status_enabled(&self) -> bool {
+        self.config.mqtt.enabled && self.config.mqtt.status_enabled
+    }
+
     pub fn listen_addr(&self) -> Result<SocketAddr> {
         self.config
             .control

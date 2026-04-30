@@ -218,6 +218,7 @@ qttools.pro.user.*
 *.qm
 #exclude path
 /.vs
+logs/iot-sim/
 /.svn
 **/.moc
 **/x64

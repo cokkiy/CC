@@ -9,7 +9,7 @@
 #   4. CC-rClient (Tauri frontend application)
 #
 # Usage: ./start-all.sh [debug|release] [--status]
-#   Default mode: debug
+#   Default mode: release
 #   Press Ctrl+C to stop all components
 # =================================================================
 
@@ -26,8 +26,8 @@ NC='\033[0m' # No Color
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Build mode (default: debug)
-BUILD_MODE="debug"
+# Build mode (default: release)
+BUILD_MODE="release"
 
 # Binaries (resolved by mode)
 STATIONSERVICE_BIN=""
@@ -38,19 +38,17 @@ CLIENT_BIN=""
 LOG_DIR="$REPO_DIR/logs"
 STATIONSERVICE_LOG="$LOG_DIR/rstationservice.log"
 AGGREGATOR_LOG="$LOG_DIR/aggregator.log"
-VITE_LOG="$LOG_DIR/vite.log"
 CLIENT_LOG="$LOG_DIR/rclient.log"
+IOT_SIM_COMPOSE_FILE="$LOG_DIR/iot-sim/docker-compose.generated.yml"
 
 # Ports
 MQTT_PORT=1883
 STATIONSERVICE_PORT=50051
 AGGREGATOR_PORT=8080
-VITE_PORT=5173
 
 # PIDs (empty means not started by this script)
 STATIONSERVICE_PID=""
 AGGREGATOR_PID=""
-VITE_PID=""
 CLIENT_PID=""
 
 # =================================================================
@@ -91,6 +89,14 @@ is_mosquitto_running() {
     docker ps --filter "name=mosquitto" --filter "status=running" -q | grep -q .
 }
 
+is_iot_sim_running() {
+    if [[ ! -f "$IOT_SIM_COMPOSE_FILE" ]]; then
+        return 1
+    fi
+
+    docker compose -p "cc-iot-sim" -f "$IOT_SIM_COMPOSE_FILE" ps --status running --services 2>/dev/null | grep -q .
+}
+
 # Check if a process with a specific PID is running
 is_process_running() {
     local pid=$1
@@ -102,6 +108,21 @@ configure_binary_paths() {
     STATIONSERVICE_BIN="$REPO_DIR/CC-rStationService/target/$BUILD_MODE/cc-rstationservice"
     AGGREGATOR_BIN="$REPO_DIR/CC-Aggregator/target/$BUILD_MODE/cc-aggregator"
     CLIENT_BIN="$REPO_DIR/CC-rClient/src-tauri/target/$BUILD_MODE/cc-rclient"
+}
+
+print_stop_commands() {
+    echo "Stop command:"
+    echo "  - ./scripts/stop-all.sh"
+
+    if is_iot_sim_running; then
+        echo "  - ./scripts/stop-all.sh --iot-sim"
+
+        if is_mosquitto_running; then
+            echo "  - ./scripts/stop-all.sh --iot-sim --broker"
+        fi
+    elif is_mosquitto_running; then
+        echo "  - ./scripts/stop-all.sh --broker"
+    fi
 }
 
 parse_args() {
@@ -118,8 +139,8 @@ parse_args() {
                 echo "Usage: ./start-all.sh [debug|release] [--status]"
                 echo ""
                 echo "Options:"
-                echo "  debug      Run debug binaries (default)"
-                echo "  release    Run release binaries"
+                echo "  debug      Run debug binaries"
+                echo "  release    Run release binaries (default)"
                 echo "  --status   Show component status and exit"
                 echo "  -h, --help Show this help message"
                 exit 0
@@ -286,44 +307,44 @@ start_aggregator() {
 
 start_client() {
     if [[ "$BUILD_MODE" == "debug" ]]; then
-        log_info "Starting Vite frontend dev server..."
-    else
-        log_info "Release mode detected, skipping Vite dev server"
-    fi
+        log_info "Starting CC-rClient with npm run tauri:dev..."
 
-    # Check if binary exists
-    if [[ ! -x "$CLIENT_BIN" ]]; then
-        log_error "CC-rClient binary not found or not executable: $CLIENT_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-rClient/src-tauri && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
+        mkdir -p "$LOG_DIR"
+        cd "$REPO_DIR/CC-rClient"
+        if [[ ! -d node_modules ]]; then
+            log_info "Installing CC-rClient npm dependencies..."
+            npm install
+        fi
+
+        npm run tauri:dev >"$CLIENT_LOG" 2>&1 &
+        CLIENT_PID=$!
+
+        sleep 5
+        if is_process_running "$CLIENT_PID"; then
+            log_success "CC-rClient dev runner started (PID: $CLIENT_PID)"
+            log_info "  Log file: $CLIENT_LOG"
+            return 0
+        fi
+
+        log_error "CC-rClient dev runner failed to start. Check log: $CLIENT_LOG"
         return 1
     fi
 
-    # Create log directory
+    log_info "Building CC-rClient release bundle with npm run tauri:build..."
     mkdir -p "$LOG_DIR"
+    cd "$REPO_DIR/CC-rClient"
+    if [[ ! -d node_modules ]]; then
+        log_info "Installing CC-rClient npm dependencies..."
+        npm install
+    fi
+    npm run tauri:build
 
-    if [[ "$BUILD_MODE" == "debug" ]]; then
-        # Debug binary loads frontend from localhost:5173
-        cd "$REPO_DIR/CC-rClient"
-        nohup npm run dev >"$VITE_LOG" 2>&1 &
-        VITE_PID=$!
-
-        # Wait for Vite to be ready
-        for i in $(seq 1 30); do
-            if is_port_listening $VITE_PORT; then
-                log_success "Vite dev server ready (PID: $VITE_PID, port $VITE_PORT)"
-                break
-            fi
-            sleep 0.5
-            if [[ $i -eq 30 ]]; then
-                log_error "Vite dev server failed to start. Check log: $VITE_LOG"
-                return 1
-            fi
-        done
+    if [[ ! -x "$CLIENT_BIN" ]]; then
+        log_error "CC-rClient binary not found or not executable after npm run tauri:build: $CLIENT_BIN"
+        return 1
     fi
 
-    log_info "Starting CC-rClient (Tauri application)..."
-
-    # Start the Tauri application
+    log_info "Starting CC-rClient release binary..."
     "$CLIENT_BIN" >"$CLIENT_LOG" 2>&1 &
     CLIENT_PID=$!
 
@@ -361,15 +382,6 @@ stop_aggregator() {
     fi
 }
 
-stop_vite() {
-    if [[ -n "$VITE_PID" ]] && is_process_running "$VITE_PID"; then
-        log_info "Stopping Vite dev server (PID: $VITE_PID)..."
-        kill "$VITE_PID" 2>/dev/null || true
-        wait "$VITE_PID" 2>/dev/null || true
-        log_success "Vite dev server stopped"
-    fi
-}
-
 stop_client() {
     if [[ -n "$CLIENT_PID" ]] && is_process_running "$CLIENT_PID"; then
         log_info "Stopping CC-rClient (PID: $CLIENT_PID)..."
@@ -389,7 +401,6 @@ cleanup() {
     
     # Stop in reverse order
     stop_client
-    stop_vite
     stop_aggregator
     stop_stationservice
     
@@ -434,7 +445,6 @@ show_status() {
     echo "Log files:"
     echo "  StationService: $STATIONSERVICE_LOG"
     echo "  Aggregator:     $AGGREGATOR_LOG"
-    echo "  Vite:           $VITE_LOG"
     echo "  Client:         $CLIENT_LOG"
     echo "=========================================="
 }
@@ -509,14 +519,14 @@ main() {
     echo "  - Mosquitto:     localhost:$MQTT_PORT (MQTT)"
     echo "  - StationService: localhost:$STATIONSERVICE_PORT (gRPC control)"
     echo "  - Aggregator:    localhost:$AGGREGATOR_PORT (WebSocket)"
-    echo "  - Vite:          localhost:$VITE_PORT (frontend dev server)"
-    echo "  - Client:        Tauri GUI window"
+    echo "  - Client:        Tauri GUI window (bundled CC-rClient/dist assets)"
     echo ""
     echo "Log files:"
     echo "  - StationService: $STATIONSERVICE_LOG"
     echo "  - Aggregator:     $AGGREGATOR_LOG"
-    echo "  - Vite:           $VITE_LOG"
     echo "  - Client:         $CLIENT_LOG"
+    echo ""
+    print_stop_commands
     echo ""
     echo "Press Ctrl+C to stop all components."
     echo "=========================================="

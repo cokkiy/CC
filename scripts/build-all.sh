@@ -87,22 +87,17 @@ build_rust_project() {
 }
 
 build_client() {
-  log_info "Building CC-rClient frontend (${MODE})..."
+  log_info "Building CC-rClient Tauri app (${MODE})..."
 
   pushd "$CLIENT_DIR" >/dev/null
   if [[ ! -d node_modules ]]; then
     log_info "Installing CC-rClient npm dependencies..."
     npm install
   fi
-  npm run build
-  popd >/dev/null
-
-  log_info "Building CC-rClient tauri binary (${MODE})..."
-  pushd "$CLIENT_TAURI_DIR" >/dev/null
   if [[ "$MODE" == "release" ]]; then
-    cargo build --release
+    npm run tauri:build
   else
-    cargo build
+    npm run tauri:build:debug
   fi
   popd >/dev/null
 

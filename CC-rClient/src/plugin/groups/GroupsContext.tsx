@@ -34,6 +34,7 @@ interface GroupsContextValue extends GroupsContextState {
   // Station membership
   addStationToGroup: (groupId: string, stationId: string) => Promise<void>;
   removeStationFromGroup: (groupId: string, stationId: string) => Promise<void>;
+  batchAddStationsToGroup: (groupId: string, stationIds: string[]) => Promise<void>;
 
   // Selection
   selectGroup: (group: StationGroup | null) => void;
@@ -116,6 +117,32 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
     await loadGroups();
   }, [loadGroups]);
 
+  const batchAddStationsToGroup = useCallback(async (groupId: string, stationIds: string[]) => {
+    const MAX_CONCURRENT_ADDS = 10;
+    const failedStationIds: string[] = [];
+
+    for (let i = 0; i < stationIds.length; i += MAX_CONCURRENT_ADDS) {
+      const stationIdsChunk = stationIds.slice(i, i + MAX_CONCURRENT_ADDS);
+      const results = await Promise.allSettled(
+        stationIdsChunk.map(stationId => groupsApi.addStationToGroup(groupId, stationId))
+      );
+
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          failedStationIds.push(stationIdsChunk[index]);
+        }
+      });
+    }
+
+    await loadGroups();
+
+    if (failedStationIds.length > 0) {
+      throw new Error(
+        `Failed to add ${failedStationIds.length} station(s) to the group: ${failedStationIds.join(', ')}`
+      );
+    }
+  }, [loadGroups]);
+
   const selectGroup = useCallback((group: StationGroup | null) => {
     setState(prev => ({ ...prev, selectedGroup: group }));
   }, []);
@@ -188,6 +215,7 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
     deleteGroup,
     addStationToGroup,
     removeStationFromGroup,
+    batchAddStationsToGroup,
     selectGroup,
     filterGroups,
     importGroups,

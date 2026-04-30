@@ -22,6 +22,7 @@ cd ~/CC/scripts
 
 ```bash
 ./start-all.sh --status
+./stop-all.sh --status
 ```
 
 ### 一键检查 MQTT 遥测链路
@@ -40,7 +41,28 @@ cd ~/CC/scripts
 
 ### 停止所有组件
 
-在运行脚本的终端按 `Ctrl+C` 即可停止所有组件。
+```bash
+./stop-all.sh
+```
+
+默认仅停止由 `start-all.sh` 启动的宿主机组件：
+
+- `CC-rClient`
+- `Vite` 开发服务器
+- `CC-Aggregator`
+- `CC-rStationService`
+
+可选参数：
+
+```bash
+# 连同 IoT 模拟容器一起停止
+./stop-all.sh --iot-sim
+
+# 连同 mosquitto 容器一起停止
+./stop-all.sh --broker
+```
+
+在运行 `start-all.sh` 的终端按 `Ctrl+C` 也可以停止其当前会话启动的组件。
 
 ## 组件说明
 
@@ -144,7 +166,7 @@ A: 组件之间有依赖关系：
 
 **Q: 如何重启某个组件？**
 
-A: 先用 Ctrl+C 停止所有组件，然后重新运行 `./start-all.sh`。
+A: 先运行 `./stop-all.sh`，再重新运行 `./start-all.sh`。如果还启用了 IoT 模拟，可追加 `./stop-all.sh --iot-sim`。
 
 **Q: 脚本能否在后台运行？**
 

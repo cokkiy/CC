@@ -44,6 +44,29 @@ Desktop agent:
 
 - Linux install artifacts: `packaging/linux`
 - Windows install artifacts: `packaging/windows`
+- Docker IoT simulation image: `packaging/docker/Dockerfile.iot-sim`
+
+## IoT simulation container
+
+Build and start simulated devices from the repo root:
+
+```bash
+./scripts/start-iot-sim.sh 10
+```
+
+The launcher builds a minimal runtime image for `cc-rstationservice`, starts a Mosquitto
+broker, and launches headless stations such as `iot-001`, `iot-002`, and `iot-003`.
+It packages a host-built `cc-rstationservice` binary into the image, so Docker does not
+recompile the Rust project on every simulator startup.
+If `1883` is already taken, the script automatically reuses the existing host broker.
+
+Useful commands:
+
+```bash
+./scripts/start-iot-sim.sh --status
+./scripts/start-iot-sim.sh --stop
+./scripts/start-iot-sim.sh 10 --dry-run
+```
 
 ## Smoke test
 
