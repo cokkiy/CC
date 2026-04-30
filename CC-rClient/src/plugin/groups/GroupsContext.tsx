@@ -118,11 +118,29 @@ export function GroupsProvider({ children }: { children: React.ReactNode }) {
   }, [loadGroups]);
 
   const batchAddStationsToGroup = useCallback(async (groupId: string, stationIds: string[]) => {
-    // Add all stations in parallel for efficiency
-    await Promise.all(
-      stationIds.map(stationId => groupsApi.addStationToGroup(groupId, stationId))
-    );
+    const MAX_CONCURRENT_ADDS = 10;
+    const failedStationIds: string[] = [];
+
+    for (let i = 0; i < stationIds.length; i += MAX_CONCURRENT_ADDS) {
+      const stationIdsChunk = stationIds.slice(i, i + MAX_CONCURRENT_ADDS);
+      const results = await Promise.allSettled(
+        stationIdsChunk.map(stationId => groupsApi.addStationToGroup(groupId, stationId))
+      );
+
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          failedStationIds.push(stationIdsChunk[index]);
+        }
+      });
+    }
+
     await loadGroups();
+
+    if (failedStationIds.length > 0) {
+      throw new Error(
+        `Failed to add ${failedStationIds.length} station(s) to the group: ${failedStationIds.join(', ')}`
+      );
+    }
   }, [loadGroups]);
 
   const selectGroup = useCallback((group: StationGroup | null) => {
