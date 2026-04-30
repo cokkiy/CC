@@ -123,15 +123,35 @@ impl AlertCondition {
         self.matches_pattern(metric_name)
     }
 
+    /// Get a cached compiled regex for a wildcard metric pattern.
+    fn cached_metric_regex(pattern: &str) -> Option<regex::Regex> {
+        static REGEX_CACHE: std::sync::OnceLock<
+            std::sync::RwLock<HashMap<String, regex::Regex>>,
+        > = std::sync::OnceLock::new();
+
+        let cache = REGEX_CACHE.get_or_init(|| std::sync::RwLock::new(HashMap::new()));
+
+        if let Ok(cache) = cache.read() {
+            if let Some(re) = cache.get(pattern) {
+                return Some(re.clone());
+            }
+        }
+
+        let regex_pattern = pattern.replace('*', ".*").replace('?', ".");
+        let compiled = regex::Regex::new(&format!("^{}$", regex_pattern)).ok()?;
+
+        if let Ok(mut cache) = cache.write() {
+            cache.insert(pattern.to_string(), compiled.clone());
+        }
+
+        Some(compiled)
+    }
+
     /// Check if metric name matches the pattern (supports * wildcard)
     fn matches_pattern(&self, metric_name: &str) -> bool {
         let pattern = &self.metric_name;
         if pattern.contains('*') {
-            // Convert wildcard pattern to regex-like matching
-            let regex_pattern = pattern
-                .replace('*', ".*")
-                .replace('?', ".");
-            regex::Regex::new(&format!("^{}$", regex_pattern))
+            Self::cached_metric_regex(pattern)
                 .map(|re| re.is_match(metric_name))
                 .unwrap_or(false)
         } else {
