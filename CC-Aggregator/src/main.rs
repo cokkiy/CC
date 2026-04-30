@@ -95,8 +95,8 @@ async fn main() -> Result<()> {
             loop {
                 match receiver.recv().await {
                     Some(msg) => {
-                        if mqtt_broadcast_tx.send(msg).is_err() {
-                            info!("No active MQTT broadcast receivers");
+                        if mqtt_broadcast_tx.receiver_count() > 0 {
+                            let _ = mqtt_broadcast_tx.send(msg);
                         }
                     }
                     None => {
