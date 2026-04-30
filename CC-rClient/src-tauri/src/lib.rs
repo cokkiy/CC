@@ -1,3 +1,9 @@
+use alert_ops::{
+    acknowledge_alert, append_alert_history, delete_alert_rule, duplicate_alert_rule,
+    export_alert_rules, get_alert_available_targets, get_alert_history, get_alert_stats,
+    get_alert_templates, import_alert_rules, load_alert_rules, preview_alert_targets,
+    resolve_alert, save_alert_rule, toggle_alert_rule, validate_alert_rule,
+};
 use batch_ops::{
     cancel_batch_execution, delete_batch_task, duplicate_batch_task, execute_batch,
     execute_batch_task, export_batch_package, get_batch_execution_status, get_batch_history,
@@ -27,6 +33,7 @@ pub mod websocket;
 pub mod wol;
 pub mod ws_bridge;
 pub mod batch_ops;
+pub mod alert_ops;
 
 fn normalize_group_color(color: String) -> String {
     let trimmed = color.trim();
@@ -828,6 +835,22 @@ pub fn run() {
             export_batch_package,
             duplicate_batch_task,
             toggle_batch_task_favorite,
+            load_alert_rules,
+            save_alert_rule,
+            delete_alert_rule,
+            toggle_alert_rule,
+            duplicate_alert_rule,
+            get_alert_history,
+            get_alert_stats,
+            validate_alert_rule,
+            preview_alert_targets,
+            import_alert_rules,
+            export_alert_rules,
+            acknowledge_alert,
+            resolve_alert,
+            get_alert_templates,
+            get_alert_available_targets,
+            append_alert_history,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
