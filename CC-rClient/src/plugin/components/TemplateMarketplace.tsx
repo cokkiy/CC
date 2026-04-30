@@ -1660,20 +1660,74 @@ function readUInt32(view: DataView, offset: number) {
   return view.getUint32(offset, true);
 }
 
+const MAX_ZIP_ENTRY_COMPRESSED_BYTES = 5 * 1024 * 1024;
+const MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES = 20 * 1024 * 1024;
+
+function assertZipCompressedSize(bytes: Uint8Array): void {
+  if (bytes.byteLength > MAX_ZIP_ENTRY_COMPRESSED_BYTES) {
+    throw new Error(`ZIP entry exceeds compressed size limit of ${MAX_ZIP_ENTRY_COMPRESSED_BYTES} bytes`);
+  }
+}
+
+async function readStreamWithLimit(stream: ReadableStream<Uint8Array>, maxBytes: number): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      if (!value || value.byteLength === 0) {
+        continue;
+      }
+
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        throw new Error(`ZIP entry exceeds uncompressed size limit of ${maxBytes} bytes`);
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const result = new Uint8Array(totalBytes);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return result;
+}
+
 async function inflateDeflateRaw(bytes: Uint8Array): Promise<Uint8Array> {
   if (typeof DecompressionStream === 'undefined') {
     throw new Error('ZIP deflate import is not supported in this runtime');
   }
 
+  assertZipCompressedSize(bytes);
+
   const normalizedBytes = new Uint8Array(bytes.byteLength);
   normalizedBytes.set(bytes);
   const decompressed = new Blob([normalizedBytes.buffer]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-  const buffer = await new Response(decompressed).arrayBuffer();
-  return new Uint8Array(buffer);
+  return readStreamWithLimit(decompressed, MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES);
 }
 
 async function inflateZipEntry(entry: ZipEntry): Promise<Uint8Array> {
+  assertZipCompressedSize(entry.compressedData);
+
   if (entry.compressionMethod === 0) {
+    if (entry.compressedData.byteLength > MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES) {
+      throw new Error(`ZIP entry exceeds uncompressed size limit of ${MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES} bytes`);
+    }
     return entry.compressedData;
   }
 
