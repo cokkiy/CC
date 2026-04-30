@@ -306,42 +306,45 @@ start_aggregator() {
 }
 
 start_client() {
-    log_info "Using bundled frontend assets from CC-rClient/dist"
+    if [[ "$BUILD_MODE" == "debug" ]]; then
+        log_info "Starting CC-rClient with npm run tauri:dev..."
 
-    if [[ ! -f "$REPO_DIR/CC-rClient/dist/index.html" ]]; then
-        log_info "Bundled frontend assets are missing. Building CC-rClient/dist..."
+        mkdir -p "$LOG_DIR"
         cd "$REPO_DIR/CC-rClient"
-        npm run build
-    fi
-
-    # Check if binary exists
-    if [[ ! -x "$CLIENT_BIN" ]]; then
-        log_error "CC-rClient binary not found or not executable: $CLIENT_BIN"
-        log_info "Building CC-rClient $BUILD_MODE binary..."
-        cd "$REPO_DIR/CC-rClient/src-tauri"
-        if [[ "$BUILD_MODE" == "release" ]]; then
-            cargo build --release
-        else
-            cargo build
+        if [[ ! -d node_modules ]]; then
+            log_info "Installing CC-rClient npm dependencies..."
+            npm install
         fi
+
+        npm run tauri:dev >"$CLIENT_LOG" 2>&1 &
+        CLIENT_PID=$!
+
+        sleep 5
+        if is_process_running "$CLIENT_PID"; then
+            log_success "CC-rClient dev runner started (PID: $CLIENT_PID)"
+            log_info "  Log file: $CLIENT_LOG"
+            return 0
+        fi
+
+        log_error "CC-rClient dev runner failed to start. Check log: $CLIENT_LOG"
+        return 1
     fi
 
-    # Create log directory
+    log_info "Building CC-rClient release bundle with npm run tauri:build..."
     mkdir -p "$LOG_DIR"
+    cd "$REPO_DIR/CC-rClient"
+    if [[ ! -d node_modules ]]; then
+        log_info "Installing CC-rClient npm dependencies..."
+        npm install
+    fi
+    npm run tauri:build
 
-    if [[ "$REPO_DIR/CC-rClient/dist/index.html" -nt "$CLIENT_BIN" ]]; then
-        log_info "Frontend assets are newer than CC-rClient binary. Rebuilding bundled binary..."
-        cd "$REPO_DIR/CC-rClient/src-tauri"
-        if [[ "$BUILD_MODE" == "release" ]]; then
-            cargo build --release
-        else
-            cargo build
-        fi
+    if [[ ! -x "$CLIENT_BIN" ]]; then
+        log_error "CC-rClient binary not found or not executable after npm run tauri:build: $CLIENT_BIN"
+        return 1
     fi
 
-    log_info "Starting CC-rClient (Tauri application)..."
-
-    # Start the Tauri application
+    log_info "Starting CC-rClient release binary..."
     "$CLIENT_BIN" >"$CLIENT_LOG" 2>&1 &
     CLIENT_PID=$!
 
