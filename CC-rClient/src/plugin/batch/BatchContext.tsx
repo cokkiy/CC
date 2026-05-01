@@ -115,7 +115,16 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
     const result = await batchApi.saveTask(task);
     setState(prev => ({
       ...prev,
-      tasks: prev.tasks.filter(t => t.id !== result.id).concat(result),
+      tasks: (() => {
+        const index = prev.tasks.findIndex(t => t.id === result.id);
+        if (index === -1) {
+          return prev.tasks.concat(result);
+        }
+
+        const next = [...prev.tasks];
+        next[index] = result;
+        return next;
+      })(),
     }));
     return result;
   }, []);

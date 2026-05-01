@@ -6,8 +6,8 @@
 import React, { useEffect, useState } from 'react';
 import { useBatch } from './BatchContext';
 import { useBatchUI } from './BatchUIContext';
-import { BatchTaskList, BatchTaskEditor, BatchTaskRunner } from './index';
-import type { BatchTask, BatchTarget, BatchTaskFilter, BatchTaskImportResult, BatchTaskPackage } from './types';
+import { BatchTaskList, BatchTaskEditor } from './index';
+import type { BatchTask, BatchTarget } from './types';
 import { scriptHost } from '../script/ScriptHost';
 import type { CommandScript } from '../script/types';
 import { groupsApi } from '../groups/api';
@@ -27,19 +27,15 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
     deleteTask,
     duplicateTask,
     toggleFavorite,
-    executeTask,
-    cancelExecution,
     importTasks,
     exportTasks,
   } = useBatch();
 
   const { 
     editor,
-    runner,
     openEditor,
     closeEditor,
     openRunner,
-    closeRunner,
   } = useBatchUI();
 
   useEffect(() => {
@@ -102,6 +98,13 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
     await toggleFavorite(taskId);
   };
 
+  const handleToggleToolbarPin = async (task: BatchTask) => {
+    await saveTask({
+      ...task,
+      showInToolbar: !(task.showInToolbar ?? false),
+    });
+  };
+
   const handleDuplicateTask = async (task: BatchTask) => {
     await duplicateTask(task.id);
   };
@@ -116,15 +119,6 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
     closeEditor();
   };
 
-  // BatchTaskRunner handlers
-  const handleRunBatch = async (taskId: string, targetIds: string[], parameters?: Record<string, string>) => {
-    return executeTask(taskId, targetIds, parameters);
-  };
-
-  const handleCancelRun = () => {
-    closeRunner();
-  };
-
   return (
     <div className="scripts-page-shell">
       <main className="grid gridScriptsMode scripts-main-grid">
@@ -136,6 +130,7 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
             onExecuteTask={handleExecuteTask}
             onDeleteTask={handleDeleteTask}
             onToggleFavorite={handleToggleFavorite}
+            onToggleToolbarPin={handleToggleToolbarPin}
             onDuplicateTask={handleDuplicateTask}
           />
         </section>
@@ -151,19 +146,6 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
               scripts={scripts}
               onSave={handleSaveTask}
               onCancel={handleCancelEdit}
-            />
-          </div>
-        </div>
-      )}
-
-      {runner.open && runner.task && (
-        <div className="scripts-layer" role="dialog" aria-modal="true">
-          <div className="scripts-modal-panel">
-            <BatchTaskRunner
-              task={runner.task}
-              targets={targets}
-              onExecute={handleRunBatch}
-              onCancel={handleCancelRun}
             />
           </div>
         </div>
@@ -233,37 +215,6 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
           overflow: hidden;
         }
 
-        .scripts-modal-panel {
-          width: min(1320px, 96vw);
-          height: min(90vh, 920px);
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 14px;
-          box-shadow: 0 22px 56px rgba(8, 20, 38, 0.24);
-          overflow: hidden;
-        }
-
-        .scripts-modal-panel .batch-task-runner.modal-overlay {
-          position: static;
-          inset: auto;
-          background: transparent;
-          padding: 0;
-          height: 100%;
-          display: flex;
-        }
-
-        .scripts-modal-panel .batch-task-runner .modal-content.runner-modal {
-          width: 100%;
-          max-width: none;
-          max-height: none;
-          height: 100%;
-          margin: 0;
-          border: none;
-          border-radius: 0;
-          box-shadow: none;
-          overflow: hidden;
-        }
-
         @media (max-width: 1024px) {
           .scripts-layer {
             padding: 12px;
@@ -275,12 +226,6 @@ export const BatchPage: React.FC<BatchPageProps> = ({ stations }) => {
 
           .scripts-drawer-panel {
             width: 100vw;
-          }
-
-          .scripts-modal-panel {
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
           }
         }
       `}</style>

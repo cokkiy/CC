@@ -64,7 +64,7 @@ CC (Central Control) is a unified management platform for workstations and IoT d
 ### Operations Features
 
 - **Script Management** - Create, edit, filter, and execute reusable shell scripts
-- **Batch Task Management** - Create reusable batch tasks, select saved scripts, run tasks against saved targets, and inspect execution results
+- **Batch Task Management** - Create reusable batch tasks, pin frequently used tasks to the main toolbar, select saved scripts, run tasks against saved targets, and inspect execution results
 - **Alert Rule Management** - Create alert rules from templates, execute rule checks, and review alert history
 
 ### Plugin System (5 Built-in Plugins)

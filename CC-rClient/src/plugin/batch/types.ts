@@ -103,6 +103,7 @@ export interface BatchTask {
   usageCount: number;
   lastRunAt?: string;
   isFavorite?: boolean;
+  showInToolbar?: boolean;
   tags?: string[];
 }
 
