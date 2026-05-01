@@ -87,6 +87,8 @@ pub struct BatchTask {
     #[serde(default)]
     pub is_favorite: bool,
     #[serde(default)]
+    pub show_in_toolbar: bool,
+    #[serde(default)]
     pub tags: Vec<String>,
 }
 
@@ -109,6 +111,7 @@ pub struct BatchTaskDraft {
     pub usage_count: Option<u64>,
     pub last_run_at: Option<String>,
     pub is_favorite: Option<bool>,
+    pub show_in_toolbar: Option<bool>,
     pub tags: Option<Vec<String>>,
 }
 
@@ -369,6 +372,10 @@ fn normalize_task(task: BatchTaskDraft, existing: Option<&BatchTask>) -> BatchTa
         is_favorite: task
             .is_favorite
             .or_else(|| base.as_ref().map(|item| item.is_favorite))
+            .unwrap_or(false),
+        show_in_toolbar: task
+            .show_in_toolbar
+            .or_else(|| base.as_ref().map(|item| item.show_in_toolbar))
             .unwrap_or(false),
         tags: task
             .tags
@@ -879,6 +886,7 @@ pub fn duplicate_batch_task(task_id: String) -> Result<SaveBatchTaskResult, Stri
         id: Uuid::new_v4().to_string(),
         name: format!("{} (Copy)", original.name),
         is_favorite: false,
+        show_in_toolbar: false,
         created_at: now_iso(),
         updated_at: now_iso(),
         usage_count: 0,
@@ -1011,6 +1019,7 @@ pub async fn execute_batch(
         usage_count: 0,
         last_run_at: None,
         is_favorite: false,
+        show_in_toolbar: false,
         tags: Vec::new(),
     };
     let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
@@ -1143,4 +1152,59 @@ pub fn export_batch_package(
         signature: None,
     };
     Ok(HashMap::from([("package", package)]))
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::{normalize_task, BatchTask, BatchTaskDraft};
+
+    #[test]
+    fn batch_task_defaults_show_in_toolbar_when_missing() {
+        let parsed: BatchTask = serde_json::from_value(json!({
+            "id": "task-1",
+            "name": "Legacy task",
+            "description": "missing the new toolbar field",
+            "taskType": "command",
+            "targetSelector": { "selectorType": "all" },
+            "content": "hostname",
+            "parameters": [],
+            "executionPolicy": {
+                "mode": "parallel",
+                "batchSize": 5,
+                "continueOnFailure": true,
+                "failureThresholdPercent": 50,
+                "timeoutSecs": 300,
+                "retryCount": 0,
+                "retryDelaySecs": 5
+            },
+            "createdBy": "tester",
+            "createdAt": "2026-05-01T00:00:00Z",
+            "updatedAt": "2026-05-01T00:00:00Z",
+            "status": "draft",
+            "version": 1,
+            "usageCount": 0,
+            "lastRunAt": null,
+            "isFavorite": false,
+            "tags": []
+        }))
+        .unwrap();
+
+        assert!(!parsed.show_in_toolbar);
+    }
+
+    #[test]
+    fn normalize_task_preserves_explicit_toolbar_setting() {
+        let task = normalize_task(
+            BatchTaskDraft {
+                name: Some("Pinned task".to_string()),
+                show_in_toolbar: Some(true),
+                ..BatchTaskDraft::default()
+            },
+            None,
+        );
+
+        assert!(task.show_in_toolbar);
+    }
 }

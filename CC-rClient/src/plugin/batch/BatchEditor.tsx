@@ -583,6 +583,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
   const [executionPolicy, setExecutionPolicy] = useState<ExecutionPolicy>(
     task?.executionPolicy || DEFAULT_EXECUTION_POLICY
   );
+  const [showInToolbar, setShowInToolbar] = useState(task?.showInToolbar ?? false);
   const [tags, setTags] = useState<string[]>(task?.tags || []);
   const [tagInput, setTagInput] = useState('');
   const [selectedScriptId, setSelectedScriptId] = useState('');
@@ -705,6 +706,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
         parameters,
         targetSelector,
         executionPolicy,
+        showInToolbar,
         tags,
       });
       if (!fullValidation.valid) {
@@ -722,6 +724,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       parameters,
       targetSelector,
       executionPolicy,
+      showInToolbar,
       tags,
       version: task?.version || 1,
       createdBy: task?.createdBy || 'current-user',
@@ -782,6 +785,18 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
                 disabled={readOnly}
                 rows={2}
               />
+            </div>
+
+            <div className="field-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={showInToolbar}
+                  onChange={(e) => setShowInToolbar(e.target.checked)}
+                  disabled={readOnly}
+                />
+                <span>Show this task in the main toolbar</span>
+              </label>
             </div>
 
             <div className="field-group">

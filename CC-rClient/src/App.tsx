@@ -28,9 +28,9 @@ import type {
 } from "./types";
 import { ScriptProvider, ScriptsPage, ScriptsUIProvider } from "./plugin/script";
 import { AlertProvider, AlertRulesPage, AlertUIProvider } from "./plugin/alert";
-import { BatchProvider, useBatch } from "./plugin/batch";
+import { BatchProvider, BatchTaskRunner, useBatch } from "./plugin/batch";
 import { BatchPage } from "./plugin/batch/BatchPage";
-import { BatchUIProvider } from "./plugin/batch/BatchUIContext";
+import { BatchUIProvider, useBatchUI } from "./plugin/batch/BatchUIContext";
 import { GroupsPage, TagsPage } from "./plugin/groups";
 import { GroupsProvider } from "./plugin/groups/GroupsContext";
 import { TagsProvider } from "./plugin/groups/TagsContext";
@@ -857,7 +857,9 @@ function StationBrowserPanel({
   );
 }
 
-export default function App() {
+function AppShell() {
+  const { tasks, executeTask } = useBatch();
+  const { runner, openRunner, closeRunner } = useBatchUI();
   const [snapshot, setSnapshot] = useState<AppSnapshot | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
   const stationsRef = useRef<Station[]>([]);
@@ -1121,6 +1123,22 @@ export default function App() {
   const tagValueOptions = useMemo(
     () => deriveTagValueOptions(stations, tagKeyFilter),
     [stations, tagKeyFilter],
+  );
+  const batchTargets = useMemo(
+    () =>
+      stations.map((station) => ({
+        id: station.id,
+        name: station.name,
+        status: station.blocked ? ("offline" as const) : ("online" as const),
+        group: station.groups[0],
+        groups: station.groups,
+        tags: station.tags,
+      })),
+    [stations],
+  );
+  const toolbarBatchTasks = useMemo(
+    () => tasks.filter((task) => task.showInToolbar),
+    [tasks],
   );
 
   const selectedStation =
@@ -1768,6 +1786,14 @@ export default function App() {
     setStationPanelWidth(Math.round(next));
   }
 
+  async function handleExecuteBatchTask(
+    taskId: string,
+    targetIds: string[],
+    parameters?: Record<string, string>,
+  ) {
+    return executeTask(taskId, targetIds, parameters);
+  }
+
   return (
     <AlertProvider>
     <div className="shell">
@@ -1842,6 +1868,24 @@ export default function App() {
         >
           Alerts
         </button>
+
+        {toolbarBatchTasks.length > 0 && (
+          <>
+            <div className="toolbar-divider" />
+            <div className="toolbar-batch-shortcuts" aria-label="Pinned batch tasks">
+              {toolbarBatchTasks.map((task) => (
+                <button
+                  key={task.id}
+                  className="toolbar-batch-shortcut"
+                  onClick={() => openRunner(task)}
+                  title={`Open batch task: ${task.name}`}
+                >
+                  {task.name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         <div className="toolbar-divider" />
 
@@ -2551,11 +2595,7 @@ export default function App() {
           </ScriptsUIProvider>
         </ScriptProvider>
       ) : activePage === "batch" ? (
-        <BatchProvider>
-          <BatchUIProvider>
-            <BatchPage stations={stations} />
-          </BatchUIProvider>
-        </BatchProvider>
+        <BatchPage stations={stations} />
       ) : activePage === "alerts" ? (
         <AlertUIProvider>
           <AlertRulesPage stations={stations} />
@@ -2689,7 +2729,30 @@ export default function App() {
           </section>
         </main>
       )}
+
+      {runner.open && runner.task && (
+        <div className="batch-runner-layer" role="dialog" aria-modal="true">
+          <div className="batch-runner-panel">
+            <BatchTaskRunner
+              task={runner.task}
+              targets={batchTargets}
+              onExecute={handleExecuteBatchTask}
+              onCancel={closeRunner}
+            />
+          </div>
+        </div>
+      )}
     </div>
     </AlertProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <BatchProvider>
+      <BatchUIProvider>
+        <AppShell />
+      </BatchUIProvider>
+    </BatchProvider>
   );
 }

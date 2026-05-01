@@ -29,6 +29,7 @@
 - Live runtime refresh backed by the station telemetry stream
 - Remote screen capture preview backed by `CaptureScreen`
 - Remote file browse / download / upload / rename backed by the Rust file APIs
+- Reusable batch task management with optional main-toolbar shortcuts for frequently used tasks
 - Debug build output through Tauri
 
 ## Current migration boundary

@@ -24,6 +24,7 @@ interface BatchTaskCardProps {
   onDelete?: (taskId: string) => void;
   onDuplicate?: (task: BatchTask) => void;
   onToggleFavorite?: (taskId: string) => void;
+  onToggleToolbarPin?: (task: BatchTask) => void;
   onPause?: (taskId: string) => void;
   onCancel?: (taskId: string) => void;
 }
@@ -36,6 +37,7 @@ const BatchTaskCard: React.FC<BatchTaskCardProps> = ({
   onDelete,
   onDuplicate,
   onToggleFavorite,
+  onToggleToolbarPin,
   onPause,
   onCancel,
 }) => {
@@ -113,16 +115,30 @@ const BatchTaskCard: React.FC<BatchTaskCardProps> = ({
           <h3 className="card-title">{task.name}</h3>
           {getStatusBadge(task.status)}
         </div>
-        <button
-          className={`favorite-btn ${task.isFavorite ? 'active' : ''}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite?.(task.id);
-          }}
-          title={task.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          {task.isFavorite ? '★' : '☆'}
-        </button>
+        <div className="card-header-actions">
+          <button
+            className={`toolbar-pin-btn ${task.showInToolbar ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleToolbarPin?.(task);
+            }}
+            title={task.showInToolbar ? 'Remove from toolbar' : 'Add to toolbar'}
+            aria-label={task.showInToolbar ? 'Remove from toolbar' : 'Add to toolbar'}
+          >
+            {task.showInToolbar ? '📌' : '📍'}
+          </button>
+          <button
+            className={`favorite-btn ${task.isFavorite ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite?.(task.id);
+            }}
+            title={task.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={task.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            {task.isFavorite ? '★' : '☆'}
+          </button>
+        </div>
       </div>
 
       <p className="card-description">
@@ -321,6 +337,7 @@ export interface BatchTaskListProps {
   onDeleteTask: (taskId: string) => void;
   onDuplicateTask?: (task: BatchTask) => void;
   onToggleFavorite?: (taskId: string) => void;
+  onToggleToolbarPin?: (task: BatchTask) => void;
   onImport?: () => void;
   onExport?: (tasks: BatchTask[]) => void;
   onPauseTask?: (taskId: string) => void;
@@ -337,6 +354,7 @@ export const BatchTaskList: React.FC<BatchTaskListProps> = ({
   onDeleteTask,
   onDuplicateTask,
   onToggleFavorite,
+  onToggleToolbarPin,
   onImport,
   onExport,
   onPauseTask,
@@ -602,6 +620,7 @@ export const BatchTaskList: React.FC<BatchTaskListProps> = ({
               onDelete={handleDelete}
               onDuplicate={handleDuplicate}
               onToggleFavorite={onToggleFavorite}
+              onToggleToolbarPin={onToggleToolbarPin}
               onPause={onPauseTask}
               onCancel={onCancelTask}
             />
@@ -1002,6 +1021,12 @@ export const BatchTaskList: React.FC<BatchTaskListProps> = ({
           margin-bottom: 8px;
         }
 
+        .card-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
         .card-title-row {
           display: flex;
           align-items: center;
@@ -1020,7 +1045,8 @@ export const BatchTaskList: React.FC<BatchTaskListProps> = ({
           color: var(--text-main);
         }
 
-        .favorite-btn {
+        .favorite-btn,
+        .toolbar-pin-btn {
           background: none;
           border: none;
           font-size: 20px;
@@ -1033,6 +1059,11 @@ export const BatchTaskList: React.FC<BatchTaskListProps> = ({
         .favorite-btn.active,
         .favorite-btn:hover {
           color: #f59e0b;
+        }
+
+        .toolbar-pin-btn.active,
+        .toolbar-pin-btn:hover {
+          color: var(--primary);
         }
 
         .status-badge {
