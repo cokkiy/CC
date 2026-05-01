@@ -7,6 +7,7 @@ use anyhow::{Context, Result};
 use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use std::time::Duration;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::{RwLock, mpsc};
 use tokio_tungstenite::{connect_async, tungstenite::Message};
@@ -107,6 +108,8 @@ pub enum BridgeCommand {
     Disconnect,
 }
 
+const RECONNECT_DELAY: Duration = Duration::from_secs(2);
+
 /// MqttWsBridge - WebSocket bridge for MQTT telemetry
 pub struct MqttWsBridge {
     aggregator_url: String,
@@ -128,6 +131,14 @@ impl MqttWsBridge {
         }
     }
 
+    async fn send_command(&self, command: BridgeCommand) -> Result<()> {
+        if let Some(tx) = &self.command_tx {
+            tx.send(command).await?;
+        }
+
+        Ok(())
+    }
+
     /// Get current connection state
     pub async fn get_state(&self) -> ConnectionState {
         self.state.read().await.clone()
@@ -140,135 +151,147 @@ impl MqttWsBridge {
             let current_state = self.state.read().await;
             if *current_state == ConnectionState::Connected
                 || *current_state == ConnectionState::Connecting
+                || *current_state == ConnectionState::Reconnecting
             {
                 info!("Already connected or connecting");
                 return Ok(());
             }
         }
 
-        // Set state to connecting
-        {
-            let mut state = self.state.write().await;
-            *state = ConnectionState::Connecting;
-        }
+        let mut first_attempt = true;
 
-        info!("Connecting to CC-Aggregator at: {}", self.aggregator_url);
+        loop {
+            {
+                let mut state = self.state.write().await;
+                *state = if first_attempt {
+                    ConnectionState::Connecting
+                } else {
+                    ConnectionState::Reconnecting
+                };
+            }
 
-        let url = self.aggregator_url.clone();
-        let app_handle = self.app_handle.clone();
-        let state = self.state.clone();
+            info!("Connecting to CC-Aggregator at: {}", self.aggregator_url);
 
-        // Create command channel
-        let (tx, mut rx) = mpsc::channel::<BridgeCommand>(100);
-        self.command_tx = Some(tx);
+            let url = self.aggregator_url.clone();
+            let app_handle = self.app_handle.clone();
+            let state = self.state.clone();
 
-        // Connect to aggregator
-        match connect_async(&url).await {
-            Ok((ws_stream, _)) => {
-                info!("WebSocket connected to aggregator");
-                {
-                    let mut s = state.write().await;
-                    *s = ConnectionState::Connected;
-                }
+            // Create a fresh command channel for each connection attempt.
+            let (tx, mut rx) = mpsc::channel::<BridgeCommand>(100);
+            self.command_tx = Some(tx);
 
-                let (ws_write, mut read) = ws_stream.split();
+            match connect_async(&url).await {
+                Ok((ws_stream, _)) => {
+                    info!("WebSocket connected to aggregator");
+                    {
+                        let mut s = state.write().await;
+                        *s = ConnectionState::Connected;
+                    }
 
-                // Spawn task to handle commands - takes ownership of ws_write
-                let command_handle = tokio::spawn(async move {
-                    let mut write = ws_write;
-                    while let Some(cmd) = rx.recv().await {
-                        match cmd {
-                            BridgeCommand::Subscribe(stations) => {
-                                let msg = WsClientMessage::Subscribe { stations };
-                                if let Ok(json) = serde_json::to_string(&msg) {
-                                    if let Err(e) = write.send(Message::Text(json.into())).await {
-                                        warn!("Failed to send subscribe message: {:?}", e);
+                    let (ws_write, mut read) = ws_stream.split();
+                    let subscribed_stations = self.subscribed_stations.read().await.clone();
+                    let initial_subscription = if subscribed_stations.is_empty() {
+                        BridgeCommand::Subscribe(Vec::new())
+                    } else {
+                        BridgeCommand::Subscribe(subscribed_stations)
+                    };
+                    let _ = self.send_command(initial_subscription).await;
+                    let _ = self.send_command(BridgeCommand::GetStations).await;
+
+                    // Spawn task to handle commands - takes ownership of ws_write
+                    let command_handle = tokio::spawn(async move {
+                        let mut write = ws_write;
+                        while let Some(cmd) = rx.recv().await {
+                            match cmd {
+                                BridgeCommand::Subscribe(stations) => {
+                                    let msg = WsClientMessage::Subscribe { stations };
+                                    if let Ok(json) = serde_json::to_string(&msg) {
+                                        if let Err(e) = write.send(Message::Text(json.into())).await {
+                                            warn!("Failed to send subscribe message: {:?}", e);
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            BridgeCommand::Unsubscribe(stations) => {
-                                let msg = WsClientMessage::Unsubscribe { stations };
-                                if let Ok(json) = serde_json::to_string(&msg) {
-                                    if let Err(e) = write.send(Message::Text(json.into())).await {
-                                        warn!("Failed to send unsubscribe message: {:?}", e);
+                                BridgeCommand::Unsubscribe(stations) => {
+                                    let msg = WsClientMessage::Unsubscribe { stations };
+                                    if let Ok(json) = serde_json::to_string(&msg) {
+                                        if let Err(e) = write.send(Message::Text(json.into())).await {
+                                            warn!("Failed to send unsubscribe message: {:?}", e);
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            BridgeCommand::GetStations => {
-                                let msg = WsClientMessage::GetStations;
-                                if let Ok(json) = serde_json::to_string(&msg) {
-                                    if let Err(e) = write.send(Message::Text(json.into())).await {
-                                        warn!("Failed to send getStations message: {:?}", e);
+                                BridgeCommand::GetStations => {
+                                    let msg = WsClientMessage::GetStations;
+                                    if let Ok(json) = serde_json::to_string(&msg) {
+                                        if let Err(e) = write.send(Message::Text(json.into())).await {
+                                            warn!("Failed to send getStations message: {:?}", e);
+                                            break;
+                                        }
                                     }
                                 }
+                                BridgeCommand::Disconnect => {
+                                    info!("Disconnect requested");
+                                    let _ = write.close().await;
+                                    break;
+                                }
                             }
-                            BridgeCommand::Disconnect => {
-                                info!("Disconnect requested");
-                                let _ = write.close().await;
+                        }
+                    });
+
+                    while let Some(msg_result) = read.next().await {
+                        match msg_result {
+                            Ok(Message::Text(text)) => {
+                                Self::handle_message(&text, &app_handle);
+                            }
+                            Ok(Message::Binary(data)) => {
+                                if let Ok(text) = String::from_utf8(data.to_vec()) {
+                                    Self::handle_message(&text, &app_handle);
+                                }
+                            }
+                            Ok(Message::Close(_)) => {
+                                info!("WebSocket connection closed by server");
                                 break;
                             }
-                        }
-                    }
-                });
-
-                // Handle incoming messages
-                let app_handle_clone = app_handle.clone();
-
-                while let Some(msg_result) = read.next().await {
-                    match msg_result {
-                        Ok(Message::Text(text)) => {
-                            Self::handle_message(&text, &app_handle_clone);
-                        }
-                        Ok(Message::Binary(data)) => {
-                            if let Ok(text) = String::from_utf8(data.to_vec()) {
-                                Self::handle_message(&text, &app_handle_clone);
+                            Ok(Message::Ping(data)) => {
+                                debug!("Received ping (auto-handled)");
+                                let _ = data;
                             }
+                            Ok(Message::Pong(_)) => {
+                                debug!("Received pong");
+                            }
+                            Err(e) => {
+                                error!("WebSocket read error: {:?}", e);
+                                break;
+                            }
+                            _ => {}
                         }
-                        Ok(Message::Close(_)) => {
-                            info!("WebSocket connection closed by server");
-                            break;
-                        }
-                        Ok(Message::Ping(data)) => {
-                            // tokio_tungstenite handles ping/pong automatically
-                            // but we need to not include the websocket writer here
-                            debug!("Received ping (auto-handled)");
-                            let _ = data;
-                        }
-                        Ok(Message::Pong(_)) => {
-                            debug!("Received pong");
-                        }
-                        Err(e) => {
-                            error!("WebSocket read error: {:?}", e);
-                            break;
-                        }
-                        _ => {}
                     }
+
+                    command_handle.abort();
+                    {
+                        let mut s = state.write().await;
+                        *s = ConnectionState::Disconnected;
+                    }
+                    self.command_tx = None;
+
+                    info!("WebSocket disconnected");
+                    let _ = app_handle.emit("ws-disconnected", ());
                 }
-
-                // Connection lost
-                command_handle.abort();
-                {
-                    let mut s = state.write().await;
-                    *s = ConnectionState::Disconnected;
+                Err(e) => {
+                    error!("Failed to connect to aggregator: {:?}", e);
+                    {
+                        let mut s = state.write().await;
+                        *s = ConnectionState::Disconnected;
+                    }
+                    self.command_tx = None;
+                    let _ = app_handle.emit("ws-error", e.to_string());
+                    warn!("{}", Err::<(), _>(e).context("WebSocket connection failed").unwrap_err());
                 }
-
-                info!("WebSocket disconnected");
-
-                // Emit disconnected event
-                let _ = app_handle.emit("ws-disconnected", ());
-
-                Ok(())
             }
-            Err(e) => {
-                error!("Failed to connect to aggregator: {:?}", e);
-                {
-                    let mut s = state.write().await;
-                    *s = ConnectionState::Disconnected;
-                }
-                // Emit error event
-                let _ = app_handle.emit("ws-error", e.to_string());
-                Err(e).context("WebSocket connection failed")
-            }
+
+            first_attempt = false;
+            tokio::time::sleep(RECONNECT_DELAY).await;
         }
     }
 
@@ -330,9 +353,7 @@ impl MqttWsBridge {
 
         info!("Subscribing to stations: {:?}", station_ids);
 
-        if let Some(tx) = &self.command_tx {
-            tx.send(BridgeCommand::Subscribe(station_ids)).await?;
-        }
+        self.send_command(BridgeCommand::Subscribe(station_ids)).await?;
 
         Ok(())
     }
@@ -346,9 +367,7 @@ impl MqttWsBridge {
 
         info!("Unsubscribing from stations: {:?}", station_ids);
 
-        if let Some(tx) = &self.command_tx {
-            tx.send(BridgeCommand::Unsubscribe(station_ids)).await?;
-        }
+        self.send_command(BridgeCommand::Unsubscribe(station_ids)).await?;
 
         Ok(())
     }
@@ -357,9 +376,7 @@ impl MqttWsBridge {
     pub async fn request_stations(&self) -> Result<()> {
         info!("Requesting station list");
 
-        if let Some(tx) = &self.command_tx {
-            tx.send(BridgeCommand::GetStations).await?;
-        }
+        self.send_command(BridgeCommand::GetStations).await?;
 
         Ok(())
     }
@@ -368,9 +385,7 @@ impl MqttWsBridge {
     pub async fn disconnect(&self) -> Result<()> {
         info!("Disconnecting from aggregator");
 
-        if let Some(tx) = &self.command_tx {
-            let _ = tx.send(BridgeCommand::Disconnect).await;
-        }
+        let _ = self.send_command(BridgeCommand::Disconnect).await;
 
         {
             let mut state = self.state.write().await;

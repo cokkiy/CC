@@ -103,8 +103,10 @@ pub async fn run(
                 }
 
                 let next_seconds = state_clone.interval_seconds().max(1);
-                ticker = tokio::time::interval(Duration::from_secs(next_seconds));
-                ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+                if ticker.period() != Duration::from_secs(next_seconds) {
+                    ticker = tokio::time::interval(Duration::from_secs(next_seconds));
+                    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+                }
             }
         });
     }

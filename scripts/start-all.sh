@@ -29,6 +29,11 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Build mode (default: release)
 BUILD_MODE="release"
 
+# Project directories
+STATIONSERVICE_DIR="$REPO_DIR/CC-rStationService"
+AGGREGATOR_DIR="$REPO_DIR/CC-Aggregator"
+CLIENT_DIR="$REPO_DIR/CC-rClient"
+
 # Binaries (resolved by mode)
 STATIONSERVICE_BIN=""
 AGGREGATOR_BIN=""
@@ -89,6 +94,11 @@ is_mosquitto_running() {
     docker ps --filter "name=mosquitto" --filter "status=running" -q | grep -q .
 }
 
+# Check if a Mosquitto container exists in any state
+is_mosquitto_container_exists() {
+    docker ps -a --filter "name=mosquitto" -q | grep -q .
+}
+
 is_iot_sim_running() {
     if [[ ! -f "$IOT_SIM_COMPOSE_FILE" ]]; then
         return 1
@@ -103,11 +113,54 @@ is_process_running() {
     kill -0 "$pid" 2>/dev/null
 }
 
+rust_binary_needs_rebuild() {
+    local project_dir=$1
+    local binary_path=$2
+
+    if [[ ! -x "$binary_path" ]]; then
+        return 0
+    fi
+
+    if [[ "$project_dir/Cargo.toml" -nt "$binary_path" ]] || \
+       [[ "$project_dir/Cargo.lock" -nt "$binary_path" ]] || \
+       [[ "$project_dir/build.rs" -nt "$binary_path" ]]; then
+        return 0
+    fi
+
+    if find "$project_dir/src" -type f -newer "$binary_path" -print -quit | grep -q .; then
+        return 0
+    fi
+
+    return 1
+}
+
+ensure_rust_binary() {
+    local name=$1
+    local project_dir=$2
+    local binary_path=$3
+
+    if [[ ! -x "$binary_path" ]] || rust_binary_needs_rebuild "$project_dir" "$binary_path"; then
+        log_info "Building ${name} (${BUILD_MODE}) before startup"
+        pushd "$project_dir" >/dev/null
+        if [[ "$BUILD_MODE" == "release" ]]; then
+            cargo build --release
+        else
+            cargo build
+        fi
+        popd >/dev/null
+    fi
+
+    if [[ ! -x "$binary_path" ]]; then
+        log_error "${name} binary not found or not executable after build: $binary_path"
+        return 1
+    fi
+}
+
 # Configure binary paths by build mode
 configure_binary_paths() {
-    STATIONSERVICE_BIN="$REPO_DIR/CC-rStationService/target/$BUILD_MODE/cc-rstationservice"
-    AGGREGATOR_BIN="$REPO_DIR/CC-Aggregator/target/$BUILD_MODE/cc-aggregator"
-    CLIENT_BIN="$REPO_DIR/CC-rClient/src-tauri/target/$BUILD_MODE/cc-rclient"
+    STATIONSERVICE_BIN="$STATIONSERVICE_DIR/target/$BUILD_MODE/cc-rstationservice"
+    AGGREGATOR_BIN="$AGGREGATOR_DIR/target/$BUILD_MODE/cc-aggregator"
+    CLIENT_BIN="$CLIENT_DIR/src-tauri/target/$BUILD_MODE/cc-rclient"
 }
 
 print_stop_commands() {
@@ -202,6 +255,16 @@ start_mosquitto() {
         log_success "Mosquitto is already running (Docker container)"
         return 0
     fi
+
+    # If an old mosquitto container exists but is stopped/exited, remove it first
+    if is_mosquitto_container_exists; then
+        local mosquitto_status
+        mosquitto_status="$(docker inspect -f '{{.State.Status}}' mosquitto 2>/dev/null || true)"
+        if [[ "$mosquitto_status" != "running" ]]; then
+            log_warning "Found existing mosquitto container in status: ${mosquitto_status:-unknown}; removing it before restart"
+            docker rm -f mosquitto >/dev/null 2>&1 || true
+        fi
+    fi
     
     # Try to start Mosquitto using docker-compose or docker run
     if [[ -f "$REPO_DIR/docker-compose.yml" ]] || [[ -f "$REPO_DIR/docker-compose.yaml" ]]; then
@@ -240,9 +303,7 @@ start_stationservice() {
     fi
     
     # Check if binary exists
-    if [[ ! -x "$STATIONSERVICE_BIN" ]]; then
-        log_error "CC-rStationService binary not found or not executable: $STATIONSERVICE_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-rStationService && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
+    if ! ensure_rust_binary "CC-rStationService" "$STATIONSERVICE_DIR" "$STATIONSERVICE_BIN"; then
         return 1
     fi
     
@@ -250,8 +311,8 @@ start_stationservice() {
     mkdir -p "$LOG_DIR"
     
     # Start in foreground mode (background)
-    cd "$REPO_DIR/CC-rStationService"
-    nohup "$STATIONSERVICE_BIN" foreground --config "$REPO_DIR/CC-rStationService/CC-rStationService.toml" >"$STATIONSERVICE_LOG" 2>&1 &
+    cd "$STATIONSERVICE_DIR"
+    nohup "$STATIONSERVICE_BIN" foreground --config "$STATIONSERVICE_DIR/CC-rStationService.toml" >"$STATIONSERVICE_LOG" 2>&1 &
     STATIONSERVICE_PID=$!
     
     # Wait for service to be ready
@@ -277,9 +338,7 @@ start_aggregator() {
     fi
     
     # Check if binary exists
-    if [[ ! -x "$AGGREGATOR_BIN" ]]; then
-        log_error "CC-Aggregator binary not found or not executable: $AGGREGATOR_BIN"
-        log_error "Please build the project first: cd $REPO_DIR/CC-Aggregator && $( [[ \"$BUILD_MODE\" == \"release\" ]] && echo \"cargo build --release\" || echo \"cargo build\" )"
+    if ! ensure_rust_binary "CC-Aggregator" "$AGGREGATOR_DIR" "$AGGREGATOR_BIN"; then
         return 1
     fi
     
@@ -287,8 +346,8 @@ start_aggregator() {
     mkdir -p "$LOG_DIR"
     
     # Start in background
-    cd "$REPO_DIR/CC-Aggregator"
-    nohup "$AGGREGATOR_BIN" --config "$REPO_DIR/CC-Aggregator/CC-Aggregator.toml" >"$AGGREGATOR_LOG" 2>&1 &
+    cd "$AGGREGATOR_DIR"
+    nohup "$AGGREGATOR_BIN" --config "$AGGREGATOR_DIR/CC-Aggregator.toml" >"$AGGREGATOR_LOG" 2>&1 &
     AGGREGATOR_PID=$!
     
     # Wait for service to be ready
@@ -310,7 +369,7 @@ start_client() {
         log_info "Starting CC-rClient with npm run tauri:dev..."
 
         mkdir -p "$LOG_DIR"
-        cd "$REPO_DIR/CC-rClient"
+        cd "$CLIENT_DIR"
         if [[ ! -d node_modules ]]; then
             log_info "Installing CC-rClient npm dependencies..."
             npm install
@@ -332,7 +391,7 @@ start_client() {
 
     log_info "Building CC-rClient release bundle with npm run tauri:build..."
     mkdir -p "$LOG_DIR"
-    cd "$REPO_DIR/CC-rClient"
+    cd "$CLIENT_DIR"
     if [[ ! -d node_modules ]]; then
         log_info "Installing CC-rClient npm dependencies..."
         npm install

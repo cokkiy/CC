@@ -97,7 +97,9 @@ build_client() {
   if [[ "$MODE" == "release" ]]; then
     npm run tauri:build
   else
-    npm run tauri:build:debug
+    log_info "Debug mode skips Linux bundle packaging; building web assets and debug binary only..."
+    npm run build
+    cargo build --manifest-path src-tauri/Cargo.toml
   fi
   popd >/dev/null
 
