@@ -480,11 +480,59 @@ input:focus, select:focus, textarea:focus {
 
 .stationsWorkspace--list,
 .stationsWorkspace--grid {
-  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.95fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.3fr);
 }
 
 .stationsWorkspace--split {
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.2fr);
+}
+
+.stationsWorkspace--list.stationsWorkspace--resizable,
+.stationsWorkspace--grid.stationsWorkspace--resizable {
+  grid-template-columns: minmax(0, 0.95fr) 10px minmax(360px, 1.3fr);
+}
+
+.stationsWorkspace--split.stationsWorkspace--resizable {
+  grid-template-columns: minmax(0, 0.9fr) 10px minmax(360px, 1.2fr);
+}
+
+.stationsPanelResizer {
+  position: relative;
+  align-self: stretch;
+  width: 10px;
+  min-width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+  border-radius: 999px;
+}
+
+.stationsPanelResizer::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--border-color);
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.stationsPanelResizer:hover::before,
+.stationsPanelResizer:focus-visible::before,
+.stationsPanelResizer.isDragging::before {
+  background: var(--primary);
+  box-shadow: 0 0 0 2px rgba(45, 140, 240, 0.15);
+}
+
+.stationsPanelResizer:focus-visible {
+  outline: none;
+}
+
+.stationsWorkspace--resizing,
+.stationsWorkspace--resizing * {
+  cursor: col-resize !important;
+  user-select: none;
 }
 
 .stationsBrowserPanel,
@@ -1095,7 +1143,7 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 1400px) {
   .stationsWorkspace--list,
   .stationsWorkspace--grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.95fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.2fr);
   }
 }
 
@@ -1110,6 +1158,10 @@ input:focus, select:focus, textarea:focus {
   .stationsWorkspace--grid,
   .stationsWorkspace--split {
     grid-template-columns: 1fr;
+  }
+
+  .stationsPanelResizer {
+    display: none;
   }
 
   .stationBrowser,

@@ -14,7 +14,6 @@ import {
 import topBanner from "../images/top_banner.png";
 import topBannerSmall from "../images/top_banner_small.png";
 import type {
-  ActionResult,
   AppSnapshot,
   BatchCapture,
   ClientOptions,
@@ -23,7 +22,6 @@ import type {
   RemoteFileBrowserResult,
   StartProgram,
   Station,
-  StationAction,
   StationGroup,
   StationRuntimeSnapshot,
   StationScreenCapture
@@ -33,8 +31,6 @@ import { AlertProvider, AlertRulesPage, AlertUIProvider } from "./plugin/alert";
 import { BatchProvider, useBatch } from "./plugin/batch";
 import { BatchPage } from "./plugin/batch/BatchPage";
 import { BatchUIProvider } from "./plugin/batch/BatchUIContext";
-import { LayoutPresetSelector } from "./plugin/components/LayoutManager";
-import { getAllLayoutPresets } from "./plugin/components/LayoutConfig";
 import { GroupsPage, TagsPage } from "./plugin/groups";
 import { GroupsProvider } from "./plugin/groups/GroupsContext";
 import { TagsProvider } from "./plugin/groups/TagsContext";
@@ -57,6 +53,12 @@ import {
 const STATION_VIEW_MODE_STORAGE_KEY = "cc-rclient.station-view-mode";
 const STATION_LIST_COLUMNS_STORAGE_KEY = "cc-rclient.station-list-columns";
 const STATION_GRID_COLUMNS_STORAGE_KEY = "cc-rclient.station-grid-columns";
+const STATION_PANEL_WIDTH_STORAGE_KEY = "cc-rclient.station-panel-width";
+
+const MIN_BROWSER_PANEL_WIDTH = 320;
+const MIN_DETAIL_PANEL_WIDTH = 360;
+const STATIONS_PANEL_RESIZER_WIDTH = 10;
+const STATIONS_STACK_BREAKPOINT = 1180;
 
 const emptyOptions: ClientOptions = {
   interval: 2,
@@ -256,6 +258,20 @@ function readStoredColumns(storageKey: string, fallback: number) {
   }
 
   return clampBrowserColumns(Number(stored), fallback);
+}
+
+function readStoredPanelWidth() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const stored = window.localStorage.getItem(STATION_PANEL_WIDTH_STORAGE_KEY);
+  if (!stored) {
+    return null;
+  }
+
+  const parsed = Number(stored);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.round(parsed) : null;
 }
 
 type StationVisualState = "ready" | "warning" | "error" | "offline";
@@ -880,9 +896,15 @@ export default function App() {
   const [listColumns, setListColumns] = useState(() => readStoredColumns(STATION_LIST_COLUMNS_STORAGE_KEY, 2));
   const [gridColumns, setGridColumns] = useState(() => readStoredColumns(STATION_GRID_COLUMNS_STORAGE_KEY, 3));
   const [detailTab, setDetailTab] = useState<StationDetailTab>("overview");
-  const [activeLayout, setActiveLayout] = useState<string>("default");
+  const [stationPanelWidth, setStationPanelWidth] = useState<number | null>(() => readStoredPanelWidth());
+  const [isResizingPanels, setIsResizingPanels] = useState(false);
+  const [isStationsStacked, setIsStationsStacked] = useState(
+    () => typeof window !== "undefined" && window.innerWidth <= STATIONS_STACK_BREAKPOINT,
+  );
   const [pendingStationTagValues, setPendingStationTagValues] = useState<Record<string, string>>({});
   const [dirtyStationTagKeys, setDirtyStationTagKeys] = useState<Record<string, boolean>>({});
+  const stationsWorkspaceRef = useRef<HTMLElement | null>(null);
+  const resizingPanelsRef = useRef(false);
 
   useEffect(() => {
     window.localStorage.setItem(STATION_VIEW_MODE_STORAGE_KEY, viewMode);
@@ -897,8 +919,75 @@ export default function App() {
   }, [gridColumns]);
 
   useEffect(() => {
+    if (stationPanelWidth === null) {
+      window.localStorage.removeItem(STATION_PANEL_WIDTH_STORAGE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(STATION_PANEL_WIDTH_STORAGE_KEY, String(stationPanelWidth));
+  }, [stationPanelWidth]);
+
+  useEffect(() => {
     stationsRef.current = stations;
   }, [stations]);
+
+  useEffect(() => {
+    const onResize = () => {
+      const isStacked = window.innerWidth <= STATIONS_STACK_BREAKPOINT;
+      setIsStationsStacked(isStacked);
+
+      if (isStacked || stationPanelWidth === null || !stationsWorkspaceRef.current) {
+        return;
+      }
+
+      const workspaceWidth = stationsWorkspaceRef.current.getBoundingClientRect().width;
+      const maxLeft = Math.max(
+        MIN_BROWSER_PANEL_WIDTH,
+        workspaceWidth - MIN_DETAIL_PANEL_WIDTH - STATIONS_PANEL_RESIZER_WIDTH,
+      );
+      const clamped = Math.min(Math.max(stationPanelWidth, MIN_BROWSER_PANEL_WIDTH), maxLeft);
+      if (clamped !== stationPanelWidth) {
+        setStationPanelWidth(clamped);
+      }
+    };
+
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [stationPanelWidth]);
+
+  useEffect(() => {
+    const onPointerMove = (event: PointerEvent) => {
+      if (!resizingPanelsRef.current || !stationsWorkspaceRef.current || isStationsStacked) {
+        return;
+      }
+
+      const rect = stationsWorkspaceRef.current.getBoundingClientRect();
+      const maxLeft = Math.max(
+        MIN_BROWSER_PANEL_WIDTH,
+        rect.width - MIN_DETAIL_PANEL_WIDTH - STATIONS_PANEL_RESIZER_WIDTH,
+      );
+      const next = Math.min(Math.max(event.clientX - rect.left, MIN_BROWSER_PANEL_WIDTH), maxLeft);
+      setStationPanelWidth(Math.round(next));
+    };
+
+    const onPointerUp = () => {
+      if (!resizingPanelsRef.current) {
+        return;
+      }
+
+      resizingPanelsRef.current = false;
+      setIsResizingPanels(false);
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+    };
+  }, [isStationsStacked]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -1135,26 +1224,6 @@ export default function App() {
       setLog((current) => [message, ...current]);
     } catch (error) {
       setLog((current) => [`Legacy export failed: ${String(error)}`, ...current]);
-    }
-  }
-
-  async function executeAction(action: StationAction, ids: string[]) {
-    if (ids.length === 0) {
-      setLog((current) => ["Select at least one station first.", ...current]);
-      return;
-    }
-
-    try {
-      const result = await invoke<ActionResult>("run_station_action", {
-        action,
-        ids
-      });
-      if (result.stations) {
-        setStations(result.stations);
-      }
-      setLog((current) => [result.message, ...current]);
-    } catch (error) {
-      setLog((current) => [`Action failed: ${String(error)}`, ...current]);
     }
   }
 
@@ -1634,8 +1703,6 @@ export default function App() {
     setDirtyStationTagKeys((current) => ({ ...current, [tagKey]: false }));
   }
 
-  const selectedIds = selectedStation ? [selectedStation.id] : [];
-
   function selectStation(stationId: string) {
     setSelectedId(stationId);
     setDetailTab("overview");
@@ -1652,6 +1719,53 @@ export default function App() {
     setGroupFilter("");
     setTagKeyFilter("");
     setTagValueFilter("");
+  }
+
+  const stationsWorkspaceColumns = (() => {
+    if (isStationsStacked) {
+      return undefined;
+    }
+
+    const leftTrack =
+      stationPanelWidth !== null
+        ? `${stationPanelWidth}px`
+        : viewMode === "split"
+          ? "minmax(0, 0.9fr)"
+          : "minmax(0, 0.95fr)";
+    const rightTrack = viewMode === "split" ? "minmax(360px, 1.2fr)" : "minmax(360px, 1.3fr)";
+    return `${leftTrack} ${STATIONS_PANEL_RESIZER_WIDTH}px ${rightTrack}`;
+  })();
+
+  function startPanelResize(event: React.PointerEvent<HTMLDivElement>) {
+    if (isStationsStacked || !stationsWorkspaceRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+    const rect = stationsWorkspaceRef.current.getBoundingClientRect();
+    const maxLeft = Math.max(
+      MIN_BROWSER_PANEL_WIDTH,
+      rect.width - MIN_DETAIL_PANEL_WIDTH - STATIONS_PANEL_RESIZER_WIDTH,
+    );
+    const next = Math.min(Math.max(event.clientX - rect.left, MIN_BROWSER_PANEL_WIDTH), maxLeft);
+    setStationPanelWidth(Math.round(next));
+    resizingPanelsRef.current = true;
+    setIsResizingPanels(true);
+  }
+
+  function resizePanelsWithKeyboard(step: number) {
+    if (isStationsStacked || !stationsWorkspaceRef.current) {
+      return;
+    }
+
+    const rect = stationsWorkspaceRef.current.getBoundingClientRect();
+    const maxLeft = Math.max(
+      MIN_BROWSER_PANEL_WIDTH,
+      rect.width - MIN_DETAIL_PANEL_WIDTH - STATIONS_PANEL_RESIZER_WIDTH,
+    );
+    const baseWidth = stationPanelWidth ?? Math.round(rect.width * (viewMode === "split" ? 0.43 : 0.42));
+    const next = Math.min(Math.max(baseWidth + step, MIN_BROWSER_PANEL_WIDTH), maxLeft);
+    setStationPanelWidth(Math.round(next));
   }
 
   return (
@@ -1731,66 +1845,10 @@ export default function App() {
 
         <div className="toolbar-divider" />
 
-        {/* Layout */}
-        <LayoutPresetSelector
-          currentPreset={activeLayout}
-          onSelectPreset={(preset) => {
-            setActiveLayout(preset);
-            console.log('[App] Layout changed to:', preset);
-          }}
-        />
-
-        <div className="toolbar-divider" />
-
         {/* Device Actions */}
         <button onClick={addStation}>+ Add</button>
         <button onClick={removeSelectedStation} disabled={!selectedStation}>
           Remove
-        </button>
-        <button onClick={() => void executeAction("power_on", selectedIds)} disabled={!selectedStation}>
-          Power On
-        </button>
-        <button onClick={() => void executeAction("shutdown", selectedIds)} disabled={!selectedStation}>
-          Shutdown
-        </button>
-        <button onClick={() => void executeAction("reboot", selectedIds)} disabled={!selectedStation}>
-          Reboot
-        </button>
-
-        <div className="toolbar-divider" />
-
-        {/* App Control */}
-        <button onClick={() => void executeAction("start_app", selectedIds)} disabled={!selectedStation}>
-          Start App
-        </button>
-        <button onClick={() => void executeAction("restart_app", selectedIds)} disabled={!selectedStation}>
-          Restart App
-        </button>
-        <button onClick={() => void executeAction("exit_app", selectedIds)} disabled={!selectedStation}>
-          Exit App
-        </button>
-
-        <div className="toolbar-divider" />
-
-        {/* Block Control */}
-        <button onClick={() => void executeAction("block", selectedIds)} disabled={!selectedStation}>
-          Block
-        </button>
-        <button onClick={() => void executeAction("unblock", selectedIds)} disabled={!selectedStation}>
-          Unblock
-        </button>
-
-        <div className="toolbar-divider" />
-
-        {/* Batch Actions */}
-        <button onClick={() => void executeAction("batch_power_on", [])} disabled={stations.length === 0}>
-          全部开机
-        </button>
-        <button onClick={() => void executeAction("batch_shutdown", [])} disabled={stations.length === 0}>
-          全部关机
-        </button>
-        <button onClick={() => void executeAction("batch_reboot", [])} disabled={stations.length === 0}>
-          全部重启
         </button>
 
         <div className="toolbar-divider" />
@@ -1799,14 +1857,19 @@ export default function App() {
         <button className="accent" onClick={() => void saveState()} disabled={saving}>
           {saving ? "Saving..." : "Save"}
         </button>
-        <button onClick={() => void exportLegacyFiles()}>Export</button>
-        <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
-          {remoteBusy === "batchCapture" ? "截图中..." : "截图"}
-        </button>
       </section>
 
       {activePage === "stations" ? (
-        <main className={`stationsWorkspace stationsWorkspace--${viewMode}`}>
+        <main
+          ref={stationsWorkspaceRef}
+          className={[
+            "stationsWorkspace",
+            `stationsWorkspace--${viewMode}`,
+            !isStationsStacked ? "stationsWorkspace--resizable" : "",
+            isResizingPanels ? "stationsWorkspace--resizing" : "",
+          ].join(" ")}
+          style={stationsWorkspaceColumns ? { gridTemplateColumns: stationsWorkspaceColumns } : undefined}
+        >
           <StationBrowserPanel
             filteredStations={filteredStations}
             totalStationCount={stations.length}
@@ -1843,6 +1906,27 @@ export default function App() {
             onSelectStation={selectStation}
             onEditStation={editStation}
             onClearFilters={clearStationFilters}
+          />
+
+          <div
+            className={`stationsPanelResizer ${isResizingPanels ? "isDragging" : ""}`}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize device and detail panels"
+            aria-valuemin={MIN_BROWSER_PANEL_WIDTH}
+            aria-valuemax={2000}
+            aria-valuenow={stationPanelWidth ?? undefined}
+            tabIndex={isStationsStacked ? -1 : 0}
+            onPointerDown={startPanelResize}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                resizePanelsWithKeyboard(-24);
+              } else if (event.key === "ArrowRight") {
+                event.preventDefault();
+                resizePanelsWithKeyboard(24);
+              }
+            }}
           />
 
           <section className="panel stationsDetailPanel">
