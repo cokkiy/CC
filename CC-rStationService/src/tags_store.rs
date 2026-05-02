@@ -9,10 +9,12 @@ use std::sync::{Arc, RwLock};
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use uuid::Uuid;
 
-use crate::tags::{StationTag, StationTagFilter, StationTagSortField, Tag, TagFilter, TagSortField, TagStats};
+use crate::tags::{
+    StationTag, StationTagFilter, StationTagSortField, Tag, TagFilter, TagSortField, TagStats,
+};
 
 /// In-memory cache for tags
 pub struct TagCache {
@@ -107,11 +109,7 @@ impl TagCache {
                 TagSortField::UpdatedAt => a.updated_at.cmp(&b.updated_at),
                 TagSortField::Name => a.name.cmp(&b.name),
             };
-            if sort_desc {
-                cmp.reverse()
-            } else {
-                cmp
-            }
+            if sort_desc { cmp.reverse() } else { cmp }
         });
 
         // Pagination (limit 0 means no limit)
@@ -144,7 +142,7 @@ impl Default for TagCache {
 /// In-memory cache for station tags
 pub struct StationTagCache {
     station_tags: RwLock<HashMap<String, Vec<StationTag>>>, // station_id -> tags
-    tag_stations: RwLock<HashMap<Uuid, Vec<StationTag>>>,     // tag_id -> stations
+    tag_stations: RwLock<HashMap<Uuid, Vec<StationTag>>>,   // tag_id -> stations
 }
 
 impl StationTagCache {
@@ -201,13 +199,11 @@ impl StationTagCache {
     pub fn remove(&self, station_id: &str, tag_id: &Uuid) -> Option<StationTag> {
         // Remove from station_tags
         let mut station_tags = self.station_tags.write().unwrap();
-        let removed = station_tags
-            .get_mut(station_id)
-            .and_then(|tags| {
-                tags.iter()
-                    .position(|t| t.tag_id == *tag_id)
-                    .map(|idx| tags.remove(idx))
-            });
+        let removed = station_tags.get_mut(station_id).and_then(|tags| {
+            tags.iter()
+                .position(|t| t.tag_id == *tag_id)
+                .map(|idx| tags.remove(idx))
+        });
         drop(station_tags);
 
         // Remove from tag_stations
@@ -266,11 +262,7 @@ impl StationTagCache {
                 StationTagSortField::StationId => a.station_id.cmp(&b.station_id),
                 StationTagSortField::TagId => a.tag_id.cmp(&b.tag_id),
             };
-            if sort_desc {
-                cmp.reverse()
-            } else {
-                cmp
-            }
+            if sort_desc { cmp.reverse() } else { cmp }
         });
 
         // Pagination
@@ -335,10 +327,7 @@ impl TagStore {
             [],
         )?;
 
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name)",
-            [],
-        )?;
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name)", [])?;
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS station_tags (
@@ -401,9 +390,8 @@ impl TagStore {
         }
 
         // Load station tags
-        let mut stmt = conn.prepare(
-            "SELECT station_id, tag_id, assigned_at, assigned_by FROM station_tags",
-        )?;
+        let mut stmt =
+            conn.prepare("SELECT station_id, tag_id, assigned_at, assigned_by FROM station_tags")?;
 
         let station_tag_rows: Vec<StationTagRowData> = stmt
             .query_map([], |row| {
@@ -531,10 +519,7 @@ impl TagStore {
         let conn = Connection::open(&self.db_path)
             .with_context(|| format!("open tag store DB at {}", self.db_path.display()))?;
 
-        let affected = conn.execute(
-            "DELETE FROM tags WHERE id = ?1",
-            [id.to_string()],
-        )?;
+        let affected = conn.execute("DELETE FROM tags WHERE id = ?1", [id.to_string()])?;
 
         if affected > 0 {
             // Also delete all station-tag assignments for this tag
@@ -591,7 +576,11 @@ impl TagStore {
     }
 
     /// Remove a tag from a station.
-    pub fn remove_tag_from_station(&self, station_id: &str, tag_id: &Uuid) -> Result<Option<StationTag>> {
+    pub fn remove_tag_from_station(
+        &self,
+        station_id: &str,
+        tag_id: &Uuid,
+    ) -> Result<Option<StationTag>> {
         let conn = Connection::open(&self.db_path)
             .with_context(|| format!("open tag store DB at {}", self.db_path.display()))?;
 

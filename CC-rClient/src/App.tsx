@@ -36,6 +36,11 @@ import { GroupsProvider } from "./plugin/groups/GroupsContext";
 import { TagsProvider } from "./plugin/groups/TagsContext";
 import type { TagDefinition } from "./plugin/groups/types";
 import {
+  buildRuntimeFromMqttTelemetry,
+  runtimeHasFullDetails,
+  type MqttTelemetryBundle,
+} from "./runtime-telemetry";
+import {
   deriveTagValueOptions,
   filterStations,
   getPrimaryIp,
@@ -82,18 +87,6 @@ const emptyStation = (): Station => ({
 
 const MQTT_DISCOVERY_SOURCE = "mqtt";
 
-type MqttTelemetryValue = {
-  key: string;
-  v: number;
-};
-
-type MqttTelemetryBundle = {
-  ts: number;
-  station_id: string;
-  interval_ms: number;
-  values: MqttTelemetryValue[];
-};
-
 type MqttTelemetryEventPayload = {
   station_id: string;
   data: MqttTelemetryBundle;
@@ -109,10 +102,6 @@ type MqttStatusEventPayload = {
     alert?: string | null;
   };
 };
-
-function isMqttDiscoveredStation(station: Station | null | undefined) {
-  return station?.metadata?.source === MQTT_DISCOVERY_SOURCE;
-}
 
 function createDiscoveredStation(stationId: string, metadata?: Record<string, string>): Station {
   return {
@@ -132,33 +121,6 @@ function createDiscoveredStation(stationId: string, metadata?: Record<string, st
   };
 }
 
-function buildRuntimeFromMqttTelemetry(
-  stationId: string,
-  telemetry: MqttTelemetryBundle,
-): StationRuntimeSnapshot {
-  const valueByKey = new Map(telemetry.values.map((value) => [value.key, value.v]));
-  const currentMemoryMb = valueByKey.get("memory_used_mb") ?? 0;
-
-  return {
-    endpoint: `mqtt:${stationId}`,
-    stationId,
-    computerName: stationId,
-    osName: "",
-    osVersion: "",
-    totalMemory: 0,
-    currentMemory: Math.round(currentMemoryMb * 1024 * 1024),
-    cpu: valueByKey.get("cpu_usage_percent") ?? 0,
-    procCount: Math.round(valueByKey.get("process_count") ?? 0),
-    serviceVersion: "",
-    appLauncherVersion: "",
-    servicePath: "",
-    appLauncherPath: "",
-    appStates: [],
-    networkStats: [],
-    message: "Live MQTT telemetry",
-  };
-}
-
 function emitAlertRuntimeUpdate(station: Station, runtime: StationRuntimeSnapshot) {
   if (typeof window === "undefined") {
     return;
@@ -172,6 +134,25 @@ function emitAlertRuntimeUpdate(station: Station, runtime: StationRuntimeSnapsho
       },
     }),
   );
+}
+
+function formatRuntimeMemory(runtime: StationRuntimeSnapshot) {
+  if (runtime.totalMemory > 0) {
+    return `${formatBytes(runtime.currentMemory)} / ${formatBytes(runtime.totalMemory)}`;
+  }
+
+  return `${formatBytes(runtime.currentMemory)} used`;
+}
+
+function getRuntimeUnavailableText(
+  runtime: StationRuntimeSnapshot,
+  subject: string,
+) {
+  if (runtimeHasFullDetails(runtime)) {
+    return "n/a";
+  }
+
+  return `${subject} unavailable in MQTT-only mode`;
 }
 
 function CpuPie({ cpu }: { cpu: number }) {
@@ -939,7 +920,6 @@ function AppShell() {
   const [browserByStation, setBrowserByStation] = useState<Record<string, RemoteFileBrowserResult>>({});
   const [captureByStation, setCaptureByStation] = useState<Record<string, StationScreenCapture>>({});
   const [batchCaptures, setBatchCaptures] = useState<BatchCapture[]>([]);
-  const [runtimeLoadingId, setRuntimeLoadingId] = useState<string>("");
   const [remoteBusy, setRemoteBusy] = useState<string>("");
   const [remotePath, setRemotePath] = useState("");
   const [downloadLocalPath, setDownloadLocalPath] = useState("");
@@ -1295,18 +1275,12 @@ function AppShell() {
   }, [filteredStations]);
 
   useEffect(() => {
-    if (!selectedStation || isMqttDiscoveredStation(selectedStation)) {
+    if (!selectedStation) {
       return;
     }
 
     setRemotePath(browserByStation[selectedStation.id]?.requestedPath ?? "");
-    void refreshRuntime(selectedStation.id, false);
-    const timer = window.setInterval(() => {
-      void refreshRuntime(selectedStation.id, false);
-    }, Math.max(options.interval, 1) * 1000);
-
-    return () => window.clearInterval(timer);
-  }, [selectedStation?.id, options.interval]);
+  }, [browserByStation, selectedStation?.id]);
 
   async function saveState() {
     setSaving(true);
@@ -1330,51 +1304,6 @@ function AppShell() {
       setLog((current) => [message, ...current]);
     } catch (error) {
       setLog((current) => [`Legacy export failed: ${String(error)}`, ...current]);
-    }
-  }
-
-  async function refreshRuntime(targetId = selectedStation?.id, logSuccess = false) {
-    if (!targetId) {
-      return;
-    }
-
-    setRuntimeLoadingId(targetId);
-    try {
-      const runtime = await invoke<StationRuntimeSnapshot>("fetch_station_runtime_for_ui", {
-        id: targetId,
-        intervalSeconds: Math.max(options.interval, 1)
-      });
-      setRuntimeByStation((current) => ({ ...current, [targetId]: runtime }));
-      const runtimeStation =
-        stations.find((station) => station.id === targetId)
-        ?? (selectedStation?.id === targetId ? selectedStation : null);
-      if (runtimeStation) {
-        emitAlertRuntimeUpdate(runtimeStation, runtime);
-      }
-      setHistoryByStation((current) => {
-        const prev = current[targetId] ?? [];
-        const totalRx = runtime.networkStats.reduce((s, n) => s + n.bytesReceivedPerSec, 0);
-        const totalTx = runtime.networkStats.reduce((s, n) => s + n.bytesSentedPerSec, 0);
-        const next = [
-          ...prev.slice(-(MAX_HISTORY - 1)),
-          {
-            cpu: runtime.cpu,
-            memory: runtime.currentMemory,
-            procCount: runtime.procCount,
-            ts: Date.now(),
-            rxbps: totalRx,
-            txbps: totalTx,
-          },
-        ];
-        return { ...current, [targetId]: next };
-      });
-      if (logSuccess) {
-        setLog((current) => [`Telemetry refreshed from ${runtime.endpoint}.`, ...current]);
-      }
-    } catch (error) {
-      setLog((current) => [`Telemetry refresh failed: ${String(error)}`, ...current]);
-    } finally {
-      setRuntimeLoadingId((current) => (current === targetId ? "" : current));
     }
   }
 
@@ -2385,15 +2314,10 @@ function AppShell() {
                 <div className="collection">
                   <div className="subHeader">
                     <h3>Runtime</h3>
-                    <button
-                      onClick={() => void refreshRuntime(selectedStation?.id, true)}
-                      disabled={!selectedStation || runtimeLoadingId === selectedStation.id}
-                    >
-                      {runtimeLoadingId === selectedStation?.id ? "Refreshing..." : "Refresh"}
-                    </button>
+                    <span>{selectedRuntime ? `${selectedRuntime.telemetrySource.toUpperCase()} live feed` : "MQTT/WebSocket only"}</span>
                   </div>
                   {!selectedRuntime ? (
-                    <p className="emptyInline">No live runtime data loaded yet.</p>
+                    <p className="emptyInline">No live MQTT runtime data received yet.</p>
                   ) : (
                     <div className="programCard">
                   <div className="statsGrid">
@@ -2404,9 +2328,7 @@ function AppShell() {
                     <CpuPie cpu={selectedRuntime.cpu} />
                     <div className="statTile">
                       <span>Memory</span>
-                      <strong>
-                        {formatBytes(selectedRuntime.currentMemory)} / {formatBytes(selectedRuntime.totalMemory)}
-                      </strong>
+                      <strong>{formatRuntimeMemory(selectedRuntime)}</strong>
                     </div>
                     <div className="statTile">
                       <span>Processes</span>
@@ -2433,23 +2355,34 @@ function AppShell() {
                       <strong>{selectedRuntime.endpoint}</strong>
                     </div>
                     <div className="runtimeEndpointRowGroup runtimeEndpointRowGroup--meta">
-                      <span>Service Version</span>
-                      <strong>{selectedRuntime.serviceVersion || "n/a"}</strong>
+                      <span>Detail Level</span>
+                      <strong>{runtimeHasFullDetails(selectedRuntime) ? "Full runtime" : "MQTT basic"}</strong>
                     </div>
                   </div>
                   <div className="logEntry">{selectedRuntime.message}</div>
                   <div className="logEntry">
-                    {selectedRuntime.computerName || "Unknown host"} · {selectedRuntime.osName || "Unknown OS"}{" "}
-                    {selectedRuntime.osVersion}
+                    {selectedRuntime.computerName || "Unknown host"} ·{" "}
+                    {selectedRuntime.osName
+                      ? `${selectedRuntime.osName} ${selectedRuntime.osVersion}`.trim()
+                      : getRuntimeUnavailableText(selectedRuntime, "OS details")}
                   </div>
-                  <div className="logEntry">Service path: {selectedRuntime.servicePath || "n/a"}</div>
-                  <div className="logEntry">Launcher path: {selectedRuntime.appLauncherPath || "n/a"}</div>
+                  <div className="logEntry">
+                    Service version: {selectedRuntime.serviceVersion || getRuntimeUnavailableText(selectedRuntime, "Service version")}
+                  </div>
+                  <div className="logEntry">
+                    Service path: {selectedRuntime.servicePath || getRuntimeUnavailableText(selectedRuntime, "Service path")}
+                  </div>
+                  <div className="logEntry">
+                    Launcher path: {selectedRuntime.appLauncherPath || getRuntimeUnavailableText(selectedRuntime, "Launcher path")}
+                  </div>
                   <div className="collection">
                     <div className="subHeader">
                       <h3>Watched Apps</h3>
                     </div>
                     {selectedRuntime.appStates.length === 0 ? (
-                      <p className="emptyInline">No watched app state returned yet.</p>
+                      <p className="emptyInline">
+                        {getRuntimeUnavailableText(selectedRuntime, "Watched app state")}
+                      </p>
                     ) : (
                       selectedRuntime.appStates.map((item) => (
                         <div key={`${item.monitorName}-${item.processId}`} className="logEntry">
@@ -2465,7 +2398,9 @@ function AppShell() {
                       <h3>Network</h3>
                     </div>
                     {selectedRuntime.networkStats.length === 0 ? (
-                      <p className="emptyInline">No network counters returned yet.</p>
+                      <p className="emptyInline">
+                        {getRuntimeUnavailableText(selectedRuntime, "Network counters")}
+                      </p>
                     ) : (
                       selectedRuntime.networkStats.map((item) => (
                         <div key={item.ifName} className="logEntry">

@@ -115,7 +115,7 @@ export function getStationRuntimeSummary(
   const memoryPct =
     runtime.totalMemory > 0
       ? `${((runtime.currentMemory / runtime.totalMemory) * 100).toFixed(0)}%`
-      : "0%";
+      : `${Math.round(runtime.currentMemory / 1024 / 1024)} MB`;
 
   return [`CPU ${runtime.cpu.toFixed(0)}%`, `MEM ${memoryPct}`, `PROC ${runtime.procCount}`];
 }

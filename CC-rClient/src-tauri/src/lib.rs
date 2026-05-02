@@ -16,9 +16,9 @@ use models::{
     ActionResult, AppSnapshot, PersistedState, Station, StationAction, StationGroup, TagDefinition,
 };
 use remote::{
-    CommandExecutionResult, RemoteFileBrowserResult, StationRuntimeSnapshot, StationScreenCapture,
-    browse_station_files, capture_station_screen, download_station_file, execute_station_command,
-    fetch_station_runtime, rename_station_file, upload_station_file,
+    CommandExecutionResult, RemoteFileBrowserResult, StationScreenCapture, browse_station_files,
+    capture_station_screen, download_station_file, execute_station_command, rename_station_file,
+    upload_station_file,
 };
 use script_ops::{
     cancel_script_execution, delete_script, execute_script, export_script_package,
@@ -198,20 +198,6 @@ async fn run_station_action(
     }
 
     Ok(result)
-}
-
-#[tauri::command]
-async fn fetch_station_runtime_for_ui(
-    id: String,
-    interval_seconds: i32,
-) -> Result<StationRuntimeSnapshot, String> {
-    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
-    let station = snapshot
-        .stations
-        .iter()
-        .find(|station| station.id == id)
-        .ok_or_else(|| format!("No station found for id {id}"))?;
-    fetch_station_runtime(station, interval_seconds).await
 }
 
 #[tauri::command]
@@ -828,7 +814,6 @@ pub fn run() {
             save_state,
             export_legacy_files,
             run_station_action,
-            fetch_station_runtime_for_ui,
             browse_station_files_for_ui,
             rename_station_file_for_ui,
             download_station_file_for_ui,

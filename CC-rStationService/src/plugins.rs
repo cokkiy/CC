@@ -29,11 +29,7 @@ pub struct TelemetryDataPoint {
 
 impl TelemetryDataPoint {
     /// Create a new telemetry data point
-    pub fn new(
-        metric_name: impl Into<String>,
-        value: f64,
-        unit: impl Into<String>,
-    ) -> Self {
+    pub fn new(metric_name: impl Into<String>, value: f64, unit: impl Into<String>) -> Self {
         Self {
             metric_name: metric_name.into(),
             value,
@@ -271,11 +267,10 @@ impl PluginConfig {
     }
 
     /// Get a setting value by key
-    pub fn get_setting<T: serde::de::DeserializeOwned>(
-        &self,
-        key: &str,
-    ) -> Option<T> {
-        self.settings.get(key).and_then(|v| serde_json::from_value(v.clone()).ok())
+    pub fn get_setting<T: serde::de::DeserializeOwned>(&self, key: &str) -> Option<T> {
+        self.settings
+            .get(key)
+            .and_then(|v| serde_json::from_value(v.clone()).ok())
     }
 }
 
@@ -453,7 +448,10 @@ mod tests {
         assert_eq!(metadata.id, "cpu_plugin");
         assert_eq!(metadata.name, "CPU Plugin");
         assert_eq!(metadata.version, "1.0.0");
-        assert_eq!(metadata.description, Some("Collects CPU usage metrics".to_string()));
+        assert_eq!(
+            metadata.description,
+            Some("Collects CPU usage metrics".to_string())
+        );
     }
 
     #[test]

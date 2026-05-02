@@ -65,7 +65,10 @@ impl StationGroup {
     }
 
     /// Add multiple stations to the group
-    pub fn add_stations(mut self, station_ids: impl IntoIterator<Item = impl Into<String>>) -> Self {
+    pub fn add_stations(
+        mut self,
+        station_ids: impl IntoIterator<Item = impl Into<String>>,
+    ) -> Self {
         for station_id in station_ids {
             let station_id = station_id.into();
             if !self.station_ids.contains(&station_id) {

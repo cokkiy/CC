@@ -8,7 +8,7 @@ use std::sync::{Arc, RwLock};
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use uuid::Uuid;
 
 use crate::batch::{
@@ -103,16 +103,16 @@ impl BatchTaskCache {
                 BatchTaskSortField::Status => a.status.cmp(&b.status),
                 BatchTaskSortField::Progress => a.progress.cmp(&b.progress),
             };
-            if sort_desc {
-                cmp.reverse()
-            } else {
-                cmp
-            }
+            if sort_desc { cmp.reverse() } else { cmp }
         });
 
         // Pagination (limit 0 means no limit)
         let offset = filter.offset as usize;
-        let limit = if filter.limit == 0 { usize::MAX } else { filter.limit as usize };
+        let limit = if filter.limit == 0 {
+            usize::MAX
+        } else {
+            filter.limit as usize
+        };
         filtered.into_iter().skip(offset).take(limit).collect()
     }
 
@@ -136,8 +136,7 @@ impl BatchTaskCache {
         stats.failed_tasks = tasks
             .values()
             .filter(|t| {
-                t.status == BatchTaskStatus::Failed
-                    || t.status == BatchTaskStatus::PartialFailure
+                t.status == BatchTaskStatus::Failed || t.status == BatchTaskStatus::PartialFailure
             })
             .count() as u64;
 
@@ -299,8 +298,7 @@ impl BatchTaskStore {
             serde_json::from_str(&data.execution_policy).unwrap_or_default();
         let default_parameters: Vec<BatchParameterValue> =
             serde_json::from_str(&data.default_parameters).unwrap_or_default();
-        let status: BatchTaskStatus =
-            serde_json::from_str(&data.status).unwrap_or_default();
+        let status: BatchTaskStatus = serde_json::from_str(&data.status).unwrap_or_default();
 
         let created_at = DateTime::parse_from_rfc3339(&data.created_at)
             .map(|dt| dt.with_timezone(&Utc))
@@ -340,7 +338,11 @@ impl BatchTaskStore {
         })
     }
 
-    fn load_execution_items(&self, task_id: &str, conn: &Connection) -> Result<Vec<BatchExecutionItem>> {
+    fn load_execution_items(
+        &self,
+        task_id: &str,
+        conn: &Connection,
+    ) -> Result<Vec<BatchExecutionItem>> {
         let mut stmt = conn.prepare(
             "SELECT station_id, script_id, parameters, result, status FROM batch_execution_items WHERE task_id = ?",
         )?;
@@ -363,9 +365,8 @@ impl BatchTaskStore {
             .map(|data| {
                 let parameters: Vec<BatchParameterValue> =
                     serde_json::from_str(&data.parameters).unwrap_or_default();
-                let result: Option<crate::scripts::ScriptExecutionResult> = data
-                    .result
-                    .and_then(|r| serde_json::from_str(&r).ok());
+                let result: Option<crate::scripts::ScriptExecutionResult> =
+                    data.result.and_then(|r| serde_json::from_str(&r).ok());
                 let status: BatchExecutionStatus =
                     serde_json::from_str(&data.status).unwrap_or_default();
 
@@ -423,7 +424,11 @@ impl BatchTaskStore {
         // Insert execution items
         for item in &task.execution_items {
             let params_json = serde_json::to_string(&item.parameters)?;
-            let result_json = item.result.as_ref().map(|r| serde_json::to_string(r).ok()).flatten();
+            let result_json = item
+                .result
+                .as_ref()
+                .map(|r| serde_json::to_string(r).ok())
+                .flatten();
             let status_json = serde_json::to_string(&item.status)?;
 
             conn.execute(
@@ -499,7 +504,11 @@ impl BatchTaskStore {
 
             for item in &task.execution_items {
                 let params_json = serde_json::to_string(&item.parameters)?;
-                let result_json = item.result.as_ref().map(|r| serde_json::to_string(r).ok()).flatten();
+                let result_json = item
+                    .result
+                    .as_ref()
+                    .map(|r| serde_json::to_string(r).ok())
+                    .flatten();
                 let status_json = serde_json::to_string(&item.status)?;
 
                 conn.execute(
@@ -528,10 +537,7 @@ impl BatchTaskStore {
         let conn = Connection::open(&self.db_path)
             .with_context(|| format!("open batch store DB at {}", self.db_path.display()))?;
 
-        let affected = conn.execute(
-            "DELETE FROM batch_tasks WHERE id = ?1",
-            [id.to_string()],
-        )?;
+        let affected = conn.execute("DELETE FROM batch_tasks WHERE id = ?1", [id.to_string()])?;
 
         if affected > 0 {
             Ok(self.cache.remove(id))
@@ -583,8 +589,8 @@ struct ExecutionItemData {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env::temp_dir;
     use crate::batch::BatchExecutionStatus;
+    use std::env::temp_dir;
 
     #[test]
     fn test_batch_task_crud() {

@@ -31,8 +31,6 @@ pub fn shutdown() -> Result<()> {
     }
 }
 
-
-
 #[cfg(unix)]
 pub fn daemonize() -> Result<()> {
     nix::unistd::daemon(true, false).map_err(|err| anyhow!("daemonize failed: {err}"))

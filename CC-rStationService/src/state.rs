@@ -166,17 +166,22 @@ impl AppState {
     /// Handle an MQTT command and return the appropriate ack
     pub fn handle_mqtt_command(&self, command: &Command) -> CommandAck {
         let timestamp = chrono::Utc::now().timestamp_millis();
-        
-        info!("Handling MQTT command: {} (id: {})", command.command, command.command_id);
-        
+
+        info!(
+            "Handling MQTT command: {} (id: {})",
+            command.command, command.command_id
+        );
+
         match command.command.as_str() {
             "restart_process" => {
                 // Get the process name from params
-                let process_name = command.params.get("process_name")
+                let process_name = command
+                    .params
+                    .get("process_name")
                     .and_then(|v| v.as_str())
                     .unwrap_or_default()
                     .to_string();
-                
+
                 if process_name.is_empty() {
                     return CommandAck {
                         command_id: command.command_id.clone(),
@@ -185,7 +190,7 @@ impl AppState {
                         timestamp,
                     };
                 }
-                
+
                 // Find and restart the process
                 let pids = crate::state::find_process_ids_by_name(&process_name);
                 if pids.is_empty() {
@@ -196,14 +201,14 @@ impl AppState {
                         timestamp,
                     };
                 }
-                
+
                 // Terminate existing processes
                 for pid in &pids {
                     if let Err(e) = crate::state::terminate_process(*pid) {
                         warn!("Failed to terminate process {}: {:?}", pid, e);
                     }
                 }
-                
+
                 info!("Restarted process: {}", process_name);
                 CommandAck {
                     command_id: command.command_id.clone(),
@@ -267,9 +272,7 @@ impl AppState {
 
     /// Single async snapshot for both running_state and apps_running_state — avoids
     /// two separate blocking sleeps per telemetry cycle.
-    pub async fn running_and_apps_state(
-        &self,
-    ) -> (StationRunningState, AppsRunningStateEnvelope) {
+    pub async fn running_and_apps_state(&self) -> (StationRunningState, AppsRunningStateEnvelope) {
         let station_id = self.station_id.clone();
         let watched = self.watched_processes();
         let server_version = self.server_version();
@@ -306,7 +309,8 @@ impl AppState {
         };
 
         let interval_ms = (self.interval_seconds.load(Ordering::Relaxed) * 1000) as u32;
-        let telemetry_bundle = crate::mqtt::TelemetryBundle::from_station_state(running, interval_ms);
+        let telemetry_bundle =
+            crate::mqtt::TelemetryBundle::from_station_state(running, interval_ms);
 
         mqtt_client
             .publish_telemetry(&telemetry_bundle)
@@ -761,24 +765,27 @@ impl NetworkSampler {
         let rates = self
             .networks
             .iter()
-                .map(|(name, data)| InterfaceStatistics {
-                    if_name: name.to_string(),
-                    bytes_received_per_sec: data.received() as f64,
-                    bytes_sented_per_sec: data.transmitted() as f64,
-                    total_bytes_per_sec: (data.received() + data.transmitted()) as f64,
-                    bytes_received: 0,
-                    bytes_sented: 0,
-                    bytes_total: 0,
-                    unicast_packet_received: 0,
-                    unicast_packet_sented: 0,
-                    multicast_packet_received: 0,
-                    multicast_packet_sented: 0,
-                })
+            .map(|(name, data)| InterfaceStatistics {
+                if_name: name.to_string(),
+                bytes_received_per_sec: data.received() as f64,
+                bytes_sented_per_sec: data.transmitted() as f64,
+                total_bytes_per_sec: (data.received() + data.transmitted()) as f64,
+                bytes_received: 0,
+                bytes_sented: 0,
+                bytes_total: 0,
+                unicast_packet_received: 0,
+                unicast_packet_sented: 0,
+                multicast_packet_received: 0,
+                multicast_packet_sented: 0,
+            })
             .map(|item| (item.if_name.clone(), item))
             .collect::<HashMap<_, _>>();
 
         let snapshot = network_counters::collect().unwrap_or_default();
-        debug!("Collected network counters: {} interfaces", snapshot.interface_counters.len());
+        debug!(
+            "Collected network counters: {} interfaces",
+            snapshot.interface_counters.len()
+        );
         let mut interface_statistics = snapshot
             .interface_counters
             .iter()

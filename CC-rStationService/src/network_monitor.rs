@@ -32,7 +32,9 @@ impl NetworkMonitorPlugin {
                 "Network Monitor".to_string(),
                 "1.0.0",
             )
-            .with_description("Monitors network usage including TCP/UDP stats and interface traffic"),
+            .with_description(
+                "Monitors network usage including TCP/UDP stats and interface traffic",
+            ),
             status: RwLock::new(PluginStatus::Stopped),
             config: RwLock::new(PluginConfig::new()),
             stats: RwLock::new(PluginStats::new()),
@@ -99,9 +101,8 @@ impl TelemetryPlugin for NetworkMonitorPlugin {
         let collection_start = Utc::now();
 
         // Collect network counters
-        let snapshot = network_counters::collect().map_err(|e| {
-            PluginError::CollectionFailed(self.metadata.id.clone(), e.to_string())
-        })?;
+        let snapshot = network_counters::collect()
+            .map_err(|e| PluginError::CollectionFailed(self.metadata.id.clone(), e.to_string()))?;
 
         let mut telemetry = TelemetryData::new(self.metadata.id.clone());
         telemetry.collection_start = collection_start;
@@ -110,51 +111,87 @@ impl TelemetryPlugin for NetworkMonitorPlugin {
         let time_diff_secs = {
             let prev_time = self.prev_collection_time.read().unwrap();
             let diff = prev_time.map(|pt| (collection_start - pt).num_seconds() as f64);
-            drop(prev_time);  // Release read lock before acquiring write lock
+            drop(prev_time); // Release read lock before acquiring write lock
             *self.prev_collection_time.write().unwrap() = Some(collection_start);
             diff.unwrap_or(0.0)
         };
 
         // TCP metrics
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_tcp_segments_received", snapshot.segments_received as f64, "count")
-                .with_label("protocol", "tcp")
-                .with_label("type", "segments"),
+            TelemetryDataPoint::new(
+                "network_tcp_segments_received",
+                snapshot.segments_received as f64,
+                "count",
+            )
+            .with_label("protocol", "tcp")
+            .with_label("type", "segments"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_tcp_segments_sent", snapshot.segments_sent as f64, "count")
-                .with_label("protocol", "tcp")
-                .with_label("type", "segments"),
+            TelemetryDataPoint::new(
+                "network_tcp_segments_sent",
+                snapshot.segments_sent as f64,
+                "count",
+            )
+            .with_label("protocol", "tcp")
+            .with_label("type", "segments"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_tcp_errors", snapshot.errors_received as f64, "count")
-                .with_label("protocol", "tcp"),
+            TelemetryDataPoint::new(
+                "network_tcp_errors",
+                snapshot.errors_received as f64,
+                "count",
+            )
+            .with_label("protocol", "tcp"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_tcp_current_connections", snapshot.current_connections as f64, "count")
-                .with_label("protocol", "tcp"),
+            TelemetryDataPoint::new(
+                "network_tcp_current_connections",
+                snapshot.current_connections as f64,
+                "count",
+            )
+            .with_label("protocol", "tcp"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_tcp_reset_connections", snapshot.reset_connections as f64, "count")
-                .with_label("protocol", "tcp"),
+            TelemetryDataPoint::new(
+                "network_tcp_reset_connections",
+                snapshot.reset_connections as f64,
+                "count",
+            )
+            .with_label("protocol", "tcp"),
         );
 
         // UDP metrics
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_udp_datagrams_received", snapshot.datagrams_received as f64, "count")
-                .with_label("protocol", "udp"),
+            TelemetryDataPoint::new(
+                "network_udp_datagrams_received",
+                snapshot.datagrams_received as f64,
+                "count",
+            )
+            .with_label("protocol", "udp"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_udp_datagrams_sent", snapshot.datagrams_sent as f64, "count")
-                .with_label("protocol", "udp"),
+            TelemetryDataPoint::new(
+                "network_udp_datagrams_sent",
+                snapshot.datagrams_sent as f64,
+                "count",
+            )
+            .with_label("protocol", "udp"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_udp_datagrams_discarded", snapshot.datagrams_discarded as f64, "count")
-                .with_label("protocol", "udp"),
+            TelemetryDataPoint::new(
+                "network_udp_datagrams_discarded",
+                snapshot.datagrams_discarded as f64,
+                "count",
+            )
+            .with_label("protocol", "udp"),
         );
         telemetry.add_data_point(
-            TelemetryDataPoint::new("network_udp_datagrams_errors", snapshot.datagrams_with_errors as f64, "count")
-                .with_label("protocol", "udp"),
+            TelemetryDataPoint::new(
+                "network_udp_datagrams_errors",
+                snapshot.datagrams_with_errors as f64,
+                "count",
+            )
+            .with_label("protocol", "udp"),
         );
 
         // Per-interface metrics
@@ -166,8 +203,16 @@ impl TelemetryPlugin for NetworkMonitorPlugin {
             let (rx_rate, tx_rate) = if time_diff_secs > 0.0 {
                 if let Some(prev) = prev_counters.iter().find(|p| p.if_name == *interface_name) {
                     (
-                        Self::calculate_rate(interface.bytes_received, prev.bytes_received, time_diff_secs),
-                        Self::calculate_rate(interface.bytes_sented, prev.bytes_sented, time_diff_secs),
+                        Self::calculate_rate(
+                            interface.bytes_received,
+                            prev.bytes_received,
+                            time_diff_secs,
+                        ),
+                        Self::calculate_rate(
+                            interface.bytes_sented,
+                            prev.bytes_sented,
+                            time_diff_secs,
+                        ),
                     )
                 } else {
                     (0.0, 0.0)
@@ -178,42 +223,74 @@ impl TelemetryPlugin for NetworkMonitorPlugin {
 
             // Bytes received/sent
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_bytes_received", interface.bytes_received as f64, "bytes")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_bytes_received",
+                    interface.bytes_received as f64,
+                    "bytes",
+                )
+                .with_label("interface", interface_name),
             );
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_bytes_sent", interface.bytes_sented as f64, "bytes")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_bytes_sent",
+                    interface.bytes_sented as f64,
+                    "bytes",
+                )
+                .with_label("interface", interface_name),
             );
 
             // Bytes per second rates
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_rx_bytes_per_sec", rx_rate, "bytes_per_sec")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_rx_bytes_per_sec",
+                    rx_rate,
+                    "bytes_per_sec",
+                )
+                .with_label("interface", interface_name),
             );
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_tx_bytes_per_sec", tx_rate, "bytes_per_sec")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_tx_bytes_per_sec",
+                    tx_rate,
+                    "bytes_per_sec",
+                )
+                .with_label("interface", interface_name),
             );
 
             // Unicast packets
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_unicast_packets_received", interface.unicast_packet_received as f64, "count")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_unicast_packets_received",
+                    interface.unicast_packet_received as f64,
+                    "count",
+                )
+                .with_label("interface", interface_name),
             );
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_unicast_packets_sent", interface.unicast_packet_sented as f64, "count")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_unicast_packets_sent",
+                    interface.unicast_packet_sented as f64,
+                    "count",
+                )
+                .with_label("interface", interface_name),
             );
 
             // Multicast packets
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_multicast_packets_received", interface.multicast_packet_received as f64, "count")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_multicast_packets_received",
+                    interface.multicast_packet_received as f64,
+                    "count",
+                )
+                .with_label("interface", interface_name),
             );
             telemetry.add_data_point(
-                TelemetryDataPoint::new("network_interface_multicast_packets_sent", interface.multicast_packet_sented as f64, "count")
-                    .with_label("interface", interface_name),
+                TelemetryDataPoint::new(
+                    "network_interface_multicast_packets_sent",
+                    interface.multicast_packet_sented as f64,
+                    "count",
+                )
+                .with_label("interface", interface_name),
             );
         }
 
@@ -298,7 +375,12 @@ mod tests {
         let tcp_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| p.labels.get("protocol").map(|p| p == "tcp").unwrap_or(false))
+            .filter(|p| {
+                p.labels
+                    .get("protocol")
+                    .map(|p| p == "tcp")
+                    .unwrap_or(false)
+            })
             .collect();
         assert!(!tcp_points.is_empty());
 
@@ -306,7 +388,12 @@ mod tests {
         let udp_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| p.labels.get("protocol").map(|p| p == "udp").unwrap_or(false))
+            .filter(|p| {
+                p.labels
+                    .get("protocol")
+                    .map(|p| p == "udp")
+                    .unwrap_or(false)
+            })
             .collect();
         assert!(!udp_points.is_empty());
     }

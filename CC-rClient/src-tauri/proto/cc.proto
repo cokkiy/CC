@@ -291,39 +291,6 @@ message AppsRunningStateEnvelope {
   repeated AppRunningState items = 1;
 }
 
-message TelemetryClientMessage {
-  oneof body {
-    ConnectRequest connect = 1;
-    TelemetryPing ping = 2;
-    TelemetryAck ack = 3;
-  }
-}
-
-message ConnectRequest {
-  string controller_id = 1;
-  string requested_station_id = 2;
-}
-
-message TelemetryPing {
-  int64 unix_millis = 1;
-}
-
-message TelemetryAck {
-  string message_id = 1;
-}
-
-message TelemetryServerMessage {
-  string message_id = 1;
-  oneof body {
-    Ack accepted = 2;
-    StationSystemState system_state = 3;
-    StationRunningState station_running_state = 4;
-    AppsRunningStateEnvelope apps_running_state = 5;
-    Statistics net_statistics = 6;
-    ServerVersionInfo server_version = 7;
-  }
-}
-
 message UploadChunk {
   string file_name = 1;
   int64 position = 2;
@@ -389,8 +356,4 @@ service StationControl {
 service FileTransfer {
   rpc Upload(stream UploadChunk) returns (UploadResult);
   rpc Download(DownloadRequest) returns (stream DownloadChunk);
-}
-
-service Telemetry {
-  rpc StreamTelemetry(stream TelemetryClientMessage) returns (stream TelemetryServerMessage);
 }

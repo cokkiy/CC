@@ -133,15 +133,13 @@ impl TelemetryPlugin for MemoryMonitorPlugin {
         let (total, used, available, usage_percent) = Self::get_memory_usage(&system);
 
         // Total memory
-        let total_data_point =
-            TelemetryDataPoint::new("memory_total_bytes", total as f64, "bytes")
-                .with_label("type", "total");
+        let total_data_point = TelemetryDataPoint::new("memory_total_bytes", total as f64, "bytes")
+            .with_label("type", "total");
         telemetry.add_data_point(total_data_point);
 
         // Used memory
-        let used_data_point =
-            TelemetryDataPoint::new("memory_used_bytes", used as f64, "bytes")
-                .with_label("type", "used");
+        let used_data_point = TelemetryDataPoint::new("memory_used_bytes", used as f64, "bytes")
+            .with_label("type", "used");
         telemetry.add_data_point(used_data_point);
 
         // Available memory
@@ -232,12 +230,7 @@ mod tests {
         let total_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| {
-                p.labels
-                    .get("type")
-                    .map(|t| t == "total")
-                    .unwrap_or(false)
-            })
+            .filter(|p| p.labels.get("type").map(|t| t == "total").unwrap_or(false))
             .collect();
         assert!(!total_points.is_empty());
 
@@ -245,12 +238,7 @@ mod tests {
         let usage_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| {
-                p.labels
-                    .get("type")
-                    .map(|t| t == "usage")
-                    .unwrap_or(false)
-            })
+            .filter(|p| p.labels.get("type").map(|t| t == "usage").unwrap_or(false))
             .collect();
         assert!(!usage_points.is_empty());
     }

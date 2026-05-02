@@ -3,7 +3,9 @@
 //! This module handles script parsing, parameter placeholder resolution,
 //! and parameter substitution for command scripts.
 
-use crate::scripts::{CommandScript, ParameterType, ScriptExecutionResult, ScriptParameter, ScriptType};
+use crate::scripts::{
+    CommandScript, ParameterType, ScriptExecutionResult, ScriptParameter, ScriptType,
+};
 use chrono::Utc;
 use regex::Regex;
 use std::collections::HashMap;
@@ -180,15 +182,10 @@ impl ScriptEngine {
         let mut resolved = Vec::new();
 
         for def in definitions {
-            let value = provided
-                .get(&def.name)
-                .map(|s| s.as_str())
-                .unwrap_or("");
+            let value = provided.get(&def.name).map(|s| s.as_str()).unwrap_or("");
 
             let value_to_use = if value.is_empty() {
-                def.default_value
-                    .as_deref()
-                    .unwrap_or("")
+                def.default_value.as_deref().unwrap_or("")
             } else {
                 value
             };
@@ -220,15 +217,15 @@ impl ScriptEngine {
     ///
     /// Replaces all {{param_name}} placeholders with their corresponding values.
     /// If a parameter is not found, it leaves the placeholder unchanged.
-    pub fn substitute_parameters(
-        content: &str,
-        values: &HashMap<String, String>,
-    ) -> String {
+    pub fn substitute_parameters(content: &str, values: &HashMap<String, String>) -> String {
         let regex = get_param_regex();
         regex
             .replace_all(content, |caps: &regex::Captures| {
                 let param_name = &caps[1];
-                values.get(param_name).cloned().unwrap_or_else(|| caps[0].to_string())
+                values
+                    .get(param_name)
+                    .cloned()
+                    .unwrap_or_else(|| caps[0].to_string())
             })
             .to_string()
     }
@@ -242,7 +239,8 @@ impl ScriptEngine {
         regex
             .replace_all(&content, |caps: &regex::Captures| {
                 // Group 1 is $VAR, group 2 is ${VAR}
-                let var_name = caps.get(1)
+                let var_name = caps
+                    .get(1)
                     .or_else(|| caps.get(2))
                     .map(|m| m.as_str())
                     .unwrap_or(&caps[0]);
@@ -357,10 +355,17 @@ impl ScriptEngine {
         rendered: &RenderedScript,
     ) -> ScriptEngineResult<(String, Vec<String>)> {
         match rendered.script_type {
-            ScriptType::Shell => Ok(("sh".to_string(), vec!["-c".to_string(), rendered.content.clone()])),
+            ScriptType::Shell => Ok((
+                "sh".to_string(),
+                vec!["-c".to_string(), rendered.content.clone()],
+            )),
             ScriptType::Powershell => Ok((
                 "pwsh".to_string(),
-                vec!["-NoProfile".to_string(), "-Command".to_string(), rendered.content.clone()],
+                vec![
+                    "-NoProfile".to_string(),
+                    "-Command".to_string(),
+                    rendered.content.clone(),
+                ],
             )),
             ScriptType::Python => Ok((
                 "python3".to_string(),
@@ -534,7 +539,7 @@ mod tests {
     #[test]
     fn test_validate_parameter_required() {
         let param = ScriptParameter::required_string("host");
-        
+
         // Empty value should fail for required
         let result = ScriptEngine::validate_parameter(&param, "");
         assert!(result.is_err());
@@ -569,7 +574,8 @@ mod tests {
 
     #[test]
     fn test_validate_parameter_select() {
-        let param = ScriptParameter::select("env", vec!["dev".to_string(), "prod".to_string()], None);
+        let param =
+            ScriptParameter::select("env", vec!["dev".to_string(), "prod".to_string()], None);
 
         assert!(ScriptEngine::validate_parameter(&param, "dev").is_ok());
         assert!(ScriptEngine::validate_parameter(&param, "prod").is_ok());
@@ -621,7 +627,11 @@ mod tests {
 
         let analysis = ScriptEngine::analyze_script(&script).unwrap();
         assert!(!analysis.is_valid);
-        assert!(analysis.missing_definitions.contains(&"unknown".to_string()));
+        assert!(
+            analysis
+                .missing_definitions
+                .contains(&"unknown".to_string())
+        );
     }
 
     #[test]

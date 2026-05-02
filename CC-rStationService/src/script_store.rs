@@ -7,7 +7,7 @@ use crate::scripts::{
     ScriptParameter, ScriptSortField, ScriptStats, ScriptType,
 };
 use chrono::{DateTime, TimeZone, Utc};
-use rusqlite::{params, Connection, Result as SqliteResult};
+use rusqlite::{Connection, Result as SqliteResult, params};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
@@ -170,9 +170,7 @@ impl ScriptStore {
             "#,
         )?;
 
-        let script = stmt.query_row(params![id.to_string()], |row| {
-            Ok(row_to_script(row)?)
-        })?;
+        let script = stmt.query_row(params![id.to_string()], |row| Ok(row_to_script(row)?))?;
 
         Ok(script)
     }
@@ -236,7 +234,8 @@ impl ScriptStore {
     pub fn delete(&self, id: Uuid) -> ScriptStoreResult<()> {
         let conn = self.conn.lock().unwrap();
 
-        let rows_affected = conn.execute("DELETE FROM scripts WHERE id = ?1", params![id.to_string()])?;
+        let rows_affected =
+            conn.execute("DELETE FROM scripts WHERE id = ?1", params![id.to_string()])?;
 
         if rows_affected == 0 {
             return Err(ScriptStoreError::NotFound(id));
@@ -299,7 +298,7 @@ impl ScriptStore {
         sql.push_str(&format!(" ORDER BY {} {}", sort_field, sort_dir));
 
         let mut stmt = conn.prepare(&sql)?;
-        
+
         let scripts: Vec<CommandScript> = stmt
             .query_map([], |row| Ok(row_to_script(row)?))?
             .filter_map(|r| r.ok())
@@ -349,11 +348,8 @@ impl ScriptStore {
     pub fn stats(&self) -> ScriptStoreResult<ScriptStats> {
         let conn = self.conn.lock().unwrap();
 
-        let total_scripts: u64 = conn.query_row(
-            "SELECT COUNT(*) FROM scripts",
-            [],
-            |row| row.get(0),
-        )?;
+        let total_scripts: u64 =
+            conn.query_row("SELECT COUNT(*) FROM scripts", [], |row| row.get(0))?;
 
         let template_count: u64 = conn.query_row(
             "SELECT COUNT(*) FROM scripts WHERE is_template = 1",
@@ -367,17 +363,18 @@ impl ScriptStore {
             |row| row.get(0),
         )?;
 
-        let most_used_id: Option<String> = conn.query_row(
-            "SELECT id FROM scripts ORDER BY usage_count DESC LIMIT 1",
-            [],
-            |row| row.get(0),
-        ).ok();
+        let most_used_id: Option<String> = conn
+            .query_row(
+                "SELECT id FROM scripts ORDER BY usage_count DESC LIMIT 1",
+                [],
+                |row| row.get(0),
+            )
+            .ok();
 
-        let total_executions: u64 = conn.query_row(
-            "SELECT COUNT(*) FROM script_executions",
-            [],
-            |row| row.get(0),
-        )?;
+        let total_executions: u64 =
+            conn.query_row("SELECT COUNT(*) FROM script_executions", [], |row| {
+                row.get(0)
+            })?;
 
         Ok(ScriptStats {
             total_scripts,
@@ -480,10 +477,8 @@ impl ScriptStore {
         let mut total_deleted = 0u64;
 
         for id in ids {
-            let deleted = conn.execute(
-                "DELETE FROM scripts WHERE id = ?1",
-                params![id.to_string()],
-            )?;
+            let deleted =
+                conn.execute("DELETE FROM scripts WHERE id = ?1", params![id.to_string()])?;
             total_deleted += deleted as u64;
         }
 
@@ -522,7 +517,8 @@ fn row_to_script(row: &rusqlite::Row) -> rusqlite::Result<CommandScript> {
 
     let id = Uuid::parse_str(&id_str).unwrap_or_else(|_| Uuid::new_v4());
     let script_type = ScriptType::from_str(&script_type_str).unwrap_or_default();
-    let parameters: Vec<ScriptParameter> = serde_json::from_str(&parameters_json).unwrap_or_default();
+    let parameters: Vec<ScriptParameter> =
+        serde_json::from_str(&parameters_json).unwrap_or_default();
     let tags: Vec<String> = serde_json::from_str(&tags_json).unwrap_or_default();
     let selected_options: std::collections::HashMap<String, String> =
         serde_json::from_str(&selected_options_json).unwrap_or_default();
@@ -670,24 +666,30 @@ mod tests {
         store.create(&script3).unwrap();
 
         // Filter by type
-        let shell_scripts = store.list(&ScriptFilter {
-            script_type: Some(ScriptType::Shell),
-            ..Default::default()
-        }).unwrap();
+        let shell_scripts = store
+            .list(&ScriptFilter {
+                script_type: Some(ScriptType::Shell),
+                ..Default::default()
+            })
+            .unwrap();
         assert_eq!(shell_scripts.len(), 1);
 
         // Filter by tag
-        let test_scripts = store.list(&ScriptFilter {
-            tags: Some(vec!["test".to_string()]),
-            ..Default::default()
-        }).unwrap();
+        let test_scripts = store
+            .list(&ScriptFilter {
+                tags: Some(vec!["test".to_string()]),
+                ..Default::default()
+            })
+            .unwrap();
         assert_eq!(test_scripts.len(), 2);
 
         // Filter by name
-        let filtered = store.list(&ScriptFilter {
-            name_contains: Some("Script".to_string()),
-            ..Default::default()
-        }).unwrap();
+        let filtered = store
+            .list(&ScriptFilter {
+                name_contains: Some("Script".to_string()),
+                ..Default::default()
+            })
+            .unwrap();
         assert_eq!(filtered.len(), 2);
     }
 
@@ -748,8 +750,7 @@ mod tests {
         let script = CommandScript::new("Exec Test", "echo exec");
         let created = store.create(&script).unwrap();
 
-        let result = ScriptExecutionResult::new(created.id)
-            .success(0, "hello", "", 100);
+        let result = ScriptExecutionResult::new(created.id).success(0, "hello", "", 100);
 
         store.save_execution(&result).unwrap();
 

@@ -136,65 +136,46 @@ impl TelemetryPlugin for DiskMonitorPlugin {
 
         for (mount_point, total, used, available, usage_percent) in disk_usage {
             // Total disk space
-            let total_data_point = TelemetryDataPoint::new(
-                "disk_total_bytes",
-                total as f64,
-                "bytes",
-            )
-            .with_label("type", "total")
-            .with_label("mount_point", &mount_point);
+            let total_data_point =
+                TelemetryDataPoint::new("disk_total_bytes", total as f64, "bytes")
+                    .with_label("type", "total")
+                    .with_label("mount_point", &mount_point);
             telemetry.add_data_point(total_data_point);
 
             // Used disk space
-            let used_data_point = TelemetryDataPoint::new(
-                "disk_used_bytes",
-                used as f64,
-                "bytes",
-            )
-            .with_label("type", "used")
-            .with_label("mount_point", &mount_point);
+            let used_data_point = TelemetryDataPoint::new("disk_used_bytes", used as f64, "bytes")
+                .with_label("type", "used")
+                .with_label("mount_point", &mount_point);
             telemetry.add_data_point(used_data_point);
 
             // Available disk space
-            let available_data_point = TelemetryDataPoint::new(
-                "disk_available_bytes",
-                available as f64,
-                "bytes",
-            )
-            .with_label("type", "available")
-            .with_label("mount_point", &mount_point);
+            let available_data_point =
+                TelemetryDataPoint::new("disk_available_bytes", available as f64, "bytes")
+                    .with_label("type", "available")
+                    .with_label("mount_point", &mount_point);
             telemetry.add_data_point(available_data_point);
 
             // Disk usage percentage
-            let usage_data_point = TelemetryDataPoint::new(
-                "disk_usage_percent",
-                usage_percent,
-                "percent",
-            )
-            .with_label("type", "usage")
-            .with_label("mount_point", &mount_point);
+            let usage_data_point =
+                TelemetryDataPoint::new("disk_usage_percent", usage_percent, "percent")
+                    .with_label("type", "usage")
+                    .with_label("mount_point", &mount_point);
             telemetry.add_data_point(usage_data_point);
         }
 
         // Collect disk I/O stats (if available)
         let disk_io_stats = Self::get_disk_io_stats(&disks);
         for (mount_point, read_bytes, write_bytes) in disk_io_stats {
-            let read_data_point = TelemetryDataPoint::new(
-                "disk_read_bytes",
-                read_bytes as f64,
-                "bytes",
-            )
-            .with_label("type", "io_read")
-            .with_label("mount_point", &mount_point);
+            let read_data_point =
+                TelemetryDataPoint::new("disk_read_bytes", read_bytes as f64, "bytes")
+                    .with_label("type", "io_read")
+                    .with_label("mount_point", &mount_point);
             telemetry.add_data_point(read_data_point);
 
-            let write_data_point = TelemetryDataPoint::new(
-                "disk_write_bytes",
-                write_bytes as f64,
-                "bytes",
-            )
-            .with_label("type", "io_write")
-            .with_label("mount_point", &mount_point);
+            let write_data_point =
+                TelemetryDataPoint::new("disk_write_bytes", write_bytes as f64, "bytes")
+                    .with_label("type", "io_write")
+                    .with_label("mount_point", &mount_point);
             telemetry.add_data_point(write_data_point);
         }
 
@@ -273,12 +254,7 @@ mod tests {
         let total_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| {
-                p.labels
-                    .get("type")
-                    .map(|t| t == "total")
-                    .unwrap_or(false)
-            })
+            .filter(|p| p.labels.get("type").map(|t| t == "total").unwrap_or(false))
             .collect();
         assert!(!total_points.is_empty());
 
@@ -286,12 +262,7 @@ mod tests {
         let usage_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| {
-                p.labels
-                    .get("type")
-                    .map(|t| t == "usage")
-                    .unwrap_or(false)
-            })
+            .filter(|p| p.labels.get("type").map(|t| t == "usage").unwrap_or(false))
             .collect();
         assert!(!usage_points.is_empty());
     }

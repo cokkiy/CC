@@ -179,47 +179,38 @@ impl TelemetryPlugin for ProcessMonitorPlugin {
         // Collect process counts
         let (total, running, zombie) = Self::get_process_counts(&system);
 
-        let total_data_point =
-            TelemetryDataPoint::new("process_count", total as f64, "count").with_label("type", "total");
+        let total_data_point = TelemetryDataPoint::new("process_count", total as f64, "count")
+            .with_label("type", "total");
         telemetry.add_data_point(total_data_point);
 
-        let running_data_point =
-            TelemetryDataPoint::new("process_count", running as f64, "count")
-                .with_label("type", "running");
+        let running_data_point = TelemetryDataPoint::new("process_count", running as f64, "count")
+            .with_label("type", "running");
         telemetry.add_data_point(running_data_point);
 
-        let zombie_data_point =
-            TelemetryDataPoint::new("process_count", zombie as f64, "count")
-                .with_label("type", "zombie");
+        let zombie_data_point = TelemetryDataPoint::new("process_count", zombie as f64, "count")
+            .with_label("type", "zombie");
         telemetry.add_data_point(zombie_data_point);
 
         // Collect top CPU-consuming processes
         let top_cpu_processes = Self::get_top_cpu_processes(&system, self.max_top_processes);
         for (idx, (name, pid, cpu_usage)) in top_cpu_processes.iter().enumerate() {
-            let data_point = TelemetryDataPoint::new(
-                "process_cpu_percent",
-                *cpu_usage,
-                "percent",
-            )
-            .with_label("type", "top_cpu")
-            .with_label("rank", &format!("{}", idx + 1))
-            .with_label("name", name)
-            .with_label("pid", &format!("{}", pid));
+            let data_point = TelemetryDataPoint::new("process_cpu_percent", *cpu_usage, "percent")
+                .with_label("type", "top_cpu")
+                .with_label("rank", &format!("{}", idx + 1))
+                .with_label("name", name)
+                .with_label("pid", &format!("{}", pid));
             telemetry.add_data_point(data_point);
         }
 
         // Collect top memory-consuming processes
         let top_memory_processes = Self::get_top_memory_processes(&system, self.max_top_processes);
         for (idx, (name, pid, memory)) in top_memory_processes.iter().enumerate() {
-            let data_point = TelemetryDataPoint::new(
-                "process_memory_bytes",
-                *memory as f64,
-                "bytes",
-            )
-            .with_label("type", "top_memory")
-            .with_label("rank", &format!("{}", idx + 1))
-            .with_label("name", name)
-            .with_label("pid", &format!("{}", pid));
+            let data_point =
+                TelemetryDataPoint::new("process_memory_bytes", *memory as f64, "bytes")
+                    .with_label("type", "top_memory")
+                    .with_label("rank", &format!("{}", idx + 1))
+                    .with_label("name", name)
+                    .with_label("pid", &format!("{}", pid));
             telemetry.add_data_point(data_point);
         }
 
@@ -301,12 +292,7 @@ mod tests {
         let total_points: Vec<_> = telemetry
             .data_points
             .iter()
-            .filter(|p| {
-                p.labels
-                    .get("type")
-                    .map(|t| t == "total")
-                    .unwrap_or(false)
-            })
+            .filter(|p| p.labels.get("type").map(|t| t == "total").unwrap_or(false))
             .collect();
         assert!(!total_points.is_empty());
     }
