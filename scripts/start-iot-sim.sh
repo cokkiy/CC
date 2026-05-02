@@ -76,6 +76,24 @@ validate_integer() {
     fi
 }
 
+station_binary_needs_rebuild() {
+    if [[ ! -x "$STATION_BINARY_PATH" ]]; then
+        return 0
+    fi
+
+    if [[ "$STATION_DIR/Cargo.toml" -nt "$STATION_BINARY_PATH" ]] || \
+       [[ "$STATION_DIR/Cargo.lock" -nt "$STATION_BINARY_PATH" ]] || \
+       [[ "$STATION_DIR/build.rs" -nt "$STATION_BINARY_PATH" ]]; then
+        return 0
+    fi
+
+    if find "$STATION_DIR/src" -type f -newer "$STATION_BINARY_PATH" -print -quit | grep -q .; then
+        return 0
+    fi
+
+    return 1
+}
+
 is_port_listening() {
     local port=$1
     if command -v ss >/dev/null 2>&1; then
@@ -116,9 +134,19 @@ prepare_image_context() {
 }
 
 ensure_station_binary() {
-    if [[ "$REBUILD_BINARY" == "1" || ! -x "$STATION_BINARY_PATH" ]]; then
+    local rebuild_reason=""
+
+    if [[ "$REBUILD_BINARY" == "1" ]]; then
+        rebuild_reason="REBUILD_BINARY=1"
+    elif [[ ! -x "$STATION_BINARY_PATH" ]]; then
+        rebuild_reason="binary missing"
+    elif station_binary_needs_rebuild; then
+        rebuild_reason="source newer than $STATION_BINARY_PATH"
+    fi
+
+    if [[ -n "$rebuild_reason" ]]; then
         require_command cargo
-        log_info "Building local CC-rStationService binary (${BUILD_MODE})"
+        log_info "Building local CC-rStationService binary (${BUILD_MODE}) (${rebuild_reason})"
         pushd "$STATION_DIR" >/dev/null
         if [[ "$BUILD_MODE" == "release" ]]; then
             cargo build --release
@@ -129,6 +157,18 @@ ensure_station_binary() {
     fi
 
     require_file "$STATION_BINARY_PATH"
+}
+
+is_project_broker_running() {
+    if [[ ! -f "$COMPOSE_FILE" ]]; then
+        return 1
+    fi
+
+    if ! command -v docker >/dev/null 2>&1; then
+        return 1
+    fi
+
+    docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" ps --status running --services mosquitto 2>/dev/null | grep -q '^mosquitto$'
 }
 
 resolve_broker_mode() {
@@ -145,8 +185,12 @@ resolve_broker_mode() {
             ;;
         auto|AUTO)
             if is_port_listening "$BROKER_PORT"; then
-                BROKER_MODE="host"
-                log_warn "Port ${BROKER_PORT} is already in use; reusing the host MQTT broker"
+                if is_project_broker_running; then
+                    log_info "Port ${BROKER_PORT} is occupied by the existing ${PROJECT_NAME} broker; keeping embedded broker mode"
+                else
+                    BROKER_MODE="host"
+                    log_warn "Port ${BROKER_PORT} is already in use; reusing the host MQTT broker"
+                fi
             fi
             ;;
         *)
