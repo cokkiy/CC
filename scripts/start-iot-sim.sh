@@ -164,7 +164,11 @@ is_project_broker_running() {
         return 1
     fi
 
-    docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" ps mosquitto --status running --services 2>/dev/null | grep -q '^mosquitto$'
+    if ! command -v docker >/dev/null 2>&1; then
+        return 1
+    fi
+
+    docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" ps --status running --services mosquitto 2>/dev/null | grep -q '^mosquitto$'
 }
 
 resolve_broker_mode() {
