@@ -94,6 +94,8 @@ export type StationRuntimeSnapshot = {
   appStates: RemoteAppState[];
   networkStats: RemoteInterfaceStat[];
   message: string;
+  telemetrySource: "mqtt" | "grpc";
+  detailLevel: "live-basic" | "full";
 };
 
 export type RemoteFileEntry = {

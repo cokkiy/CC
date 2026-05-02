@@ -105,6 +105,10 @@ export class NetworkMonitorPlugin implements Plugin {
    * Process incoming telemetry data
    */
   private processTelemetry(telemetry: StationRuntimeSnapshot): void {
+    if (telemetry.detailLevel !== 'full') {
+      return;
+    }
+
     const stationId = telemetry.stationId;
     
     // Get or create network history store for this station

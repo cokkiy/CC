@@ -19,19 +19,16 @@ use tracing::{debug, error, info, warn};
 use crate::config::AppConfig;
 use crate::grpc::agent::desktop_agent_client::DesktopAgentClient;
 use crate::grpc::cc::{
-    Ack, AppControlResult, AppStartParameter, AppStartingResult, CaptureScreenChunk,
-    CaptureScreenRequest, CloseAppRequest, CloseAppResponse, DownloadChunk, DownloadRequest,
-    Empty, ExecuteCommandRequest, ExecuteCommandResponse, GetAllProcessInfoResponse,
+    AppControlResult, AppStartParameter, AppStartingResult, CaptureScreenChunk,
+    CaptureScreenRequest, CloseAppRequest, CloseAppResponse, DownloadChunk, DownloadRequest, Empty,
+    ExecuteCommandRequest, ExecuteCommandResponse, GetAllProcessInfoResponse,
     GetAppLauncherPathResponse, GetConnectionInformationsResponse, GetFileInfoResponse,
     GetNetworkInterfacesResponse, GetServicePathResponse, GetTcpListenerInfosResponse,
-    GetUdpListenerInfosResponse, PathRef, RebootRequest, RenameFileRequest,
-    RenameFileResponse, RestartAppRequest, RestartAppResponse,
-    ServerVersionInfo, SetStateGatheringIntervalRequest, SetWatchingAppRequest,
-    ShutdownRequest, StartAppRequest, StartAppResponse, TelemetryClientMessage, TelemetryServerMessage, UploadChunk,
+    GetUdpListenerInfosResponse, PathRef, RebootRequest, RenameFileRequest, RenameFileResponse,
+    RestartAppRequest, RestartAppResponse, ServerVersionInfo, SetStateGatheringIntervalRequest,
+    SetWatchingAppRequest, ShutdownRequest, StartAppRequest, StartAppResponse, UploadChunk,
     UploadResult, file_transfer_server::FileTransfer, file_transfer_server::FileTransferServer,
     station_control_server::StationControl, station_control_server::StationControlServer,
-    telemetry_client_message, telemetry_server::Telemetry, telemetry_server::TelemetryServer,
-    telemetry_server_message,
 };
 use crate::platform;
 use crate::state::{AppState, find_process_ids_by_name, terminate_process};
@@ -74,12 +71,14 @@ pub async fn run(
             info!("MQTT status publisher started");
 
             loop {
-                let status = crate::mqtt::StationStatus::online(state_clone.station_id().to_string());
+                let status =
+                    crate::mqtt::StationStatus::online(state_clone.station_id().to_string());
                 if let Err(error) = mqtt_client.publish_status(&status).await {
                     warn!(error = %error, "failed to publish MQTT status");
                 }
 
-                tokio::time::sleep(Duration::from_secs(state_clone.interval_seconds().max(1))).await;
+                tokio::time::sleep(Duration::from_secs(state_clone.interval_seconds().max(1)))
+                    .await;
             }
         });
     }
@@ -88,7 +87,8 @@ pub async fn run(
         let state_clone = Arc::clone(&state);
         tokio::spawn(async move {
             info!("MQTT telemetry publisher started");
-            let mut ticker = tokio::time::interval(Duration::from_secs(state_clone.interval_seconds()));
+            let mut ticker =
+                tokio::time::interval(Duration::from_secs(state_clone.interval_seconds()));
             ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
 
             loop {
@@ -143,9 +143,6 @@ pub async fn run(
         }))
         .add_service(FileTransferServer::new(FileTransferService {
             _state: Arc::clone(&state),
-        }))
-        .add_service(TelemetryServer::new(TelemetryRpc {
-            state: Arc::clone(&state),
         }))
         .serve_with_shutdown(listen_addr, async move {
             let _ = shutdown.changed().await;
@@ -254,8 +251,6 @@ impl StationControl for StationControlService {
         Ok(Response::new(Empty {}))
     }
 
-
-
     async fn capture_screen(
         &self,
         request: Request<CaptureScreenRequest>,
@@ -321,12 +316,6 @@ impl StationControl for StationControlService {
         Ok(Response::new(self.state.server_version()))
     }
 
-
-
-
-
-
-
     async fn get_service_path(
         &self,
         _request: Request<Empty>,
@@ -377,7 +366,10 @@ impl StationControl for StationControlService {
     ) -> Result<Response<GetNetworkInterfacesResponse>, Status> {
         debug!("gRPC: get_network_interfaces called");
         let response = self.state.network_interfaces();
-        debug!("gRPC: returning {} network interfaces", response.items.len());
+        debug!(
+            "gRPC: returning {} network interfaces",
+            response.items.len()
+        );
         Ok(Response::new(response))
     }
 
@@ -414,9 +406,7 @@ impl StationControl for StationControlService {
 
         let output = tokio::time::timeout(
             std::time::Duration::from_secs(timeout_secs),
-            TokioCommand::new("sh")
-                .args(["-c", &req.command])
-                .output(),
+            TokioCommand::new("sh").args(["-c", &req.command]).output(),
         )
         .await
         .map_err(|_| Status::deadline_exceeded("command timed out"))?
@@ -554,120 +544,6 @@ impl FileTransfer for FileTransferService {
 
                 if completed {
                     break;
-                }
-            }
-        };
-
-        Ok(Response::new(Box::pin(output)))
-    }
-}
-
-#[derive(Clone)]
-struct TelemetryRpc {
-    state: Arc<AppState>,
-}
-
-#[tonic::async_trait]
-impl Telemetry for TelemetryRpc {
-    type StreamTelemetryStream =
-        Pin<Box<dyn Stream<Item = Result<TelemetryServerMessage, Status>> + Send>>;
-
-    async fn stream_telemetry(
-        &self,
-        request: Request<Streaming<TelemetryClientMessage>>,
-    ) -> Result<Response<Self::StreamTelemetryStream>, Status> {
-        let mut inbound = request.into_inner();
-        let state = Arc::clone(&self.state);
-
-        let output = try_stream! {
-            let mut controller_id = "unknown".to_string();
-
-            if let Some(message) = inbound.message().await? {
-                if let Some(body) = message.body {
-                    match body {
-                        telemetry_client_message::Body::Connect(connect) => {
-                            if !connect.requested_station_id.is_empty()
-                                && connect.requested_station_id != state.station_id()
-                            {
-                                yield telemetry_message(telemetry_server_message::Body::Accepted(Ack {
-                                    ok: false,
-                                    message: format!(
-                                        "station mismatch: requested {}, current {}",
-                                        connect.requested_station_id,
-                                        state.station_id()
-                                    ),
-                                }));
-                                return;
-                            }
-
-                            controller_id = connect.controller_id;
-                        }
-                        telemetry_client_message::Body::Ping(_) | telemetry_client_message::Body::Ack(_) => {}
-                    }
-                }
-            }
-
-            yield telemetry_message(telemetry_server_message::Body::Accepted(Ack {
-                ok: true,
-                message: format!("connected to station {} for controller {}", state.station_id(), controller_id),
-            }));
-            yield telemetry_message(telemetry_server_message::Body::SystemState(state.system_state()));
-            yield telemetry_message(telemetry_server_message::Body::ServerVersion(state.server_version()));
-
-            loop {
-                let sleep = tokio::time::sleep(Duration::from_secs(state.interval_seconds()));
-                tokio::pin!(sleep);
-
-                tokio::select! {
-                    inbound_message = inbound.message() => {
-                        match inbound_message {
-                            Ok(Some(message)) => {
-                                if let Some(body) = message.body {
-                                    match body {
-                                        telemetry_client_message::Body::Connect(connect) => {
-                                            if !connect.requested_station_id.is_empty()
-                                                && connect.requested_station_id != state.station_id()
-                                            {
-                                                yield telemetry_message(telemetry_server_message::Body::Accepted(Ack {
-                                                    ok: false,
-                                                    message: format!(
-                                                        "station mismatch: requested {}, current {}",
-                                                        connect.requested_station_id,
-                                                        state.station_id()
-                                                    ),
-                                                }));
-                                                break;
-                                            }
-
-                                            controller_id = connect.controller_id;
-                                            yield telemetry_message(telemetry_server_message::Body::Accepted(Ack {
-                                                ok: true,
-                                                message: format!("controller switched to {}", controller_id),
-                                            }));
-                                        }
-                                        telemetry_client_message::Body::Ping(ping) => {
-                                            yield telemetry_message(telemetry_server_message::Body::Accepted(Ack {
-                                                ok: true,
-                                                message: format!("pong {}", ping.unix_millis),
-                                            }));
-                                        }
-                                        telemetry_client_message::Body::Ack(_) => {}
-                                    }
-                                }
-                            }
-                            Ok(None) => break,
-                            Err(error) => {
-                                warn!(error = %error, "telemetry client stream closed with error");
-                                break;
-                            }
-                        }
-                    }
-                    _ = &mut sleep => {
-                        let (running, apps) = state.running_and_apps_state().await;
-                        yield telemetry_message(telemetry_server_message::Body::StationRunningState(running));
-                        yield telemetry_message(telemetry_server_message::Body::AppsRunningState(apps));
-                        yield telemetry_message(telemetry_server_message::Body::NetStatistics(state.network_statistics()));
-                    }
                 }
             }
         };
@@ -820,13 +696,6 @@ async fn remove_existing_path(path: &Path) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn telemetry_message(body: telemetry_server_message::Body) -> TelemetryServerMessage {
-    TelemetryServerMessage {
-        message_id: uuid::Uuid::new_v4().to_string(),
-        body: Some(body),
-    }
 }
 
 async fn console_telemetry_task(state: Arc<AppState>) {

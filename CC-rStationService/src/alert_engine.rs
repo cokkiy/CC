@@ -125,9 +125,8 @@ impl AlertCondition {
 
     /// Get a cached compiled regex for a wildcard metric pattern.
     fn cached_metric_regex(pattern: &str) -> Option<regex::Regex> {
-        static REGEX_CACHE: std::sync::OnceLock<
-            std::sync::RwLock<HashMap<String, regex::Regex>>,
-        > = std::sync::OnceLock::new();
+        static REGEX_CACHE: std::sync::OnceLock<std::sync::RwLock<HashMap<String, regex::Regex>>> =
+            std::sync::OnceLock::new();
 
         let cache = REGEX_CACHE.get_or_init(|| std::sync::RwLock::new(HashMap::new()));
 
@@ -466,7 +465,9 @@ impl AlertEngine {
     pub fn add_rule(&mut self, rule: AlertRule) {
         let rule_id = rule.id.clone();
         self.rules.insert(rule_id.clone(), rule);
-        self.states.entry(rule_id.clone()).or_insert_with(|| AlertState::new(rule_id));
+        self.states
+            .entry(rule_id.clone())
+            .or_insert_with(|| AlertState::new(rule_id));
     }
 
     /// Remove a rule
@@ -491,12 +492,17 @@ impl AlertEngine {
     }
 
     /// Evaluate all rules against a collection of telemetry data
-    pub fn evaluate(&mut self, telemetry_data: &crate::plugins::TelemetryData) -> Vec<EvaluationResult> {
+    pub fn evaluate(
+        &mut self,
+        telemetry_data: &crate::plugins::TelemetryData,
+    ) -> Vec<EvaluationResult> {
         let now = Utc::now();
         let mut results = Vec::new();
 
         // Collect rule IDs first to avoid borrow conflict
-        let rule_ids: Vec<String> = self.rules.values()
+        let rule_ids: Vec<String> = self
+            .rules
+            .values()
             .filter(|rule| rule.enabled)
             .map(|rule| rule.id.clone())
             .collect();
@@ -511,16 +517,23 @@ impl AlertEngine {
     }
 
     /// Internal evaluation of a single rule (uses rule_id to avoid borrow issues)
-    fn evaluate_rule_internal(&self, rule_id: &str, telemetry_data: &crate::plugins::TelemetryData, now: DateTime<Utc>) -> EvaluationResult {
+    fn evaluate_rule_internal(
+        &self,
+        rule_id: &str,
+        telemetry_data: &crate::plugins::TelemetryData,
+        now: DateTime<Utc>,
+    ) -> EvaluationResult {
         let rule = match self.rules.get(rule_id) {
             Some(r) => r,
-            None => return EvaluationResult {
-                rule_id: rule_id.to_string(),
-                is_matched: false,
-                matched_conditions: Vec::new(),
-                triggering_metrics: Vec::new(),
-                evaluated_at: now,
-            },
+            None => {
+                return EvaluationResult {
+                    rule_id: rule_id.to_string(),
+                    is_matched: false,
+                    matched_conditions: Vec::new(),
+                    triggering_metrics: Vec::new(),
+                    evaluated_at: now,
+                };
+            }
         };
 
         let mut matched_conditions = Vec::new();
@@ -531,7 +544,8 @@ impl AlertEngine {
                 .data_points
                 .iter()
                 .filter(|point| {
-                    condition.matches_metric(&point.metric_name) && condition.matches_labels(&point.labels)
+                    condition.matches_metric(&point.metric_name)
+                        && condition.matches_labels(&point.labels)
                 })
                 .collect();
 
@@ -578,9 +592,8 @@ impl AlertEngine {
                         timestamp: point.timestamp,
                     }),
                 "Avg" | "Average" => {
-                    let representative_point = matching_points
-                        .iter()
-                        .max_by_key(|point| point.timestamp);
+                    let representative_point =
+                        matching_points.iter().max_by_key(|point| point.timestamp);
                     let avg = matching_points.iter().map(|point| point.value).sum::<f64>()
                         / matching_points.len() as f64;
 
@@ -604,7 +617,8 @@ impl AlertEngine {
             }
         }
 
-        let is_matched = self.check_logical_op(&matched_conditions, &rule.conditions, rule.condition_op);
+        let is_matched =
+            self.check_logical_op(&matched_conditions, &rule.conditions, rule.condition_op);
 
         EvaluationResult {
             rule_id: rule.id.clone(),
@@ -629,7 +643,10 @@ impl AlertEngine {
         match op {
             LogicalOp::And => {
                 // All conditions must be matched
-                conditions.iter().enumerate().all(|(idx, _)| matched.contains(&idx))
+                conditions
+                    .iter()
+                    .enumerate()
+                    .all(|(idx, _)| matched.contains(&idx))
             }
             LogicalOp::Or => {
                 // At least one condition must be matched
@@ -656,7 +673,9 @@ impl AlertEngine {
 
             // Check cooldown
             if let Some(last_fired) = state.last_fired_at {
-                let cooldown = self.rules.get(rule_id)
+                let cooldown = self
+                    .rules
+                    .get(rule_id)
                     .map(|r| r.cooldown_seconds as i64)
                     .unwrap_or(300);
                 if (now.timestamp() - last_fired.timestamp()) < cooldown {
@@ -697,7 +716,9 @@ impl AlertEngine {
         };
 
         // Get the first triggered condition
-        let condition = match result.matched_conditions.iter()
+        let condition = match result
+            .matched_conditions
+            .iter()
             .filter_map(|&idx| rule.conditions.get(idx))
             .next()
         {
@@ -746,15 +767,16 @@ impl AlertEngine {
     /// Execute an alert action
     fn execute_action(&self, action: &AlertAction, alert: &Alert) {
         match action {
-            AlertAction::Log { level } => {
-                match level.as_str() {
-                    "error" => tracing::error!("[ALERT] {}", alert.message),
-                    "warn" => tracing::warn!("[ALERT] {}", alert.message),
-                    "info" => tracing::info!("[ALERT] {}", alert.message),
-                    _ => tracing::debug!("[ALERT] {}", alert.message),
-                }
-            }
-            AlertAction::Mqtt { topic, payload_template } => {
+            AlertAction::Log { level } => match level.as_str() {
+                "error" => tracing::error!("[ALERT] {}", alert.message),
+                "warn" => tracing::warn!("[ALERT] {}", alert.message),
+                "info" => tracing::info!("[ALERT] {}", alert.message),
+                _ => tracing::debug!("[ALERT] {}", alert.message),
+            },
+            AlertAction::Mqtt {
+                topic,
+                payload_template,
+            } => {
                 // MQTT publishing would be handled by integration with mqtt module
                 tracing::debug!(
                     "[ALERT:MQTT] topic={}, payload={:?}",
@@ -762,7 +784,10 @@ impl AlertEngine {
                     payload_template.as_ref().unwrap_or(&alert.message)
                 );
             }
-            AlertAction::Script { script_id, timeout_seconds } => {
+            AlertAction::Script {
+                script_id,
+                timeout_seconds,
+            } => {
                 tracing::debug!(
                     "[ALERT:SCRIPT] script_id={}, timeout={}s",
                     script_id,
@@ -771,11 +796,7 @@ impl AlertEngine {
                 // Script execution would be handled by script_engine module
             }
             AlertAction::Webhook { url, headers } => {
-                tracing::debug!(
-                    "[ALERT:WEBHOOK] url={}, headers={:?}",
-                    url,
-                    headers
-                );
+                tracing::debug!("[ALERT:WEBHOOK] url={}, headers={:?}", url, headers);
                 // Webhook execution would use reqwest or similar
             }
         }
@@ -788,7 +809,8 @@ impl AlertEngine {
 
     /// Get active (unresolved) alerts
     pub fn get_active_alerts(&self) -> Vec<&Alert> {
-        self.recent_alerts.iter()
+        self.recent_alerts
+            .iter()
             .filter(|a| a.resolved_at.is_none())
             .collect()
     }

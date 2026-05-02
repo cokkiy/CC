@@ -153,11 +153,7 @@ impl ScriptParameter {
     }
 
     /// Create a new select parameter with options
-    pub fn select(
-        name: impl Into<String>,
-        options: Vec<String>,
-        default: Option<String>,
-    ) -> Self {
+    pub fn select(name: impl Into<String>, options: Vec<String>, default: Option<String>) -> Self {
         Self {
             name: name.into(),
             param_type: ParameterType::Select,
@@ -530,8 +526,7 @@ mod tests {
 
     #[test]
     fn test_script_execution_result() {
-        let result = ScriptExecutionResult::new(Uuid::new_v4())
-            .success(0, "hello", "", 100);
+        let result = ScriptExecutionResult::new(Uuid::new_v4()).success(0, "hello", "", 100);
 
         assert!(result.success);
         assert_eq!(result.exit_code, Some(0));

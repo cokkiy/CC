@@ -114,12 +114,20 @@ function getMetricValue(runtime: StationRuntimeSnapshot, metricType: AlertRule['
     case 'cpu_load':
       return runtime.cpu;
     case 'memory_usage':
-      return runtime.totalMemory > 0 ? (runtime.currentMemory / runtime.totalMemory) * 100 : 0;
+      return runtime.totalMemory > 0 ? (runtime.currentMemory / runtime.totalMemory) * 100 : NaN;
     case 'memory_available':
-      return Math.max(runtime.totalMemory - runtime.currentMemory, 0) / (1024 * 1024);
+      return runtime.totalMemory > 0
+        ? Math.max(runtime.totalMemory - runtime.currentMemory, 0) / (1024 * 1024)
+        : NaN;
     case 'network_rx':
+      if (runtime.detailLevel !== 'full') {
+        return NaN;
+      }
       return runtime.networkStats.reduce((sum, item) => sum + item.bytesReceivedPerSec, 0);
     case 'network_tx':
+      if (runtime.detailLevel !== 'full') {
+        return NaN;
+      }
       return runtime.networkStats.reduce((sum, item) => sum + item.bytesSentedPerSec, 0);
     case 'process_count':
       return runtime.procCount;

@@ -8,7 +8,7 @@ use std::sync::{Arc, RwLock};
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use uuid::Uuid;
 
 use crate::groups::{StationGroup, StationGroupFilter, StationGroupSortField, StationGroupStats};
@@ -105,13 +105,11 @@ impl StationGroupCache {
                 StationGroupSortField::CreatedAt => a.created_at.cmp(&b.created_at),
                 StationGroupSortField::UpdatedAt => a.updated_at.cmp(&b.updated_at),
                 StationGroupSortField::Name => a.name.cmp(&b.name),
-                StationGroupSortField::StationCount => a.station_ids.len().cmp(&b.station_ids.len()),
+                StationGroupSortField::StationCount => {
+                    a.station_ids.len().cmp(&b.station_ids.len())
+                }
             };
-            if sort_desc {
-                cmp.reverse()
-            } else {
-                cmp
-            }
+            if sort_desc { cmp.reverse() } else { cmp }
         });
 
         // Pagination (limit 0 means no limit)
@@ -169,8 +167,9 @@ impl StationGroupStore {
 
     /// Initialize the database schema.
     fn init_db(&self) -> Result<()> {
-        let conn = Connection::open(&self.db_path)
-            .with_context(|| format!("open station group store DB at {}", self.db_path.display()))?;
+        let conn = Connection::open(&self.db_path).with_context(|| {
+            format!("open station group store DB at {}", self.db_path.display())
+        })?;
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS station_groups (
@@ -195,8 +194,9 @@ impl StationGroupStore {
 
     /// Load groups from the database into cache.
     fn load_from_db(&self) -> Result<()> {
-        let conn = Connection::open(&self.db_path)
-            .with_context(|| format!("open station group store DB at {}", self.db_path.display()))?;
+        let conn = Connection::open(&self.db_path).with_context(|| {
+            format!("open station group store DB at {}", self.db_path.display())
+        })?;
 
         let mut stmt = conn.prepare(
             "SELECT id, name, description, station_ids, created_at, updated_at, created_by
@@ -231,8 +231,7 @@ impl StationGroupStore {
     }
 
     fn row_data_to_group(&self, data: GroupRowData) -> Result<StationGroup> {
-        let station_ids: Vec<String> =
-            serde_json::from_str(&data.station_ids).unwrap_or_default();
+        let station_ids: Vec<String> = serde_json::from_str(&data.station_ids).unwrap_or_default();
 
         let created_at = DateTime::parse_from_rfc3339(&data.created_at)
             .map(|dt| dt.with_timezone(&Utc))
@@ -256,8 +255,9 @@ impl StationGroupStore {
 
     /// Create a new station group.
     pub fn create(&self, group: &StationGroup) -> Result<()> {
-        let conn = Connection::open(&self.db_path)
-            .with_context(|| format!("open station group store DB at {}", self.db_path.display()))?;
+        let conn = Connection::open(&self.db_path).with_context(|| {
+            format!("open station group store DB at {}", self.db_path.display())
+        })?;
 
         let station_ids_json = serde_json::to_string(&group.station_ids)?;
 
@@ -296,8 +296,9 @@ impl StationGroupStore {
 
     /// Update a station group.
     pub fn update(&self, group: &StationGroup) -> Result<Option<StationGroup>> {
-        let conn = Connection::open(&self.db_path)
-            .with_context(|| format!("open station group store DB at {}", self.db_path.display()))?;
+        let conn = Connection::open(&self.db_path).with_context(|| {
+            format!("open station group store DB at {}", self.db_path.display())
+        })?;
 
         let station_ids_json = serde_json::to_string(&group.station_ids)?;
 
@@ -325,13 +326,12 @@ impl StationGroupStore {
 
     /// Delete a station group by ID.
     pub fn delete(&self, id: &Uuid) -> Result<Option<StationGroup>> {
-        let conn = Connection::open(&self.db_path)
-            .with_context(|| format!("open station group store DB at {}", self.db_path.display()))?;
+        let conn = Connection::open(&self.db_path).with_context(|| {
+            format!("open station group store DB at {}", self.db_path.display())
+        })?;
 
-        let affected = conn.execute(
-            "DELETE FROM station_groups WHERE id = ?1",
-            [id.to_string()],
-        )?;
+        let affected =
+            conn.execute("DELETE FROM station_groups WHERE id = ?1", [id.to_string()])?;
 
         if affected > 0 {
             Ok(self.cache.remove(id))
@@ -384,7 +384,10 @@ mod tests {
         // Read
         let retrieved = store.get(&group.id).unwrap();
         assert_eq!(retrieved.name, "Test Group");
-        assert_eq!(retrieved.description, Some("A test station group".to_string()));
+        assert_eq!(
+            retrieved.description,
+            Some("A test station group".to_string())
+        );
         assert_eq!(retrieved.station_ids.len(), 2);
 
         // Update
@@ -447,10 +450,7 @@ mod tests {
         // Create groups with stations
         for i in 0..3 {
             let mut group = StationGroup::new(format!("Group {}", i));
-            group = group.add_stations([
-                format!("station-{}", i),
-                format!("station-{}", i + 10),
-            ]);
+            group = group.add_stations([format!("station-{}", i), format!("station-{}", i + 10)]);
             store.create(&group).unwrap();
         }
 

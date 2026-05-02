@@ -1,5 +1,5 @@
 //! MQTT client module for CC-rStationService
-//! 
+//!
 //! This module implements MQTT telemetry publishing for the station service.
 //! It publishes telemetry data to the CC-Aggregator via MQTT and
 //! subscribes to command messages from the CC-Aggregator.
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 use tracing::{debug, error, info, warn};
 
 /// Command received from the Aggregator via MQTT
@@ -67,15 +67,16 @@ impl MqttClient {
 
         let (client, eventloop) = AsyncClient::new(mqttoptions, 100);
         let (worker_tx, mut worker_rx) = mpsc::channel::<MqttWorkerMsg>(100);
-        
+
         let client_for_worker = client.clone();
 
         // Spawn background task to handle event loop and subscriptions
         tokio::spawn(async move {
             let mut eventloop = eventloop;
             // Map of topic -> command sender
-            let handlers: Arc<Mutex<HashMap<String, mpsc::Sender<Command>>>> = Arc::new(Mutex::new(HashMap::new()));
-            
+            let handlers: Arc<Mutex<HashMap<String, mpsc::Sender<Command>>>> =
+                Arc::new(Mutex::new(HashMap::new()));
+
             loop {
                 tokio::select! {
                     // Handle messages from the main client (subscription requests)
@@ -86,14 +87,14 @@ impl MqttClient {
                                 match client_for_worker.subscribe(&topic, QoS::AtLeastOnce).await {
                                     Ok(()) => {
                                         debug!("Subscribed to topic: {}", topic);
-                                        
+
                                         // Create a channel for this subscription
                                         let (tx, rx) = mpsc::channel::<Command>(100);
-                                        
+
                                         // Store the handler
                                         let mut handlers_lock = handlers.lock().await;
                                         handlers_lock.insert(topic.clone(), tx);
-                                        
+
                                         let _ = response_tx.send(Ok(rx)).await;
                                     }
                                     Err(e) => {
@@ -114,7 +115,7 @@ impl MqttClient {
                             Ok(event) => {
                                 if let Event::Incoming(Packet::Publish(publish)) = event {
                                     let topic = publish.topic.clone();
-                                    
+
                                     // Look up handler for this topic
                                     let handlers_lock = handlers.lock().await;
                                     if let Some(tx) = handlers_lock.get(&topic) {
@@ -135,12 +136,14 @@ impl MqttClient {
                     }
                 }
             }
-            
+
             info!("MQTT worker task ending");
         });
 
-        info!("MQTT client created: broker={}:{}, station_id={}", 
-              broker_host, broker_port, station_id);
+        info!(
+            "MQTT client created: broker={}:{}, station_id={}",
+            broker_host, broker_port, station_id
+        );
 
         Ok(Self {
             client,
@@ -152,9 +155,10 @@ impl MqttClient {
     /// Subscribe to command topic and return a receiver for command messages.
     pub async fn subscribe_commands(&self) -> Result<mpsc::Receiver<Command>> {
         let command_topic = format!("cc/{}/command", self.station_id);
-        
-        let (response_tx, mut response_rx) = mpsc::channel::<Result<mpsc::Receiver<Command>, anyhow::Error>>(1);
-        
+
+        let (response_tx, mut response_rx) =
+            mpsc::channel::<Result<mpsc::Receiver<Command>, anyhow::Error>>(1);
+
         self.worker_tx
             .send(MqttWorkerMsg::Subscribe {
                 topic: command_topic,
@@ -162,12 +166,12 @@ impl MqttClient {
             })
             .await
             .context("Failed to send subscribe request to worker")?;
-        
+
         let result = response_rx
             .recv()
             .await
             .context("Worker dropped response channel")??;
-        
+
         Ok(result)
     }
 
@@ -175,12 +179,12 @@ impl MqttClient {
     pub async fn publish_command_ack(&self, ack: &CommandAck) -> Result<()> {
         let topic = format!("cc/{}/command/ack", self.station_id);
         let payload = serde_json::to_vec(ack)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, false, payload)
             .await
             .context("Failed to publish command ack")?;
-        
+
         debug!("Published command ack for command_id: {}", ack.command_id);
         Ok(())
     }
@@ -194,12 +198,12 @@ impl MqttClient {
     pub async fn publish_telemetry(&self, telemetry: &TelemetryBundle) -> Result<()> {
         let topic = format!("cc/{}/telemetry", self.station_id);
         let payload = serde_json::to_vec(telemetry)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, false, payload)
             .await
             .context("Failed to publish telemetry")?;
-        
+
         debug!("Published telemetry for station: {}", self.station_id);
         Ok(())
     }
@@ -208,12 +212,12 @@ impl MqttClient {
     pub async fn publish_status(&self, status: &StationStatus) -> Result<()> {
         let topic = format!("cc/{}/status", self.station_id);
         let payload = serde_json::to_vec(status)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, true, payload)
             .await
             .context("Failed to publish status")?;
-        
+
         debug!("Published status for station: {}", self.station_id);
         Ok(())
     }
@@ -222,12 +226,12 @@ impl MqttClient {
     pub async fn publish_descriptor(&self, descriptor: &StationDescriptor) -> Result<()> {
         let topic = format!("cc/{}/descriptor/announce", self.station_id);
         let payload = serde_json::to_vec(descriptor)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, true, payload)
             .await
             .context("Failed to publish descriptor")?;
-        
+
         info!("Published station descriptor for: {}", self.station_id);
         Ok(())
     }
@@ -260,18 +264,24 @@ impl TelemetryBundle {
     }
 
     /// Convert from StationRunningState to TelemetryBundle
-    pub fn from_station_state(state: &crate::grpc::cc::StationRunningState, interval_ms: u32) -> Self {
+    pub fn from_station_state(
+        state: &crate::grpc::cc::StationRunningState,
+        interval_ms: u32,
+    ) -> Self {
         let mut bundle = TelemetryBundle::new(state.station_id.clone(), interval_ms);
-        
+
         // Add CPU usage
         bundle.add_value("cpu_usage_percent", state.cpu as f64);
-        
+
         // Add memory usage
-        bundle.add_value("memory_used_mb", (state.current_memory as f64) / 1024.0 / 1024.0);
-        
+        bundle.add_value(
+            "memory_used_mb",
+            (state.current_memory as f64) / 1024.0 / 1024.0,
+        );
+
         // Add process count
         bundle.add_value("process_count", state.proc_count as f64);
-        
+
         bundle
     }
 }

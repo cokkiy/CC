@@ -296,7 +296,11 @@ impl BatchTask {
     }
 
     /// Add a default parameter
-    pub fn with_default_parameter(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+    pub fn with_default_parameter(
+        mut self,
+        name: impl Into<String>,
+        value: impl Into<String>,
+    ) -> Self {
         self.default_parameters.push(BatchParameterValue {
             name: name.into(),
             value: value.into(),
@@ -335,7 +339,12 @@ impl BatchTask {
         let completed = self
             .execution_items
             .iter()
-            .filter(|item| matches!(item.status, BatchExecutionStatus::Success | BatchExecutionStatus::Failed))
+            .filter(|item| {
+                matches!(
+                    item.status,
+                    BatchExecutionStatus::Success | BatchExecutionStatus::Failed
+                )
+            })
             .count() as u32;
 
         self.progress = completed;
@@ -450,11 +459,7 @@ impl BatchExecutor {
             }
             ExecutionPolicy::Sequential => {
                 // Each item in its own batch
-                items
-                    .iter()
-                    .enumerate()
-                    .map(|(i, _)| vec![i])
-                    .collect()
+                items.iter().enumerate().map(|(i, _)| vec![i]).collect()
             }
             ExecutionPolicy::LimitedParallel { max_concurrency } => {
                 // Split into batches of max_concurrency
@@ -548,30 +553,40 @@ mod tests {
 
         assert!(TargetSelector::All.matches("any-id", &tags, &groups));
 
-        assert!(TargetSelector::ByIds {
-            ids: vec!["id1".to_string(), "id2".to_string()]
-        }
-        .matches("id1", &tags, &groups));
+        assert!(
+            TargetSelector::ByIds {
+                ids: vec!["id1".to_string(), "id2".to_string()]
+            }
+            .matches("id1", &tags, &groups)
+        );
 
-        assert!(!TargetSelector::ByIds {
-            ids: vec!["id1".to_string(), "id2".to_string()]
-        }
-        .matches("id3", &tags, &groups));
+        assert!(
+            !TargetSelector::ByIds {
+                ids: vec!["id1".to_string(), "id2".to_string()]
+            }
+            .matches("id3", &tags, &groups)
+        );
 
-        assert!(TargetSelector::ByPattern {
-            pattern: "station-".to_string()
-        }
-        .matches("station-001", &tags, &groups));
+        assert!(
+            TargetSelector::ByPattern {
+                pattern: "station-".to_string()
+            }
+            .matches("station-001", &tags, &groups)
+        );
 
-        assert!(TargetSelector::ByTag {
-            tag: "production".to_string()
-        }
-        .matches("any-id", &tags, &groups));
+        assert!(
+            TargetSelector::ByTag {
+                tag: "production".to_string()
+            }
+            .matches("any-id", &tags, &groups)
+        );
 
-        assert!(TargetSelector::ByGroup {
-            group: "backend".to_string()
-        }
-        .matches("any-id", &tags, &groups));
+        assert!(
+            TargetSelector::ByGroup {
+                group: "backend".to_string()
+            }
+            .matches("any-id", &tags, &groups)
+        );
     }
 
     #[test]
@@ -610,7 +625,8 @@ mod tests {
         assert_eq!(batches[0], vec![0, 1, 2, 3, 4]);
 
         // Sequential - each in own batch
-        let batches = BatchExecutor::determine_execution_order(&items, &ExecutionPolicy::Sequential);
+        let batches =
+            BatchExecutor::determine_execution_order(&items, &ExecutionPolicy::Sequential);
         assert_eq!(batches.len(), 5);
         assert_eq!(batches[0], vec![0]);
         assert_eq!(batches[4], vec![4]);
@@ -642,7 +658,7 @@ mod tests {
     fn test_batch_task_creation() {
         let script = CommandScript::new("test script", "echo hello");
         let task = BatchTask::new("Test Task", &script);
-        
+
         assert_eq!(task.name, "Test Task");
         assert_eq!(task.script_id, script.id);
         assert_eq!(task.script_content, "echo hello");
@@ -655,7 +671,7 @@ mod tests {
     fn test_batch_task_update_status() {
         let script = CommandScript::new("test script", "echo hello");
         let mut task = BatchTask::new("Test Task", &script);
-        
+
         // Add execution items
         task.execution_items.push(BatchExecutionItem {
             station_id: "station-1".to_string(),
@@ -683,7 +699,7 @@ mod tests {
     fn test_batch_task_completion_percentage() {
         let script = CommandScript::new("test script", "echo hello");
         let mut task = BatchTask::new("Test Task", &script);
-        
+
         assert_eq!(task.completion_percentage(), 0.0);
 
         task.total_items = 4;

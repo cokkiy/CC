@@ -185,9 +185,8 @@ impl TelemetryPlugin for CpuMonitorPlugin {
 
         // Collect CPU core count
         let core_count = system.cpus().len() as f64;
-        let core_count_data_point =
-            TelemetryDataPoint::new("cpu_core_count", core_count, "count")
-                .with_label("type", "info");
+        let core_count_data_point = TelemetryDataPoint::new("cpu_core_count", core_count, "count")
+            .with_label("type", "info");
         telemetry.add_data_point(core_count_data_point);
 
         // Collect CPU brand/model info
