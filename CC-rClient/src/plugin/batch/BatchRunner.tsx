@@ -16,6 +16,7 @@ import type {
   TargetSelector,
   ExecutionPolicy,
 } from './types';
+import { getBatchTaskMeta } from './taskMeta';
 
 // ============================================
 // Parameter Input Component
@@ -909,7 +910,7 @@ export const BatchTaskRunner: React.FC<BatchTaskRunnerProps> = ({
         <div className="runner-header">
           <div className="header-info">
             <h2>Execute Batch Task</h2>
-            <span className="task-type-badge">{task.taskType}</span>
+            <span className="task-type-badge">{getBatchTaskMeta(task.taskType).label}</span>
           </div>
           <button className="btn-close" onClick={handleClose} disabled={isExecuting}>×</button>
         </div>
@@ -918,15 +919,7 @@ export const BatchTaskRunner: React.FC<BatchTaskRunnerProps> = ({
           <div className="config-panel">
             <div className="config-section task-info-section">
               <div className="task-name-row">
-                <span className="task-type-icon">
-                  {task.taskType === 'power_on' && '⚡'}
-                  {task.taskType === 'shutdown' && '⏻'}
-                  {task.taskType === 'start_app' && '🚀'}
-                  {task.taskType === 'command' && '💻'}
-                  {task.taskType === 'watch_processes' && '👁'}
-                  {task.taskType === 'script' && '📜'}
-                  {task.taskType === 'reboot' && '🔄'}
-                </span>
+                <span className="task-type-icon">{getBatchTaskMeta(task.taskType).icon}</span>
                 <h3>{task.name}</h3>
               </div>
               <p className="task-description">{task.description || 'No description'}</p>

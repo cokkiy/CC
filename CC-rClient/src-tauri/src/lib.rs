@@ -75,6 +75,40 @@ fn normalize_group_station_ids(station_ids: Vec<String>) -> Vec<String> {
     normalized
 }
 
+fn build_mqtt_placeholder_station(station_id: &str) -> Station {
+    let mut metadata = HashMap::new();
+    metadata.insert("source".to_string(), "mqtt".to_string());
+
+    Station {
+        id: station_id.to_string(),
+        name: station_id.to_string(),
+        blocked: false,
+        network_interfaces: Vec::new(),
+        start_programs: Vec::new(),
+        monitor_processes: Vec::new(),
+        last_action: Some("Discovered via MQTT".to_string()),
+        groups: Vec::new(),
+        tags: HashMap::new(),
+        metadata,
+        location: None,
+    }
+}
+
+fn ensure_station_exists(stations: &mut Vec<Station>, station_id: &str) {
+    let trimmed = station_id.trim();
+    if trimmed.is_empty() || stations.iter().any(|station| station.id == trimmed) {
+        return;
+    }
+
+    stations.push(build_mqtt_placeholder_station(trimmed));
+}
+
+fn ensure_stations_exist(stations: &mut Vec<Station>, station_ids: &[String]) {
+    for station_id in station_ids {
+        ensure_station_exists(stations, station_id);
+    }
+}
+
 fn build_station_group(
     name: String,
     description: String,
@@ -281,6 +315,7 @@ fn create_station_group(
 ) -> Result<StationGroup, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
     let group = build_station_group(name, description, color, icon, station_ids);
+    ensure_stations_exist(&mut snapshot.stations, &group.station_ids);
     sync_station_group_membership(&mut snapshot.stations, &group.id, &group.station_ids);
     snapshot.groups.push(group.clone());
     StateStore::save_payload(PersistedState {
@@ -315,6 +350,7 @@ fn update_station_group(
     group.icon = normalize_group_icon(icon);
     group.station_ids = station_ids;
     let updated = group.clone();
+    ensure_stations_exist(&mut snapshot.stations, &updated.station_ids);
     sync_station_group_membership(&mut snapshot.stations, &id, &updated.station_ids);
     StateStore::save_payload(PersistedState {
         stations: snapshot.stations,
@@ -441,6 +477,7 @@ fn delete_group(group_id: String) -> Result<String, String> {
 #[tauri::command]
 fn add_station_to_group(group_id: String, station_id: String) -> Result<StationGroup, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    ensure_station_exists(&mut snapshot.stations, &station_id);
     let group = snapshot
         .groups
         .iter_mut()
@@ -635,6 +672,7 @@ fn update_station_tags(
     tags: HashMap<String, String>,
 ) -> Result<HashMap<String, String>, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    ensure_station_exists(&mut snapshot.stations, &station_id);
     let station = snapshot
         .stations
         .iter_mut()
@@ -660,6 +698,7 @@ fn batch_update_station_tags(
     tags: HashMap<String, String>,
 ) -> Result<String, String> {
     let mut snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    ensure_stations_exist(&mut snapshot.stations, &station_ids);
     let mut updated = 0usize;
 
     for station in &mut snapshot.stations {

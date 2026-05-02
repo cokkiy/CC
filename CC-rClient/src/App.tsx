@@ -380,6 +380,7 @@ type NetworkDataPoint = {
 };
 
 type ChartDataPoint = { ts: number; cpu: number; memory: number; memPct: number };
+type ProcessChartDataPoint = { ts: number; procCount: number };
 
 function PerformanceCharts({
   history,
@@ -503,6 +504,55 @@ function NetworkTrafficChart({
   );
 }
 
+function ProcessCountMiniChart({
+  history,
+}: {
+  history: { ts: number; procCount: number }[];
+}) {
+  const data: ProcessChartDataPoint[] = history
+    .filter((entry) => Number.isFinite(entry.procCount))
+    .map((entry) => ({
+      ts: entry.ts,
+      procCount: entry.procCount,
+    }));
+
+  if (data.length < 2) {
+    return null;
+  }
+
+  const values = data.map((entry) => entry.procCount);
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
+  const domain =
+    minValue === maxValue
+      ? [Math.max(0, minValue - 1), maxValue + 1]
+      : [Math.max(0, minValue), maxValue];
+
+  return (
+    <div className="processMiniChart">
+      <ResponsiveContainer width="100%" height={42}>
+        <LineChart data={data} margin={{ top: 4, right: 2, left: 2, bottom: 2 }}>
+          <Tooltip
+            formatter={(value) => [String(value), "Processes"]}
+            labelFormatter={(value) => new Date(Number(value)).toLocaleTimeString()}
+          />
+          <Line
+            type="monotone"
+            dataKey="procCount"
+            stroke="#2d8cf0"
+            strokeWidth={1.3}
+            dot={{ r: 2, fill: "#2d8cf0", strokeWidth: 0 }}
+            activeDot={{ r: 3 }}
+            isAnimationActive={false}
+          />
+          <YAxis hide domain={domain} />
+          <XAxis hide dataKey="ts" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 type StationDetailTab = "overview" | "edit";
 
 interface StationBrowserPanelProps {
@@ -523,6 +573,7 @@ interface StationBrowserPanelProps {
   viewMode: StationViewMode;
   listColumns: number;
   gridColumns: number;
+  panelMaxHeight: number | null;
   hasActiveFilter: boolean;
   filtersHideStations: boolean;
   selectedStationHiddenByFilters: boolean;
@@ -558,6 +609,7 @@ function StationBrowserPanel({
   viewMode,
   listColumns,
   gridColumns,
+  panelMaxHeight,
   hasActiveFilter,
   filtersHideStations,
   selectedStationHiddenByFilters,
@@ -578,7 +630,10 @@ function StationBrowserPanel({
     tagDefinitions.find((definition) => getTagDefinitionKey(definition) === tagKeyFilter) ?? null;
 
   return (
-    <aside className="panel stationsBrowserPanel">
+    <aside
+      className="panel stationsBrowserPanel"
+      style={panelMaxHeight ? { maxHeight: `${panelMaxHeight}px` } : undefined}
+    >
       <div className="stationsBrowserHeader">
         <div className="panelHeader stationsBrowserTitleRow">
           <div>
@@ -700,8 +755,15 @@ function StationBrowserPanel({
               </>
             )
           ) : null}
-          <button type="button" onClick={onClearFilters} disabled={!hasActiveFilter}>
-            Clear Filters
+          <button
+            type="button"
+            className="stationsClearFiltersButton"
+            onClick={onClearFilters}
+            disabled={!hasActiveFilter}
+            aria-label="Clear filters"
+            title="Clear filters"
+          >
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
@@ -872,7 +934,7 @@ function AppShell() {
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [runtimeByStation, setRuntimeByStation] = useState<Record<string, StationRuntimeSnapshot>>({});
-  const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; ts: number; rxbps: number; txbps: number }[]>>({});
+  const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; procCount: number; ts: number; rxbps: number; txbps: number }[]>>({});
   const MAX_HISTORY = 30;
   const [browserByStation, setBrowserByStation] = useState<Record<string, RemoteFileBrowserResult>>({});
   const [captureByStation, setCaptureByStation] = useState<Record<string, StationScreenCapture>>({});
@@ -903,6 +965,7 @@ function AppShell() {
   const [isStationsStacked, setIsStationsStacked] = useState(
     () => typeof window !== "undefined" && window.innerWidth <= STATIONS_STACK_BREAKPOINT,
   );
+  const [stationPanelsMaxHeight, setStationPanelsMaxHeight] = useState<number | null>(null);
   const [pendingStationTagValues, setPendingStationTagValues] = useState<Record<string, string>>({});
   const [dirtyStationTagKeys, setDirtyStationTagKeys] = useState<Record<string, boolean>>({});
   const stationsWorkspaceRef = useRef<HTMLElement | null>(null);
@@ -957,6 +1020,30 @@ function AppShell() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [stationPanelWidth]);
+
+  useEffect(() => {
+    const updatePanelHeight = () => {
+      if (!stationsWorkspaceRef.current) {
+        setStationPanelsMaxHeight(null);
+        return;
+      }
+
+      const rect = stationsWorkspaceRef.current.getBoundingClientRect();
+      const viewportBottomPadding = 8;
+      const availableHeight = Math.floor(window.innerHeight - Math.max(rect.top, 0) - viewportBottomPadding);
+      setStationPanelsMaxHeight(availableHeight > 0 ? availableHeight : null);
+    };
+
+    updatePanelHeight();
+    window.addEventListener("resize", updatePanelHeight);
+    const scrollContainer = stationsWorkspaceRef.current?.closest(".app-content");
+    scrollContainer?.addEventListener("scroll", updatePanelHeight, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", updatePanelHeight);
+      scrollContainer?.removeEventListener("scroll", updatePanelHeight);
+    };
+  }, [activePage, loading, stations.length, viewMode]);
 
   useEffect(() => {
     const onPointerMove = (event: PointerEvent) => {
@@ -1041,6 +1128,7 @@ function AppShell() {
             {
               cpu: runtime.cpu,
               memory: runtime.currentMemory,
+              procCount: runtime.procCount,
               ts: Date.now(),
               rxbps: 0,
               txbps: 0,
@@ -1269,7 +1357,14 @@ function AppShell() {
         const totalTx = runtime.networkStats.reduce((s, n) => s + n.bytesSentedPerSec, 0);
         const next = [
           ...prev.slice(-(MAX_HISTORY - 1)),
-          { cpu: runtime.cpu, memory: runtime.currentMemory, ts: Date.now(), rxbps: totalRx, txbps: totalTx },
+          {
+            cpu: runtime.cpu,
+            memory: runtime.currentMemory,
+            procCount: runtime.procCount,
+            ts: Date.now(),
+            rxbps: totalRx,
+            txbps: totalTx,
+          },
         ];
         return { ...current, [targetId]: next };
       });
@@ -1931,6 +2026,7 @@ function AppShell() {
             tagValueOptions={tagValueOptions}
             viewMode={viewMode}
             listColumns={listColumns}
+            panelMaxHeight={stationPanelsMaxHeight}
             hasActiveFilter={hasActiveFilter}
             filtersHideStations={filtersHideStations}
             selectedStationHiddenByFilters={selectedStationHiddenByFilters}
@@ -1973,7 +2069,10 @@ function AppShell() {
             }}
           />
 
-          <section className="panel stationsDetailPanel">
+          <section
+            className="panel stationsDetailPanel"
+            style={stationPanelsMaxHeight ? { maxHeight: `${stationPanelsMaxHeight}px` } : undefined}
+          >
             <div className="panelHeader stationsDetailHeader">
               <div>
                 <h2>{detailTab === "edit" ? "Device Editor" : "Runtime & Tools"}</h2>
@@ -2299,10 +2398,6 @@ function AppShell() {
                     <div className="programCard">
                   <div className="statsGrid">
                     <div className="statTile">
-                      <span>Endpoint</span>
-                      <strong>{selectedRuntime.endpoint}</strong>
-                    </div>
-                    <div className="statTile">
                       <span>Remote Device ID</span>
                       <strong>{selectedRuntime.stationId || "n/a"}</strong>
                     </div>
@@ -2316,10 +2411,11 @@ function AppShell() {
                     <div className="statTile">
                       <span>Processes</span>
                       <strong>{selectedRuntime.procCount}</strong>
+                      <ProcessCountMiniChart history={historyByStation[selectedStation.id] ?? []} />
                     </div>
                     <div className="statTile">
-                      <span>Service Version</span>
-                      <strong>{selectedRuntime.serviceVersion || "n/a"}</strong>
+                      <span>Disk Usage</span>
+                      <strong>n/a</strong>
                     </div>
                   </div>
                   <div className="collection">
@@ -2330,6 +2426,16 @@ function AppShell() {
                       history={historyByStation[selectedStation.id] ?? []}
                       totalMemory={selectedRuntime.totalMemory}
                     />
+                  </div>
+                  <div className="runtimeEndpointRow">
+                    <div className="runtimeEndpointRowGroup">
+                      <span>Endpoint</span>
+                      <strong>{selectedRuntime.endpoint}</strong>
+                    </div>
+                    <div className="runtimeEndpointRowGroup runtimeEndpointRowGroup--meta">
+                      <span>Service Version</span>
+                      <strong>{selectedRuntime.serviceVersion || "n/a"}</strong>
+                    </div>
                   </div>
                   <div className="logEntry">{selectedRuntime.message}</div>
                   <div className="logEntry">
@@ -2401,45 +2507,6 @@ function AppShell() {
 
                 <div className="collection">
               <div className="subHeader">
-                <h3>Batch Captures ({batchCaptures.length})</h3>
-                <button onClick={() => void batchCaptureScreen()} disabled={filteredStations.length === 0 || remoteBusy === "batchCapture"}>
-                  {remoteBusy === "batchCapture" ? "Capturing..." : "Batch Capture All"}
-                </button>
-              </div>
-              {batchCaptures.length === 0 ? (
-                <p className="emptyInline">Click "Batch Capture All" to capture screenshots from all filtered stations.</p>
-              ) : (
-                <div className="captureGrid">
-                  {batchCaptures.map((capture) => (
-                    <div key={capture.stationId} className="captureThumb">
-                      {capture.error ? (
-                        <div className="captureThumbError">
-                          <div className="captureThumbName">{capture.stationName}</div>
-                          <div className="captureThumbErrMsg">Failed: {capture.error}</div>
-                        </div>
-                      ) : (
-                        <>
-                          <img
-                            src={capture.dataUrl}
-                            alt={`Screen of ${capture.stationName}`}
-                            className="captureThumbImg"
-                            onClick={() => {
-                              setSelectedId(capture.stationId);
-                              setDetailTab("overview");
-                            }}
-                            title={`${capture.stationName} · ${capture.endpoint} · ${formatBytes(capture.byteLen)}`}
-                          />
-                          <div className="captureThumbName">{capture.stationName}</div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-                </div>
-
-                <div className="collection">
-              <div className="subHeader">
                 <h3>Remote Command</h3>
                 <button onClick={() => void executeRemoteCommand()} disabled={!selectedStation || remoteBusy === "command"}>
                   {remoteBusy === "command" ? "Executing..." : "Execute"}
@@ -2483,79 +2550,6 @@ function AppShell() {
                   ) : null}
                 </div>
               ) : null}
-                </div>
-
-                <div className="collection">
-              <div className="subHeader">
-                <h3>Remote Files</h3>
-                <button onClick={() => void browseRemote()} disabled={!selectedStation || remoteBusy === "browse"}>
-                  {remoteBusy === "browse" ? "Browsing..." : "Browse"}
-                </button>
-              </div>
-              <label className="field">
-                <span>Remote Browse Path</span>
-                <input value={remotePath} onChange={(event) => setRemotePath(event.target.value)} />
-              </label>
-              <label className="field">
-                <span>Remote Source Path</span>
-                <input value={renameSourcePath} onChange={(event) => setRenameSourcePath(event.target.value)} />
-              </label>
-              <label className="field">
-                <span>Remote Target Path</span>
-                <input value={renameTargetPath} onChange={(event) => setRenameTargetPath(event.target.value)} />
-              </label>
-              <label className="field">
-                <span>Local Download Path</span>
-                <input value={downloadLocalPath} onChange={(event) => setDownloadLocalPath(event.target.value)} />
-              </label>
-              <label className="field">
-                <span>Local Upload Path</span>
-                <input value={uploadLocalPath} onChange={(event) => setUploadLocalPath(event.target.value)} />
-              </label>
-              <div className="toolbar miniToolbar">
-                <button onClick={() => void renameRemote()} disabled={!selectedStation || remoteBusy === "rename"}>
-                  Rename
-                </button>
-                <button onClick={() => void downloadRemote()} disabled={!selectedStation || remoteBusy === "download"}>
-                  Download
-                </button>
-                <button onClick={() => void uploadRemote()} disabled={!selectedStation || remoteBusy === "upload"}>
-                  Upload
-                </button>
-                <button onClick={() => void batchDownloadAll()} disabled={stations.length === 0 || remoteBusy === "batchDownload"}>
-                  {remoteBusy === "batchDownload" ? "Sending..." : "发送全部"}
-                </button>
-                <button onClick={() => void batchUploadAll()} disabled={stations.length === 0 || remoteBusy === "batchUpload"}>
-                  {remoteBusy === "batchUpload" ? "Receiving..." : "接收全部"}
-                </button>
-              </div>
-              {!selectedBrowser ? (
-                <p className="emptyInline">Browse a remote path to inspect files.</p>
-              ) : (
-                <div className="logList">
-                  {selectedBrowser.items.length === 0 ? (
-                    <p className="emptyInline">No remote entries returned for this path.</p>
-                  ) : (
-                    selectedBrowser.items.map((item) => (
-                      <button
-                        key={item.path}
-                        className="stationCard fileEntry"
-                        onClick={() => {
-                          setRenameSourcePath(item.path);
-                          setRenameTargetPath(item.path);
-                          if (item.isDirectory) {
-                            setRemotePath(item.path);
-                            void browseRemote(item.path);
-                          }
-                        }}
-                      >
-                        <span className="stationName">{item.isDirectory ? "Directory" : "File"}</span>
-                        <span className="stationMeta">{item.path}</span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
                 </div>
 
                 <div className="collection">

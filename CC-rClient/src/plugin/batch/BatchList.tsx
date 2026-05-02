@@ -11,6 +11,7 @@ import type {
   BatchTaskType,
   BatchTaskStatus,
 } from './types';
+import { getBatchTaskMeta } from './taskMeta';
 
 // ============================================
 // Batch Task Card Component
@@ -46,19 +47,6 @@ const BatchTaskCard: React.FC<BatchTaskCardProps> = ({
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const getTaskTypeIcon = (type: BatchTaskType) => {
-    const icons: Record<BatchTaskType, string> = {
-      power_on: '⚡',
-      shutdown: '⏻',
-      reboot: '🔄',
-      start_app: '🚀',
-      command: '💻',
-      watch_processes: '👁',
-      script: '📜',
-    };
-    return icons[type] || '📄';
   };
 
   const getStatusBadge = (status: BatchTaskStatus) => {
@@ -111,7 +99,7 @@ const BatchTaskCard: React.FC<BatchTaskCardProps> = ({
     <div className={`script-card batch-task-card ${task.isFavorite ? 'favorite' : ''}`} onClick={() => onSelect?.(task)}>
       <div className="card-header">
         <div className="card-title-row">
-          <span className="script-type-icon task-type-icon">{getTaskTypeIcon(task.taskType)}</span>
+          <span className="script-type-icon task-type-icon">{getBatchTaskMeta(task.taskType).icon}</span>
           <h3 className="card-title">{task.name}</h3>
           {getStatusBadge(task.status)}
         </div>
@@ -252,10 +240,12 @@ const BatchTypeFilter: React.FC<BatchTypeFilterProps> = ({ selected, onChange, c
     { key: 'power_on', label: 'Power On', icon: '⚡' },
     { key: 'shutdown', label: 'Shutdown', icon: '⏻' },
     { key: 'reboot', label: 'Reboot', icon: '🔄' },
+    { key: 'app_control', label: 'App Control', icon: '🧩' },
     { key: 'start_app', label: 'Start App', icon: '🚀' },
     { key: 'command', label: 'Command', icon: '💻' },
     { key: 'watch_processes', label: 'Watch', icon: '👁' },
     { key: 'script', label: 'Script', icon: '📜' },
+    { key: 'file_transfer', label: 'File Transfer', icon: '📦' },
   ];
 
   return (

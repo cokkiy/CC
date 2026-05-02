@@ -95,4 +95,82 @@ describe("Batch task toolbar controls", () => {
       }),
     );
   });
+
+  it("saves app control tasks with the selected subtype parameter", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+
+    render(
+      <BatchTaskEditor
+        targets={targets}
+        groups={[]}
+        scripts={[]}
+        onSave={onSave}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    await user.type(screen.getByPlaceholderText(/enter task name/i), "Restart apps");
+    await user.click(screen.getByRole("button", { name: /app control/i }));
+    await user.selectOptions(screen.getByRole("combobox", { name: /action/i }), "restart");
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /create task/i })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole("button", { name: /create task/i }));
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        taskType: "app_control",
+        parameters: expect.arrayContaining([
+          expect.objectContaining({
+            name: "appControlAction",
+            defaultValue: "restart",
+          }),
+        ]),
+      }),
+    );
+  });
+
+  it("saves file transfer tasks with structured source and target paths", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+
+    render(
+      <BatchTaskEditor
+        targets={targets}
+        groups={[]}
+        scripts={[]}
+        onSave={onSave}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    await user.type(screen.getByPlaceholderText(/enter task name/i), "Pull configs");
+    await user.click(screen.getByRole("button", { name: /file transfer/i }));
+    await user.selectOptions(screen.getByRole("combobox", { name: /direction/i }), "pull");
+    await user.selectOptions(screen.getByRole("combobox", { name: /entry type/i }), "folder");
+    await user.type(screen.getByPlaceholderText("/path/on/device"), "/opt/config");
+    await user.type(screen.getByPlaceholderText("/path/on/client"), "/tmp/config");
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /create task/i })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole("button", { name: /create task/i }));
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        taskType: "file_transfer",
+        content: "",
+        parameters: expect.arrayContaining([
+          expect.objectContaining({ name: "transferDirection", defaultValue: "pull" }),
+          expect.objectContaining({ name: "transferEntryType", defaultValue: "folder" }),
+          expect.objectContaining({ name: "sourcePath", defaultValue: "/opt/config" }),
+          expect.objectContaining({ name: "targetPath", defaultValue: "/tmp/config" }),
+        ]),
+      }),
+    );
+  });
 });
