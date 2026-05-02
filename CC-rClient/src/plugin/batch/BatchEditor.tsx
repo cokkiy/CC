@@ -6,10 +6,13 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import type {
+  AppControlAction,
   BatchTask,
   BatchTaskType,
   BatchTaskParameter,
   BatchTaskStatus,
+  FileTransferDirection,
+  FileTransferEntryType,
   TargetSelector,
   TargetSelectorType,
   ExecutionPolicy,
@@ -19,8 +22,14 @@ import type {
   ValidateTaskResult,
 } from './types';
 import { DEFAULT_EXECUTION_POLICY } from './types';
-import type { CommandScript } from '../script/types';
+import type { CommandScript, ScriptType } from '../script/types';
 import type { StationGroup } from '../groups/types';
+import {
+  APP_CONTROL_ACTIONS,
+  FILE_TRANSFER_DIRECTIONS,
+  FILE_TRANSFER_ENTRY_TYPES,
+  getBatchTaskMeta,
+} from './taskMeta';
 
 function mapScriptParametersToBatchParameters(script: CommandScript): BatchTaskParameter[] {
   return (script.parameters || []).map((parameter) => ({
@@ -33,6 +42,151 @@ function mapScriptParametersToBatchParameters(script: CommandScript): BatchTaskP
     options: parameter.options,
   }));
 }
+
+type ContentLanguage = ScriptType | 'json' | 'text';
+
+const CONTENT_PATTERNS: Record<Exclude<ContentLanguage, 'text'>, { pattern: RegExp; className: string }[]> = {
+  shell: [
+    { pattern: /(#.*$)/gm, className: 'comment' },
+    { pattern: /(".*?"|'.*?'|`.*?`)/g, className: 'string' },
+    { pattern: /(\$\w+|\$\{[^}]+\})/g, className: 'variable' },
+    { pattern: /(\bif\b|\bthen\b|\belse\b|\belif\b|\bfi\b|\bfor\b|\bdo\b|\bdone\b|\bwhile\b|\buntil\b|\bcase\b|\besac\b|\bfunction\b|\breturn\b|\bexit\b|\bbreak\b|\bcontinue\b)/g, className: 'keyword' },
+    { pattern: /(\becho\b|\bread\b|\bexport\b|\blocal\b|\breadonly\b|\bunset\b|\bshift\b|\bset\b|\bsource\b|\balias\b|\bunalias\b|\bcd\b|\bpwd\b|\bls\b|\bmkdir\b|\brm\b|\bcp\b|\bmv\b|\bcat\b|\bgrep\b|\bsed\b|\bawk\b|\bfind\b|\bxargs\b|\bsort\b|\buniq\b|\bwc\b|\bhead\b|\btail\b)/g, className: 'builtin' },
+  ],
+  powershell: [
+    { pattern: /(#.*$)/gm, className: 'comment' },
+    { pattern: /(".*?"|'.*?')/g, className: 'string' },
+    { pattern: /(\$[a-zA-Z_]\w*)/g, className: 'variable' },
+    { pattern: /(\bfunction\b|\bparam\b|\bbegin\b|\bprocess\b|\bend\b|\bif\b|\belse\b|\belseif\b|\bswitch\b|\bwhile\b|\bdo\b|\bfor\b|\bforeach\b|\btry\b|\bcatch\b|\bfinally\b|\bthrow\b|\breturn\b|\bbreak\b|\bcontinue\b|\bexit\b)/gi, className: 'keyword' },
+    { pattern: /(\bWrite-Host\b|\bGet-Item\b|\bSet-Item\b|\bRemove-Item\b|\bGet-Content\b|\bSet-Content\b|\bCopy-Item\b|\bMove-Item\b|\bInvoke-Command\b|\bInvoke-Expression\b|\bStart-Process\b|\bStop-Process\b)/g, className: 'builtin' },
+  ],
+  python: [
+    { pattern: /(#.*$)/gm, className: 'comment' },
+    { pattern: /(".*?"|'.*?'|'''[\s\S]*?'''|"""[\s\S]*?""")/g, className: 'string' },
+    { pattern: /(\b[a-zA-Z_]\w*(?=\s*\()|def\s+\w+|class\s+\w+)/g, className: 'function' },
+    { pattern: /(\bif\b|\belif\b|\belse\b|\bfor\b|\bwhile\b|\btry\b|\bexcept\b|\bfinally\b|\bwith\b|\bas\b|\bimport\b|\bfrom\b|\breturn\b|\byield\b|\braise\b|\bbreak\b|\bcontinue\b|\bpass\b|\band\b|\bor\b|\bnot\b|\bin\b|\bis\b|\blambda\b|\bTrue\b|\bFalse\b|\bNone\b|\bdef\b|\bclass\b)/gi, className: 'keyword' },
+    { pattern: /(\bprint\b|\blen\b|\brange\b|\bstr\b|\bint\b|\bfloat\b|\blist\b|\bdict\b|\bset\b|\btuple\b|\bopen\b|\binput\b|\bisinstance\b|\btype\b)/gi, className: 'builtin' },
+  ],
+  lua: [
+    { pattern: /(--.*$)/gm, className: 'comment' },
+    { pattern: /(".*?"|'.*?'|\[=*\[[\s\S]*?\]=*\])/g, className: 'string' },
+    { pattern: /(\b[a-zA-Z_]\w*(?=\s*\())/g, className: 'function' },
+    { pattern: /(\bif\b|\bthen\b|\belse\b|\belseif\b|\bend\b|\bfor\b|\bwhile\b|\bdo\b|\brepeat\b|\buntil\b|\bfunction\b|\breturn\b|\blocal\b|\btrue\b|\bfalse\b|\bnil\b|\band\b|\bor\b|\bnot\b|\bin\b)/gi, className: 'keyword' },
+    { pattern: /(\bprint\b|\bpairs\b|\bipairs\b|\brequire\b|\bmodule\b|\bsetmetatable\b|\bgetmetatable\b|\berror\b|\bpcall\b|\bxpcall\b|\btonumber\b|\btostring\b|\btype\b)/gi, className: 'builtin' },
+  ],
+  javascript: [
+    { pattern: /(\/\/.*$|\/\*[\s\S]*?\*\/)/gm, className: 'comment' },
+    { pattern: /(".*?"|'.*?'|`.*?`)/g, className: 'string' },
+    { pattern: /(\bconst\b|\blet\b|\bvar\b|\bfunction\b|\breturn\b|\bif\b|\belse\b|\bswitch\b|\bcase\b|\bfor\b|\bwhile\b|\bdo\b|\bbreak\b|\bcontinue\b|\btry\b|\bcatch\b|\bfinally\b|\bthrow\b|\bnew\b|\bclass\b|\bextends\b|\bimport\b|\bexport\b|\bfrom\b|\bdefault\b|\basync\b|\bawait\b|\byield\b|\bthis\b|\btrue\b|\bfalse\b|\bnull\b|\bundefined\b)/gi, className: 'keyword' },
+    { pattern: /(\bconsole\b|\bprocess\b|\brequire\b|\bsetTimeout\b|\bsetInterval\b|\bPromise\b|\bMath\b|\bArray\b|\bObject\b|\bString\b|\bNumber\b|\bJSON\b|\bError\b)/g, className: 'builtin' },
+    { pattern: /(\b[a-zA-Z_]\w*(?=\s*\())/g, className: 'function' },
+  ],
+  json: [
+    { pattern: /("([^"\\]|\\.)*"(?=\s*:))/g, className: 'property' },
+    { pattern: /(:\s*"([^"\\]|\\.)*")/g, className: 'string' },
+    { pattern: /(:\s*-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g, className: 'literal' },
+    { pattern: /(:\s*(true|false|null))/g, className: 'keyword' },
+  ],
+};
+
+function escapeHtml(text: string): string {
+  if (typeof document === 'undefined') {
+    return text
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;');
+  }
+
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function highlightContent(code: string, language: ContentLanguage): string {
+  if (language === 'text') {
+    return escapeHtml(code);
+  }
+
+  let result = escapeHtml(code);
+  for (const { pattern, className } of CONTENT_PATTERNS[language] ?? []) {
+    result = result.replace(pattern, `<span class="syntax-${className}">$1</span>`);
+  }
+  return result;
+}
+
+function getTaskParameter(parameters: BatchTaskParameter[], name: string): BatchTaskParameter | undefined {
+  return parameters.find((parameter) => parameter.name === name);
+}
+
+function getTaskParameterValue(parameters: BatchTaskParameter[], name: string, fallback = ''): string {
+  return getTaskParameter(parameters, name)?.defaultValue ?? fallback;
+}
+
+function upsertTaskParameter(
+  parameters: BatchTaskParameter[],
+  nextParameter: BatchTaskParameter,
+): BatchTaskParameter[] {
+  const index = parameters.findIndex((parameter) => parameter.name === nextParameter.name);
+  if (index === -1) {
+    return [...parameters, nextParameter];
+  }
+
+  const next = [...parameters];
+  next[index] = { ...next[index], ...nextParameter };
+  return next;
+}
+
+interface SyntaxHighlightedTextareaProps {
+  value: string;
+  language: ContentLanguage;
+  onChange: (value: string) => void;
+  placeholder: string;
+  disabled?: boolean;
+  minHeight?: number;
+}
+
+const SyntaxHighlightedTextarea: React.FC<SyntaxHighlightedTextareaProps> = ({
+  value,
+  language,
+  onChange,
+  placeholder,
+  disabled = false,
+  minHeight = 240,
+}) => {
+  const highlighted = useMemo(() => highlightContent(value, language), [language, value]);
+  const highlightRef = React.useRef<HTMLDivElement | null>(null);
+
+  const syncScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
+    if (!highlightRef.current) {
+      return;
+    }
+
+    highlightRef.current.scrollTop = event.currentTarget.scrollTop;
+    highlightRef.current.scrollLeft = event.currentTarget.scrollLeft;
+  };
+
+  return (
+    <div className="task-code-editor-container">
+      <div className="task-code-editor-wrapper" style={{ minHeight }}>
+        <div
+          ref={highlightRef}
+          className="task-syntax-highlighter"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: highlighted }}
+        />
+        <textarea
+          className="task-code-textarea"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onScroll={syncScroll}
+          disabled={disabled}
+          placeholder={placeholder}
+          spellCheck={false}
+        />
+      </div>
+    </div>
+  );
+};
 
 // ============================================
 // Target Selector Component
@@ -623,15 +777,95 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
     }
   }, [content, parameters.length, scripts, selectedScriptId, task?.parameters, taskType]);
 
+  const taskMeta = useMemo(() => getBatchTaskMeta(taskType), [taskType]);
+  const usesContentEditor = taskType === 'command' || taskType === 'script' || taskType === 'watch_processes';
+  const appControlAction = getTaskParameterValue(parameters, 'appControlAction', 'start') as AppControlAction;
+  const transferDirection = getTaskParameterValue(parameters, 'transferDirection', 'push') as FileTransferDirection;
+  const transferEntryType = getTaskParameterValue(parameters, 'transferEntryType', 'file') as FileTransferEntryType;
+  const transferSourcePath = getTaskParameterValue(parameters, 'sourcePath');
+  const transferTargetPath = getTaskParameterValue(parameters, 'targetPath');
+  const contentLanguage = useMemo<ContentLanguage>(() => {
+    if (taskType === 'script') {
+      return selectedScript?.scriptType ?? 'shell';
+    }
+    if (taskType === 'command') {
+      return 'shell';
+    }
+    return 'text';
+  }, [selectedScript?.scriptType, taskType]);
+  const contentPlaceholder = useMemo(() => {
+    switch (taskType) {
+      case 'power_on':
+        return 'Wake-on-LAN does not require extra content.';
+      case 'shutdown':
+        return 'Shutdown uses the station control RPC and does not require extra content.';
+      case 'reboot':
+        return 'Reboot uses the station control RPC and does not require extra content.';
+      case 'start_app':
+        return 'Legacy start-app tasks use each station’s configured startup programs.';
+      case 'command':
+        return 'Enter command to execute on the device...';
+      case 'watch_processes':
+        return 'Enter process names separated by commas or new lines...';
+      case 'script':
+        return 'Select a saved script to run on the target devices.';
+      case 'app_control':
+        return 'App Control uses the selected action and does not need freeform content.';
+      case 'file_transfer':
+        return 'File Transfer uses the structured path fields below.';
+      default:
+        return 'Enter task content...';
+    }
+  }, [taskType]);
+  const taskSemanticHint = useMemo(() => {
+    switch (taskType) {
+      case 'command':
+        return 'Command executes a direct shell command on the target device.';
+      case 'script':
+        return 'Script runs a saved script package on the target device.';
+      case 'app_control':
+        return 'App Control unifies start, stop, and restart actions through one task type.';
+      case 'file_transfer':
+        return 'File Transfer handles push and pull for both files and folders.';
+      case 'start_app':
+        return 'Start App remains for backward compatibility. Prefer App Control for new tasks.';
+      default:
+        return taskMeta.summary;
+    }
+  }, [taskMeta.summary, taskType]);
+
+  const setTaskParameterValue = useCallback(
+    (
+      name: string,
+      defaultValue: string,
+      updates: Partial<BatchTaskParameter> = {},
+    ) => {
+      setParameters((current) =>
+        upsertTaskParameter(current, {
+          name,
+          paramType: updates.paramType ?? 'string',
+          defaultValue,
+          required: updates.required ?? false,
+          validation: updates.validation,
+          description: updates.description,
+          options: updates.options,
+        }),
+      );
+    },
+    [],
+  );
+
   // Task types
   const taskTypes: { key: BatchTaskType; label: string; icon: string }[] = [
     { key: 'power_on', label: 'Power On', icon: '⚡' },
     { key: 'shutdown', label: 'Shutdown', icon: '⏻' },
     { key: 'reboot', label: 'Reboot', icon: '🔄' },
+    { key: 'app_control', label: 'App Control', icon: '🧩' },
     { key: 'start_app', label: 'Start App', icon: '🚀' },
     { key: 'command', label: 'Command', icon: '💻' },
     { key: 'watch_processes', label: 'Watch Processes', icon: '👁' },
     { key: 'script', label: 'Script', icon: '📜' },
+    { key: 'file_transfer', label: 'File Transfer', icon: '📦' },
   ];
 
   // Validate task
@@ -653,8 +887,25 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       errors.push('Select a script to run');
     }
 
+    if (taskType === 'app_control' && !appControlAction) {
+      errors.push('Select an app control action');
+    }
+
+    if (taskType === 'file_transfer') {
+      if (!transferSourcePath.trim()) {
+        errors.push('Source path is required for file transfer');
+      }
+      if (!transferTargetPath.trim()) {
+        errors.push('Target path is required for file transfer');
+      }
+    }
+
     if (taskType === 'watch_processes' && content.trim() && !content.includes(',') && !content.includes('\n')) {
       warnings.push('Multiple watched processes are usually separated by commas or new lines');
+    }
+
+    if (taskType === 'file_transfer' && transferDirection === 'pull' && transferEntryType === 'folder') {
+      warnings.push('Pull-folder tasks may take longer because the client walks the remote directory tree recursively.');
     }
 
     return {
@@ -662,7 +913,17 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       errors,
       warnings,
     };
-  }, [name, content, taskType]);
+  }, [
+    appControlAction,
+    content,
+    selectedScriptId,
+    taskType,
+    name,
+    transferDirection,
+    transferEntryType,
+    transferSourcePath,
+    transferTargetPath,
+  ]);
 
   // Update validation on changes
   React.useEffect(() => {
@@ -696,14 +957,64 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       return;
     }
 
+    let parametersForSave = [...parameters];
+    if (taskType === 'app_control') {
+      parametersForSave = upsertTaskParameter(parametersForSave, {
+        name: 'appControlAction',
+        paramType: 'select',
+        defaultValue: appControlAction,
+        required: true,
+        description: 'Start, stop, or restart the configured startup applications.',
+        options: APP_CONTROL_ACTIONS.map((item) => item.value),
+      });
+    }
+    if (taskType === 'file_transfer') {
+      parametersForSave = upsertTaskParameter(parametersForSave, {
+        name: 'transferDirection',
+        paramType: 'select',
+        defaultValue: transferDirection,
+        required: true,
+        description: 'Whether files move from client to device or device to client.',
+        options: FILE_TRANSFER_DIRECTIONS.map((item) => item.value),
+      });
+      parametersForSave = upsertTaskParameter(parametersForSave, {
+        name: 'transferEntryType',
+        paramType: 'select',
+        defaultValue: transferEntryType,
+        required: true,
+        description: 'Transfer a single file or recurse through a folder.',
+        options: FILE_TRANSFER_ENTRY_TYPES.map((item) => item.value),
+      });
+      parametersForSave = upsertTaskParameter(parametersForSave, {
+        name: 'sourcePath',
+        paramType: 'string',
+        defaultValue: transferSourcePath,
+        required: true,
+        description: 'Path to read from when the transfer starts.',
+      });
+      parametersForSave = upsertTaskParameter(parametersForSave, {
+        name: 'targetPath',
+        paramType: 'string',
+        defaultValue: transferTargetPath,
+        required: true,
+        description: 'Path to write into when the transfer completes.',
+      });
+    }
+
+    const normalizedContent = taskType === 'script'
+      ? (selectedScript?.content ?? content)
+      : usesContentEditor
+        ? content
+        : '';
+
     if (onValidate) {
       const fullValidation = await onValidate({
         id: task?.id,
         name: name.trim(),
         description: description.trim(),
         taskType,
-        content: taskType === 'script' ? (selectedScript?.content ?? content) : content,
-        parameters,
+        content: normalizedContent,
+        parameters: parametersForSave,
         targetSelector,
         executionPolicy,
         showInToolbar,
@@ -720,8 +1031,8 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
       name: name.trim(),
       description: description.trim(),
       taskType,
-      content: taskType === 'script' ? (selectedScript?.content ?? content) : content,
-      parameters,
+      content: normalizedContent,
+      parameters: parametersForSave,
       targetSelector,
       executionPolicy,
       showInToolbar,
@@ -815,6 +1126,13 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
                   </button>
                 ))}
               </div>
+              <div className="task-type-summary">
+                <div className="task-type-summary-title">
+                  <span>{taskMeta.icon}</span>
+                  <strong>{taskMeta.label}</strong>
+                </div>
+                <p>{taskSemanticHint}</p>
+              </div>
             </div>
           </div>
 
@@ -833,6 +1151,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
           {/* Content Editor Section */}
           <div className="editor-section content-section">
             <h3>Task Content</h3>
+            <p className="input-hint">{taskSemanticHint}</p>
             {taskType === 'script' ? (
               <div className="script-selector">
                 <div className="field-group">
@@ -886,23 +1205,135 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
                   </div>
                 ) : null}
               </div>
-            ) : (
-              <textarea
-                className="content-editor"
-                placeholder={
-                  taskType === 'power_on' ? 'Wake-on-LAN does not require extra content.' :
-                  taskType === 'shutdown' ? 'Shutdown uses the station control RPC and does not require extra content.' :
-                  taskType === 'reboot' ? 'Reboot uses the station control RPC and does not require extra content.' :
-                  taskType === 'start_app' ? 'Start App uses each station’s configured startup programs.' :
-                  taskType === 'command' ? 'Enter command to execute...' :
-                  'Enter process names separated by commas or new lines...'
-                }
+            ) : null}
+
+            {taskType === 'app_control' ? (
+              <div className="task-config-grid">
+                <label className="field-group">
+                  <span className="field-label">Action</span>
+                  <select
+                    className="field-input"
+                    value={appControlAction}
+                    onChange={(event) =>
+                      setTaskParameterValue('appControlAction', event.target.value, {
+                        paramType: 'select',
+                        required: true,
+                        description: 'Start, stop, or restart the configured startup applications.',
+                        options: APP_CONTROL_ACTIONS.map((item) => item.value),
+                      })
+                    }
+                    disabled={readOnly}
+                  >
+                    {APP_CONTROL_ACTIONS.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            ) : null}
+
+            {taskType === 'file_transfer' ? (
+              <div className="task-config-grid task-config-grid--wide">
+                <label className="field-group">
+                  <span className="field-label">Direction</span>
+                  <select
+                    className="field-input"
+                    value={transferDirection}
+                    onChange={(event) =>
+                      setTaskParameterValue('transferDirection', event.target.value, {
+                        paramType: 'select',
+                        required: true,
+                        description: 'Whether files move from client to device or device to client.',
+                        options: FILE_TRANSFER_DIRECTIONS.map((item) => item.value),
+                      })
+                    }
+                    disabled={readOnly}
+                  >
+                    {FILE_TRANSFER_DIRECTIONS.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field-group">
+                  <span className="field-label">Entry Type</span>
+                  <select
+                    className="field-input"
+                    value={transferEntryType}
+                    onChange={(event) =>
+                      setTaskParameterValue('transferEntryType', event.target.value, {
+                        paramType: 'select',
+                        required: true,
+                        description: 'Transfer a single file or recurse through a folder.',
+                        options: FILE_TRANSFER_ENTRY_TYPES.map((item) => item.value),
+                      })
+                    }
+                    disabled={readOnly}
+                  >
+                    {FILE_TRANSFER_ENTRY_TYPES.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field-group">
+                  <span className="field-label">{transferDirection === 'push' ? 'Client Source Path' : 'Remote Source Path'}</span>
+                  <input
+                    type="text"
+                    className="field-input"
+                    value={transferSourcePath}
+                    onChange={(event) =>
+                      setTaskParameterValue('sourcePath', event.target.value, {
+                        required: true,
+                        description: 'Path to read from when the transfer starts.',
+                      })
+                    }
+                    disabled={readOnly}
+                    placeholder={transferDirection === 'push' ? '/path/on/client' : '/path/on/device'}
+                  />
+                </label>
+
+                <label className="field-group">
+                  <span className="field-label">{transferDirection === 'push' ? 'Remote Target Path' : 'Client Target Path'}</span>
+                  <input
+                    type="text"
+                    className="field-input"
+                    value={transferTargetPath}
+                    onChange={(event) =>
+                      setTaskParameterValue('targetPath', event.target.value, {
+                        required: true,
+                        description: 'Path to write into when the transfer completes.',
+                      })
+                    }
+                    disabled={readOnly}
+                    placeholder={transferDirection === 'push' ? '/path/on/device' : '/path/on/client'}
+                  />
+                </label>
+              </div>
+            ) : null}
+
+            {!usesContentEditor && taskType !== 'app_control' && taskType !== 'file_transfer' ? (
+              <div className="task-config-note">
+                {contentPlaceholder}
+              </div>
+            ) : null}
+
+            {usesContentEditor ? (
+              <SyntaxHighlightedTextarea
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                language={contentLanguage}
+                onChange={setContent}
                 disabled={readOnly}
-                rows={10}
+                placeholder={contentPlaceholder}
+                minHeight={taskType === 'script' ? 220 : 260}
               />
-            )}
+            ) : null}
           </div>
 
           {/* Parameters Section */}
@@ -1115,6 +1546,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
         .field-input,
         .field-textarea,
         .content-editor,
+        .task-code-textarea,
         .batch-size-input,
         .device-ids-input,
         .filter-expr-input,
@@ -1139,6 +1571,7 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
         .field-input:focus,
         .field-textarea:focus,
         .content-editor:focus,
+        .task-code-textarea:focus,
         .batch-size-input:focus,
         .device-ids-input:focus,
         .filter-expr-input:focus,
@@ -1156,8 +1589,32 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
 
         .field-textarea,
         .content-editor,
+        .task-code-textarea,
         .device-ids-input {
           resize: vertical;
+        }
+
+        .task-type-summary {
+          display: grid;
+          gap: 6px;
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px solid rgba(45, 140, 240, 0.16);
+          background: linear-gradient(135deg, rgba(45, 140, 240, 0.08), rgba(45, 140, 240, 0.02));
+        }
+
+        .task-type-summary-title {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.88rem;
+        }
+
+        .task-type-summary p {
+          margin: 0;
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          line-height: 1.45;
         }
 
         .task-type-selector,
@@ -1257,6 +1714,27 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
           gap: 14px;
         }
 
+        .task-config-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 12px;
+          margin-top: 12px;
+        }
+
+        .task-config-grid--wide {
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        .task-config-note {
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px dashed var(--border-color);
+          background: var(--bg-main);
+          color: var(--text-muted);
+          font-size: 0.8rem;
+          line-height: 1.45;
+        }
+
         .script-selector-list {
           display: grid;
           gap: 10px;
@@ -1339,6 +1817,66 @@ export const BatchTaskEditor: React.FC<BatchTaskEditorProps> = ({
           background: rgba(234, 179, 8, 0.1);
           border-color: #eab308;
           color: #a16207;
+        }
+
+        .task-code-editor-container {
+          margin-top: 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          overflow: hidden;
+        }
+
+        .task-code-editor-wrapper {
+          position: relative;
+          max-height: 520px;
+          background: #101b2f;
+        }
+
+        .task-syntax-highlighter {
+          position: absolute;
+          inset: 0;
+          padding: 12px;
+          color: #d4d4d4;
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-size: 13px;
+          line-height: 1.55;
+          white-space: pre-wrap;
+          word-break: break-word;
+          overflow: auto;
+          pointer-events: none;
+        }
+
+        .task-syntax-highlighter .syntax-comment { color: #6a9955; }
+        .task-syntax-highlighter .syntax-string { color: #ce9178; }
+        .task-syntax-highlighter .syntax-variable { color: #9cdcfe; }
+        .task-syntax-highlighter .syntax-keyword { color: #c586c0; }
+        .task-syntax-highlighter .syntax-builtin { color: #4ec9b0; }
+        .task-syntax-highlighter .syntax-literal { color: #b5cea8; }
+        .task-syntax-highlighter .syntax-function { color: #dcdcaa; }
+        .task-syntax-highlighter .syntax-property { color: #9cdcfe; }
+
+        .task-code-textarea {
+          position: relative;
+          min-height: 100%;
+          border: none;
+          background: transparent;
+          color: transparent;
+          caret-color: #d4d4d4;
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-size: 13px;
+          line-height: 1.55;
+          white-space: pre-wrap;
+          word-break: break-word;
+          padding: 12px;
+          outline: none;
+        }
+
+        .task-code-textarea::selection {
+          background: #264f78;
+        }
+
+        .task-code-textarea::placeholder {
+          color: #7c8aa6;
         }
 
         .checkbox-label,

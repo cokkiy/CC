@@ -15,7 +15,15 @@ export type BatchTaskType =
   | 'start_app'
   | 'command'
   | 'watch_processes'
-  | 'script';
+  | 'script'
+  | 'app_control'
+  | 'file_transfer';
+
+export type AppControlAction = 'start' | 'stop' | 'restart';
+
+export type FileTransferDirection = 'push' | 'pull';
+
+export type FileTransferEntryType = 'file' | 'folder';
 
 // Target selector type enum
 export type TargetSelectorType = 'all' | 'group' | 'tag' | 'device_ids' | 'filter';

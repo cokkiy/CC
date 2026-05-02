@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use chrono::Utc;
 use futures_util::stream::{self, StreamExt};
@@ -11,7 +11,10 @@ use uuid::Uuid;
 
 use crate::control::execute_station_action;
 use crate::models::{Station, StationAction};
-use crate::remote::{execute_station_command, set_station_watching_apps};
+use crate::remote::{
+    browse_station_files, download_station_file, execute_station_command,
+    set_station_watching_apps, upload_station_file,
+};
 use crate::storage::StateStore;
 
 const DEFAULT_BATCH_TIMEOUT_SECS: u64 = 300;
@@ -121,6 +124,7 @@ pub struct BatchTarget {
     pub id: String,
     pub name: String,
     pub group: Option<String>,
+    pub groups: Option<Vec<String>>,
     pub tags: Option<HashMap<String, String>>,
     pub status: String,
     pub last_seen: Option<String>,
@@ -393,6 +397,13 @@ fn validate_task(task: &BatchTaskDraft) -> ValidateTaskResult {
         .unwrap_or_else(|| "command".to_string());
     let name = task.name.as_deref().unwrap_or("").trim();
     let content = task.content.as_deref().unwrap_or("").trim();
+    let parameter_values = task
+        .parameters
+        .clone()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|parameter| (parameter.name, parameter.default_value))
+        .collect::<HashMap<_, _>>();
 
     if name.is_empty() {
         errors.push("Task name is required".to_string());
@@ -406,6 +417,50 @@ fn validate_task(task: &BatchTaskDraft) -> ValidateTaskResult {
 
     if task_type == "watch_processes" && !content.contains('\n') && !content.contains(',') {
         warnings.push("Watch-processes content usually contains multiple process names separated by commas or new lines".to_string());
+    }
+
+    if task_type == "app_control" {
+        let action = parameter_values
+            .get("appControlAction")
+            .map(|value| value.trim())
+            .unwrap_or("start");
+        if !matches!(action, "start" | "stop" | "restart") {
+            errors.push(
+                "App Control requires appControlAction to be start, stop, or restart".to_string(),
+            );
+        }
+    }
+
+    if task_type == "file_transfer" {
+        if parameter_values
+            .get("sourcePath")
+            .map(|value| value.trim().is_empty())
+            .unwrap_or(true)
+        {
+            errors.push("File Transfer requires a sourcePath parameter".to_string());
+        }
+        if parameter_values
+            .get("targetPath")
+            .map(|value| value.trim().is_empty())
+            .unwrap_or(true)
+        {
+            errors.push("File Transfer requires a targetPath parameter".to_string());
+        }
+        let direction = parameter_values
+            .get("transferDirection")
+            .map(|value| value.trim())
+            .unwrap_or("push");
+        if !matches!(direction, "push" | "pull") {
+            errors.push("File Transfer requires transferDirection to be push or pull".to_string());
+        }
+        let entry_type = parameter_values
+            .get("transferEntryType")
+            .map(|value| value.trim())
+            .unwrap_or("file");
+        if !matches!(entry_type, "file" | "folder") {
+            errors
+                .push("File Transfer requires transferEntryType to be file or folder".to_string());
+        }
     }
 
     ValidateTaskResult {
@@ -506,18 +561,17 @@ fn to_batch_target(station: &Station) -> BatchTarget {
         id: station.id.clone(),
         name: station.name.clone(),
         group: station.groups.first().cloned(),
+        groups: Some(station.groups.clone()),
         tags: Some(station.tags.clone()),
         status: if station.blocked { "offline" } else { "online" }.to_string(),
         last_seen: station.metadata.get("mqttLastSeen").cloned(),
     }
 }
 
-fn render_content(
-    content: &str,
+fn merge_parameter_values(
     parameters: &HashMap<String, String>,
     defaults: &[BatchTaskParameter],
-) -> String {
-    let mut rendered = content.to_string();
+) -> HashMap<String, String> {
     let mut merged = HashMap::new();
     for item in defaults {
         merged.insert(item.name.clone(), item.default_value.clone());
@@ -525,11 +579,152 @@ fn render_content(
     for (key, value) in parameters {
         merged.insert(key.clone(), value.clone());
     }
-    for (key, value) in merged {
+    merged
+}
+
+fn render_content(content: &str, parameters: &HashMap<String, String>) -> String {
+    let mut rendered = content.to_string();
+    for (key, value) in parameters {
         rendered = rendered.replace(&format!("{{{{{key}}}}}"), &value);
         rendered = rendered.replace(&format!("${{{key}}}"), &value);
     }
     rendered
+}
+
+fn parameter_value(parameters: &HashMap<String, String>, name: &str) -> Option<String> {
+    parameters
+        .get(name)
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
+}
+
+fn remote_separator(path: &str) -> &'static str {
+    if path.contains('\\') && !path.contains('/') {
+        "\\"
+    } else {
+        "/"
+    }
+}
+
+fn join_remote_path(parent: &str, child: &str) -> String {
+    if parent.trim().is_empty() {
+        return child.to_string();
+    }
+
+    let separator = remote_separator(parent);
+    let trimmed = parent.trim_end_matches(['/', '\\']);
+    format!("{trimmed}{separator}{child}")
+}
+
+fn append_remote_relative_path(base: &str, relative: &Path) -> String {
+    let mut next = base.trim_end_matches(['/', '\\']).to_string();
+    for component in relative.components() {
+        let segment = component.as_os_str().to_string_lossy();
+        if segment.is_empty() {
+            continue;
+        }
+        next = if next.is_empty() {
+            segment.into_owned()
+        } else {
+            join_remote_path(&next, &segment)
+        };
+    }
+    next
+}
+
+async fn push_folder_to_station(
+    station: &Station,
+    local_root: &str,
+    remote_root: &str,
+) -> Result<String, String> {
+    let local_root_path = PathBuf::from(local_root);
+    if !local_root_path.is_dir() {
+        return Err(format!("Local folder not found: {local_root}"));
+    }
+
+    let mut pending = vec![local_root_path.clone()];
+    let mut uploaded_files = 0usize;
+
+    while let Some(current_dir) = pending.pop() {
+        let entries = fs::read_dir(&current_dir)
+            .map_err(|error| format!("read local directory {}: {error}", current_dir.display()))?;
+
+        for entry in entries {
+            let entry = entry.map_err(|error| {
+                format!("iterate local directory {}: {error}", current_dir.display())
+            })?;
+            let entry_path = entry.path();
+            let metadata = entry
+                .metadata()
+                .map_err(|error| format!("read metadata {}: {error}", entry_path.display()))?;
+
+            if metadata.is_dir() {
+                pending.push(entry_path);
+                continue;
+            }
+
+            if !metadata.is_file() {
+                continue;
+            }
+
+            let relative = entry_path
+                .strip_prefix(&local_root_path)
+                .map_err(|error| format!("strip local prefix {}: {error}", entry_path.display()))?;
+            let remote_path = append_remote_relative_path(remote_root, relative);
+            upload_station_file(station, &entry_path.to_string_lossy(), &remote_path).await?;
+            uploaded_files += 1;
+        }
+    }
+
+    Ok(format!(
+        "Pushed folder {local_root} to {remote_root} ({uploaded_files} file(s))."
+    ))
+}
+
+async fn pull_folder_from_station(
+    station: &Station,
+    remote_root: &str,
+    local_root: &str,
+) -> Result<String, String> {
+    let local_root_path = PathBuf::from(local_root);
+    fs::create_dir_all(&local_root_path).map_err(|error| {
+        format!(
+            "create local directory {}: {error}",
+            local_root_path.display()
+        )
+    })?;
+
+    let mut pending = vec![(remote_root.to_string(), local_root_path.clone())];
+    let mut downloaded_files = 0usize;
+
+    while let Some((remote_dir, local_dir)) = pending.pop() {
+        fs::create_dir_all(&local_dir)
+            .map_err(|error| format!("create local directory {}: {error}", local_dir.display()))?;
+
+        let listing = browse_station_files(station, &remote_dir).await?;
+        for item in listing.items {
+            let remote_path = join_remote_path(&item.parent, &item.path);
+            let local_path = local_dir.join(&item.path);
+
+            if item.is_directory {
+                pending.push((remote_path, local_path));
+                continue;
+            }
+
+            if let Some(parent) = local_path.parent() {
+                fs::create_dir_all(parent).map_err(|error| {
+                    format!("create local directory {}: {error}", parent.display())
+                })?;
+            }
+
+            download_station_file(station, &remote_path, &local_path.to_string_lossy()).await?;
+            downloaded_files += 1;
+        }
+    }
+
+    Ok(format!(
+        "Pulled folder {remote_root} to {local_root} ({downloaded_files} file(s))."
+    ))
 }
 
 async fn execute_one_target(
@@ -539,7 +734,8 @@ async fn execute_one_target(
 ) -> BatchTargetResult {
     let started_at = now_iso();
     let start_time = std::time::Instant::now();
-    let rendered = render_content(&task.content, &parameters, &task.parameters);
+    let resolved_parameters = merge_parameter_values(&parameters, &task.parameters);
+    let rendered = render_content(&task.content, &resolved_parameters);
     let timeout_secs = task.execution_policy.timeout_secs.max(10) as u64;
     let retries = task.execution_policy.retry_count;
     let retry_delay = task.execution_policy.retry_delay_secs.unwrap_or(5) as u64;
@@ -599,6 +795,26 @@ async fn execute_one_target(
                     .await?;
                     Ok((Some(result.message), None, Some(0), "success".to_string()))
                 }
+                "app_control" => {
+                    let action = parameter_value(&resolved_parameters, "appControlAction")
+                        .unwrap_or_else(|| "start".to_string());
+                    let station_action = match action.as_str() {
+                        "start" => StationAction::StartApp,
+                        "stop" => StationAction::ExitApp,
+                        "restart" => StationAction::RestartApp,
+                        other => {
+                            return Err(format!("Unsupported app control action: {other}"));
+                        }
+                    };
+                    let mut stations = vec![station.clone()];
+                    let result = execute_station_action(
+                        station_action,
+                        vec![station.id.clone()],
+                        &mut stations,
+                    )
+                    .await?;
+                    Ok((Some(result.message), None, Some(0), "success".to_string()))
+                }
                 "watch_processes" => {
                     let process_names = rendered
                         .split(['\n', ','])
@@ -634,6 +850,37 @@ async fn execute_one_target(
                         Some(command_result.exit_code),
                         status,
                     ))
+                }
+                "file_transfer" => {
+                    let direction = parameter_value(&resolved_parameters, "transferDirection")
+                        .unwrap_or_else(|| "push".to_string());
+                    let entry_type = parameter_value(&resolved_parameters, "transferEntryType")
+                        .unwrap_or_else(|| "file".to_string());
+                    let source_path = parameter_value(&resolved_parameters, "sourcePath")
+                        .ok_or_else(|| "sourcePath parameter is required".to_string())?;
+                    let target_path = parameter_value(&resolved_parameters, "targetPath")
+                        .ok_or_else(|| "targetPath parameter is required".to_string())?;
+
+                    let message = match (direction.as_str(), entry_type.as_str()) {
+                        ("push", "file") => {
+                            upload_station_file(&station, &source_path, &target_path).await?
+                        }
+                        ("pull", "file") => {
+                            download_station_file(&station, &source_path, &target_path).await?
+                        }
+                        ("push", "folder") => {
+                            push_folder_to_station(&station, &source_path, &target_path).await?
+                        }
+                        ("pull", "folder") => {
+                            pull_folder_from_station(&station, &source_path, &target_path).await?
+                        }
+                        _ => {
+                            return Err(format!(
+                                "Unsupported file transfer combination: direction={direction}, entryType={entry_type}"
+                            ));
+                        }
+                    };
+                    Ok((Some(message), None, Some(0), "success".to_string()))
                 }
                 other => Err(format!("Unsupported batch task type: {other}")),
             }
@@ -817,6 +1064,7 @@ async fn execute_batch_task_internal(
     } else {
         "partial_failure".to_string()
     };
+    let overall_failure_rate = failure_rate(&results);
 
     BatchExecutionResult {
         task_id: task.id.clone(),
@@ -830,7 +1078,7 @@ async fn execute_batch_task_internal(
         skipped_count,
         results,
         circuit_breaker_triggered: Some(circuit_breaker_triggered),
-        failure_rate: Some(failure_rate(&[])),
+        failure_rate: Some(overall_failure_rate),
     }
 }
 
@@ -1158,7 +1406,7 @@ pub fn export_batch_package(
 mod tests {
     use serde_json::json;
 
-    use super::{normalize_task, BatchTask, BatchTaskDraft};
+    use super::{BatchTask, BatchTaskDraft, BatchTaskParameter, normalize_task, validate_task};
 
     #[test]
     fn batch_task_defaults_show_in_toolbar_when_missing() {
@@ -1206,5 +1454,72 @@ mod tests {
         );
 
         assert!(task.show_in_toolbar);
+    }
+
+    #[test]
+    fn validate_file_transfer_requires_source_and_target_paths() {
+        let validation = validate_task(&BatchTaskDraft {
+            name: Some("Pull folder".to_string()),
+            task_type: Some("file_transfer".to_string()),
+            parameters: Some(vec![
+                BatchTaskParameter {
+                    name: "transferDirection".to_string(),
+                    param_type: "select".to_string(),
+                    default_value: "pull".to_string(),
+                    required: true,
+                    validation: None,
+                    description: None,
+                    options: Some(vec!["push".to_string(), "pull".to_string()]),
+                },
+                BatchTaskParameter {
+                    name: "transferEntryType".to_string(),
+                    param_type: "select".to_string(),
+                    default_value: "folder".to_string(),
+                    required: true,
+                    validation: None,
+                    description: None,
+                    options: Some(vec!["file".to_string(), "folder".to_string()]),
+                },
+            ]),
+            ..BatchTaskDraft::default()
+        });
+
+        assert!(!validation.valid);
+        assert!(
+            validation
+                .errors
+                .iter()
+                .any(|error| error.contains("sourcePath"))
+        );
+        assert!(
+            validation
+                .errors
+                .iter()
+                .any(|error| error.contains("targetPath"))
+        );
+    }
+
+    #[test]
+    fn validate_app_control_accepts_restart_action() {
+        let validation = validate_task(&BatchTaskDraft {
+            name: Some("Restart apps".to_string()),
+            task_type: Some("app_control".to_string()),
+            parameters: Some(vec![BatchTaskParameter {
+                name: "appControlAction".to_string(),
+                param_type: "select".to_string(),
+                default_value: "restart".to_string(),
+                required: true,
+                validation: None,
+                description: None,
+                options: Some(vec![
+                    "start".to_string(),
+                    "stop".to_string(),
+                    "restart".to_string(),
+                ]),
+            }]),
+            ..BatchTaskDraft::default()
+        });
+
+        assert!(validation.valid);
     }
 }
