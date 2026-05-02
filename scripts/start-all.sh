@@ -256,14 +256,18 @@ start_mosquitto() {
         return 0
     fi
 
-    # If an old mosquitto container exists but is stopped/exited, remove it first
+    # If old mosquitto container(s) exist but are stopped/exited, remove them first
     if is_mosquitto_container_exists; then
-        local mosquitto_status
-        mosquitto_status="$(docker inspect -f '{{.State.Status}}' mosquitto 2>/dev/null || true)"
-        if [[ "$mosquitto_status" != "running" ]]; then
-            log_warning "Found existing mosquitto container in status: ${mosquitto_status:-unknown}; removing it before restart"
-            docker rm -f mosquitto >/dev/null 2>&1 || true
-        fi
+        local mosquitto_container_ids mosquitto_container_id mosquitto_status
+        mosquitto_container_ids="$(docker ps -a --filter name=mosquitto -q)"
+
+        for mosquitto_container_id in $mosquitto_container_ids; do
+            mosquitto_status="$(docker inspect -f '{{.State.Status}}' "$mosquitto_container_id" 2>/dev/null || true)"
+            if [[ "$mosquitto_status" != "running" ]]; then
+                log_warning "Found existing mosquitto container ($mosquitto_container_id) in status: ${mosquitto_status:-unknown}; removing it before restart"
+                docker rm -f "$mosquitto_container_id" >/dev/null 2>&1 || true
+            fi
+        done
     fi
     
     # Try to start Mosquitto using docker-compose or docker run
