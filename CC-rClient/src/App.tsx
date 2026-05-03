@@ -3048,7 +3048,7 @@ function AppShell() {
                       }
                     />
                     <small className="fieldHint">
-                      Used as the station-wide gathering interval pushed to devices.
+                      Used as the station-wide gathering interval pushed to devices. Whole seconds only.
                     </small>
                   </label>
                   <button

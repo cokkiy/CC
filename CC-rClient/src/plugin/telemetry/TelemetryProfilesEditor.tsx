@@ -174,7 +174,8 @@ export const TelemetryProfilesEditor: React.FC<TelemetryProfilesEditorProps> = (
                   <span>Collection Interval (ms)</span>
                   <input
                     type="number"
-                    min={1}
+                    min={500}
+                    step={500}
                     value={profile.collectionIntervalMs}
                     onChange={(event) =>
                       patchProfile(index, {
