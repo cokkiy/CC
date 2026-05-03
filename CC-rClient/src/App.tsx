@@ -1159,7 +1159,7 @@ function AppShell() {
       window.removeEventListener("resize", updatePanelHeight);
       scrollContainer?.removeEventListener("scroll", updatePanelHeight);
     };
-  }, [activePage, loading, runtimeByStation, stations.length, viewMode]);
+  }, [activePage, loading, stations.length, viewMode]);
 
   useEffect(() => {
     const onPointerMove = (event: PointerEvent) => {
