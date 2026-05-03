@@ -11,14 +11,18 @@ use batch_ops::{
     preview_batch_targets, resume_batch_execution, save_batch_task, toggle_batch_task_favorite,
     validate_batch_task,
 };
-use control::{execute_station_action, set_station_gathering_interval};
+use control::{
+    TelemetryProfileDto, TelemetryProfilesResponseDto, TelemetrySchemaResponseDto,
+    execute_station_action, get_station_telemetry_profiles, get_station_telemetry_schema,
+    replace_station_telemetry_profiles, set_station_gathering_interval,
+};
 use models::{
     ActionResult, AppSnapshot, PersistedState, Station, StationAction, StationGroup, TagDefinition,
 };
 use remote::{
-    CommandExecutionResult, RemoteFileBrowserResult, StationScreenCapture, browse_station_files,
-    capture_station_screen, download_station_file, execute_station_command, rename_station_file,
-    upload_station_file,
+    CommandExecutionResult, RemoteFileBrowserResult, RemoteStationIdentity, StationScreenCapture,
+    browse_station_files, capture_station_screen, download_station_file, execute_station_command,
+    probe_station_identity, rename_station_file, upload_station_file,
 };
 use script_ops::{
     cancel_script_execution, delete_script, execute_script, export_script_package,
@@ -283,6 +287,17 @@ async fn execute_station_command_for_ui(
         .find(|station| station.id == id)
         .ok_or_else(|| format!("No station found for id {id}"))?;
     execute_station_command(station, &command, timeout_seconds).await
+}
+
+#[tauri::command]
+async fn probe_station_identity_for_ui(id: String) -> Result<RemoteStationIdentity, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let station = snapshot
+        .stations
+        .iter()
+        .find(|station| station.id == id)
+        .ok_or_else(|| format!("No station found for id {id}"))?;
+    probe_station_identity(station).await
 }
 
 #[tauri::command]
@@ -796,6 +811,46 @@ async fn set_station_gathering_interval_for_ui(interval_seconds: i32) -> Result<
     }
 }
 
+#[tauri::command]
+async fn get_station_telemetry_profiles_for_ui(
+    id: String,
+) -> Result<TelemetryProfilesResponseDto, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let station = snapshot
+        .stations
+        .iter()
+        .find(|station| station.id == id)
+        .ok_or_else(|| format!("No station found for id {id}"))?;
+    get_station_telemetry_profiles(station).await
+}
+
+#[tauri::command]
+async fn replace_station_telemetry_profiles_for_ui(
+    id: String,
+    profiles: Vec<TelemetryProfileDto>,
+) -> Result<TelemetryProfilesResponseDto, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let station = snapshot
+        .stations
+        .iter()
+        .find(|station| station.id == id)
+        .ok_or_else(|| format!("No station found for id {id}"))?;
+    replace_station_telemetry_profiles(station, profiles).await
+}
+
+#[tauri::command]
+async fn get_station_telemetry_schema_for_ui(
+    id: String,
+) -> Result<TelemetrySchemaResponseDto, String> {
+    let snapshot = StateStore::load_snapshot().map_err(|error| error.to_string())?;
+    let station = snapshot
+        .stations
+        .iter()
+        .find(|station| station.id == id)
+        .ok_or_else(|| format!("No station found for id {id}"))?;
+    get_station_telemetry_schema(station).await
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -820,6 +875,7 @@ pub fn run() {
             upload_station_file_for_ui,
             capture_station_screen_for_ui,
             execute_station_command_for_ui,
+            probe_station_identity_for_ui,
             get_station_groups,
             create_station_group,
             update_station_group,
@@ -829,6 +885,9 @@ pub fn run() {
             update_tag,
             delete_tag,
             set_station_gathering_interval_for_ui,
+            get_station_telemetry_profiles_for_ui,
+            replace_station_telemetry_profiles_for_ui,
+            get_station_telemetry_schema_for_ui,
             // Phase 8 frontend API aliases
             load_groups,
             create_group,

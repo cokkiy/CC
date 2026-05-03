@@ -198,6 +198,14 @@ body {
   padding: 24px;
 }
 
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .page-container {
   display: flex;
   flex-direction: column;
@@ -518,7 +526,19 @@ input:focus, select:focus, textarea:focus {
 }
 
 .gridSettingsMode {
-  grid-template-columns: minmax(360px, 400px) minmax(400px, 1fr);
+  grid-template-columns: minmax(520px, 2fr) minmax(300px, 0.8fr);
+  flex: 1;
+  min-height: 0;
+  align-items: start;
+  overflow: hidden;
+}
+
+.gridSettingsMode > .panel {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .gridScriptsMode {
@@ -1068,6 +1088,18 @@ input:focus, select:focus, textarea:focus {
   gap: 1rem;
 }
 
+.timingFieldRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr)) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.timingFieldRow button {
+  min-height: 40px;
+  align-self: center;
+}
+
 .cardGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1262,7 +1294,8 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 1180px) {
   .grid,
   .gridDetailMode,
-  .gridRuntimeMode {
+  .gridRuntimeMode,
+  .timingFieldRow {
     grid-template-columns: 1fr;
   }
 

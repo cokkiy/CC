@@ -132,7 +132,15 @@ function getMetricValue(runtime: StationRuntimeSnapshot, metricType: AlertRule['
     case 'process_count':
       return runtime.procCount;
     case 'disk_usage':
+      if (runtime.storageStats.length === 0) {
+        return NaN;
+      }
+      return Math.max(...runtime.storageStats.map((item) => item.usagePercent));
     case 'disk_free':
+      if (runtime.storageStats.length === 0) {
+        return NaN;
+      }
+      return runtime.storageStats.reduce((sum, item) => sum + item.availableBytes, 0) / (1024 * 1024);
     case 'custom':
     default:
       return NaN;

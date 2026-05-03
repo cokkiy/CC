@@ -15,8 +15,29 @@ auth_token = "local-change-me"
 preferred_display_index = 0
 
 [mqtt]
-enabled = true  # Enable MQTT telemetry publishing
+enabled = true
 broker_host = "localhost"
-broker_port = 1883  # MQTT port (Mosquitto Broker)
+broker_port = 1883
 telemetry_enabled = true
 status_enabled = true
+
+[[mqtt.telemetry_profiles]]
+id = "Default"
+name = "Default"
+enabled = true
+collection_interval_ms = 1500
+includes = [
+    "runtime_basic",
+    "runtime_system",
+    "runtime_network",
+]
+
+[[mqtt.telemetry_profiles]]
+id = "App"
+name = "AppWatch"
+enabled = true
+collection_interval_ms = 5000
+includes = [
+    "runtime_apps",
+    "runtime_storage",
+]

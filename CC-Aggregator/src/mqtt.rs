@@ -1,5 +1,5 @@
 //! MQTT client module for CC-Aggregator
-//! 
+//!
 //! This module implements the MQTT client functionality using rumqttc.
 //! It handles connection to the message broker and manages topic subscriptions/publishing.
 
@@ -35,13 +35,12 @@ impl MqttClient {
 
         let (client, eventloop) = AsyncClient::new(mqttoptions, 100);
 
-        info!("MQTT client created: broker={}:{}, client_id={}", 
-              broker_host, broker_port, client_id);
+        info!(
+            "MQTT client created: broker={}:{}, client_id={}",
+            broker_host, broker_port, client_id
+        );
 
-        Ok(Self {
-            client,
-            eventloop,
-        })
+        Ok(Self { client, eventloop })
     }
 
     /// Subscribe to a topic pattern
@@ -50,7 +49,7 @@ impl MqttClient {
             .subscribe(topic, qos)
             .await
             .context(format!("Failed to subscribe to topic: {}", topic))?;
-        
+
         info!("Subscribed to topic: {}", topic);
         Ok(())
     }
@@ -60,26 +59,31 @@ impl MqttClient {
         // Subscribe to command topics for all stations
         self.subscribe("cc/+/command", QoS::AtLeastOnce).await?;
         self.subscribe("cc/+/config/set", QoS::AtLeastOnce).await?;
-        
+
         // Subscribe to telemetry and status for all stations
         self.subscribe("cc/+/telemetry", QoS::AtLeastOnce).await?;
         self.subscribe("cc/+/status", QoS::AtLeastOnce).await?;
-        self.subscribe("cc/+/descriptor/announce", QoS::AtLeastOnce).await?;
-        
+        self.subscribe("cc/+/descriptor/announce", QoS::AtLeastOnce)
+            .await?;
+
         info!("Subscribed to all CC topics");
         Ok(())
     }
 
     /// Publish telemetry data
-    pub async fn publish_telemetry(&self, station_id: &str, telemetry: &TelemetryBundle) -> Result<()> {
+    pub async fn publish_telemetry(
+        &self,
+        station_id: &str,
+        telemetry: &TelemetryBundle,
+    ) -> Result<()> {
         let topic = format!("cc/{}/telemetry", station_id);
         let payload = serde_json::to_vec(telemetry)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, false, payload)
             .await
             .context("Failed to publish telemetry")?;
-        
+
         debug!("Published telemetry for station: {}", station_id);
         Ok(())
     }
@@ -88,12 +92,12 @@ impl MqttClient {
     pub async fn publish_status(&self, station_id: &str, status: &StationStatus) -> Result<()> {
         let topic = format!("cc/{}/status", station_id);
         let payload = serde_json::to_vec(status)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, true, payload)
             .await
             .context("Failed to publish status")?;
-        
+
         debug!("Published status for station: {}", station_id);
         Ok(())
     }
@@ -102,12 +106,12 @@ impl MqttClient {
     pub async fn publish_command_ack(&self, station_id: &str, ack: &CommandAck) -> Result<()> {
         let topic = format!("cc/{}/command/ack", station_id);
         let payload = serde_json::to_vec(ack)?;
-        
+
         self.client
             .publish(&topic, QoS::AtLeastOnce, false, payload)
             .await
             .context("Failed to publish command ack")?;
-        
+
         Ok(())
     }
 
@@ -224,7 +228,7 @@ pub async fn handle_mqtt_events(
                     payload: publish.payload.to_vec(),
                     qos: publish.qos,
                 };
-                
+
                 if let Err(e) = message_sender.send(message).await {
                     warn!("Failed to send MQTT message to channel: {:?}", e);
                     break;
@@ -249,6 +253,6 @@ pub async fn handle_mqtt_events(
             }
         }
     }
-    
+
     Ok(())
 }

@@ -13,6 +13,7 @@ use pnet_datalink::interfaces;
 #[cfg(windows)]
 use sysinfo::Disks;
 use sysinfo::{MINIMUM_CPU_UPDATE_INTERVAL, Networks, Pid, ProcessesToUpdate, System};
+use tokio::sync::watch;
 
 use crate::config::AppConfig;
 use crate::grpc::cc::{
@@ -24,10 +25,16 @@ use crate::grpc::cc::{
 };
 use crate::mqtt::{Command, CommandAck, MqttClient};
 use crate::network_counters;
+use crate::telemetry::{
+    CollectedRuntimeTelemetry, CollectedTelemetrySections, TelemetryAppSnapshot, TelemetryInclude,
+    TelemetryNetworkInterfaceSnapshot, TelemetryNetworkSnapshot, TelemetryProfileConfig,
+    TelemetryProfileState, TelemetrySchema, TelemetryStorageSnapshot, validate_profiles,
+};
 use tracing::{debug, info, warn};
 
 pub struct AppState {
     config: AppConfig,
+    config_path: PathBuf,
     station_id: String,
     service_path: PathBuf,
     udp_target: SocketAddr,
@@ -37,10 +44,13 @@ pub struct AppState {
     network_sampler: Mutex<NetworkSampler>,
     server_version: ServerVersionInfo,
     mqtt_client: Option<MqttClient>,
+    telemetry_profiles: RwLock<Vec<TelemetryProfileConfig>>,
+    telemetry_profiles_version: AtomicU64,
+    telemetry_profiles_tx: watch::Sender<TelemetryProfileState>,
 }
 
 impl AppState {
-    pub fn new(config: AppConfig, service_path: PathBuf) -> Result<Self> {
+    pub fn new(config: AppConfig, config_path: PathBuf, service_path: PathBuf) -> Result<Self> {
         let station_id = config.resolved_station_id();
         let udp_target = config
             .service
@@ -73,17 +83,43 @@ impl AppState {
             None
         };
 
+        let telemetry_profiles = if config.mqtt.telemetry_profiles.is_empty() {
+            vec![TelemetryProfileConfig::default_full(
+                config.service.state_interval_seconds.max(1) * 1000,
+            )]
+        } else {
+            config
+                .mqtt
+                .telemetry_profiles
+                .iter()
+                .map(TelemetryProfileConfig::normalized)
+                .collect()
+        };
+        validate_profiles(&telemetry_profiles)
+            .map_err(|error| anyhow::anyhow!("invalid telemetry profiles: {error}"))?;
+
+        let telemetry_profiles_version = 1u64;
+        let telemetry_profile_state = TelemetryProfileState {
+            version: telemetry_profiles_version,
+            profiles: telemetry_profiles.clone(),
+        };
+        let (telemetry_profiles_tx, _) = watch::channel(telemetry_profile_state);
+
         Ok(Self {
             watched_processes: RwLock::new(config.service.watched_processes.clone()),
             interval_seconds: AtomicU64::new(config.service.state_interval_seconds.max(1)),
             network_sampler: Mutex::new(NetworkSampler::new()),
             server_version: build_server_version(),
             config,
+            config_path,
             station_id,
             service_path,
             udp_target,
             agent_target,
             mqtt_client,
+            telemetry_profiles: RwLock::new(telemetry_profiles),
+            telemetry_profiles_version: AtomicU64::new(telemetry_profiles_version),
+            telemetry_profiles_tx,
         })
     }
 
@@ -139,6 +175,57 @@ impl AppState {
 
     pub fn preferred_display_index(&self) -> u32 {
         self.config.agent.preferred_display_index
+    }
+
+    pub fn telemetry_profiles(&self) -> Vec<TelemetryProfileConfig> {
+        self.telemetry_profiles
+            .read()
+            .map(|profiles| profiles.clone())
+            .unwrap_or_default()
+    }
+
+    pub fn telemetry_profiles_version(&self) -> u64 {
+        self.telemetry_profiles_version.load(Ordering::Relaxed)
+    }
+
+    pub fn telemetry_profile_receiver(&self) -> watch::Receiver<TelemetryProfileState> {
+        self.telemetry_profiles_tx.subscribe()
+    }
+
+    pub fn telemetry_schema(&self) -> TelemetrySchema {
+        TelemetrySchema::current()
+    }
+
+    pub fn replace_telemetry_profiles(
+        &self,
+        profiles: Vec<TelemetryProfileConfig>,
+    ) -> Result<TelemetryProfileState> {
+        let profiles = profiles
+            .into_iter()
+            .map(|profile| profile.normalized())
+            .collect::<Vec<_>>();
+        validate_profiles(&profiles)
+            .map_err(|error| anyhow::anyhow!("invalid telemetry profiles: {error}"))?;
+
+        let mut config = self.config.clone();
+        config.mqtt.telemetry_profiles = profiles.clone();
+        config.persist(&self.config_path)?;
+
+        if let Ok(mut stored_profiles) = self.telemetry_profiles.write() {
+            *stored_profiles = profiles.clone();
+        }
+
+        let version = self
+            .telemetry_profiles_version
+            .fetch_add(1, Ordering::Relaxed)
+            .saturating_add(1);
+        let state = TelemetryProfileState { version, profiles };
+
+        self.telemetry_profiles_tx
+            .send(state.clone())
+            .map_err(|_| anyhow::anyhow!("telemetry scheduler update channel closed"))?;
+
+        Ok(state)
     }
 
     pub fn interval_seconds(&self) -> u64 {
@@ -296,26 +383,106 @@ impl AppState {
         (running, apps)
     }
 
-    pub async fn publish_mqtt_telemetry_from_running_state(
+    pub async fn collect_telemetry_sections(
         &self,
-        running: &StationRunningState,
-    ) -> Result<()> {
-        if !self.mqtt_telemetry_enabled() {
-            return Ok(());
-        }
+        includes: &[TelemetryInclude],
+    ) -> CollectedTelemetrySections {
+        let include_set = includes
+            .iter()
+            .copied()
+            .collect::<std::collections::BTreeSet<_>>();
+        let need_runtime_basic = include_set.contains(&TelemetryInclude::RuntimeBasic);
+        let need_runtime_system = include_set.contains(&TelemetryInclude::RuntimeSystem);
+        let need_apps = include_set.contains(&TelemetryInclude::RuntimeApps);
+        let need_network = include_set.contains(&TelemetryInclude::RuntimeNetwork);
+        let need_storage = include_set.contains(&TelemetryInclude::RuntimeStorage);
+        let ts = chrono::Utc::now().timestamp_millis();
 
-        let Some(mqtt_client) = &self.mqtt_client else {
-            return Ok(());
+        let system = if need_runtime_basic || need_runtime_system || need_apps {
+            Some(prepared_system_snapshot_async().await)
+        } else {
+            None
         };
 
-        let interval_ms = (self.interval_seconds.load(Ordering::Relaxed) * 1000) as u32;
-        let telemetry_bundle =
-            crate::mqtt::TelemetryBundle::from_station_state(running, interval_ms);
+        let runtime = system.as_ref().and_then(|system| {
+            (need_runtime_basic || need_runtime_system).then(|| CollectedRuntimeTelemetry {
+                computer_name: System::host_name().unwrap_or_default(),
+                cpu: system.global_cpu_usage(),
+                current_memory: saturating_i64(system.used_memory()),
+                total_memory: saturating_i64(system.total_memory()),
+                proc_count: system.processes().len() as i32,
+                os_name: System::name().unwrap_or_default(),
+                os_version: System::os_version().unwrap_or_default(),
+                service_version: self
+                    .server_version
+                    .services_version
+                    .as_ref()
+                    .map(|value| value.product_version.clone())
+                    .unwrap_or_default(),
+                app_launcher_version: self
+                    .server_version
+                    .app_launcher_version
+                    .as_ref()
+                    .map(|value| value.product_version.clone())
+                    .unwrap_or_default(),
+                service_path: self.service_path.display().to_string(),
+                app_launcher_path: self.launcher_proxy_path().to_string(),
+            })
+        });
 
-        mqtt_client
-            .publish_telemetry(&telemetry_bundle)
-            .await
-            .context("publish telemetry via MQTT")
+        let apps = if need_apps {
+            system.as_ref().map(|system| {
+                self.watched_processes()
+                    .iter()
+                    .map(|name| collect_app_snapshot(system, name))
+                    .collect()
+            })
+        } else {
+            None
+        };
+
+        let network = need_network.then(|| {
+            let stats = self.network_statistics();
+            TelemetryNetworkSnapshot {
+                current_connections: stats.current_connections,
+                reset_connections: stats.reset_connections,
+                udp_listeners: stats.udp_listeners,
+                datagrams_received: stats.datagrams_received,
+                datagrams_sent: stats.datagrams_sent,
+                datagrams_discarded: stats.datagrams_discarded,
+                datagrams_with_errors: stats.datagrams_with_errors,
+                segments_received: stats.segments_received,
+                segments_sent: stats.segments_sent,
+                errors_received: stats.errors_received,
+                interfaces: stats
+                    .interface_statistics
+                    .into_iter()
+                    .map(|item| TelemetryNetworkInterfaceSnapshot {
+                        if_name: item.if_name,
+                        bytes_received_per_sec: item.bytes_received_per_sec,
+                        bytes_sented_per_sec: item.bytes_sented_per_sec,
+                        total_bytes_per_sec: item.total_bytes_per_sec,
+                        bytes_received: item.bytes_received,
+                        bytes_sented: item.bytes_sented,
+                        bytes_total: item.bytes_total,
+                        unicast_packet_received: item.unicast_packet_received,
+                        unicast_packet_sented: item.unicast_packet_sented,
+                        multicast_packet_received: item.multicast_packet_received,
+                        multicast_packet_sented: item.multicast_packet_sented,
+                    })
+                    .collect(),
+            }
+        });
+
+        let storage = need_storage.then(collect_storage_snapshots);
+
+        CollectedTelemetrySections {
+            ts,
+            runtime,
+            apps,
+            network,
+            storage,
+        }
     }
 
     pub fn all_process_info(&self) -> GetAllProcessInfoResponse {
@@ -635,6 +802,56 @@ fn collect_app_running_state(system: &System, station_id: &str, name: &str) -> A
     }
 }
 
+fn collect_app_snapshot(system: &System, name: &str) -> TelemetryAppSnapshot {
+    let state = collect_app_running_state(system, "", name);
+    let process = state.process.unwrap_or_default();
+
+    TelemetryAppSnapshot {
+        monitor_name: process.process_monitor_name,
+        process_name: process.process_name,
+        process_id: process.id,
+        is_running: state.is_running,
+        cpu: state.cpu,
+        proc_count: state.proc_count,
+        thread_count: state.thread_count,
+        current_memory: state.current_memory,
+        app_version: state.app_version,
+        start_time: state.start_time,
+    }
+}
+
+fn collect_storage_snapshots() -> Vec<TelemetryStorageSnapshot> {
+    #[cfg(windows)]
+    let disks = Disks::new_with_refreshed_list();
+    #[cfg(not(windows))]
+    let disks = sysinfo::Disks::new_with_refreshed_list();
+
+    let mut items = disks
+        .iter()
+        .map(|disk| {
+            let total = disk.total_space();
+            let available = disk.available_space();
+            let used = total.saturating_sub(available);
+            let usage_percent = if total == 0 {
+                0.0
+            } else {
+                (used as f64 / total as f64) * 100.0
+            };
+
+            TelemetryStorageSnapshot {
+                mount_point: disk.mount_point().display().to_string(),
+                total_bytes: saturating_i64(total),
+                used_bytes: saturating_i64(used),
+                available_bytes: saturating_i64(available),
+                usage_percent,
+            }
+        })
+        .collect::<Vec<_>>();
+
+    items.sort_by(|left, right| left.mount_point.cmp(&right.mount_point));
+    items
+}
+
 fn process_name_candidates(name: &str) -> Vec<String> {
     let lower = name.trim().to_ascii_lowercase();
     if lower.is_empty() {
@@ -845,5 +1062,51 @@ impl NetworkSampler {
             reset_connections: saturating_i64(snapshot.reset_connections) as i32,
             interface_statistics,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::telemetry::TelemetryInclude;
+
+    fn make_state() -> AppState {
+        AppState::new(
+            AppConfig::default(),
+            PathBuf::from("/tmp/CC-rStationService.test.toml"),
+            PathBuf::from("/tmp/cc-rstationservice"),
+        )
+        .unwrap()
+    }
+
+    #[tokio::test]
+    async fn collect_telemetry_sections_includes_runtime_network_and_storage() {
+        let state = make_state();
+        let sections = state
+            .collect_telemetry_sections(&[
+                TelemetryInclude::RuntimeBasic,
+                TelemetryInclude::RuntimeSystem,
+                TelemetryInclude::RuntimeNetwork,
+                TelemetryInclude::RuntimeStorage,
+            ])
+            .await;
+
+        let runtime = sections.runtime.expect("runtime");
+        assert!(runtime.total_memory >= 0);
+        assert!(runtime.service_path.contains("cc-rstationservice"));
+        assert!(sections.network.is_some());
+        assert!(sections.storage.is_some());
+    }
+
+    #[test]
+    fn collect_storage_snapshots_returns_sorted_mount_points() {
+        let storage = collect_storage_snapshots();
+        let mut sorted = storage
+            .iter()
+            .map(|item| item.mount_point.clone())
+            .collect::<Vec<_>>();
+        let original = sorted.clone();
+        sorted.sort();
+        assert_eq!(original, sorted);
     }
 }

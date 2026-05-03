@@ -60,3 +60,4 @@ export * from './components';
 
 // Plugin Marketplace Infrastructure
 export * from './marketplace';
+export * from './telemetry';

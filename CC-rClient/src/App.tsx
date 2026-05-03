@@ -32,6 +32,14 @@ import { BatchProvider, BatchTaskRunner, useBatch } from "./plugin/batch";
 import { BatchPage } from "./plugin/batch/BatchPage";
 import { BatchUIProvider, useBatchUI } from "./plugin/batch/BatchUIContext";
 import { GroupsPage, TagsPage } from "./plugin/groups";
+import {
+  TelemetryProfilesEditor,
+  SUPPORTED_TELEMETRY_INCLUDES,
+  validateEnabledTelemetrySectionConflicts,
+  validateTelemetryProfileDrafts,
+  type TelemetryProfileDraft,
+  type TelemetrySchemaResponse,
+} from "./plugin/telemetry";
 import { GroupsProvider } from "./plugin/groups/GroupsContext";
 import { TagsProvider } from "./plugin/groups/TagsContext";
 import type { TagDefinition } from "./plugin/groups/types";
@@ -69,7 +77,8 @@ const emptyOptions: ClientOptions = {
   interval: 2,
   isFirstTimeRun: true,
   startApps: [],
-  monitorProcesses: []
+  monitorProcesses: [],
+  defaultTelemetryProfiles: [],
 };
 
 const emptyStation = (): Station => ({
@@ -86,6 +95,7 @@ const emptyStation = (): Station => ({
 });
 
 const MQTT_DISCOVERY_SOURCE = "mqtt";
+const LOCAL_STATION_ID = "local-rstationservice";
 
 type MqttTelemetryEventPayload = {
   station_id: string;
@@ -101,6 +111,12 @@ type MqttStatusEventPayload = {
     version?: string | null;
     alert?: string | null;
   };
+};
+
+type RemoteStationIdentity = {
+  endpoint: string;
+  stationId: string;
+  computerName: string;
 };
 
 function createDiscoveredStation(stationId: string, metadata?: Record<string, string>): Station {
@@ -119,6 +135,105 @@ function createDiscoveredStation(stationId: string, metadata?: Record<string, st
       ...metadata,
     },
   };
+}
+
+function mergeStringArrays(left: string[] = [], right: string[] = []) {
+  return Array.from(new Set([...left, ...right]));
+}
+
+function mergeNetworkInterfaces(
+  left: Station["networkInterfaces"] = [],
+  right: Station["networkInterfaces"] = [],
+) {
+  const byMac = new Map<string, Station["networkInterfaces"][number]>();
+
+  [...left, ...right].forEach((item) => {
+    const key = item.mac || `ips:${item.ips.join(",")}`;
+    const existing = byMac.get(key);
+    if (!existing) {
+      byMac.set(key, { ...item, ips: [...item.ips] });
+      return;
+    }
+
+    byMac.set(key, {
+      ...existing,
+      ips: mergeStringArrays(existing.ips, item.ips),
+    });
+  });
+
+  return Array.from(byMac.values());
+}
+
+function reconcileStationIdentity(
+  current: Station[],
+  fromId: string,
+  toId: string,
+  computerName?: string,
+) {
+  if (!toId || fromId === toId) {
+    return current;
+  }
+
+  const source = current.find((station) => station.id === fromId);
+  if (!source) {
+    return current;
+  }
+
+  const target = current.find((station) => station.id === toId);
+  if (!target) {
+    return current.map((station) =>
+      station.id === fromId
+        ? {
+            ...station,
+            id: toId,
+            name: station.name || computerName || toId,
+            metadata: {
+              ...station.metadata,
+              mqttCanonicalId: toId,
+            },
+          }
+        : station,
+    );
+  }
+
+  const merged: Station = {
+    ...target,
+    id: toId,
+    name:
+      source.name === "Local CC-rStationService"
+        ? source.name
+        : target.name || source.name || computerName || toId,
+    blocked: target.blocked || source.blocked,
+    networkInterfaces: mergeNetworkInterfaces(source.networkInterfaces, target.networkInterfaces),
+    startPrograms: target.startPrograms.length > 0 ? target.startPrograms : source.startPrograms,
+    monitorProcesses:
+      target.monitorProcesses.length > 0 ? target.monitorProcesses : source.monitorProcesses,
+    lastAction: target.lastAction ?? source.lastAction,
+    groups: mergeStringArrays(source.groups, target.groups),
+    tags: { ...source.tags, ...target.tags },
+    metadata: {
+      ...source.metadata,
+      ...target.metadata,
+      mqttCanonicalId: toId,
+    },
+    location: target.location ?? source.location,
+  };
+
+  return current
+    .filter((station) => station.id !== fromId && station.id !== toId)
+    .concat(merged);
+}
+
+function remapRecordKey<T>(current: Record<string, T>, fromId: string, toId: string) {
+  if (fromId === toId || !(fromId in current)) {
+    return current;
+  }
+
+  const next = { ...current };
+  const value = next[fromId];
+  delete next[fromId];
+  next[toId] = value;
+  return next;
 }
 
 function emitAlertRuntimeUpdate(station: Station, runtime: StationRuntimeSnapshot) {
@@ -915,6 +1030,7 @@ function AppShell() {
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [runtimeByStation, setRuntimeByStation] = useState<Record<string, StationRuntimeSnapshot>>({});
+  const runtimeByStationRef = useRef<Record<string, StationRuntimeSnapshot>>({});
   const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; procCount: number; ts: number; rxbps: number; txbps: number }[]>>({});
   const MAX_HISTORY = 30;
   const [browserByStation, setBrowserByStation] = useState<Record<string, RemoteFileBrowserResult>>({});
@@ -948,6 +1064,16 @@ function AppShell() {
   const [stationPanelsMaxHeight, setStationPanelsMaxHeight] = useState<number | null>(null);
   const [pendingStationTagValues, setPendingStationTagValues] = useState<Record<string, string>>({});
   const [dirtyStationTagKeys, setDirtyStationTagKeys] = useState<Record<string, boolean>>({});
+  const [telemetrySchema, setTelemetrySchema] = useState<TelemetrySchemaResponse | null>(null);
+  const [telemetrySchemaLoading, setTelemetrySchemaLoading] = useState(false);
+  const [stationTelemetryProfiles, setStationTelemetryProfiles] = useState<TelemetryProfileDraft[]>([]);
+  const [stationTelemetryLoading, setStationTelemetryLoading] = useState(false);
+  const [stationTelemetrySaving, setStationTelemetrySaving] = useState(false);
+  const [stationTelemetryNotice, setStationTelemetryNotice] = useState<string | null>(null);
+  const [stationTelemetryError, setStationTelemetryError] = useState<string | null>(null);
+  const [globalTelemetryNotice, setGlobalTelemetryNotice] = useState<string | null>(null);
+  const [globalTelemetryError, setGlobalTelemetryError] = useState<string | null>(null);
+  const [globalTelemetrySaving, setGlobalTelemetrySaving] = useState(false);
   const stationsWorkspaceRef = useRef<HTMLElement | null>(null);
   const resizingPanelsRef = useRef(false);
 
@@ -975,6 +1101,10 @@ function AppShell() {
   useEffect(() => {
     stationsRef.current = stations;
   }, [stations]);
+
+  useEffect(() => {
+    runtimeByStationRef.current = runtimeByStation;
+  }, [runtimeByStation]);
 
   useEffect(() => {
     const onResize = () => {
@@ -1015,11 +1145,17 @@ function AppShell() {
     };
 
     updatePanelHeight();
+    const frameId = window.requestAnimationFrame(updatePanelHeight);
+    const transitionTimer = window.setTimeout(updatePanelHeight, 450);
     window.addEventListener("resize", updatePanelHeight);
-    const scrollContainer = stationsWorkspaceRef.current?.closest(".app-content");
+    const scrollContainer =
+      stationsWorkspaceRef.current?.closest(".app-content") ??
+      stationsWorkspaceRef.current?.closest(".shell");
     scrollContainer?.addEventListener("scroll", updatePanelHeight, { passive: true });
 
     return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(transitionTimer);
       window.removeEventListener("resize", updatePanelHeight);
       scrollContainer?.removeEventListener("scroll", updatePanelHeight);
     };
@@ -1063,12 +1199,65 @@ function AppShell() {
   }, []);
 
   useEffect(() => {
+    const localStation = stations.find((station) => station.id === LOCAL_STATION_ID);
+    if (!localStation) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void invoke<RemoteStationIdentity>("probe_station_identity_for_ui", {
+      id: LOCAL_STATION_ID,
+    })
+      .then((identity) => {
+        if (cancelled || !identity.stationId || identity.stationId === LOCAL_STATION_ID) {
+          return;
+        }
+
+        setStations((current) =>
+          reconcileStationIdentity(
+            current,
+            LOCAL_STATION_ID,
+            identity.stationId,
+            identity.computerName,
+          ),
+        );
+        setRuntimeByStation((current) =>
+          remapRecordKey(current, LOCAL_STATION_ID, identity.stationId),
+        );
+        setHistoryByStation((current) =>
+          remapRecordKey(current, LOCAL_STATION_ID, identity.stationId),
+        );
+        setBrowserByStation((current) =>
+          remapRecordKey(current, LOCAL_STATION_ID, identity.stationId),
+        );
+        setCaptureByStation((current) =>
+          remapRecordKey(current, LOCAL_STATION_ID, identity.stationId),
+        );
+        setSelectedId((current) =>
+          current === LOCAL_STATION_ID ? identity.stationId : current,
+        );
+      })
+      .catch(() => {
+        // Keep the placeholder when the local service probe is unavailable.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [stations]);
+
+  useEffect(() => {
     const unlistenFns: UnlistenFn[] = [];
 
     const registerListeners = async () => {
       const unlistenTelemetry = await listen<MqttTelemetryEventPayload>("telemetry", (event) => {
         const { station_id: stationId, data } = event.payload;
-        const runtime = buildRuntimeFromMqttTelemetry(stationId, data);
+        const runtime = buildRuntimeFromMqttTelemetry(
+          stationId,
+          data,
+          runtimeByStationRef.current[stationId],
+        );
         const existingStation = stationsRef.current.find((station) => station.id === stationId) ?? null;
         const alertStation =
           existingStation
@@ -1103,6 +1292,8 @@ function AppShell() {
         setRuntimeByStation((current) => ({ ...current, [stationId]: runtime }));
         setHistoryByStation((current) => {
           const prev = current[stationId] ?? [];
+          const rxbps = runtime.networkStats.reduce((sum, item) => sum + item.bytesReceivedPerSec, 0);
+          const txbps = runtime.networkStats.reduce((sum, item) => sum + item.bytesSentedPerSec, 0);
           const next = [
             ...prev.slice(-(MAX_HISTORY - 1)),
             {
@@ -1110,8 +1301,8 @@ function AppShell() {
               memory: runtime.currentMemory,
               procCount: runtime.procCount,
               ts: Date.now(),
-              rxbps: 0,
-              txbps: 0,
+              rxbps,
+              txbps,
             },
           ];
           return { ...current, [stationId]: next };
@@ -1211,7 +1402,9 @@ function AppShell() {
 
   const selectedStation =
     filteredStations.find((station) => station.id === selectedId) ??
+    filteredStations[0] ??
     stations.find((station) => station.id === selectedId) ??
+    stations[0] ??
     null;
   const selectedRuntime = selectedStation ? runtimeByStation[selectedStation.id] ?? null : null;
   const selectedBrowser = selectedStation ? browserByStation[selectedStation.id] ?? null : null;
@@ -1229,11 +1422,140 @@ function AppShell() {
   const selectedStationHiddenByFilters =
     Boolean(selectedStation) &&
     filteredStations.every((station) => station.id !== selectedStation?.id);
+  const stationTelemetryValidationErrors = useMemo(
+    () => validateTelemetryProfileDrafts(stationTelemetryProfiles),
+    [stationTelemetryProfiles],
+  );
+  const stationTelemetryValidationWarnings = useMemo(
+    () => validateEnabledTelemetrySectionConflicts(stationTelemetryProfiles),
+    [stationTelemetryProfiles],
+  );
+  const globalTelemetryProfiles = useMemo(
+    () => options.defaultTelemetryProfiles as TelemetryProfileDraft[],
+    [options.defaultTelemetryProfiles],
+  );
+  const globalTelemetryValidationErrors = useMemo(
+    () => validateTelemetryProfileDrafts(globalTelemetryProfiles),
+    [globalTelemetryProfiles],
+  );
+  const globalTelemetryValidationWarnings = useMemo(
+    () => validateEnabledTelemetrySectionConflicts(globalTelemetryProfiles),
+    [globalTelemetryProfiles],
+  );
+
+  function normalizeOptionsTelemetryProfiles(nextOptions: ClientOptions): ClientOptions {
+    return {
+      ...nextOptions,
+      interval: Math.max(1, nextOptions.interval),
+      defaultTelemetryProfiles: nextOptions.defaultTelemetryProfiles,
+    };
+  }
+
+  function updateDefaultTelemetryProfiles(nextProfiles: TelemetryProfileDraft[]) {
+    setGlobalTelemetryNotice(null);
+    setGlobalTelemetryError(null);
+    setOptions((current) => ({
+      ...current,
+      defaultTelemetryProfiles: nextProfiles,
+    }));
+  }
 
   useEffect(() => {
     setPendingStationTagValues({});
     setDirtyStationTagKeys({});
   }, [selectedStation?.id]);
+
+  useEffect(() => {
+    if (activePage !== "stations") {
+      return;
+    }
+
+    const schemaStationId =
+      selectedStation?.id ??
+      filteredStations[0]?.id ??
+      stations[0]?.id ??
+      "";
+
+    if (!schemaStationId) {
+      setTelemetrySchema(null);
+      setTelemetrySchemaLoading(false);
+      return;
+    }
+
+    if (telemetrySchema) {
+      return;
+    }
+
+    let cancelled = false;
+    setTelemetrySchemaLoading(true);
+    void invoke<TelemetrySchemaResponse>("get_station_telemetry_schema_for_ui", {
+      id: schemaStationId,
+    })
+      .then((schema) => {
+        if (cancelled) {
+          return;
+        }
+        setTelemetrySchema(schema);
+      })
+      .catch(() => {
+        // Leave schema unset until a reachable station is available.
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setTelemetrySchemaLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activePage, filteredStations, selectedStation?.id, stations, telemetrySchema]);
+
+  useEffect(() => {
+    if (detailTab !== "edit" || !selectedStation) {
+      return;
+    }
+
+    let cancelled = false;
+    setStationTelemetryLoading(true);
+    setStationTelemetryError(null);
+    setStationTelemetryNotice(null);
+
+    void Promise.all([
+      invoke<TelemetrySchemaResponse>("get_station_telemetry_schema_for_ui", {
+        id: selectedStation.id,
+      }),
+      invoke<{ schemaVersion: number; profilesVersion: number; profiles: TelemetryProfileDraft[] }>(
+        "get_station_telemetry_profiles_for_ui",
+        { id: selectedStation.id },
+      ),
+    ])
+      .then(([schema, response]) => {
+        if (cancelled) {
+          return;
+        }
+        setTelemetrySchema(schema);
+        setStationTelemetryProfiles(response.profiles);
+      })
+      .catch((error) => {
+        if (cancelled) {
+          return;
+        }
+        setStationTelemetryError(
+          error instanceof Error ? error.message : String(error),
+        );
+        setStationTelemetryProfiles([]);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setStationTelemetryLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [detailTab, selectedStation?.id]);
 
   async function loadSnapshot() {
     setLoading(true);
@@ -1244,7 +1566,7 @@ function AppShell() {
       setOptions(next.options);
       setGroups(next.groups ?? []);
       setTagDefinitions(next.tags ?? []);
-      setSelectedId(next.stations[0]?.id ?? "");
+      setSelectedId("");
       setLog((current) => [
         next.legacyImported
           ? "Imported legacy ~/.CC-Client data into the Rust state store."
@@ -1265,7 +1587,7 @@ function AppShell() {
   }
 
   function ensureSelected() {
-    if (!selectedStation && filteredStations[0]) {
+    if (filteredStations[0] && !filteredStations.some((station) => station.id === selectedId)) {
       setSelectedId(filteredStations[0].id);
     }
   }
@@ -1285,7 +1607,12 @@ function AppShell() {
   async function saveState() {
     setSaving(true);
     try {
-      const payload: PersistedState = { stations, options, groups, tags: tagDefinitions };
+      const payload: PersistedState = {
+        stations,
+        options: normalizeOptionsTelemetryProfiles(options),
+        groups,
+        tags: tagDefinitions,
+      };
       const next = await invoke<AppSnapshot>("save_state", { payload });
       setSnapshot(next);
       setStations(next.stations);
@@ -1296,6 +1623,117 @@ function AppShell() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function saveStationTelemetryProfiles() {
+    if (!selectedStation || stationTelemetryValidationErrors.length > 0) {
+      return;
+    }
+
+    if (stationTelemetryValidationWarnings.length > 0) {
+      setStationTelemetryNotice(null);
+      setStationTelemetryError(stationTelemetryValidationWarnings.join(" "));
+      return;
+    }
+
+    const profiles = stationTelemetryProfiles;
+
+    setStationTelemetrySaving(true);
+    setStationTelemetryError(null);
+    setStationTelemetryNotice(null);
+    try {
+      const response = await invoke<{
+        schemaVersion: number;
+        profilesVersion: number;
+        profiles: TelemetryProfileDraft[];
+      }>("replace_station_telemetry_profiles_for_ui", {
+        id: selectedStation.id,
+        profiles,
+      });
+      setStationTelemetryProfiles(response.profiles);
+      setStationTelemetryNotice("Telemetry profiles saved and applied live.");
+      setLog((current) => [`Telemetry profiles saved for ${selectedStation.name}.`, ...current]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setStationTelemetryError(message);
+      setLog((current) => [`Telemetry profile save failed for ${selectedStation.name}: ${message}`, ...current]);
+    } finally {
+      setStationTelemetrySaving(false);
+    }
+  }
+
+  async function applyDefaultTelemetryProfilesToAllStations() {
+    if (globalTelemetryValidationErrors.length > 0) {
+      return;
+    }
+
+    if (globalTelemetryValidationWarnings.length > 0) {
+      setGlobalTelemetryNotice(null);
+      setGlobalTelemetryError(globalTelemetryValidationWarnings.join(" "));
+      return;
+    }
+
+    const profiles = globalTelemetryProfiles;
+    if (profiles.length === 0) {
+      setGlobalTelemetryError("Create at least one default telemetry profile before applying.");
+      return;
+    }
+
+    setGlobalTelemetrySaving(true);
+    setGlobalTelemetryError(null);
+    setGlobalTelemetryNotice(null);
+
+    let profilesToApply = profiles;
+    try {
+      const nextOptions = normalizeOptionsTelemetryProfiles({
+        ...options,
+        defaultTelemetryProfiles: profiles,
+      });
+      const payload: PersistedState = {
+        stations,
+        options: nextOptions,
+        groups,
+        tags: tagDefinitions,
+      };
+      const next = await invoke<AppSnapshot>("save_state", { payload });
+      setSnapshot(next);
+      setStations(next.stations);
+      setOptions(next.options);
+      profilesToApply = next.options.defaultTelemetryProfiles as TelemetryProfileDraft[];
+      setLog((current) => ["Saved default telemetry profiles locally.", ...current]);
+    } catch (error) {
+      const message = `Failed to save default telemetry profiles locally: ${String(error)}`;
+      setGlobalTelemetryError(message);
+      setLog((current) => [message, ...current]);
+      setGlobalTelemetrySaving(false);
+      return;
+    }
+
+    let success = 0;
+    let failed = 0;
+    for (const station of stations) {
+      try {
+        await invoke("replace_station_telemetry_profiles_for_ui", {
+          id: station.id,
+          profiles: profilesToApply,
+        });
+        success += 1;
+      } catch (error) {
+        failed += 1;
+        setLog((current) => [
+          `Default telemetry apply failed for ${station.name}: ${String(error)}`,
+          ...current,
+        ]);
+      }
+    }
+
+    const notice =
+      failed === 0
+        ? `Applied default telemetry profiles to ${success} device${success === 1 ? "" : "s"}.`
+        : `Applied defaults to ${success} device${success === 1 ? "" : "s"}; ${failed} failed.`;
+    setGlobalTelemetryNotice(notice);
+    setLog((current) => [notice, ...current]);
+    setGlobalTelemetrySaving(false);
   }
 
   async function exportLegacyFiles() {
@@ -2045,12 +2483,6 @@ function AppShell() {
               <p className="emptyState">Select or create a device to continue.</p>
             ) : detailTab === "edit" ? (
               <div className="detailLayout">
-                <div className="subHeader">
-                  <h3>Edit Device</h3>
-                  <button type="button" onClick={() => setDetailTab("overview")}>
-                    Back to Overview
-                  </button>
-                </div>
 
                 <label className="field">
                   <span>Name</span>
@@ -2308,6 +2740,30 @@ function AppShell() {
                     </div>
                   )}
                 </div>
+
+                <div className="collection">
+                  <TelemetryProfilesEditor
+                    title="Telemetry"
+                    subtitle="Per-device MQTT telemetry profiles. Each profile gathers and publishes on its own interval."
+                    profiles={stationTelemetryProfiles}
+                    supportedIncludes={telemetrySchema?.supportedIncludes ?? []}
+                    loading={stationTelemetryLoading}
+                    saving={stationTelemetrySaving}
+                    error={stationTelemetryError}
+                    notice={stationTelemetryNotice}
+                    validationErrors={stationTelemetryValidationErrors}
+                    validationWarnings={stationTelemetryValidationWarnings}
+                    emptyState="No telemetry profiles configured for this device."
+                    onChange={(profiles) => {
+                      setStationTelemetryNotice(null);
+                      setStationTelemetryError(null);
+                      setStationTelemetryProfiles(profiles);
+                    }}
+                    onSave={() => void saveStationTelemetryProfiles()}
+                    saveLabel="Save Device Telemetry"
+                    savePlacement="footer"
+                  />
+                </div>
               </div>
             ) : (
               <>
@@ -2337,7 +2793,11 @@ function AppShell() {
                     </div>
                     <div className="statTile">
                       <span>Disk Usage</span>
-                      <strong>n/a</strong>
+                      <strong>
+                        {selectedRuntime.storageStats[0]
+                          ? `${selectedRuntime.storageStats[0].usagePercent.toFixed(0)}%`
+                          : getRuntimeUnavailableText(selectedRuntime, "Storage")}
+                      </strong>
                     </div>
                   </div>
                   <div className="collection">
@@ -2356,7 +2816,7 @@ function AppShell() {
                     </div>
                     <div className="runtimeEndpointRowGroup runtimeEndpointRowGroup--meta">
                       <span>Detail Level</span>
-                      <strong>{runtimeHasFullDetails(selectedRuntime) ? "Full runtime" : "MQTT basic"}</strong>
+                      <strong>{runtimeHasFullDetails(selectedRuntime) ? "Full runtime" : "Basic runtime"}</strong>
                     </div>
                   </div>
                   <div className="logEntry">{selectedRuntime.message}</div>
@@ -2413,6 +2873,23 @@ function AppShell() {
                           <div>
                             RX Total {formatBytes(item.bytesReceived)} · TX Total {formatBytes(item.bytesSented)} · Total {formatBytes(item.bytesTotal)}
                           </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="collection">
+                    <div className="subHeader">
+                      <h3>Storage</h3>
+                    </div>
+                    {selectedRuntime.storageStats.length === 0 ? (
+                      <p className="emptyInline">
+                        {getRuntimeUnavailableText(selectedRuntime, "Storage metrics")}
+                      </p>
+                    ) : (
+                      selectedRuntime.storageStats.map((item) => (
+                        <div key={item.mountPoint} className="logEntry">
+                          {item.mountPoint} · Used {formatBytes(item.usedBytes)} / {formatBytes(item.totalBytes)} · Free{" "}
+                          {formatBytes(item.availableBytes)} · {item.usagePercent.toFixed(1)}%
                         </div>
                       ))
                     )}
@@ -2539,43 +3016,58 @@ function AppShell() {
 
             <div className="detailLayout">
               <div className="collection">
-                <div className="subHeader">
-                  <h3>Monitor Settings</h3>
-                </div>
-                <label className="field">
-                  <span>Monitor Interval (seconds)</span>
-                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <TelemetryProfilesEditor
+                  title="Default Telemetry Profiles"
+                  subtitle="Defaults for station telemetry. Apply them to devices after editing."
+                  profiles={globalTelemetryProfiles}
+                  supportedIncludes={SUPPORTED_TELEMETRY_INCLUDES}
+                  loading={false}
+                  saving={globalTelemetrySaving}
+                  error={globalTelemetryError}
+                  notice={globalTelemetryNotice}
+                  validationErrors={globalTelemetryValidationErrors}
+                  validationWarnings={globalTelemetryValidationWarnings}
+                  emptyState="No default telemetry profiles configured."
+                  onChange={updateDefaultTelemetryProfiles}
+                  onSave={() => void applyDefaultTelemetryProfilesToAllStations()}
+                  saveLabel="Apply Default Profile to All Devices"
+                />
+                <div className="timingFieldRow">
+                  <label className="field">
+                    <span>Device Telemetry Collection Interval (ms)</span>
                     <input
                       type="number"
-                      min={1}
-                      max={60}
-                      value={options.interval}
+                      min={1000}
+                      step={1000}
+                      value={Math.max(1, options.interval) * 1000}
                       onChange={(event) =>
                         setOptions((current) => ({
                           ...current,
-                          interval: Number(event.target.value)
+                          interval: Math.max(1, Math.round(Number(event.target.value) / 1000)),
                         }))
                       }
-                      style={{ width: "80px" }}
                     />
-                    <button
-                      className="accent"
-                      onClick={async () => {
-                        try {
-                          const msg = await invoke<string>(
-                            "set_station_gathering_interval_for_ui",
-                            { intervalSeconds: options.interval }
-                          );
-                          setLog((current) => [msg, ...current]);
-                        } catch (err) {
-                          setLog((current) => [`Failed to set interval: ${String(err)}`, ...current]);
-                        }
-                      }}
-                    >
-                      Save to Devices
-                    </button>
-                  </div>
-                </label>
+                    <small className="fieldHint">
+                      Used as the station-wide gathering interval pushed to devices. Whole seconds only.
+                    </small>
+                  </label>
+                  <button
+                    className="accent"
+                    onClick={async () => {
+                      try {
+                        const msg = await invoke<string>(
+                          "set_station_gathering_interval_for_ui",
+                          { intervalSeconds: options.interval }
+                        );
+                        setLog((current) => [msg, ...current]);
+                      } catch (err) {
+                        setLog((current) => [`Failed to set interval: ${String(err)}`, ...current]);
+                      }
+                    }}
+                  >
+                    Save Interval to Devices
+                  </button>
+                </div>
               </div>
 
               <label className="checkField">
@@ -2631,6 +3123,10 @@ function AppShell() {
                 <div className="statTile">
                   <span>Global Monitors</span>
                   <strong>{options.monitorProcesses.length}</strong>
+                </div>
+                <div className="statTile">
+                  <span>Default Profiles</span>
+                  <strong>{globalTelemetryProfiles.length}</strong>
                 </div>
                 <div className="statTile">
                   <span>Startup Apps</span>

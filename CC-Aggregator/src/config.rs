@@ -31,22 +31,20 @@ impl Default for AggregatorConfig {
 impl AggregatorConfig {
     /// Load configuration from file
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let content = std::fs::read_to_string(path.as_ref())
-            .context("Failed to read configuration file")?;
-        
-        let config: AggregatorConfig = toml::from_str(&content)
-            .map_err(|e| anyhow::anyhow!("TOML parse error: {}", e))?;
-        
+        let content =
+            std::fs::read_to_string(path.as_ref()).context("Failed to read configuration file")?;
+
+        let config: AggregatorConfig =
+            toml::from_str(&content).map_err(|e| anyhow::anyhow!("TOML parse error: {}", e))?;
+
         Ok(config)
     }
 
     /// Save configuration to file
     pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<()> {
-        let content = toml::to_string_pretty(self)
-            .context("Failed to serialize configuration")?;
-        
-        std::fs::write(path.as_ref(), content)
-            .context("Failed to write configuration file")
+        let content = toml::to_string_pretty(self).context("Failed to serialize configuration")?;
+
+        std::fs::write(path.as_ref(), content).context("Failed to write configuration file")
     }
 }
 
@@ -133,7 +131,7 @@ mod tests {
         let config = AggregatorConfig::default();
         let toml = toml::to_string(&config).unwrap();
         let parsed: AggregatorConfig = toml::from_str(&toml).unwrap();
-        
+
         assert_eq!(parsed.server_id, config.server_id);
     }
 }

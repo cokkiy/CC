@@ -55,15 +55,91 @@ pub enum WsServerMessage {
 pub struct TelemetryBundle {
     pub ts: i64,
     pub station_id: String,
-    pub interval_ms: u32,
-    pub values: Vec<TelemetryValue>,
+    pub schema_version: u32,
+    pub profiles_version: u64,
+    pub runtime: Option<TelemetryRuntimeSnapshot>,
+    pub apps: Option<Vec<TelemetryAppSnapshot>>,
+    pub network: Option<TelemetryNetworkSnapshot>,
+    pub storage: Option<Vec<TelemetryStorageSnapshot>>,
+    #[serde(default)]
+    pub profiles: Vec<TelemetryProfileSnapshot>,
 }
 
-/// Telemetry value
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TelemetryValue {
-    pub key: String,
-    pub v: f64,
+pub struct TelemetryRuntimeSnapshot {
+    pub computer_name: Option<String>,
+    pub cpu: Option<f32>,
+    pub current_memory: Option<i64>,
+    pub total_memory: Option<i64>,
+    pub proc_count: Option<i32>,
+    pub os_name: Option<String>,
+    pub os_version: Option<String>,
+    pub service_version: Option<String>,
+    pub app_launcher_version: Option<String>,
+    pub service_path: Option<String>,
+    pub app_launcher_path: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryAppSnapshot {
+    pub monitor_name: String,
+    pub process_name: String,
+    pub process_id: i32,
+    pub is_running: bool,
+    pub cpu: f32,
+    pub proc_count: i32,
+    pub thread_count: i32,
+    pub current_memory: i64,
+    pub app_version: String,
+    pub start_time: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryNetworkSnapshot {
+    pub current_connections: i32,
+    pub reset_connections: i32,
+    pub udp_listeners: i32,
+    pub datagrams_received: i64,
+    pub datagrams_sent: i64,
+    pub datagrams_discarded: i64,
+    pub datagrams_with_errors: i64,
+    pub segments_received: i64,
+    pub segments_sent: i64,
+    pub errors_received: i64,
+    pub interfaces: Vec<TelemetryNetworkInterfaceSnapshot>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryNetworkInterfaceSnapshot {
+    pub if_name: String,
+    pub bytes_received_per_sec: f64,
+    pub bytes_sented_per_sec: f64,
+    pub total_bytes_per_sec: f64,
+    pub bytes_received: i64,
+    pub bytes_sented: i64,
+    pub bytes_total: i64,
+    pub unicast_packet_received: i64,
+    pub unicast_packet_sented: i64,
+    pub multicast_packet_received: i64,
+    pub multicast_packet_sented: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryStorageSnapshot {
+    pub mount_point: String,
+    pub total_bytes: i64,
+    pub used_bytes: i64,
+    pub available_bytes: i64,
+    pub usage_percent: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TelemetryProfileSnapshot {
+    pub id: String,
+    pub name: String,
+    pub enabled: bool,
+    pub collection_interval_ms: u64,
+    pub includes: Vec<String>,
 }
 
 /// Station status
@@ -206,7 +282,8 @@ impl MqttWsBridge {
                                 BridgeCommand::Subscribe(stations) => {
                                     let msg = WsClientMessage::Subscribe { stations };
                                     if let Ok(json) = serde_json::to_string(&msg) {
-                                        if let Err(e) = write.send(Message::Text(json.into())).await {
+                                        if let Err(e) = write.send(Message::Text(json.into())).await
+                                        {
                                             warn!("Failed to send subscribe message: {:?}", e);
                                             break;
                                         }
@@ -215,7 +292,8 @@ impl MqttWsBridge {
                                 BridgeCommand::Unsubscribe(stations) => {
                                     let msg = WsClientMessage::Unsubscribe { stations };
                                     if let Ok(json) = serde_json::to_string(&msg) {
-                                        if let Err(e) = write.send(Message::Text(json.into())).await {
+                                        if let Err(e) = write.send(Message::Text(json.into())).await
+                                        {
                                             warn!("Failed to send unsubscribe message: {:?}", e);
                                             break;
                                         }
@@ -224,7 +302,8 @@ impl MqttWsBridge {
                                 BridgeCommand::GetStations => {
                                     let msg = WsClientMessage::GetStations;
                                     if let Ok(json) = serde_json::to_string(&msg) {
-                                        if let Err(e) = write.send(Message::Text(json.into())).await {
+                                        if let Err(e) = write.send(Message::Text(json.into())).await
+                                        {
                                             warn!("Failed to send getStations message: {:?}", e);
                                             break;
                                         }
@@ -286,7 +365,12 @@ impl MqttWsBridge {
                     }
                     self.command_tx = None;
                     let _ = app_handle.emit("ws-error", e.to_string());
-                    warn!("{}", Err::<(), _>(e).context("WebSocket connection failed").unwrap_err());
+                    warn!(
+                        "{}",
+                        Err::<(), _>(e)
+                            .context("WebSocket connection failed")
+                            .unwrap_err()
+                    );
                 }
             }
 
@@ -303,9 +387,8 @@ impl MqttWsBridge {
             match msg {
                 WsServerMessage::Telemetry { station_id, data } => {
                     info!(
-                        "Received telemetry for station {}: {} values",
-                        station_id,
-                        data.values.len()
+                        "Received telemetry for station {} with schema {}",
+                        station_id, data.schema_version
                     );
                     let payload = TelemetryEventPayload { station_id, data };
                     if let Err(e) = app_handle.emit("telemetry", payload) {
@@ -353,7 +436,8 @@ impl MqttWsBridge {
 
         info!("Subscribing to stations: {:?}", station_ids);
 
-        self.send_command(BridgeCommand::Subscribe(station_ids)).await?;
+        self.send_command(BridgeCommand::Subscribe(station_ids))
+            .await?;
 
         Ok(())
     }
@@ -367,7 +451,8 @@ impl MqttWsBridge {
 
         info!("Unsubscribing from stations: {:?}", station_ids);
 
-        self.send_command(BridgeCommand::Unsubscribe(station_ids)).await?;
+        self.send_command(BridgeCommand::Unsubscribe(station_ids))
+            .await?;
 
         Ok(())
     }
@@ -413,14 +498,15 @@ mod tests {
 
     #[test]
     fn test_deserialize_telemetry_message() {
-        let json = r#"{"type":"telemetry","station_id":"ws-001","data":{"ts":1234567890,"station_id":"ws-001","interval_ms":1000,"values":[{"key":"cpu","v":45.5}]}}"#;
+        let json = r#"{"type":"telemetry","station_id":"ws-001","data":{"ts":1234567890,"station_id":"ws-001","schema_version":2,"profiles_version":3,"runtime":{"computer_name":"alpha","cpu":45.5,"current_memory":2048,"proc_count":5},"apps":[],"profiles":[{"id":"default","name":"Default","enabled":true,"collection_interval_ms":1000,"includes":["runtime_basic"]}]}}"#;
         let msg: WsServerMessage = serde_json::from_str(json).unwrap();
         match msg {
             WsServerMessage::Telemetry { station_id, data } => {
                 assert_eq!(station_id, "ws-001");
-                assert_eq!(data.values.len(), 1);
-                assert_eq!(data.values[0].key, "cpu");
-                assert_eq!(data.values[0].v, 45.5);
+                assert_eq!(data.schema_version, 2);
+                assert_eq!(data.profiles_version, 3);
+                assert_eq!(data.profiles.len(), 1);
+                assert_eq!(data.runtime.and_then(|runtime| runtime.cpu), Some(45.5));
             }
             _ => panic!("Expected Telemetry message"),
         }
