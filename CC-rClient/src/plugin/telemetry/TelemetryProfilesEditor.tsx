@@ -100,8 +100,23 @@ export const TelemetryProfilesEditor: React.FC<TelemetryProfilesEditorProps> = (
     );
   }
 
+  function getNextProfileNumber() {
+    const usedIds = new Set(profiles.map((profile) => profile.id));
+    let nextProfileNumber =
+      profiles.reduce((maxProfileNumber, profile) => {
+        const match = /^profile-(\d+)$/.exec(profile.id);
+        return match ? Math.max(maxProfileNumber, Number(match[1])) : maxProfileNumber;
+      }, 0) + 1;
+
+    while (usedIds.has(`profile-${nextProfileNumber}`)) {
+      nextProfileNumber += 1;
+    }
+
+    return nextProfileNumber;
+  }
+
   function addProfile() {
-    onChange([...profiles, createTelemetryProfileDraft(profiles.length + 1)]);
+    onChange([...profiles, createTelemetryProfileDraft(getNextProfileNumber())]);
   }
 
   function removeProfile(index: number) {
