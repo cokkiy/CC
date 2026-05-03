@@ -129,29 +129,45 @@ function mapStorage(storage: MqttTelemetryBundle["storage"]): RemoteStorageStat[
   }));
 }
 
+function pickValue<T>(next: T | null | undefined, previous: T | undefined, fallback: T): T {
+  return next ?? previous ?? fallback;
+}
+
 export function buildRuntimeFromMqttTelemetry(
   stationId: string,
   telemetry: MqttTelemetryBundle,
+  previousRuntime?: StationRuntimeSnapshot | null,
 ): StationRuntimeSnapshot {
+  const previous = previousRuntime ?? undefined;
   const runtime = telemetry.runtime ?? {};
+  const appStates =
+    telemetry.apps == null ? (previous?.appStates ?? []) : mapApps(telemetry.apps);
+  const networkStats =
+    telemetry.network == null ? (previous?.networkStats ?? []) : mapNetwork(telemetry.network);
+  const storageStats =
+    telemetry.storage == null ? (previous?.storageStats ?? []) : mapStorage(telemetry.storage);
 
   return {
     endpoint: `mqtt:${stationId}`,
     stationId,
-    computerName: runtime.computer_name ?? stationId,
-    osName: runtime.os_name ?? "",
-    osVersion: runtime.os_version ?? "",
-    totalMemory: runtime.total_memory ?? 0,
-    currentMemory: runtime.current_memory ?? 0,
-    cpu: runtime.cpu ?? 0,
-    procCount: runtime.proc_count ?? 0,
-    serviceVersion: runtime.service_version ?? "",
-    appLauncherVersion: runtime.app_launcher_version ?? "",
-    servicePath: runtime.service_path ?? "",
-    appLauncherPath: runtime.app_launcher_path ?? "",
-    appStates: mapApps(telemetry.apps),
-    networkStats: mapNetwork(telemetry.network),
-    storageStats: mapStorage(telemetry.storage),
+    computerName: pickValue(runtime.computer_name, previous?.computerName, stationId),
+    osName: pickValue(runtime.os_name, previous?.osName, ""),
+    osVersion: pickValue(runtime.os_version, previous?.osVersion, ""),
+    totalMemory: pickValue(runtime.total_memory, previous?.totalMemory, 0),
+    currentMemory: pickValue(runtime.current_memory, previous?.currentMemory, 0),
+    cpu: pickValue(runtime.cpu, previous?.cpu, 0),
+    procCount: pickValue(runtime.proc_count, previous?.procCount, 0),
+    serviceVersion: pickValue(runtime.service_version, previous?.serviceVersion, ""),
+    appLauncherVersion: pickValue(
+      runtime.app_launcher_version,
+      previous?.appLauncherVersion,
+      "",
+    ),
+    servicePath: pickValue(runtime.service_path, previous?.servicePath, ""),
+    appLauncherPath: pickValue(runtime.app_launcher_path, previous?.appLauncherPath, ""),
+    appStates,
+    networkStats,
+    storageStats,
     message: profileSummary(telemetry.profiles),
     telemetrySource: "mqtt",
     detailLevel: "full",

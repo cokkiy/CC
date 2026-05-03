@@ -123,4 +123,108 @@ describe("runtime telemetry helpers", () => {
     expect(runtime.storageStats).toEqual([]);
     expect(runtime.appStates).toEqual([]);
   });
+
+  it("preserves prior sections when alternating profile payloads omit them", () => {
+    const baseline = buildRuntimeFromMqttTelemetry("station-5", {
+      ts: 1000,
+      station_id: "station-5",
+      schema_version: 2,
+      profiles_version: 1,
+      runtime: {
+        computer_name: "alpha",
+        cpu: 30,
+        current_memory: 2048,
+        total_memory: 8192,
+        proc_count: 99,
+        os_name: "Linux",
+        os_version: "6.8",
+      },
+      network: {
+        current_connections: 0,
+        reset_connections: 0,
+        udp_listeners: 0,
+        datagrams_received: 0,
+        datagrams_sent: 0,
+        datagrams_discarded: 0,
+        datagrams_with_errors: 0,
+        segments_received: 0,
+        segments_sent: 0,
+        errors_received: 0,
+        interfaces: [
+          {
+            if_name: "eth0",
+            bytes_received_per_sec: 11,
+            bytes_sented_per_sec: 22,
+            total_bytes_per_sec: 33,
+            bytes_received: 44,
+            bytes_sented: 55,
+            bytes_total: 99,
+            unicast_packet_received: 0,
+            unicast_packet_sented: 0,
+            multicast_packet_received: 0,
+            multicast_packet_sented: 0,
+          },
+        ],
+      },
+      profiles: [
+        {
+          id: "default",
+          name: "Default",
+          enabled: true,
+          collection_interval_ms: 1000,
+          includes: ["runtime_basic", "runtime_system", "runtime_network"],
+        },
+      ],
+    });
+
+    const merged = buildRuntimeFromMqttTelemetry(
+      "station-5",
+      {
+        ts: 2000,
+        station_id: "station-5",
+        schema_version: 2,
+        profiles_version: 1,
+        apps: [
+          {
+            monitor_name: "watcher",
+            process_name: "watcher",
+            process_id: 10,
+            is_running: true,
+            cpu: 7,
+            proc_count: 1,
+            thread_count: 2,
+            current_memory: 512,
+            app_version: "1.0.0",
+            start_time: 77,
+          },
+        ],
+        storage: [
+          {
+            mount_point: "/",
+            total_bytes: 1000,
+            used_bytes: 250,
+            available_bytes: 750,
+            usage_percent: 25,
+          },
+        ],
+        profiles: [
+          {
+            id: "app",
+            name: "AppWatch",
+            enabled: true,
+            collection_interval_ms: 2000,
+            includes: ["runtime_apps", "runtime_storage"],
+          },
+        ],
+      },
+      baseline,
+    );
+
+    expect(merged.computerName).toBe("alpha");
+    expect(merged.cpu).toBe(30);
+    expect(merged.currentMemory).toBe(2048);
+    expect(merged.networkStats).toEqual(baseline.networkStats);
+    expect(merged.appStates).toMatchObject([{ monitorName: "watcher" }]);
+    expect(merged.storageStats).toMatchObject([{ mountPoint: "/" }]);
+  });
 });

@@ -1030,6 +1030,7 @@ function AppShell() {
   const [saving, setSaving] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [runtimeByStation, setRuntimeByStation] = useState<Record<string, StationRuntimeSnapshot>>({});
+  const runtimeByStationRef = useRef<Record<string, StationRuntimeSnapshot>>({});
   const [historyByStation, setHistoryByStation] = useState<Record<string, { cpu: number; memory: number; procCount: number; ts: number; rxbps: number; txbps: number }[]>>({});
   const MAX_HISTORY = 30;
   const [browserByStation, setBrowserByStation] = useState<Record<string, RemoteFileBrowserResult>>({});
@@ -1100,6 +1101,10 @@ function AppShell() {
   useEffect(() => {
     stationsRef.current = stations;
   }, [stations]);
+
+  useEffect(() => {
+    runtimeByStationRef.current = runtimeByStation;
+  }, [runtimeByStation]);
 
   useEffect(() => {
     const onResize = () => {
@@ -1248,7 +1253,11 @@ function AppShell() {
     const registerListeners = async () => {
       const unlistenTelemetry = await listen<MqttTelemetryEventPayload>("telemetry", (event) => {
         const { station_id: stationId, data } = event.payload;
-        const runtime = buildRuntimeFromMqttTelemetry(stationId, data);
+        const runtime = buildRuntimeFromMqttTelemetry(
+          stationId,
+          data,
+          runtimeByStationRef.current[stationId],
+        );
         const existingStation = stationsRef.current.find((station) => station.id === stationId) ?? null;
         const alertStation =
           existingStation
