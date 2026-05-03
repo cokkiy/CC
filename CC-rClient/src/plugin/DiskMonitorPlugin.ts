@@ -24,6 +24,10 @@ interface DiskData {
   computerName: string;
   readBytesPerSec: number;
   writeBytesPerSec: number;
+  totalBytes: number;
+  usedBytes: number;
+  freeBytes: number;
+  usagePercent: number;
   timestamp: number;
 }
 
@@ -114,14 +118,16 @@ export class DiskMonitorPlugin implements Plugin {
       this.diskStores.set(stationId, store);
     }
 
-    // Create disk data record - note: telemetry doesn't have direct disk stats
-    // In a real implementation, this would come from the telemetry data
-    // For now, we structure the interface to support disk I/O when available
+    const primaryStorage = telemetry.storageStats[0];
     const diskData: DiskData = {
       stationId,
       computerName: telemetry.computerName,
-      readBytesPerSec: 0, // Would be populated from telemetry if available
+      readBytesPerSec: 0,
       writeBytesPerSec: 0,
+      totalBytes: primaryStorage?.totalBytes ?? 0,
+      usedBytes: primaryStorage?.usedBytes ?? 0,
+      freeBytes: primaryStorage?.availableBytes ?? 0,
+      usagePercent: primaryStorage?.usagePercent ?? 0,
       timestamp: Date.now(),
     };
 

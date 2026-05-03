@@ -137,6 +137,45 @@ message SetStateGatheringIntervalRequest {
   int32 interval_seconds = 1;
 }
 
+enum TelemetryInclude {
+  TELEMETRY_INCLUDE_UNSPECIFIED = 0;
+  TELEMETRY_INCLUDE_RUNTIME_BASIC = 1;
+  TELEMETRY_INCLUDE_RUNTIME_SYSTEM = 2;
+  TELEMETRY_INCLUDE_RUNTIME_APPS = 3;
+  TELEMETRY_INCLUDE_RUNTIME_NETWORK = 4;
+  TELEMETRY_INCLUDE_RUNTIME_STORAGE = 5;
+}
+
+message TelemetryIncludeDefinition {
+  TelemetryInclude include = 1;
+  string key = 2;
+  string label = 3;
+  string description = 4;
+}
+
+message TelemetryProfile {
+  string id = 1;
+  string name = 2;
+  bool enabled = 3;
+  int64 collection_interval_ms = 4;
+  repeated TelemetryInclude includes = 5;
+}
+
+message GetTelemetryProfilesResponse {
+  uint32 schema_version = 1;
+  uint64 profiles_version = 2;
+  repeated TelemetryProfile profiles = 3;
+}
+
+message ReplaceTelemetryProfilesRequest {
+  repeated TelemetryProfile profiles = 1;
+}
+
+message GetCurrentTelemetrySchemaResponse {
+  uint32 schema_version = 1;
+  repeated TelemetryIncludeDefinition supported_includes = 2;
+}
+
 
 
 
@@ -335,6 +374,9 @@ service StationControl {
   rpc GetSystemState(Empty) returns (StationSystemState);
   rpc SetWatchingApp(SetWatchingAppRequest) returns (Empty);
   rpc SetStateGatheringInterval(SetStateGatheringIntervalRequest) returns (Empty);
+  rpc GetTelemetryProfiles(Empty) returns (GetTelemetryProfilesResponse);
+  rpc ReplaceTelemetryProfiles(ReplaceTelemetryProfilesRequest) returns (GetTelemetryProfilesResponse);
+  rpc GetCurrentTelemetrySchema(Empty) returns (GetCurrentTelemetrySchemaResponse);
 
   rpc CaptureScreen(CaptureScreenRequest) returns (stream CaptureScreenChunk);
   rpc GetFileInfo(PathRef) returns (GetFileInfoResponse);

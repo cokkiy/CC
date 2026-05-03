@@ -21,3 +21,15 @@ broker_port = __BROKER_PORT__
 telemetry_enabled = true
 status_enabled = true
 
+[[mqtt.telemetry_profiles]]
+id = "default"
+name = "Default Runtime"
+enabled = true
+collection_interval_ms = 5000
+includes = [
+  "runtime_basic",
+  "runtime_system",
+  "runtime_apps",
+  "runtime_network",
+  "runtime_storage",
+]

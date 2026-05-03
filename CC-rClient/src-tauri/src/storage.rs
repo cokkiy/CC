@@ -291,6 +291,7 @@ fn load_legacy_options() -> Result<ClientOptions, StorageError> {
         is_first_time_run,
         start_apps,
         monitor_processes,
+        default_telemetry_profiles: Vec::new(),
     })
 }
 
@@ -607,6 +608,7 @@ SavePathForWindows=C:\weather
             monitor_processes: parse_pipe_list(
                 section_value(&sections, "ControlAndMonitor", "MonitorProc").unwrap(),
             ),
+            default_telemetry_profiles: Vec::new(),
         };
 
         assert_eq!(options.interval, 5);
@@ -659,6 +661,7 @@ SavePathForWindows=C:\weather
                 allow_multi_instance: true,
             }],
             monitor_processes: vec!["alpha".into(), "beta".into()],
+            default_telemetry_profiles: Vec::new(),
         });
 
         assert!(ini.contains("Interval=7"));

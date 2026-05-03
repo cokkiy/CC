@@ -1,5 +1,5 @@
 //! WebSocket server module for CC-Aggregator
-//! 
+//!
 //! This module implements the WebSocket server that bridges
 //! between browser clients and the MQTT message broker.
 
@@ -22,8 +22,8 @@ use crate::telemetry::TelemetryBundle;
 #[derive(Debug, Clone)]
 pub struct WsSession {
     pub id: String,
-    pub station_filter: Vec<String>,  // Station IDs this client is interested in
-    tx: mpsc::Sender<String>,         // Sender for pushing messages to this session
+    pub station_filter: Vec<String>, // Station IDs this client is interested in
+    tx: mpsc::Sender<String>,        // Sender for pushing messages to this session
 }
 
 impl WsSession {
@@ -49,9 +49,15 @@ impl WsSession {
 #[derive(Debug, Clone)]
 pub enum WsOutboundMessage {
     /// Telemetry data for a station
-    Telemetry { station_id: String, data: TelemetryBundle },
+    Telemetry {
+        station_id: String,
+        data: TelemetryBundle,
+    },
     /// Status update for a station
-    StatusUpdate { station_id: String, status: StationStatus },
+    StatusUpdate {
+        station_id: String,
+        status: StationStatus,
+    },
     /// Station list response
     StationList(Vec<String>),
     /// Error message
@@ -139,12 +145,14 @@ impl WsServer {
 
     /// Start the WebSocket server
     pub async fn start(&self, listen_addr: &str) -> Result<()> {
-        let addr: SocketAddr = listen_addr.parse()
+        let addr: SocketAddr = listen_addr
+            .parse()
             .context("Invalid WebSocket listen address")?;
-        
-        let listener = TcpListener::bind(&addr).await
+
+        let listener = TcpListener::bind(&addr)
+            .await
             .context("Failed to bind WebSocket address")?;
-        
+
         info!("WebSocket server listening on {}", addr);
 
         loop {
@@ -152,9 +160,11 @@ impl WsServer {
                 Ok((stream, peer_addr)) => {
                     let sessions = self.sessions.clone();
                     let mqtt_tx = self.mqtt_tx.clone();
-                    
+
                     tokio::spawn(async move {
-                        if let Err(e) = handle_connection(stream, peer_addr, sessions, mqtt_tx).await {
+                        if let Err(e) =
+                            handle_connection(stream, peer_addr, sessions, mqtt_tx).await
+                        {
                             error!("WebSocket connection error: {:?}", e);
                         }
                     });
@@ -171,30 +181,36 @@ impl WsServer {
         let msg = match (WsOutboundMessage::Telemetry {
             station_id: station_id.to_string(),
             data: data.clone(),
-        }).to_json_string() {
+        })
+        .to_json_string()
+        {
             Ok(j) => j,
             Err(e) => {
                 error!("Failed to serialize telemetry message: {:?}", e);
                 return;
             }
         };
-        
+
         // Collect session IDs and senders while holding the lock
         let targets: Vec<(String, mpsc::Sender<String>)> = {
             let sessions = self.sessions.read();
-            sessions.iter()
+            sessions
+                .iter()
                 .filter(|(_, session)| {
-                    session.station_filter.is_empty() || 
-                    session.station_filter.contains(&station_id.to_string())
+                    session.station_filter.is_empty()
+                        || session.station_filter.contains(&station_id.to_string())
                 })
                 .map(|(id, session)| (id.clone(), session.get_sender()))
                 .collect()
         };
-        
+
         // Now release the lock and send messages
         for (session_id, tx) in targets {
             if let Err(e) = tx.send(msg.clone()).await {
-                warn!("Failed to send telemetry to session {}: {:?}", session_id, e);
+                warn!(
+                    "Failed to send telemetry to session {}: {:?}",
+                    session_id, e
+                );
             }
         }
     }
@@ -204,26 +220,29 @@ impl WsServer {
         let msg = match (WsOutboundMessage::StatusUpdate {
             station_id: station_id.to_string(),
             status: status.clone(),
-        }).to_json_string() {
+        })
+        .to_json_string()
+        {
             Ok(j) => j,
             Err(e) => {
                 error!("Failed to serialize status message: {:?}", e);
                 return;
             }
         };
-        
+
         // Collect session IDs and senders while holding the lock
         let targets: Vec<(String, mpsc::Sender<String>)> = {
             let sessions = self.sessions.read();
-            sessions.iter()
+            sessions
+                .iter()
                 .filter(|(_, session)| {
-                    session.station_filter.is_empty() || 
-                    session.station_filter.contains(&station_id.to_string())
+                    session.station_filter.is_empty()
+                        || session.station_filter.contains(&station_id.to_string())
                 })
                 .map(|(id, session)| (id.clone(), session.get_sender()))
                 .collect()
         };
-        
+
         // Now release the lock and send messages
         for (session_id, tx) in targets {
             if let Err(e) = tx.send(msg.clone()).await {
@@ -243,13 +262,16 @@ async fn handle_connection(
     let ws_stream = accept_async(stream)
         .await
         .context("WebSocket handshake failed")?;
-    
+
     let session_id = uuid::Uuid::new_v4().to_string();
-    info!("New WebSocket connection: session_id={}, peer={}", session_id, peer_addr);
+    info!(
+        "New WebSocket connection: session_id={}, peer={}",
+        session_id, peer_addr
+    );
 
     // Create mpsc channel for this session's outbound messages
     let (tx, mut rx) = mpsc::channel::<String>(100);
-    
+
     // Register session with the message sender
     {
         let mut sessions = sessions.write();
@@ -257,19 +279,25 @@ async fn handle_connection(
     }
 
     let (mut write, mut read) = ws_stream.split();
-    
+
     // Spawn task to forward messages from the channel to the WebSocket
     let write_session_id = session_id.clone();
     let write_task = tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
             if let Err(e) = write.send(Message::Text(msg.into())).await {
-                warn!("Failed to send WebSocket message to session {}: {:?}", write_session_id, e);
+                warn!(
+                    "Failed to send WebSocket message to session {}: {:?}",
+                    write_session_id, e
+                );
                 break;
             }
         }
-        info!("WebSocket write task ended for session {}", write_session_id);
+        info!(
+            "WebSocket write task ended for session {}",
+            write_session_id
+        );
     });
-    
+
     // Handle incoming messages
     while let Some(msg_result) = read.next().await {
         match msg_result {
@@ -300,7 +328,7 @@ async fn handle_connection(
 
     // Abort the write task since we're done
     write_task.abort();
-    
+
     // Cleanup session
     {
         let mut sessions = sessions.write();
@@ -328,13 +356,17 @@ async fn handle_text_message(
                             .iter()
                             .filter_map(|v| v.as_str().map(String::from))
                             .collect();
-                        
+
                         let mut sessions = sessions.write();
                         if let Some(session) = sessions.get_mut(session_id) {
                             session.subscribe_stations(station_ids.clone());
                         }
-                        
-                        info!("Session {} subscribed to {} stations", session_id, station_ids.len());
+
+                        info!(
+                            "Session {} subscribed to {} stations",
+                            session_id,
+                            station_ids.len()
+                        );
                     }
                 }
                 "unsubscribe" => {
@@ -343,14 +375,20 @@ async fn handle_text_message(
                             .iter()
                             .filter_map(|v| v.as_str().map(String::from))
                             .collect();
-                        
+
                         let mut sessions = sessions.write();
                         if let Some(session) = sessions.get_mut(session_id) {
                             // Remove stations from filter
-                            session.station_filter.retain(|id| !station_ids.contains(id));
+                            session
+                                .station_filter
+                                .retain(|id| !station_ids.contains(id));
                         }
-                        
-                        info!("Session {} unsubscribed from {} stations", session_id, station_ids.len());
+
+                        info!(
+                            "Session {} unsubscribed from {} stations",
+                            session_id,
+                            station_ids.len()
+                        );
                     }
                 }
                 "getStations" => {

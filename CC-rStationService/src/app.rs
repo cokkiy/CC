@@ -22,25 +22,28 @@ use crate::grpc::cc::{
     AppControlResult, AppStartParameter, AppStartingResult, CaptureScreenChunk,
     CaptureScreenRequest, CloseAppRequest, CloseAppResponse, DownloadChunk, DownloadRequest, Empty,
     ExecuteCommandRequest, ExecuteCommandResponse, GetAllProcessInfoResponse,
-    GetAppLauncherPathResponse, GetConnectionInformationsResponse, GetFileInfoResponse,
-    GetNetworkInterfacesResponse, GetServicePathResponse, GetTcpListenerInfosResponse,
+    GetAppLauncherPathResponse, GetConnectionInformationsResponse,
+    GetCurrentTelemetrySchemaResponse, GetFileInfoResponse, GetNetworkInterfacesResponse,
+    GetServicePathResponse, GetTcpListenerInfosResponse, GetTelemetryProfilesResponse,
     GetUdpListenerInfosResponse, PathRef, RebootRequest, RenameFileRequest, RenameFileResponse,
-    RestartAppRequest, RestartAppResponse, ServerVersionInfo, SetStateGatheringIntervalRequest,
-    SetWatchingAppRequest, ShutdownRequest, StartAppRequest, StartAppResponse, UploadChunk,
+    ReplaceTelemetryProfilesRequest, RestartAppRequest, RestartAppResponse, ServerVersionInfo,
+    SetStateGatheringIntervalRequest, SetWatchingAppRequest, ShutdownRequest, StartAppRequest,
+    StartAppResponse, TelemetryInclude, TelemetryIncludeDefinition, TelemetryProfile, UploadChunk,
     UploadResult, file_transfer_server::FileTransfer, file_transfer_server::FileTransferServer,
     station_control_server::StationControl, station_control_server::StationControlServer,
 };
 use crate::platform;
 use crate::state::{AppState, find_process_ids_by_name, terminate_process};
+use crate::telemetry::{TelemetryProfileConfig, TelemetryScheduler};
 
 pub async fn run(
     config_path: Option<PathBuf>,
     mut shutdown: watch::Receiver<bool>,
     console_telemetry: bool,
 ) -> Result<()> {
-    let config = AppConfig::load(config_path.as_deref())?;
+    let (config, resolved_config_path) = AppConfig::load_with_path(config_path.as_deref())?;
     let service_path = std::env::current_exe().context("resolve current executable")?;
-    let state = Arc::new(AppState::new(config, service_path)?);
+    let state = Arc::new(AppState::new(config, resolved_config_path, service_path)?);
     let listen_addr = state.listen_addr()?;
     if !state.agent_target().ip().is_loopback() {
         anyhow::bail!(
@@ -87,25 +90,62 @@ pub async fn run(
         let state_clone = Arc::clone(&state);
         tokio::spawn(async move {
             info!("MQTT telemetry publisher started");
-            let mut ticker =
-                tokio::time::interval(Duration::from_secs(state_clone.interval_seconds()));
-            ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+            let Some(mqtt_client) = state_clone.mqtt_client().cloned() else {
+                return;
+            };
+
+            let mut profiles_rx = state_clone.telemetry_profile_receiver();
+            let start = tokio::time::Instant::now();
+            let mut scheduler =
+                TelemetryScheduler::new(&profiles_rx.borrow().profiles, elapsed_ms(start));
 
             loop {
-                ticker.tick().await;
-
-                let (running, _) = state_clone.running_and_apps_state().await;
-                if let Err(error) = state_clone
-                    .publish_mqtt_telemetry_from_running_state(&running)
-                    .await
-                {
-                    warn!(error = %error, "failed to publish telemetry via MQTT");
+                if scheduler.is_empty() {
+                    if profiles_rx.changed().await.is_err() {
+                        break;
+                    }
+                    scheduler =
+                        TelemetryScheduler::new(&profiles_rx.borrow().profiles, elapsed_ms(start));
+                    continue;
                 }
 
-                let next_seconds = state_clone.interval_seconds().max(1);
-                if ticker.period() != Duration::from_secs(next_seconds) {
-                    ticker = tokio::time::interval(Duration::from_secs(next_seconds));
-                    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+                let now_ms = elapsed_ms(start);
+                let Some(deadline_ms) = scheduler.next_deadline_ms() else {
+                    continue;
+                };
+                let wait_ms = deadline_ms.saturating_sub(now_ms);
+
+                tokio::select! {
+                    changed = profiles_rx.changed() => {
+                        if changed.is_err() {
+                            break;
+                        }
+                        scheduler = TelemetryScheduler::new(
+                            &profiles_rx.borrow().profiles,
+                            elapsed_ms(start),
+                        );
+                        continue;
+                    }
+                    _ = tokio::time::sleep(Duration::from_millis(wait_ms.max(1))) => {}
+                }
+
+                let now_ms = elapsed_ms(start);
+                let due_collect = scheduler.due_collection_indices(now_ms);
+                if !due_collect.is_empty() {
+                    let includes = scheduler.collection_includes(&due_collect);
+                    let collected = state_clone.collect_telemetry_sections(&includes).await;
+                    let profiles_version = profiles_rx.borrow().version;
+                    for bundle in scheduler.collect_due_bundles(
+                        &due_collect,
+                        now_ms,
+                        &collected,
+                        state_clone.station_id(),
+                        profiles_version,
+                    ) {
+                        if let Err(error) = mqtt_client.publish_telemetry(&bundle).await {
+                            warn!(error = %error, "failed to publish telemetry via MQTT");
+                        }
+                    }
                 }
             }
         });
@@ -249,6 +289,68 @@ impl StationControl for StationControlService {
 
         self.state.set_interval_seconds(interval as u64);
         Ok(Response::new(Empty {}))
+    }
+
+    async fn get_telemetry_profiles(
+        &self,
+        _request: Request<Empty>,
+    ) -> Result<Response<GetTelemetryProfilesResponse>, Status> {
+        Ok(Response::new(GetTelemetryProfilesResponse {
+            schema_version: self.state.telemetry_schema().schema_version,
+            profiles_version: self.state.telemetry_profiles_version(),
+            profiles: self
+                .state
+                .telemetry_profiles()
+                .into_iter()
+                .map(proto_telemetry_profile_from_config)
+                .collect(),
+        }))
+    }
+
+    async fn replace_telemetry_profiles(
+        &self,
+        request: Request<ReplaceTelemetryProfilesRequest>,
+    ) -> Result<Response<GetTelemetryProfilesResponse>, Status> {
+        let profiles = request
+            .into_inner()
+            .profiles
+            .into_iter()
+            .map(config_telemetry_profile_from_proto)
+            .collect::<Result<Vec<_>, _>>()?;
+        let state = self
+            .state
+            .replace_telemetry_profiles(profiles)
+            .map_err(status_from_error)?;
+
+        Ok(Response::new(GetTelemetryProfilesResponse {
+            schema_version: self.state.telemetry_schema().schema_version,
+            profiles_version: state.version,
+            profiles: state
+                .profiles
+                .into_iter()
+                .map(proto_telemetry_profile_from_config)
+                .collect(),
+        }))
+    }
+
+    async fn get_current_telemetry_schema(
+        &self,
+        _request: Request<Empty>,
+    ) -> Result<Response<GetCurrentTelemetrySchemaResponse>, Status> {
+        let schema = self.state.telemetry_schema();
+        Ok(Response::new(GetCurrentTelemetrySchemaResponse {
+            schema_version: schema.schema_version,
+            supported_includes: schema
+                .supported_includes
+                .into_iter()
+                .map(|item| TelemetryIncludeDefinition {
+                    include: proto_include_from_key(&item.key) as i32,
+                    key: item.key,
+                    label: item.label,
+                    description: item.description,
+                })
+                .collect(),
+        }))
     }
 
     async fn capture_screen(
@@ -610,6 +712,82 @@ async fn start_one_app(app: AppStartParameter) -> AppStartingResult {
             result: error.to_string(),
         },
     }
+}
+
+fn elapsed_ms(start: tokio::time::Instant) -> u64 {
+    start.elapsed().as_millis().min(u128::from(u64::MAX)) as u64
+}
+
+fn proto_include_from_config(include: crate::telemetry::TelemetryInclude) -> TelemetryInclude {
+    match include {
+        crate::telemetry::TelemetryInclude::RuntimeBasic => TelemetryInclude::RuntimeBasic,
+        crate::telemetry::TelemetryInclude::RuntimeSystem => TelemetryInclude::RuntimeSystem,
+        crate::telemetry::TelemetryInclude::RuntimeApps => TelemetryInclude::RuntimeApps,
+        crate::telemetry::TelemetryInclude::RuntimeNetwork => TelemetryInclude::RuntimeNetwork,
+        crate::telemetry::TelemetryInclude::RuntimeStorage => TelemetryInclude::RuntimeStorage,
+    }
+}
+
+fn proto_include_from_key(key: &str) -> TelemetryInclude {
+    match key {
+        "runtime_basic" => TelemetryInclude::RuntimeBasic,
+        "runtime_system" => TelemetryInclude::RuntimeSystem,
+        "runtime_apps" => TelemetryInclude::RuntimeApps,
+        "runtime_network" => TelemetryInclude::RuntimeNetwork,
+        "runtime_storage" => TelemetryInclude::RuntimeStorage,
+        _ => TelemetryInclude::Unspecified,
+    }
+}
+
+fn config_include_from_proto(include: i32) -> Result<crate::telemetry::TelemetryInclude, Status> {
+    match TelemetryInclude::try_from(include).unwrap_or(TelemetryInclude::Unspecified) {
+        TelemetryInclude::RuntimeBasic => Ok(crate::telemetry::TelemetryInclude::RuntimeBasic),
+        TelemetryInclude::RuntimeSystem => Ok(crate::telemetry::TelemetryInclude::RuntimeSystem),
+        TelemetryInclude::RuntimeApps => Ok(crate::telemetry::TelemetryInclude::RuntimeApps),
+        TelemetryInclude::RuntimeNetwork => Ok(crate::telemetry::TelemetryInclude::RuntimeNetwork),
+        TelemetryInclude::RuntimeStorage => Ok(crate::telemetry::TelemetryInclude::RuntimeStorage),
+        TelemetryInclude::Unspecified => Err(Status::invalid_argument(
+            "telemetry include cannot be unspecified",
+        )),
+    }
+}
+
+fn proto_telemetry_profile_from_config(profile: TelemetryProfileConfig) -> TelemetryProfile {
+    TelemetryProfile {
+        id: profile.id,
+        name: profile.name,
+        enabled: profile.enabled,
+        collection_interval_ms: profile.collection_interval_ms as i64,
+        includes: profile
+            .includes
+            .into_iter()
+            .map(|include| proto_include_from_config(include) as i32)
+            .collect(),
+    }
+}
+
+fn config_telemetry_profile_from_proto(
+    profile: TelemetryProfile,
+) -> Result<TelemetryProfileConfig, Status> {
+    let includes = profile
+        .includes
+        .into_iter()
+        .map(config_include_from_proto)
+        .collect::<Result<Vec<_>, _>>()?;
+
+    if profile.collection_interval_ms <= 0 {
+        return Err(Status::invalid_argument(
+            "collection_interval_ms must be positive",
+        ));
+    }
+
+    Ok(TelemetryProfileConfig {
+        id: profile.id,
+        name: profile.name,
+        enabled: profile.enabled,
+        collection_interval_ms: profile.collection_interval_ms as u64,
+        includes,
+    })
 }
 
 fn effective_process_name(app: &AppStartParameter) -> String {

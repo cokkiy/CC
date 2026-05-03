@@ -2,12 +2,15 @@ use std::collections::BTreeSet;
 use std::net::{IpAddr, SocketAddr};
 use std::path::Path;
 
+use serde::{Deserialize, Serialize};
 use tonic::transport::Channel;
 
 use crate::grpc::cc::{
     AppStartParameter, AppStartingResult, CloseAppRequest, Empty, GetAllProcessInfoResponse,
-    RebootRequest, RestartAppRequest, SetStateGatheringIntervalRequest, ShutdownRequest,
-    StartAppRequest, station_control_client::StationControlClient,
+    GetCurrentTelemetrySchemaResponse, GetTelemetryProfilesResponse, RebootRequest,
+    ReplaceTelemetryProfilesRequest, RestartAppRequest, SetStateGatheringIntervalRequest,
+    ShutdownRequest, StartAppRequest, TelemetryInclude, TelemetryProfile,
+    station_control_client::StationControlClient,
 };
 use crate::models::{ActionResult, StartProgram, Station, StationAction};
 use crate::storage::StorageError;
@@ -22,6 +25,39 @@ const APP_CONTROL_RESULT_NOT_RUNNING: i32 = 4;
 const APP_CONTROL_RESULT_CLOSED: i32 = 5;
 const APP_CONTROL_RESULT_FAIL_TO_CLOSE: i32 = 6;
 const APP_CONTROL_RESULT_ERROR: i32 = 7;
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TelemetryProfileDto {
+    pub id: String,
+    pub name: String,
+    pub enabled: bool,
+    pub collection_interval_ms: i64,
+    pub includes: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TelemetryIncludeDefinitionDto {
+    pub key: String,
+    pub label: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TelemetryProfilesResponseDto {
+    pub schema_version: u32,
+    pub profiles_version: u64,
+    pub profiles: Vec<TelemetryProfileDto>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TelemetrySchemaResponseDto {
+    pub schema_version: u32,
+    pub supported_includes: Vec<TelemetryIncludeDefinitionDto>,
+}
 
 pub async fn execute_station_action(
     action: StationAction,
@@ -552,6 +588,83 @@ pub(crate) fn station_label(station: &Station) -> &str {
     }
 }
 
+fn include_key_from_proto(include: TelemetryInclude) -> Result<String, String> {
+    match include {
+        TelemetryInclude::RuntimeBasic => Ok("runtime_basic".to_string()),
+        TelemetryInclude::RuntimeSystem => Ok("runtime_system".to_string()),
+        TelemetryInclude::RuntimeApps => Ok("runtime_apps".to_string()),
+        TelemetryInclude::RuntimeNetwork => Ok("runtime_network".to_string()),
+        TelemetryInclude::RuntimeStorage => Ok("runtime_storage".to_string()),
+        TelemetryInclude::Unspecified => Err("Telemetry include cannot be unspecified".to_string()),
+    }
+}
+
+fn include_proto_from_key(key: &str) -> Result<TelemetryInclude, String> {
+    match key {
+        "runtime_basic" => Ok(TelemetryInclude::RuntimeBasic),
+        "runtime_system" => Ok(TelemetryInclude::RuntimeSystem),
+        "runtime_apps" => Ok(TelemetryInclude::RuntimeApps),
+        "runtime_network" => Ok(TelemetryInclude::RuntimeNetwork),
+        "runtime_storage" => Ok(TelemetryInclude::RuntimeStorage),
+        _ => Err(format!("Unsupported telemetry include '{key}'")),
+    }
+}
+
+fn map_profiles_response(
+    response: GetTelemetryProfilesResponse,
+) -> Result<TelemetryProfilesResponseDto, String> {
+    Ok(TelemetryProfilesResponseDto {
+        schema_version: response.schema_version,
+        profiles_version: response.profiles_version,
+        profiles: response
+            .profiles
+            .into_iter()
+            .map(map_profile)
+            .collect::<Result<Vec<_>, _>>()?,
+    })
+}
+
+fn map_profile(profile: TelemetryProfile) -> Result<TelemetryProfileDto, String> {
+    let includes = profile
+        .includes
+        .into_iter()
+        .map(|value| {
+            let include =
+                TelemetryInclude::try_from(value).unwrap_or(TelemetryInclude::Unspecified);
+            include_key_from_proto(include)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(TelemetryProfileDto {
+        id: profile.id,
+        name: profile.name,
+        enabled: profile.enabled,
+        collection_interval_ms: profile.collection_interval_ms,
+        includes,
+    })
+}
+
+fn map_schema_response(
+    response: GetCurrentTelemetrySchemaResponse,
+) -> Result<TelemetrySchemaResponseDto, String> {
+    Ok(TelemetrySchemaResponseDto {
+        schema_version: response.schema_version,
+        supported_includes: response
+            .supported_includes
+            .into_iter()
+            .map(|item| {
+                let include = TelemetryInclude::try_from(item.include)
+                    .unwrap_or(TelemetryInclude::Unspecified);
+                include_key_from_proto(include).map(|key| TelemetryIncludeDefinitionDto {
+                    key,
+                    label: item.label,
+                    description: item.description,
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?,
+    })
+}
+
 /// Set the telemetry gathering interval on a station via gRPC.
 pub async fn set_station_gathering_interval(
     station: &Station,
@@ -563,4 +676,59 @@ pub async fn set_station_gathering_interval(
         .await
         .map_err(|e| format!("set_state_gathering_interval RPC via {endpoint}: {e}"))?;
     Ok(())
+}
+
+pub async fn get_station_telemetry_profiles(
+    station: &Station,
+) -> Result<TelemetryProfilesResponseDto, String> {
+    let (mut client, endpoint) = connect_station(station).await?;
+    let response = client
+        .get_telemetry_profiles(Empty {})
+        .await
+        .map_err(|error| format!("get_telemetry_profiles RPC via {endpoint}: {error}"))?
+        .into_inner();
+    map_profiles_response(response)
+}
+
+pub async fn replace_station_telemetry_profiles(
+    station: &Station,
+    profiles: Vec<TelemetryProfileDto>,
+) -> Result<TelemetryProfilesResponseDto, String> {
+    let (mut client, endpoint) = connect_station(station).await?;
+    let profiles = profiles
+        .into_iter()
+        .map(|profile| {
+            let includes = profile
+                .includes
+                .iter()
+                .map(|key| include_proto_from_key(key))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(TelemetryProfile {
+                id: profile.id,
+                name: profile.name,
+                enabled: profile.enabled,
+                collection_interval_ms: profile.collection_interval_ms,
+                includes: includes.into_iter().map(|include| include as i32).collect(),
+            })
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+
+    let response = client
+        .replace_telemetry_profiles(ReplaceTelemetryProfilesRequest { profiles })
+        .await
+        .map_err(|error| format!("replace_telemetry_profiles RPC via {endpoint}: {error}"))?
+        .into_inner();
+    map_profiles_response(response)
+}
+
+pub async fn get_station_telemetry_schema(
+    station: &Station,
+) -> Result<TelemetrySchemaResponseDto, String> {
+    let (mut client, endpoint) = connect_station(station).await?;
+    let response = client
+        .get_current_telemetry_schema(Empty {})
+        .await
+        .map_err(|error| format!("get_current_telemetry_schema RPC via {endpoint}: {error}"))?
+        .into_inner();
+    map_schema_response(response)
 }

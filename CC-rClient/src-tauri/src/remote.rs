@@ -10,9 +10,9 @@ use tonic::Request;
 
 use crate::control::{station_endpoints, station_label};
 use crate::grpc::cc::{
-    CaptureScreenRequest, DownloadRequest, ExecuteCommandRequest, PathRef, RenameFileRequest,
-    SetWatchingAppRequest, UploadChunk, file_transfer_client::FileTransferClient,
-    station_control_client::StationControlClient,
+    CaptureScreenRequest, DownloadRequest, Empty, ExecuteCommandRequest, PathRef,
+    RenameFileRequest, SetWatchingAppRequest, UploadChunk,
+    file_transfer_client::FileTransferClient, station_control_client::StationControlClient,
 };
 use crate::models::Station;
 
@@ -42,6 +42,14 @@ pub struct StationScreenCapture {
     pub endpoint: String,
     pub byte_len: usize,
     pub data_url: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RemoteStationIdentity {
+    pub endpoint: String,
+    pub station_id: String,
+    pub computer_name: String,
 }
 
 pub async fn browse_station_files(
@@ -295,6 +303,26 @@ pub async fn capture_station_screen(station: &Station) -> Result<StationScreenCa
                 "data:image/png;base64,{}",
                 base64::engine::general_purpose::STANDARD.encode(bytes)
             ),
+        })
+    })
+    .await
+}
+
+pub async fn probe_station_identity(station: &Station) -> Result<RemoteStationIdentity, String> {
+    with_station_endpoint(station, move |endpoint| async move {
+        let mut client = StationControlClient::connect(endpoint.clone())
+            .await
+            .map_err(|error| format!("connect station control via {endpoint}: {error}"))?;
+        let response = client
+            .get_system_state(Empty {})
+            .await
+            .map_err(|error| format!("get_system_state via {endpoint}: {error}"))?
+            .into_inner();
+
+        Ok(RemoteStationIdentity {
+            endpoint,
+            station_id: response.station_id,
+            computer_name: response.computer_name,
         })
     })
     .await

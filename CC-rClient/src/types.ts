@@ -29,6 +29,13 @@ export type ClientOptions = {
   isFirstTimeRun: boolean;
   startApps: StartProgram[];
   monitorProcesses: string[];
+  defaultTelemetryProfiles: Array<{
+    id: string;
+    name: string;
+    enabled: boolean;
+    collectionIntervalMs: number;
+    includes: string[];
+  }>;
 };
 
 export type PersistedState = {
@@ -77,6 +84,14 @@ export type RemoteInterfaceStat = {
   multicastPacketSented: number;
 };
 
+export type RemoteStorageStat = {
+  mountPoint: string;
+  totalBytes: number;
+  usedBytes: number;
+  availableBytes: number;
+  usagePercent: number;
+};
+
 export type StationRuntimeSnapshot = {
   endpoint: string;
   stationId: string;
@@ -93,6 +108,7 @@ export type StationRuntimeSnapshot = {
   appLauncherPath: string;
   appStates: RemoteAppState[];
   networkStats: RemoteInterfaceStat[];
+  storageStats: RemoteStorageStat[];
   message: string;
   telemetrySource: "mqtt" | "grpc";
   detailLevel: "live-basic" | "full";

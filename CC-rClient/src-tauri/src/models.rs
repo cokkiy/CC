@@ -50,11 +50,34 @@ pub struct Location {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
+pub struct TelemetryProfileConfig {
+    pub id: String,
+    pub name: String,
+    pub enabled: bool,
+    pub collection_interval_ms: i64,
+    pub includes: Vec<String>,
+}
+
+impl Default for TelemetryProfileConfig {
+    fn default() -> Self {
+        Self {
+            id: String::new(),
+            name: String::new(),
+            enabled: true,
+            collection_interval_ms: 1000,
+            includes: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct ClientOptions {
     pub interval: i32,
     pub is_first_time_run: bool,
     pub start_apps: Vec<StartProgram>,
     pub monitor_processes: Vec<String>,
+    pub default_telemetry_profiles: Vec<TelemetryProfileConfig>,
 }
 
 impl Default for ClientOptions {
@@ -64,6 +87,7 @@ impl Default for ClientOptions {
             is_first_time_run: true,
             start_apps: Vec::new(),
             monitor_processes: Vec::new(),
+            default_telemetry_profiles: Vec::new(),
         }
     }
 }

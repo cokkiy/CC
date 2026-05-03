@@ -22,3 +22,4 @@ pub mod scripts;
 pub mod state;
 pub mod tags;
 pub mod tags_store;
+pub mod telemetry;

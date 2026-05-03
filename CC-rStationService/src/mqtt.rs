@@ -13,6 +13,8 @@ use std::time::Duration;
 use tokio::sync::{Mutex, mpsc};
 use tracing::{debug, error, info, warn};
 
+use crate::telemetry::TelemetryBundle;
+
 /// Command received from the Aggregator via MQTT
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Command {
@@ -235,62 +237,6 @@ impl MqttClient {
         info!("Published station descriptor for: {}", self.station_id);
         Ok(())
     }
-}
-
-/// Telemetry bundle for MQTT publishing
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TelemetryBundle {
-    pub ts: i64,
-    pub station_id: String,
-    pub interval_ms: u32,
-    pub values: Vec<TelemetryValue>,
-}
-
-impl TelemetryBundle {
-    pub fn new(station_id: String, interval_ms: u32) -> Self {
-        Self {
-            ts: chrono::Utc::now().timestamp_millis(),
-            station_id,
-            interval_ms,
-            values: Vec::new(),
-        }
-    }
-
-    pub fn add_value(&mut self, key: &str, value: f64) {
-        self.values.push(TelemetryValue {
-            key: key.to_string(),
-            v: value,
-        });
-    }
-
-    /// Convert from StationRunningState to TelemetryBundle
-    pub fn from_station_state(
-        state: &crate::grpc::cc::StationRunningState,
-        interval_ms: u32,
-    ) -> Self {
-        let mut bundle = TelemetryBundle::new(state.station_id.clone(), interval_ms);
-
-        // Add CPU usage
-        bundle.add_value("cpu_usage_percent", state.cpu as f64);
-
-        // Add memory usage
-        bundle.add_value(
-            "memory_used_mb",
-            (state.current_memory as f64) / 1024.0 / 1024.0,
-        );
-
-        // Add process count
-        bundle.add_value("process_count", state.proc_count as f64);
-
-        bundle
-    }
-}
-
-/// Telemetry value
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TelemetryValue {
-    pub key: String,
-    pub v: f64,
 }
 
 /// Station status
