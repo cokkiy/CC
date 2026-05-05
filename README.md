@@ -8,45 +8,91 @@ CC (Central Control) is a unified management platform for workstations and IoT d
 
 **Tech Stack:** Rust + Tauri + TypeScript + React + MQTT + WebSocket
 
+## System Overview
+![System Overview](./images/SystemOverviewDiagram.png "System Overview")
+
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CC-rClient (Tauri)                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │   React UI  │  │ Plugin Host │  │  WebSocket Bridge       │  │
-│  └─────────────┘  └─────────────┘  └───────────┬─────────────┘  │
-└──────────────────────────────────────────────┬──────────────────┘
-                                               │ ws://localhost:8080
-┌──────────────────────────────────────────────┴──────────────────┐
-│                    CC-Aggregator (Rust)                         │
-│  ┌─────────────────┐  ┌─────────────────────────────────────┐   │
-│  │ MQTT Consumer   │  │ WebSocket Server                    │   │
-│  │ (localhost:1883)│  │ (127.0.0.1:8080)                    │   │
-│  └─────────────────┘  └─────────────────────────────────────┘   │
-└──────────────────────────────────────────────┬───────────────────┘
-                                             │ MQTT (localhost:1883)
-┌──────────────────────────────────────────────┴───────────────────┐
-│                CC-rStationService (Rust)                        │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌────────────────┐   │
-│  │ Station Agent   │  │ Plugin Engine   │  │ Script Runner │   │
-│  └─────────────────┘  └─────────────────┘  └────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                                              ▲
-                                              │ Direct Execution
-┌─────────────────────────────────────────────┴───────────────────┐
-│                  Mosquitto MQTT Broker                          │
-│                      (Docker)                                    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+---
+id: d667f6fd-1dc2-4709-8fdb-895ca78dfe48
+---
+flowchart TD
+    subgraph Domain_A[Network Domain A]
+        subgraph Devices_A[Devices]
+            IoT_A[IoT Device\nstationService]
+            WS_A[Workstation\nstationService]
+            Other_A[Other Equipment\nstationService]
+        end
+        Broker_A["MQTT Broker\n(may have multiple)"]
+        Relay_A["gRPC-Relay\n(may have multiple)"]
+    end
+
+    subgraph Domain_B[Network Domain B]
+        subgraph Devices_B[Devices]
+            IoT_B[IoT Device\nstationService]
+            WS_B[Workstation\nstationService]
+        end
+        Broker_B[MQTT Broker]
+        Relay_B[gRPC-Relay]
+    end
+
+    subgraph Controllers["Controllers (one or more)"]
+        Controller1["Controller\n(Office/Public Network)"]
+        Controller2["Controller\n(another instance)"]
+    end
+
+    %% Connects between devices and brokers
+    IoT_A --> Broker_A
+    WS_A --> Broker_A
+    Other_A --> Broker_A
+    IoT_B --> Broker_B
+    WS_B --> Broker_B
+
+    %% Connects between devices and relays
+    IoT_A --> Relay_A
+    WS_A --> Relay_A
+    Other_A --> Relay_A
+    IoT_B --> Relay_B
+    WS_B --> Relay_B
+
+    %% Connects between controllers and brokers
+    Controller1 --> Broker_A
+    Controller1 --> Broker_B
+    Controller2 --> Broker_A
+    Controller2 --> Broker_B
+
+    %% Connects between controllers and relays
+    Controller1 --> Relay_A
+    Controller1 --> Relay_B
+    Controller2 --> Relay_A
+    Controller2 --> Relay_B
+
+    %% Connection to Domain_A and Domain_B
+    note1[Note: Each domain may have one or more MQTT brokers and Relays.\nController can connect to any broker/relay.]
+    note1 -.-> Domain_A
+    note1 -.-> Domain_B
+
+    style Domain_A fill:#e3f2fd,stroke:#1e88e5
+    style Domain_B fill:#e8f5e9,stroke:#43a047
+    style Controllers fill:#fff3e0,stroke:#fb8c00
+    style Broker_A fill:#fce4ec,stroke:#e91e63
+    style Broker_B fill:#fce4ec,stroke:#e91e63
+    style Relay_A fill:#f3e5f5,stroke:#9c27b0
+    style Relay_B fill:#f3e5f5,stroke:#9c27b0
+    style Controller1 fill:#ffecb3,stroke:#ffa000
+    style Controller2 fill:#ffecb3,stroke:#ffa000
 ```
 
 ## Components
 
-| Component | Description | Language |
-|-----------|-------------|----------|
-| CC-rClient | Desktop GUI client with plugin support | Tauri + React + TypeScript |
-| CC-Aggregator | Data aggregation and WebSocket bridge | Rust |
-| CC-rStationService | Workstation agent service | Rust |
+| Component          | Description                                                       | Language                   |
+| ------------------ | ----------------------------------------------------------------- | -------------------------- |
+| CC-rClient         | Desktop GUI client with plugin support                            | Tauri + React + TypeScript |
+| CC-Aggregator      | Data aggregation and WebSocket bridge                             | Rust                       |
+| CC-rStationService | Workstation agent service                                         | Rust                       |
+| gRPC-Relay         | A relay for gRPC over QUIC/HTTP2/HTTP3, not includes in this repo | Rust                       |
+
 
 ## Features
 
