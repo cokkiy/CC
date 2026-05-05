@@ -14,72 +14,83 @@ CC (Central Control) is a unified management platform for workstations and IoT d
 ## Architecture
 
 ```mermaid
----
-id: d667f6fd-1dc2-4709-8fdb-895ca78dfe48
----
 flowchart TD
-    subgraph Domain_A[Network Domain A]
-        subgraph Devices_A[Devices]
-            IoT_A[IoT Device\nstationService]
-            WS_A[Workstation\nstationService]
-            Other_A[Other Equipment\nstationService]
+    subgraph Domain_A["Network Domain A"]
+        subgraph Devices_A["Devices"]
+            IoT_A["IoT Device\nstationService"]
+            WS_A["Workstation\nstationService"]
+            Other_A["Other Equipment\nstationService"]
         end
         Broker_A["MQTT Broker\n(may have multiple)"]
         Relay_A["gRPC-Relay\n(may have multiple)"]
     end
 
-    subgraph Domain_B[Network Domain B]
-        subgraph Devices_B[Devices]
-            IoT_B[IoT Device\nstationService]
-            WS_B[Workstation\nstationService]
+    subgraph Domain_B["Network Domain B"]
+        subgraph Devices_B["Devices"]
+            IoT_B["IoT Device\nstationService"]
+            WS_B["Workstation\nstationService"]
         end
-        Broker_B[MQTT Broker]
-        Relay_B[gRPC-Relay]
+        Broker_B["MQTT Broker"]
+        Relay_B["gRPC-Relay"]
     end
 
     subgraph Controllers["Controllers (one or more)"]
-        Controller1["Controller\n(Office/Public Network)"]
-        Controller2["Controller\n(another instance)"]
+        Controller1["Controller 1\nOffice/Public Network"]
+        Controller2["Controller 2\nanother instance"]
     end
 
-    %% Connects between devices and brokers
-    IoT_A --> Broker_A
-    WS_A --> Broker_A
-    Other_A --> Broker_A
-    IoT_B --> Broker_B
-    WS_B --> Broker_B
+    subgraph Global_Services["Global Services (below Controllers)"]
+        Aggregator1["Aggregator 1\n(Data Aggregation + WebSocket Bridge)"]
+        Aggregator2["Aggregator 2\n(another instance)"]
+    end
 
-    %% Connects between devices and relays
-    IoT_A --> Relay_A
-    WS_A --> Relay_A
-    Other_A --> Relay_A
-    IoT_B --> Relay_B
-    WS_B --> Relay_B
+    %% stationService to Broker (MQTT telemetry)
+    IoT_A -- "MQTT (telemetry)" --> Broker_A
+    WS_A -- "MQTT (telemetry)" --> Broker_A
+    Other_A -- "MQTT (telemetry)" --> Broker_A
+    IoT_B -- "MQTT (telemetry)" --> Broker_B
+    WS_B -- "MQTT (telemetry)" --> Broker_B
 
-    %% Connects between controllers and brokers
-    Controller1 --> Broker_A
-    Controller1 --> Broker_B
-    Controller2 --> Broker_A
-    Controller2 --> Broker_B
+    %% stationService to Relay (gRPC)
+    IoT_A -- "gRPC (control/data)\nover QUIC/HTTP2/HTTP3" --> Relay_A
+    WS_A -- "gRPC (control/data)" --> Relay_A
+    Other_A -- "gRPC (control/data)" --> Relay_A
+    IoT_B -- "gRPC (control/data)" --> Relay_B
+    WS_B -- "gRPC (control/data)" --> Relay_B
 
-    %% Connects between controllers and relays
-    Controller1 --> Relay_A
-    Controller1 --> Relay_B
-    Controller2 --> Relay_A
-    Controller2 --> Relay_B
+    %% Aggregators subscribe to brokers (MQTT)
+    Aggregator1 -- "Subscribe raw telemetry (MQTT)" --> Broker_A
+    Aggregator1 -- "Subscribe raw telemetry (MQTT)" --> Broker_B
+    Aggregator2 -- "Subscribe raw telemetry (MQTT)" --> Broker_A
+    Aggregator2 -- "Subscribe raw telemetry (MQTT)" --> Broker_B
 
-    %% Connection to Domain_A and Domain_B
-    note1[Note: Each domain may have one or more MQTT brokers and Relays.\nController can connect to any broker/relay.]
+    %% Aggregators push aggregated data via WebSocket to Controllers
+    Aggregator1 -- "WebSocket (aggregated telemetry)" --> Controller1
+    Aggregator1 -- "WebSocket (aggregated telemetry)" --> Controller2
+    Aggregator2 -- "WebSocket (aggregated telemetry)" --> Controller1
+    Aggregator2 -- "WebSocket (aggregated telemetry)" --> Controller2
+
+    %% Controllers send control messages via Relay
+    Controller1 -- "gRPC (control/data)" --> Relay_A
+    Controller1 -- "gRPC (control/data)" --> Relay_B
+    Controller2 -- "gRPC (control/data)" --> Relay_A
+    Controller2 -- "gRPC (control/data)" --> Relay_B
+
+    %% Annotation
+    note1["Note: Each domain may have multiple MQTT brokers and Relays.\nAny Aggregator can connect to any broker.\nAny Controller can connect to any Relay.\nMultiple Aggregators can run in parallel."]
     note1 -.-> Domain_A
     note1 -.-> Domain_B
 
     style Domain_A fill:#e3f2fd,stroke:#1e88e5
     style Domain_B fill:#e8f5e9,stroke:#43a047
     style Controllers fill:#fff3e0,stroke:#fb8c00
+    style Global_Services fill:#f9fbe7,stroke:#afb42b
     style Broker_A fill:#fce4ec,stroke:#e91e63
     style Broker_B fill:#fce4ec,stroke:#e91e63
     style Relay_A fill:#f3e5f5,stroke:#9c27b0
     style Relay_B fill:#f3e5f5,stroke:#9c27b0
+    style Aggregator1 fill:#d1c4e9,stroke:#512da8
+    style Aggregator2 fill:#d1c4e9,stroke:#512da8
     style Controller1 fill:#ffecb3,stroke:#ffa000
     style Controller2 fill:#ffecb3,stroke:#ffa000
 ```
