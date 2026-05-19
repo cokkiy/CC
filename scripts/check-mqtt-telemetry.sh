@@ -59,7 +59,7 @@ fi
 
 if [[ $STATUS -eq 124 ]]; then
   echo "[FAIL] Timeout waiting for telemetry messages"
-  echo "[HINT] Verify StationService telemetry publisher and logs"
+  echo "[HINT] Verify DeviceAgent telemetry publisher and logs"
   exit 1
 fi
 

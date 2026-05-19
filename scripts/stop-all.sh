@@ -6,13 +6,14 @@
 #   - CC-rClient
 #   - Vite dev server
 #   - CC-Aggregator
-#   - CC-rStationService
+#   - CC-rDeviceAgent
 #
 # Safe defaults:
 #   - Leaves Mosquitto running unless --broker is provided
 #   - Leaves IoT simulation containers running unless --iot-sim is provided
 #
 # Usage: ./stop-all.sh [--broker] [--iot-sim] [--status]
+# Set CC_RDEVICEAGENT_DIR to point at a split CC-rDeviceAgent checkout.
 # =================================================================
 
 set -euo pipefail
@@ -30,8 +31,25 @@ CLIENT_DEBUG_BIN="$REPO_DIR/CC-rClient/src-tauri/target/debug/cc-rclient"
 CLIENT_RELEASE_BIN="$REPO_DIR/CC-rClient/src-tauri/target/release/cc-rclient"
 AGGREGATOR_DEBUG_BIN="$REPO_DIR/CC-Aggregator/target/debug/cc-aggregator"
 AGGREGATOR_RELEASE_BIN="$REPO_DIR/CC-Aggregator/target/release/cc-aggregator"
-STATIONSERVICE_DEBUG_BIN="$REPO_DIR/CC-rStationService/target/debug/cc-rstationservice"
-STATIONSERVICE_RELEASE_BIN="$REPO_DIR/CC-rStationService/target/release/cc-rstationservice"
+
+resolve_station_dir() {
+    local configured_dir="${CC_RDEVICEAGENT_DIR:-${CC_RSTATIONSERVICE_DIR:-}}"
+    local candidate
+
+    if [[ -n "$configured_dir" ]]; then
+        candidate="$configured_dir"
+    elif [[ -f "$REPO_DIR/CC-rDeviceAgent/Cargo.toml" ]]; then
+        candidate="$REPO_DIR/CC-rDeviceAgent"
+    else
+        candidate="$(cd "$REPO_DIR/.." && pwd)/CC-rDeviceAgent"
+    fi
+
+    cd "$candidate" 2>/dev/null && pwd || printf '%s' "$candidate"
+}
+
+DEVICEAGENT_DIR="$(resolve_station_dir)"
+DEVICEAGENT_DEBUG_BIN="$DEVICEAGENT_DIR/target/debug/cc-rdeviceagent"
+DEVICEAGENT_RELEASE_BIN="$DEVICEAGENT_DIR/target/release/cc-rdeviceagent"
 
 STOP_BROKER=0
 STOP_IOT_SIM=0
@@ -169,11 +187,11 @@ show_status() {
         log_info "CC-Aggregator           - Not running"
     fi
 
-    find_component_pids "$STATIONSERVICE_DEBUG_BIN.*foreground" "$STATIONSERVICE_RELEASE_BIN.*foreground"
+    find_component_pids "$DEVICEAGENT_DEBUG_BIN.*foreground" "$DEVICEAGENT_RELEASE_BIN.*foreground"
     if [[ ${#MATCHED_PIDS[@]} -gt 0 ]]; then
-        log_ok "CC-rStationService      - Running (${MATCHED_PIDS[*]})"
+        log_ok "CC-rDeviceAgent      - Running (${MATCHED_PIDS[*]})"
     else
-        log_info "CC-rStationService      - Not running"
+        log_info "CC-rDeviceAgent      - Not running"
     fi
 
     if docker ps --filter "name=mosquitto" --filter "status=running" -q | grep -q .; then
@@ -200,8 +218,8 @@ stop_host_components() {
     find_component_pids "$AGGREGATOR_DEBUG_BIN" "$AGGREGATOR_RELEASE_BIN"
     stop_pids "CC-Aggregator" "${MATCHED_PIDS[@]}"
 
-    find_component_pids "$STATIONSERVICE_DEBUG_BIN.*foreground" "$STATIONSERVICE_RELEASE_BIN.*foreground"
-    stop_pids "CC-rStationService" "${MATCHED_PIDS[@]}"
+    find_component_pids "$DEVICEAGENT_DEBUG_BIN.*foreground" "$DEVICEAGENT_RELEASE_BIN.*foreground"
+    stop_pids "CC-rDeviceAgent" "${MATCHED_PIDS[@]}"
 }
 
 stop_iot_sim() {

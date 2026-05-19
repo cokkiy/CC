@@ -4,7 +4,7 @@ English | [中文](./README.zh.md)
 
 ## Project Overview
 
-CC (Central Control) is a unified management platform for workstations and IoT devices. It provides real-time monitoring, remote control, plugin extensibility, and data visualization for distributed computing environments.
+CC (Central Control) is the management-side repository for a unified workstation and IoT management platform. It contains the desktop controller and data aggregation bridge. The device-side agent lives in the separate `CC-rDeviceAgent` repository.
 
 **Tech Stack:** Rust + Tauri + TypeScript + React + MQTT + WebSocket
 
@@ -101,7 +101,7 @@ flowchart TD
 | ------------------ | ----------------------------------------------------------------- | -------------------------- |
 | CC-rClient         | Desktop GUI client with plugin support                            | Tauri + React + TypeScript |
 | CC-Aggregator      | Data aggregation and WebSocket bridge                             | Rust                       |
-| CC-rStationService | Workstation agent service                                         | Rust                       |
+| CC-rDeviceAgent | Workstation/IoT agent service, maintained in a separate repo      | Rust                       |
 | gRPC-Relay         | A relay for gRPC over QUIC/HTTP2/HTTP3, not includes in this repo | Rust                       |
 
 
@@ -161,13 +161,13 @@ flowchart TD
 │   │   ├── websocket.rs  # WebSocket server
 │   │   └── config.rs    # Configuration
 │   └── CC-Aggregator.toml
-├── CC-rStationService/  # Workstation agent
-│   ├── src/
-│   │   └── alert_engine.rs # Station-side alert evaluation
-│   └── ...
+├── proto/
+│   └── cc.proto          # Shared gRPC contract snapshot
 ├── scripts/              # Startup scripts
 │   └── start-all.sh     # One-click start
 └── logs/                # Application logs
+
+~/CC-rDeviceAgent/     # Split repository for the device-side agent
 ```
 
 ## Quick Start
@@ -199,13 +199,22 @@ cd ~/CC
 
 This script starts:
 1. CC-Aggregator (MQTT → WebSocket bridge)
-2. CC-rStationService (Workstation agent)
+2. CC-rDeviceAgent (Workstation agent)
 3. CC-rClient (Desktop UI)
+
+By default the scripts look for `CC-rDeviceAgent` next to this checkout:
+
+```bash
+~/CC
+~/CC-rDeviceAgent
+```
+
+Set `CC_RDEVICEAGENT_DIR=/path/to/CC-rDeviceAgent` when the agent checkout is elsewhere.
 
 ### Step 2b: Start IoT Device Simulation
 
 Use the dedicated launcher when you want a lightweight MQTT broker plus `N` simulated
-`CC-rStationService` devices in Docker:
+`CC-rDeviceAgent` devices in Docker:
 
 ```bash
 cd ~/CC
@@ -229,9 +238,9 @@ REBUILD_BINARY=1 ./scripts/start-iot-sim.sh 20
 USE_HOST_BROKER=1 HOST_BROKER_HOST=host.docker.internal ./scripts/start-iot-sim.sh 20
 ```
 
-This flow builds a small runtime image for `CC-rStationService`, starts one Mosquitto
+This flow builds a small runtime image for `CC-rDeviceAgent`, starts one Mosquitto
 broker, then launches deterministic stations such as `iot-001`, `iot-002`, and so on.
-The Docker image is assembled from a host-built `cc-rstationservice` binary instead of
+The Docker image is assembled from a host-built `cc-rdeviceagent` binary instead of
 recompiling Rust inside Docker, so simulator startup is much faster.
 If host port `1883` is already occupied, the launcher automatically reuses the existing
 host MQTT broker instead of trying to bind a second Mosquitto container.
@@ -263,7 +272,7 @@ max_connections = 1000
 level = "info"
 ```
 
-### CC-rStationService (CC-rStationService.toml)
+### CC-rDeviceAgent (CC-rDeviceAgent.toml)
 
 Configuration for workstation agent (MQTT client, plugins, etc.)
 
@@ -275,8 +284,8 @@ Configuration for workstation agent (MQTT client, plugins, etc.)
 # Build Aggregator
 cd CC-Aggregator && cargo build
 
-# Build Station Service
-cd CC-rStationService && cargo build
+# Build Station Service from its split repository
+cd ../CC-rDeviceAgent && cargo build
 
 # Build Client
 cd CC-rClient && pnpm install && pnpm tauri build
@@ -286,7 +295,7 @@ cd CC-rClient && pnpm install && pnpm tauri build
 
 Logs are stored in `~/CC/logs/`:
 - `aggregator.log` - Aggregator output
-- `rstationservice.log` - Station service output
+- `rdeviceagent.log` - Station service output
 - `rclient.log` - Client output
 - `iot-sim/docker-compose.generated.yml` - Generated compose file for the Docker simulation
 

@@ -4,7 +4,7 @@ set -euo pipefail
 # Build all CC artifacts:
 # - CC-rClient (frontend + tauri binary)
 # - CC-Aggregator
-# - CC-rStationService
+# - CC-rDeviceAgent from a split checkout
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -31,6 +31,9 @@ Options:
   --debug     Build debug artifacts
   --release   Build release artifacts (default)
   -h, --help  Show this help
+
+Environment:
+  CC_RDEVICEAGENT_DIR  Path to CC-rDeviceAgent checkout
 EOF
 }
 
@@ -59,7 +62,29 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLIENT_DIR="$REPO_DIR/CC-rClient"
 CLIENT_TAURI_DIR="$CLIENT_DIR/src-tauri"
 AGGREGATOR_DIR="$REPO_DIR/CC-Aggregator"
-STATION_DIR="$REPO_DIR/CC-rStationService"
+
+resolve_station_dir() {
+  local configured_dir="${CC_RDEVICEAGENT_DIR:-${CC_RSTATIONSERVICE_DIR:-}}"
+  local candidate
+
+  if [[ -n "$configured_dir" ]]; then
+    candidate="$configured_dir"
+  elif [[ -f "$REPO_DIR/CC-rDeviceAgent/Cargo.toml" ]]; then
+    candidate="$REPO_DIR/CC-rDeviceAgent"
+  else
+    candidate="$(cd "$REPO_DIR/.." && pwd)/CC-rDeviceAgent"
+  fi
+
+  if [[ ! -f "$candidate/Cargo.toml" ]]; then
+    log_err "CC-rDeviceAgent checkout not found: $candidate"
+    log_err "Clone it next to this repository or set CC_RDEVICEAGENT_DIR."
+    exit 1
+  fi
+
+  cd "$candidate" && pwd
+}
+
+STATION_DIR="$(resolve_station_dir)"
 
 if ! command -v cargo >/dev/null 2>&1; then
   log_err "cargo not found in PATH"
@@ -112,7 +137,7 @@ main() {
 
   build_client
   build_rust_project "CC-Aggregator" "$AGGREGATOR_DIR"
-  build_rust_project "CC-rStationService" "$STATION_DIR"
+  build_rust_project "CC-rDeviceAgent" "$STATION_DIR"
 
   log_ok "All builds completed successfully"
 
@@ -121,13 +146,13 @@ main() {
     echo "Artifacts:"
     echo "- $CLIENT_TAURI_DIR/target/release/cc-rclient"
     echo "- $AGGREGATOR_DIR/target/release/cc-aggregator"
-    echo "- $STATION_DIR/target/release/cc-rstationservice"
+    echo "- $STATION_DIR/target/release/cc-rdeviceagent"
   else
     echo
     echo "Artifacts:"
     echo "- $CLIENT_TAURI_DIR/target/debug/cc-rclient"
     echo "- $AGGREGATOR_DIR/target/debug/cc-aggregator"
-    echo "- $STATION_DIR/target/debug/cc-rstationservice"
+    echo "- $STATION_DIR/target/debug/cc-rdeviceagent"
   fi
 }
 
