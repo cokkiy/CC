@@ -12,7 +12,7 @@ ZeroC Ice interfaces from:
 ## Transport choice
 
 - Rust client/backend: `tonic`
-- .NET station service: `grpc-dotnet`
+- .NET device agent: `grpc-dotnet`
 - Shared contract: `src-tauri/proto/cc.proto`
 
 ## Service split
@@ -66,8 +66,8 @@ Typical `.csproj` protobuf item setup:
 
 ## Current implementation status
 
-`CC-rClient` now has a real tonic-based control adapter for the completed
-`CC-rStationService` RPCs that cover:
+`CC-rController` now has a real tonic-based control adapter for the completed
+`CC-rDeviceAgent` RPCs that cover:
 
 - `start app`
 - `restart app`

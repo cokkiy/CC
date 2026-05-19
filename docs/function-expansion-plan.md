@@ -6,7 +6,7 @@
 
 | 模块 | 状态 | 说明 |
 |------|------|------|
-| 架构重构 (gRPC→MQTT) | ✅ 完成 | NATS/MQTT消息中间件已部署，CC-rStationService已改造 |
+| 架构重构 (gRPC→MQTT) | ✅ 完成 | NATS/MQTT消息中间件已部署，CC-rDeviceAgent已改造 |
 | 插件系统 | ✅ 完成 | TelemetryPlugin trait定义，加载机制，5个内置插件(CPU/内存/网络/进程/磁盘) |
 | 插件市场基础设施 | ✅ 完成 | PluginSigner签名验证，PluginMarketplace分发安装API |
 | 客户端插件化改造 | ✅ 完成 | PluginHost, PanelRegistry, ActionRegistry, DataBridge |
@@ -99,13 +99,13 @@ ScriptParameter {
 
 #### 6.3 技术实现
 
-**后端 (CC-rStationService)**:
+**后端 (CC-rDeviceAgent)**:
 - `scripts.rs`: 命令脚本数据结构定义
 - `script_engine.rs`: 脚本解析和参数替换
 - `script_executor.rs`: 脚本执行和结果收集
 - 存储: SQLite本地持久化
 
-**前端 (CC-rClient)**:
+**前端 (CC-rController)**:
 - `ScriptEditor.tsx`: 命令编辑界面
 - `ScriptList.tsx`: 命令列表和搜索
 - `ScriptRunner.tsx`: 命令执行界面
@@ -227,7 +227,7 @@ GET    /api/devices/selector       - 设备选择器预览
 #### 8.1 设备模型扩展
 
 ```rust
-// CC-rStationService/state.rs 扩展
+// CC-rDeviceAgent/state.rs 扩展
 struct DeviceInfo {
     // 已有字段...
     
@@ -393,7 +393,7 @@ cc-core          # 通用模型、协议、错误定义
 ├── protocol.rs   # 通信协议定义
 └── crypto.rs     # 加密签名工具
 
-CC-rStationService # Agent端(已存在)
+CC-rDeviceAgent # Agent端(已存在)
 ├── plugins/       # 插件系统
 ├── monitors/      # 内置监控
 ├── scripts.rs     # [新增] 命令脚本管理
@@ -405,7 +405,7 @@ CC-Aggregator      # 数据聚合服务(已存在)
 ├── ws_server.rs   # WebSocket服务
 └── rules/         # [新增] 告警规则引擎
 
-CC-rClient         # 客户端(已存在)
+CC-rController         # 客户端(已存在)
 ├── plugin/        # 插件系统
 ├── script/        # [新增] 脚本管理UI
 ├── batch/         # [新增] 批量操作UI

@@ -158,7 +158,7 @@
 
 ---
 
-### 13.2 CC-rStationService 命令执行器 📋
+### 13.2 CC-rDeviceAgent 命令执行器 📋
 
 **任务:**
 - [ ] 实现命令执行模块 `cmd_executor.rs`
@@ -193,7 +193,7 @@
 
 ---
 
-### 13.4 CC-rClient 命令执行UI 📋
+### 13.4 CC-rController 命令执行UI 📋
 
 **任务:**
 - [ ] 创建命令执行面板 `<CommandPanel />`
@@ -232,7 +232,7 @@
 
 ```
 □ 命令执行通道设计完成
-□ CC-rStationService 命令执行器完成
+□ CC-rDeviceAgent 命令执行器完成
 □ CC-Aggregator 命令路由完成
 □ 命令执行UI完成
 □ 命令模板集成完成

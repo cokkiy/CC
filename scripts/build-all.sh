@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Build all CC artifacts:
-# - CC-rClient (frontend + tauri binary)
+# - CC-rController (frontend + tauri binary)
 # - CC-Aggregator
 # - CC-rDeviceAgent from a split checkout
 
@@ -59,7 +59,7 @@ for arg in "$@"; do
 done
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CLIENT_DIR="$REPO_DIR/CC-rClient"
+CLIENT_DIR="$REPO_DIR/CC-rController"
 CLIENT_TAURI_DIR="$CLIENT_DIR/src-tauri"
 AGGREGATOR_DIR="$REPO_DIR/CC-Aggregator"
 
@@ -112,11 +112,11 @@ build_rust_project() {
 }
 
 build_client() {
-  log_info "Building CC-rClient Tauri app (${MODE})..."
+  log_info "Building CC-rController Tauri app (${MODE})..."
 
   pushd "$CLIENT_DIR" >/dev/null
   if [[ ! -d node_modules ]]; then
-    log_info "Installing CC-rClient npm dependencies..."
+    log_info "Installing CC-rController npm dependencies..."
     npm install
   fi
   if [[ "$MODE" == "release" ]]; then
@@ -128,7 +128,7 @@ build_client() {
   fi
   popd >/dev/null
 
-  log_ok "CC-rClient build complete"
+  log_ok "CC-rController build complete"
 }
 
 main() {
@@ -144,13 +144,13 @@ main() {
   if [[ "$MODE" == "release" ]]; then
     echo
     echo "Artifacts:"
-    echo "- $CLIENT_TAURI_DIR/target/release/cc-rclient"
+    echo "- $CLIENT_TAURI_DIR/target/release/cc-rcontroller"
     echo "- $AGGREGATOR_DIR/target/release/cc-aggregator"
     echo "- $STATION_DIR/target/release/cc-rdeviceagent"
   else
     echo
     echo "Artifacts:"
-    echo "- $CLIENT_TAURI_DIR/target/debug/cc-rclient"
+    echo "- $CLIENT_TAURI_DIR/target/debug/cc-rcontroller"
     echo "- $AGGREGATOR_DIR/target/debug/cc-aggregator"
     echo "- $STATION_DIR/target/debug/cc-rdeviceagent"
   fi

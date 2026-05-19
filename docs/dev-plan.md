@@ -10,8 +10,8 @@ CC项目是一个基于Rust生态构建的IoT设备和工作站集中管理控�
 ### 已完成工作
 1. **基础架构迁移**：从Qt/C++迁移到Rust/Tauri架构
 2. **核心组件**：
-   - CC-rStationService：工作站服务（Rust）
-   - CC-rClient：客户端（Tauri + React）
+   - CC-rDeviceAgent：工作站服务（Rust）
+   - CC-rController：客户端（Tauri + React）
    - 已完成网络遥测、进程监控等基础功能
 3. **Phase 3-5任务**：正在进行调试日志添加和数据流测试
 
@@ -155,8 +155,8 @@ CC项目是一个基于Rust生态构建的IoT设备和工作站集中管理控�
 ## 团队角色分配建议
 
 1. **架构师（1人）**：负责整体架构设计和技术选型
-2. **后端开发（2-3人）**：负责CC-rStationService和CC-Aggregator
-3. **前端开发（2人）**：负责CC-rClient和UI系统
+2. **后端开发（2-3人）**：负责CC-rDeviceAgent和CC-Aggregator
+3. **前端开发（2人）**：负责CC-rController和UI系统
 4. **嵌入式开发（1人）**：负责IoT设备支持
 5. **DevOps（1人）**：负责部署和运维
 6. **测试工程师（1人）**：负责质量保证

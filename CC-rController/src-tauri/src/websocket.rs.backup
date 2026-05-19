@@ -1,4 +1,4 @@
-//! WebSocket bridge module for CC-rClient
+//! WebSocket bridge module for CC-rController
 //! 
 //! This module implements WebSocket connection to CC-Aggregator
 //! and bridges between the Tauri frontend and MQTT message broker.

@@ -3,7 +3,7 @@
 # CC Project - Stop All Components Script
 # =================================================================
 # Stops components commonly started by scripts/start-all.sh:
-#   - CC-rClient
+#   - CC-rController
 #   - Vite dev server
 #   - CC-Aggregator
 #   - CC-rDeviceAgent
@@ -27,8 +27,8 @@ NC='\033[0m'
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CLIENT_DEBUG_BIN="$REPO_DIR/CC-rClient/src-tauri/target/debug/cc-rclient"
-CLIENT_RELEASE_BIN="$REPO_DIR/CC-rClient/src-tauri/target/release/cc-rclient"
+CLIENT_DEBUG_BIN="$REPO_DIR/CC-rController/src-tauri/target/debug/cc-rcontroller"
+CLIENT_RELEASE_BIN="$REPO_DIR/CC-rController/src-tauri/target/release/cc-rcontroller"
 AGGREGATOR_DEBUG_BIN="$REPO_DIR/CC-Aggregator/target/debug/cc-aggregator"
 AGGREGATOR_RELEASE_BIN="$REPO_DIR/CC-Aggregator/target/release/cc-aggregator"
 
@@ -168,12 +168,12 @@ show_status() {
 
     find_component_pids "$CLIENT_DEBUG_BIN" "$CLIENT_RELEASE_BIN"
     if [[ ${#MATCHED_PIDS[@]} -gt 0 ]]; then
-        log_ok "CC-rClient              - Running (${MATCHED_PIDS[*]})"
+        log_ok "CC-rController              - Running (${MATCHED_PIDS[*]})"
     else
-        log_info "CC-rClient              - Not running"
+        log_info "CC-rController              - Not running"
     fi
 
-    find_component_pids "$REPO_DIR/CC-rClient.*vite" "$REPO_DIR/CC-rClient.*npm run dev"
+    find_component_pids "$REPO_DIR/CC-rController.*vite" "$REPO_DIR/CC-rController.*npm run dev"
     if [[ ${#MATCHED_PIDS[@]} -gt 0 ]]; then
         log_ok "Vite dev server         - Running (${MATCHED_PIDS[*]})"
     else
@@ -210,9 +210,9 @@ show_status() {
 
 stop_host_components() {
     find_component_pids "$CLIENT_DEBUG_BIN" "$CLIENT_RELEASE_BIN"
-    stop_pids "CC-rClient" "${MATCHED_PIDS[@]}"
+    stop_pids "CC-rController" "${MATCHED_PIDS[@]}"
 
-    find_component_pids "$REPO_DIR/CC-rClient.*vite" "$REPO_DIR/CC-rClient.*npm run dev"
+    find_component_pids "$REPO_DIR/CC-rController.*vite" "$REPO_DIR/CC-rController.*npm run dev"
     stop_pids "Vite dev server" "${MATCHED_PIDS[@]}"
 
     find_component_pids "$AGGREGATOR_DEBUG_BIN" "$AGGREGATOR_RELEASE_BIN"
