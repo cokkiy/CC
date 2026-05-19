@@ -259,7 +259,7 @@ pub struct PreviewTargetsResult {
 fn cc_client_dir() -> Result<PathBuf, String> {
     let home =
         dirs::home_dir().ok_or_else(|| "Unable to resolve the user home directory.".to_string())?;
-    let path = home.join(".CC-rClient");
+    let path = home.join(".CC-rController");
     fs::create_dir_all(&path).map_err(|error| format!("create {}: {error}", path.display()))?;
     Ok(path)
 }
@@ -524,7 +524,7 @@ fn build_templates() -> Vec<AlertRule> {
             is_template: true,
             is_favorite: false,
             tags: vec!["cpu".to_string(), "system".to_string()],
-            created_by: "CC-rClient".to_string(),
+            created_by: "CC-rController".to_string(),
             created_at: now.clone(),
             updated_at: now.clone(),
             version: 1,
@@ -572,7 +572,7 @@ fn build_templates() -> Vec<AlertRule> {
             is_template: true,
             is_favorite: false,
             tags: vec!["memory".to_string(), "system".to_string()],
-            created_by: "CC-rClient".to_string(),
+            created_by: "CC-rController".to_string(),
             created_at: now.clone(),
             updated_at: now,
             version: 1,
@@ -867,8 +867,8 @@ pub fn export_alert_rules(
             id: Uuid::new_v4().to_string(),
             name: "Exported Alert Rules".to_string(),
             version: "1.0.0".to_string(),
-            description: Some("Exported from CC-rClient".to_string()),
-            author: Some("CC-rClient".to_string()),
+            description: Some("Exported from CC-rController".to_string()),
+            author: Some("CC-rController".to_string()),
             tags: Vec::new(),
             created_at: now.clone(),
             updated_at: now,

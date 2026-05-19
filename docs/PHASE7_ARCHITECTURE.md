@@ -23,8 +23,8 @@ Phase 7旨在为CC项目实现完整的批量操作支持系统，支持对多�
 
 ### 1.3 技术栈
 
-- **后端**: Rust (CC-rStationService)
-- **前端**: React + TypeScript (CC-rClient)
+- **后端**: Rust (CC-rDeviceAgent)
+- **前端**: React + TypeScript (CC-rController)
 - **通信**: gRPC (现有架构)
 - **状态存储**: SQLite (复用script_store模式)
 
@@ -2673,7 +2673,7 @@ fn task_status_to_proto(s: TaskStatus) -> i32 {
 ### 6.1 组件结构
 
 ```
-CC-rClient/src/plugin/batch/
+CC-rController/src/plugin/batch/
 ├── components/
 │   ├── BatchTaskList.tsx       # 批量任务列表
 │   ├── BatchTaskCard.tsx        # 任务卡片
@@ -4368,7 +4368,7 @@ export const useBatchTasks = () => {
 
 ## 7. 实现文件清单
 
-### 7.1 后端 (CC-rStationService/src/)
+### 7.1 后端 (CC-rDeviceAgent/src/)
 
 | 文件 | 说明 |
 |------|------|
@@ -4381,7 +4381,7 @@ export const useBatchTasks = () => {
 | `batch_task.proto` | Protobuf定义 |
 | `lib.rs` | 添加`pub mod batch_*` |
 
-### 7.2 前端 (CC-rClient/src/plugin/batch/)
+### 7.2 前端 (CC-rController/src/plugin/batch/)
 
 | 文件 | 说明 |
 |------|------|
@@ -4406,7 +4406,7 @@ export const useBatchTasks = () => {
 ### 7.3 Protobuf定义
 
 ```
-CC-rStationService/proto/batch_task.proto
+CC-rDeviceAgent/proto/batch_task.proto
 ```
 
 ---

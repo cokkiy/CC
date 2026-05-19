@@ -173,7 +173,7 @@ pub struct ScriptImportResult {
 fn cc_client_dir() -> Result<PathBuf, String> {
     let home =
         dirs::home_dir().ok_or_else(|| "Unable to resolve the user home directory.".to_string())?;
-    let path = home.join(".CC-rClient");
+    let path = home.join(".CC-rController");
     fs::create_dir_all(&path).map_err(|error| format!("create {}: {error}", path.display()))?;
     Ok(path)
 }

@@ -4,9 +4,9 @@
 # =================================================================
 # This script starts all CC project components in the correct order:
 #   1. Mosquitto MQTT Broker (if not running)
-#   2. CC-rDeviceAgent (workstation service)
+#   2. CC-rDeviceAgent (workstation device agent)
 #   3. CC-Aggregator (MQTT to WebSocket data aggregator)
-#   4. CC-rClient (Tauri frontend application)
+#   4. CC-rController (Tauri frontend application)
 #
 # Usage: ./start-all.sh [debug|release] [--status]
 #   Default mode: release
@@ -54,7 +54,7 @@ resolve_deviceagent_dir() {
 
 DEVICEAGENT_DIR="$(resolve_deviceagent_dir)"
 AGGREGATOR_DIR="$REPO_DIR/CC-Aggregator"
-CLIENT_DIR="$REPO_DIR/CC-rClient"
+CLIENT_DIR="$REPO_DIR/CC-rController"
 
 # Binaries (resolved by mode)
 DEVICEAGENT_BIN=""
@@ -65,7 +65,7 @@ CLIENT_BIN=""
 LOG_DIR="$REPO_DIR/logs"
 DEVICEAGENT_LOG="$LOG_DIR/rdeviceagent.log"
 AGGREGATOR_LOG="$LOG_DIR/aggregator.log"
-CLIENT_LOG="$LOG_DIR/rclient.log"
+CLIENT_LOG="$LOG_DIR/rcontroller.log"
 IOT_SIM_COMPOSE_FILE="$LOG_DIR/iot-sim/docker-compose.generated.yml"
 
 # Ports
@@ -182,7 +182,7 @@ ensure_rust_binary() {
 configure_binary_paths() {
     DEVICEAGENT_BIN="$DEVICEAGENT_DIR/target/$BUILD_MODE/cc-rdeviceagent"
     AGGREGATOR_BIN="$AGGREGATOR_DIR/target/$BUILD_MODE/cc-aggregator"
-    CLIENT_BIN="$CLIENT_DIR/src-tauri/target/$BUILD_MODE/cc-rclient"
+    CLIENT_BIN="$CLIENT_DIR/src-tauri/target/$BUILD_MODE/cc-rcontroller"
 }
 
 print_stop_commands() {
@@ -392,12 +392,12 @@ start_aggregator() {
 
 start_client() {
     if [[ "$BUILD_MODE" == "debug" ]]; then
-        log_info "Starting CC-rClient with npm run tauri:dev..."
+        log_info "Starting CC-rController with npm run tauri:dev..."
 
         mkdir -p "$LOG_DIR"
         cd "$CLIENT_DIR"
         if [[ ! -d node_modules ]]; then
-            log_info "Installing CC-rClient npm dependencies..."
+            log_info "Installing CC-rController npm dependencies..."
             npm install
         fi
 
@@ -406,41 +406,41 @@ start_client() {
 
         sleep 5
         if is_process_running "$CLIENT_PID"; then
-            log_success "CC-rClient dev runner started (PID: $CLIENT_PID)"
+            log_success "CC-rController dev runner started (PID: $CLIENT_PID)"
             log_info "  Log file: $CLIENT_LOG"
             return 0
         fi
 
-        log_error "CC-rClient dev runner failed to start. Check log: $CLIENT_LOG"
+        log_error "CC-rController dev runner failed to start. Check log: $CLIENT_LOG"
         return 1
     fi
 
-    log_info "Building CC-rClient release bundle with npm run tauri:build..."
+    log_info "Building CC-rController release bundle with npm run tauri:build..."
     mkdir -p "$LOG_DIR"
     cd "$CLIENT_DIR"
     if [[ ! -d node_modules ]]; then
-        log_info "Installing CC-rClient npm dependencies..."
+        log_info "Installing CC-rController npm dependencies..."
         npm install
     fi
     npm run tauri:build
 
     if [[ ! -x "$CLIENT_BIN" ]]; then
-        log_error "CC-rClient binary not found or not executable after npm run tauri:build: $CLIENT_BIN"
+        log_error "CC-rController binary not found or not executable after npm run tauri:build: $CLIENT_BIN"
         return 1
     fi
 
-    log_info "Starting CC-rClient release binary..."
+    log_info "Starting CC-rController release binary..."
     "$CLIENT_BIN" >"$CLIENT_LOG" 2>&1 &
     CLIENT_PID=$!
 
     sleep 2
 
     if is_process_running "$CLIENT_PID"; then
-        log_success "CC-rClient started (PID: $CLIENT_PID)"
+        log_success "CC-rController started (PID: $CLIENT_PID)"
         log_info "  Log file: $CLIENT_LOG"
         return 0
     else
-        log_error "CC-rClient failed to start. Check log: $CLIENT_LOG"
+        log_error "CC-rController failed to start. Check log: $CLIENT_LOG"
         return 1
     fi
 }
@@ -469,10 +469,10 @@ stop_aggregator() {
 
 stop_client() {
     if [[ -n "$CLIENT_PID" ]] && is_process_running "$CLIENT_PID"; then
-        log_info "Stopping CC-rClient (PID: $CLIENT_PID)..."
+        log_info "Stopping CC-rController (PID: $CLIENT_PID)..."
         kill "$CLIENT_PID" 2>/dev/null || true
         wait "$CLIENT_PID" 2>/dev/null || true
-        log_success "CC-rClient stopped"
+        log_success "CC-rController stopped"
     fi
 }
 
@@ -584,7 +584,7 @@ main() {
     
     # 4. Start Client
     if ! start_client; then
-        log_error "Failed to start CC-rClient"
+        log_error "Failed to start CC-rController"
         failed=1
     fi
     
@@ -604,7 +604,7 @@ main() {
     echo "  - Mosquitto:     localhost:$MQTT_PORT (MQTT)"
     echo "  - DeviceAgent: localhost:$DEVICEAGENT_PORT (gRPC control)"
     echo "  - Aggregator:    localhost:$AGGREGATOR_PORT (WebSocket)"
-    echo "  - Client:        Tauri GUI window (bundled CC-rClient/dist assets)"
+    echo "  - Client:        Tauri GUI window (bundled CC-rController/dist assets)"
     echo ""
     echo "Log files:"
     echo "  - DeviceAgent: $DEVICEAGENT_LOG"
@@ -622,7 +622,7 @@ main() {
         sleep 1
         # Check if client is still running
         if ! check_client; then
-            log_warning "CC-rClient has exited"
+            log_warning "CC-rController has exited"
             break
         fi
     done

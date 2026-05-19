@@ -4,14 +4,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLIENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_DIR="$(cd "$CLIENT_DIR/.." && pwd)"
-SERVICE_DIR="$REPO_DIR/CC-rStationService"
+SERVICE_DIR="$REPO_DIR/CC-rDeviceAgent"
 
 PROFILE="${PROFILE:-debug}"
 SERVICE_HOST="${SERVICE_HOST:-127.0.0.1}"
 SERVICE_PORT="${SERVICE_PORT:-50051}"
 AGENT_PORT="${AGENT_PORT:-50052}"
 STATE_INTERVAL_SECONDS="${STATE_INTERVAL_SECONDS:-2}"
-TEST_HOME="${TEST_HOME:-$REPO_DIR/.tmp/cc-rclient-dev-home}"
+TEST_HOME="${TEST_HOME:-$REPO_DIR/.tmp/cc-rcontroller-dev-home}"
 AUTO_INSTALL_NPM="${AUTO_INSTALL_NPM:-1}"
 START_AGENT="${START_AGENT:-auto}"
 HOST_HOME="${HOME:-$(getent passwd "$(id -un)" | cut -d: -f6)}"
@@ -26,12 +26,12 @@ else
   SERVICE_TARGET_DIR="$SERVICE_DIR/target/debug"
 fi
 
-SERVICE_BIN="$SERVICE_TARGET_DIR/cc-rstationservice"
-AGENT_BIN="$SERVICE_TARGET_DIR/cc-rstationservice-agent"
-SERVICE_LOG="$TEST_HOME/logs/rstationservice.log"
-AGENT_LOG="$TEST_HOME/logs/rstationservice-agent.log"
-SERVICE_CONFIG_PATH="$TEST_HOME/CC-rStationService.toml"
-CLIENT_STATE_DIR="$TEST_HOME/.CC-rClient"
+SERVICE_BIN="$SERVICE_TARGET_DIR/cc-rdeviceagent"
+AGENT_BIN="$SERVICE_TARGET_DIR/cc-rdeviceagent-agent"
+SERVICE_LOG="$TEST_HOME/logs/rdeviceagent.log"
+AGENT_LOG="$TEST_HOME/logs/rdeviceagent-agent.log"
+SERVICE_CONFIG_PATH="$TEST_HOME/CC-rDeviceAgent.toml"
+CLIENT_STATE_DIR="$TEST_HOME/.CC-rController"
 CLIENT_STATE_PATH="$CLIENT_STATE_DIR/state.json"
 SERVICE_PID=""
 AGENT_PID=""
@@ -59,10 +59,10 @@ mkdir -p "$TEST_HOME/logs" "$CLIENT_STATE_DIR"
 
 cat >"$SERVICE_CONFIG_PATH" <<EOF
 [service]
-service_name = "CC-rStationService"
-station_id = "cc-rclient-dev-station"
+service_name = "CC-rDeviceAgent"
+station_id = "cc-rcontroller-dev-station"
 state_interval_seconds = $STATE_INTERVAL_SECONDS
-watched_processes = ["vite", "cc-rclient", "cc-rstationservice"]
+watched_processes = ["vite", "cc-rcontroller", "cc-rdeviceagent"]
 udp_display_target = "127.0.0.1:9008"
 launcher_proxy_path = ""
 
@@ -79,8 +79,8 @@ cat >"$CLIENT_STATE_PATH" <<EOF
 {
   "stations": [
     {
-      "id": "local-rstationservice",
-      "name": "Local CC-rStationService",
+      "id": "local-rdeviceagent",
+      "name": "Local CC-rDeviceAgent",
       "blocked": false,
       "networkInterfaces": [
         {
@@ -89,7 +89,7 @@ cat >"$CLIENT_STATE_PATH" <<EOF
         }
       ],
       "startPrograms": [],
-      "monitorProcesses": ["vite", "cc-rclient", "cc-rstationservice"],
+      "monitorProcesses": ["vite", "cc-rcontroller", "cc-rdeviceagent"],
       "lastAction": null
     }
   ],
@@ -97,7 +97,7 @@ cat >"$CLIENT_STATE_PATH" <<EOF
     "interval": $STATE_INTERVAL_SECONDS,
     "isFirstTimeRun": false,
     "startApps": [],
-    "monitorProcesses": ["vite", "cc-rclient", "cc-rstationservice"],
+    "monitorProcesses": ["vite", "cc-rcontroller", "cc-rdeviceagent"],
     "weatherImageDownloadOption": {
       "download": 2,
       "url": "",
@@ -120,7 +120,7 @@ cd "$SERVICE_DIR"
 cargo build "${BUILD_ARGS[@]}"
 
 if [[ ! -x "$SERVICE_BIN" ]]; then
-  echo "missing station service binary: $SERVICE_BIN" >&2
+  echo "missing device agent binary: $SERVICE_BIN" >&2
   exit 1
 fi
 
@@ -134,7 +134,7 @@ fi
 
 if [[ "$START_AGENT" == "1" ]]; then
   if [[ ! -x "$AGENT_BIN" ]]; then
-    echo "missing station agent binary: $AGENT_BIN" >&2
+    echo "missing device agent helper binary: $AGENT_BIN" >&2
     exit 1
   fi
   HOME="$TEST_HOME" \
@@ -158,7 +158,7 @@ for _ in $(seq 1 50); do
 done
 
 if ! bash -lc "exec 3<>/dev/tcp/$SERVICE_HOST/$SERVICE_PORT" >/dev/null 2>&1; then
-  echo "station service did not start on $SERVICE_HOST:$SERVICE_PORT" >&2
+  echo "device agent did not start on $SERVICE_HOST:$SERVICE_PORT" >&2
   exit 1
 fi
 
@@ -167,7 +167,7 @@ if [[ "$AUTO_INSTALL_NPM" == "1" && ! -d node_modules ]]; then
   npm install
 fi
 
-echo "Launching CC-rClient against local CC-rStationService"
+echo "Launching CC-rController against local CC-rDeviceAgent"
 echo "  HOME=$TEST_HOME"
 echo "  Service endpoint=$SERVICE_HOST:$SERVICE_PORT"
 echo "  Config=$SERVICE_CONFIG_PATH"

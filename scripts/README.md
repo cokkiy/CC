@@ -20,7 +20,7 @@ cd ~/CC/scripts
 1. **Mosquitto MQTT Broker** - 消息代理（如果未运行）
 2. **CC-rDeviceAgent** - 工作站服务（Rust/Tauri 后台服务）
 3. **CC-Aggregator** - 数据聚合器（MQTT → WebSocket）
-4. **CC-rClient** - 前端界面（Tauri 应用）
+4. **CC-rController** - Tauri 控制台（Tauri 应用）
 
 ### 查看组件状态
 
@@ -51,7 +51,7 @@ cd ~/CC/scripts
 
 默认仅停止由 `start-all.sh` 启动的宿主机组件：
 
-- `CC-rClient`
+- `CC-rController`
 - `Vite` 开发服务器
 - `CC-Aggregator`
 - `CC-rDeviceAgent`
@@ -75,7 +75,7 @@ cd ~/CC/scripts
 | Mosquitto | 1883 (MQTT), 9001 (WebSocket) | MQTT 消息代理 |
 | CC-rDeviceAgent | 50051 (gRPC) | 工作站服务，提供设备遥测和控制 |
 | CC-Aggregator | 8080 (WebSocket) | 数据聚合器，将 MQTT 消息转发为 WebSocket |
-| CC-rClient | GUI | Tauri 前端应用 |
+| CC-rController | GUI | Tauri 前端应用 |
 
 ## 日志文件
 
@@ -83,7 +83,7 @@ cd ~/CC/scripts
 
 - `rdeviceagent.log` - CC-rDeviceAgent 日志
 - `aggregator.log` - CC-Aggregator 日志
-- `rclient.log` - CC-rClient 日志
+- `rcontroller.log` - CC-rController 日志
 
 ## 前置要求
 
@@ -105,8 +105,8 @@ cargo build
 cd ~/CC/CC-Aggregator
 cargo build
 
-# 构建 CC-rClient
-cd ~/CC/CC-rClient/src-tauri
+# 构建 CC-rController
+cd ~/CC/CC-rController/src-tauri
 cargo build
 ```
 

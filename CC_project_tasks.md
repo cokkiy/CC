@@ -14,7 +14,7 @@ CC 项目已完成核心功能迁移（Rust/Tauri），当前正在进行架构�
 - [x] 配置NATS服务器（创建nats.conf）
 - [x] 验证NATS服务器启动（已测试成功）
 - [x] 配置MQTT插件（端口1883）
-- [x] 更新组件配置（CC-Aggregator和CC-rStationService）
+- [x] 更新组件配置（CC-Aggregator和CC-rDeviceAgent）
 
 **完成状态：**
 NATS服务器已完全配置就绪，所有组件已更新配置，可以开始集成测试。
@@ -32,7 +32,7 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 - [x] 完善代码并清理warning（已完成基础清理）
 - [x] 实现真正的WebSocket消息推送功能
 
-### 1.3 CC-rStationService MQTT改造 ✅
+### 1.3 CC-rDeviceAgent MQTT改造 ✅
 **负责人:** Codex
 **完成时间:** 2026-04-19 10:00
 **任务:**
@@ -48,7 +48,7 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 - handle_mqtt_command()命令处理器
 - app.rs集成命令监听
 
-### 1.4 CC-rClient WebSocket桥接 ✅
+### 1.4 CC-rController WebSocket桥接 ✅
 **负责人:** Claude
 **完成时间:** 2026-04-19 10:00
 **任务:**
@@ -137,8 +137,8 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 ### 4.1 构建验证 ✅
 **负责人:** Hermes
 **任务:**
-- [x] 运行 `cd ~/CC/CC-rStationService && cargo build` 验证编译通过
-- [x] 运行 `cd ~/CC/CC-rClient && npm run build` 验证前端编译通过
+- [x] 运行 `cd ~/CC/CC-rDeviceAgent && cargo build` 验证编译通过
+- [x] 运行 `cd ~/CC/CC-rController && npm run build` 验证前端编译通过
 - [x] 运行 `cd ~/CC/CC-Aggregator && cargo build` 验证编译通过
 
 ### 4.2 运行时日志测试 ✅
@@ -147,8 +147,8 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 **前置条件:** MQTT Broker已就绪 (Docker 35482b4895cb)
 **任务:**
 - [x] 启动MQTT Broker (Mosquitto/NATS) ✅ 已就绪
-- [x] 启动CC-rStationService（前台模式），观察日志输出 ✅ 完成
-- [ ] 启动CC-rClient，连接工作站
+- [x] 启动CC-rDeviceAgent（前台模式），观察日志输出 ✅ 完成
+- [ ] 启动CC-rController，连接工作站
 - [x] 检查日志是否正常输出，格式是否正确 ✅ 正常
 
 **测试结果:**
@@ -167,19 +167,19 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 **状态:** ✅ 已完成
 **前置条件:** MQTT Broker已就绪 (Docker 35482b4895cb)
 **任务:**
-- [x] 验证StationService日志显示正确的接口数量 ✅ (state.rs:769)
+- [x] 验证DeviceAgent日志显示正确的接口数量 ✅ (state.rs:769)
 - [x] 验证gRPC日志显示正确的调用和响应 ✅ (app.rs:333)
 - [x] 验证客户端日志显示接收到的接口数量 ✅ (App.tsx:1236)
 - [x] 验证UI console.log显示正确的接口信息 ✅ (App.tsx:1236-1238)
 
 **验证结果:**
-- StationService `InterfaceStatistics` 结构体包含所有必需字段 (11个字段)
+- DeviceAgent `InterfaceStatistics` 结构体包含所有必需字段 (11个字段)
 - gRPC `get_network_interfaces` 返回正确的接口列表
 - 客户端 `RemoteInterfaceStat` 与服务端 `InterfaceStatistics` 字段完全匹配
 - UI 代码正确渲染网络接口数据并输出 console.log
 
 **数据流验证:**
-- CC-rStationService → MQTT (cc/station-01/telemetry) → CC-Aggregator → WebSocket → CC-rClient → UI
+- CC-rDeviceAgent → MQTT (cc/station-01/telemetry) → CC-Aggregator → WebSocket → CC-rController → UI
 - 网络统计数据通过 gRPC telemetry stream 传输 (NetStatistics)
 - 数据结构: InterfaceStatistics (服务端) ↔ RemoteInterfaceStat (客户端)
 
@@ -246,7 +246,7 @@ NATS服务器已完全配置就绪，所有组件已更新配置，可以开始�
 - npm build: ✅ 通过
 
 ### 前端架构设计
-- 集成设计方案: `CC-rClient/src/docs/PHASE6_INTEGRATION_DESIGN.md`
+- 集成设计方案: `CC-rController/src/docs/PHASE6_INTEGRATION_DESIGN.md`
 - 布局方案: Tab-based (Scripts tab)
 - 状态管理: Context + Hooks
 - API层: Tauri invoke wrappers
@@ -290,12 +290,12 @@ ScriptParameter {
 | 版本管理 | P2 |
 
 ### 6.3 实现文件
-**后端 (CC-rStationService)**:
+**后端 (CC-rDeviceAgent)**:
 - `scripts.rs`: 命令脚本数据结构定义
 - `script_engine.rs`: 脚本解析和参数替换
 - `script_executor.rs`: 脚本执行和结果收集
 
-**前端 (CC-rClient)**:
+**前端 (CC-rController)**:
 - `ScriptEditor.tsx`: 命令编辑界面
 - `ScriptList.tsx`: 命令列表和搜索
 - `ScriptRunner.tsx`: 命令执行界面
@@ -331,12 +331,12 @@ POST   /api/scripts/{id}/favorite - 收藏/取消收藏
 - 新增文件: BatchPage.tsx, BatchUIContext.tsx
 
 ### 实现文件
-**后端 (CC-rStationService)**:
+**后端 (CC-rDeviceAgent)**:
 - `src/batch.rs` - 批量操作数据结构定义
 - `src/batch_store.rs` - 批量任务CRUD存储
 - `src/batch_executor.rs` - 批量执行引擎
 
-**前端 (CC-rClient)**:
+**前端 (CC-rController)**:
 - `src/plugin/batch/types.ts` - 类型定义
 - `src/plugin/batch/api.ts` - Tauri API封装
 - `src/plugin/batch/BatchContext.tsx` - Context + Hooks
@@ -411,13 +411,13 @@ ExecutionPolicy {
 - location: Option<Location> - 地理位置 ✅ (预留字段)
 
 ### 8.2 实现文件
-**后端 (CC-rStationService)**:
+**后端 (CC-rDeviceAgent)**:
 - `src/groups.rs` - 分组数据结构定义
 - `src/groups_store.rs` - 分组CRUD存储
 - `src/tags.rs` - 标签数据结构定义
 - `src/tags_store.rs` - 标签CRUD存储
 
-**前端 (CC-rClient)**:
+**前端 (CC-rController)**:
 - `src/plugin/groups/GroupsPage.tsx` - 分组管理页面
 - `src/plugin/groups/GroupCard.tsx` - 分组卡片组件
 - `src/plugin/groups/GroupEditor.tsx` - 分组编辑器
@@ -550,7 +550,7 @@ AlertRule {
 | 邮件客户端缺失 | P2 | ⚠️ 待处理 | himalaya未配置IMAP/SMTP，无法发送邮件 |
 | station_id配置为空 | P1 | ✅ 已解决 | 已修复，station_id=station-01 |
 | gRPC端口50051冲突 | P1 | ⚠️ 阻塞中 | 有旧进程占用50051端口 |
-| Phase 4.2 运行时日志测试 | P1 | ⚠️ 进行中 | CC-rStationService已连接MQTT，遥测数据待验证 |
+| Phase 4.2 运行时日志测试 | P1 | ⚠️ 进行中 | CC-rDeviceAgent已连接MQTT，遥测数据待验证 |
 
 ---
 
@@ -569,7 +569,7 @@ AlertRule {
 - AlertOverlay.tsx ✅
 
 ### 构建验证
-- CC-rClient npm build: ✅ 通过
+- CC-rController npm build: ✅ 通过
 
 ### 剩余阻塞问题
 - gRPC端口50051被占用 (需手动清理旧进程)

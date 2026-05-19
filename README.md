@@ -99,7 +99,7 @@ flowchart TD
 
 | Component          | Description                                                       | Language                   |
 | ------------------ | ----------------------------------------------------------------- | -------------------------- |
-| CC-rClient         | Desktop GUI client with plugin support                            | Tauri + React + TypeScript |
+| CC-rController         | Desktop GUI controller with plugin support                            | Tauri + React + TypeScript |
 | CC-Aggregator      | Data aggregation and WebSocket bridge                             | Rust                       |
 | CC-rDeviceAgent | Workstation/IoT agent service, maintained in a separate repo      | Rust                       |
 | gRPC-Relay         | A relay for gRPC over QUIC/HTTP2/HTTP3, not includes in this repo | Rust                       |
@@ -141,7 +141,7 @@ flowchart TD
 
 ```
 ~/CC/
-├── CC-rClient/           # Tauri desktop client (React + TypeScript)
+├── CC-rController/           # Tauri desktop controller (React + TypeScript)
 │   ├── src/              # Frontend source
 │   │   ├── plugin/       # Plugin system
 │   │   │   ├── script/   # Script management UI
@@ -200,7 +200,7 @@ cd ~/CC
 This script starts:
 1. CC-Aggregator (MQTT → WebSocket bridge)
 2. CC-rDeviceAgent (Workstation agent)
-3. CC-rClient (Desktop UI)
+3. CC-rController (Desktop UI)
 
 By default the scripts look for `CC-rDeviceAgent` next to this checkout:
 
@@ -247,7 +247,7 @@ host MQTT broker instead of trying to bind a second Mosquitto container.
 
 ### Step 3: Access the Application
 
-- Desktop Client: Launch CC-rClient application
+- Desktop Controller: Launch CC-rController application
 - WebSocket: `ws://127.0.0.1:8080`
 - MQTT: `localhost:1883`
 
@@ -284,11 +284,11 @@ Configuration for workstation agent (MQTT client, plugins, etc.)
 # Build Aggregator
 cd CC-Aggregator && cargo build
 
-# Build Station Service from its split repository
+# Build Device Agent from its split repository
 cd ../CC-rDeviceAgent && cargo build
 
 # Build Client
-cd CC-rClient && pnpm install && pnpm tauri build
+cd CC-rController && pnpm install && pnpm tauri build
 ```
 
 ### Logs
@@ -296,7 +296,7 @@ cd CC-rClient && pnpm install && pnpm tauri build
 Logs are stored in `~/CC/logs/`:
 - `aggregator.log` - Aggregator output
 - `rdeviceagent.log` - Station service output
-- `rclient.log` - Client output
+- `rcontroller.log` - Controller output
 - `iot-sim/docker-compose.generated.yml` - Generated compose file for the Docker simulation
 
 ## Troubleshooting
