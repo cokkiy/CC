@@ -40,9 +40,10 @@ Examples:
 Environment:
   BROKER_PORT              Host MQTT port to publish (default: 1883)
   STATE_INTERVAL_SECONDS   Telemetry interval per device (default: 5)
-  IMAGE_TAG                Docker image tag (default: cc-rstationservice-iot-sim:latest)
+  IMAGE_TAG                Docker image tag (default: cc-rdeviceagent-iot-sim:latest)
   DEVICE_PREFIX            Station ID prefix (default: iot)
   BUILD_MODE               Local cargo profile to package (default: release)
+  CC_RDEVICEAGENT_DIR   Path to CC-rDeviceAgent checkout
   REBUILD_BINARY           Set to 1 to rebuild locally before packaging
   STATION_BINARY_PATH      Override the binary path copied into the image
   USE_HOST_BROKER          auto, 0, or 1 (default: auto)
@@ -124,12 +125,12 @@ prepare_image_context() {
     rm -rf "$IMAGE_CONTEXT_DIR"
     mkdir -p "$IMAGE_CONTEXT_DIR"
 
-    install -m 755 "$STATION_BINARY_PATH" "$IMAGE_CONTEXT_DIR/cc-rstationservice"
+    install -m 755 "$STATION_BINARY_PATH" "$IMAGE_CONTEXT_DIR/cc-rdeviceagent"
     install -m 755 "$ENTRYPOINT_SOURCE" "$IMAGE_CONTEXT_DIR/iot-sim-entrypoint.sh"
-    install -m 644 "$CONFIG_TEMPLATE_SOURCE" "$IMAGE_CONTEXT_DIR/CC-rStationService.iot.toml.template"
+    install -m 644 "$CONFIG_TEMPLATE_SOURCE" "$IMAGE_CONTEXT_DIR/CC-rDeviceAgent.iot.toml.template"
 
     if [[ "$BUILD_MODE" == "release" ]] && command -v strip >/dev/null 2>&1; then
-        strip --strip-unneeded "$IMAGE_CONTEXT_DIR/cc-rstationservice" 2>/dev/null || true
+        strip --strip-unneeded "$IMAGE_CONTEXT_DIR/cc-rdeviceagent" 2>/dev/null || true
     fi
 }
 
@@ -146,7 +147,7 @@ ensure_station_binary() {
 
     if [[ -n "$rebuild_reason" ]]; then
         require_command cargo
-        log_info "Building local CC-rStationService binary (${BUILD_MODE}) (${rebuild_reason})"
+        log_info "Building local CC-rDeviceAgent binary (${BUILD_MODE}) (${rebuild_reason})"
         pushd "$STATION_DIR" >/dev/null
         if [[ "$BUILD_MODE" == "release" ]]; then
             cargo build --release
@@ -337,17 +338,39 @@ start_simulation() {
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-STATION_DIR="$REPO_DIR/CC-rStationService"
+
+resolve_station_dir() {
+    local configured_dir="${CC_RDEVICEAGENT_DIR:-${CC_RSTATIONSERVICE_DIR:-}}"
+    local candidate
+
+    if [[ -n "$configured_dir" ]]; then
+        candidate="$configured_dir"
+    elif [[ -f "$REPO_DIR/CC-rDeviceAgent/Cargo.toml" ]]; then
+        candidate="$REPO_DIR/CC-rDeviceAgent"
+    else
+        candidate="$(cd "$REPO_DIR/.." && pwd)/CC-rDeviceAgent"
+    fi
+
+    if [[ ! -f "$candidate/Cargo.toml" ]]; then
+        log_err "CC-rDeviceAgent checkout not found: $candidate"
+        log_err "Clone it next to this repository or set CC_RDEVICEAGENT_DIR."
+        exit 1
+    fi
+
+    cd "$candidate" && pwd
+}
+
+STATION_DIR="$(resolve_station_dir)"
 SIM_DIR="$REPO_DIR/logs/iot-sim"
 COMPOSE_FILE="$SIM_DIR/docker-compose.generated.yml"
 PROJECT_NAME="cc-iot-sim"
-IMAGE_TAG="${IMAGE_TAG:-cc-rstationservice-iot-sim:latest}"
+IMAGE_TAG="${IMAGE_TAG:-cc-rdeviceagent-iot-sim:latest}"
 BROKER_PORT="${BROKER_PORT:-1883}"
 STATE_INTERVAL_SECONDS="${STATE_INTERVAL_SECONDS:-5}"
 DEVICE_PREFIX="${DEVICE_PREFIX:-iot}"
 BUILD_MODE="${BUILD_MODE:-release}"
 REBUILD_BINARY="${REBUILD_BINARY:-0}"
-STATION_BINARY_PATH="${STATION_BINARY_PATH:-$STATION_DIR/target/$BUILD_MODE/cc-rstationservice}"
+STATION_BINARY_PATH="${STATION_BINARY_PATH:-$STATION_DIR/target/$BUILD_MODE/cc-rdeviceagent}"
 USE_HOST_BROKER="${USE_HOST_BROKER:-auto}"
 HOST_BROKER_HOST="${HOST_BROKER_HOST:-host.docker.internal}"
 HOST_BROKER_PORT="${HOST_BROKER_PORT:-$BROKER_PORT}"
@@ -357,7 +380,7 @@ ACTIVE_BROKER_PORT="1883"
 MOSQUITTO_CONF="$SCRIPT_DIR/mosquitto.iot-sim.conf"
 DOCKERFILE_PATH="$STATION_DIR/packaging/docker/Dockerfile.iot-sim"
 ENTRYPOINT_SOURCE="$STATION_DIR/packaging/docker/iot-sim-entrypoint.sh"
-CONFIG_TEMPLATE_SOURCE="$STATION_DIR/packaging/docker/CC-rStationService.iot.toml.template"
+CONFIG_TEMPLATE_SOURCE="$STATION_DIR/packaging/docker/CC-rDeviceAgent.iot.toml.template"
 IMAGE_CONTEXT_DIR="$SIM_DIR/image-context"
 DRY_RUN=0
 ACTION="start"

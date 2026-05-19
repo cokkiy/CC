@@ -2,6 +2,10 @@
 
 本目录包含用于启动和管理 CC 项目所有组件的脚本。
 
+> `CC-rDeviceAgent` 已拆分为独立仓库。脚本会优先使用当前仓库内的
+> `CC-rDeviceAgent/`，否则自动查找相邻目录 `../CC-rDeviceAgent`。
+> 如需使用其他位置，请设置 `CC_RDEVICEAGENT_DIR=/path/to/CC-rDeviceAgent`。
+
 ## 快速开始
 
 ### 一键启动所有组件
@@ -14,7 +18,7 @@ cd ~/CC/scripts
 脚本将按以下顺序启动所有组件：
 
 1. **Mosquitto MQTT Broker** - 消息代理（如果未运行）
-2. **CC-rStationService** - 工作站服务（Rust/Tauri 后台服务）
+2. **CC-rDeviceAgent** - 工作站服务（Rust/Tauri 后台服务）
 3. **CC-Aggregator** - 数据聚合器（MQTT → WebSocket）
 4. **CC-rClient** - 前端界面（Tauri 应用）
 
@@ -50,7 +54,7 @@ cd ~/CC/scripts
 - `CC-rClient`
 - `Vite` 开发服务器
 - `CC-Aggregator`
-- `CC-rStationService`
+- `CC-rDeviceAgent`
 
 可选参数：
 
@@ -69,7 +73,7 @@ cd ~/CC/scripts
 | 组件 | 端口 | 说明 |
 |------|------|------|
 | Mosquitto | 1883 (MQTT), 9001 (WebSocket) | MQTT 消息代理 |
-| CC-rStationService | 50051 (gRPC) | 工作站服务，提供设备遥测和控制 |
+| CC-rDeviceAgent | 50051 (gRPC) | 工作站服务，提供设备遥测和控制 |
 | CC-Aggregator | 8080 (WebSocket) | 数据聚合器，将 MQTT 消息转发为 WebSocket |
 | CC-rClient | GUI | Tauri 前端应用 |
 
@@ -77,7 +81,7 @@ cd ~/CC/scripts
 
 日志文件位于 `~/CC/logs/` 目录：
 
-- `rstationservice.log` - CC-rStationService 日志
+- `rdeviceagent.log` - CC-rDeviceAgent 日志
 - `aggregator.log` - CC-Aggregator 日志
 - `rclient.log` - CC-rClient 日志
 
@@ -93,8 +97,8 @@ cd ~/CC/scripts
 启动脚本需要以下组件已经构建完成：
 
 ```bash
-# 构建 CC-rStationService
-cd ~/CC/CC-rStationService
+# 构建 CC-rDeviceAgent
+cd ~/CC-rDeviceAgent
 cargo build
 
 # 构建 CC-Aggregator
@@ -141,7 +145,7 @@ ss -tlnp | grep -E '1883|50051|8080'
 若失败，再检查：
 
 ```bash
-tail -n 120 ~/CC/logs/rstationservice.log
+tail -n 120 ~/CC/logs/rdeviceagent.log
 tail -n 120 ~/CC/logs/aggregator.log
 docker logs --tail 120 mosquitto
 ```
@@ -162,7 +166,7 @@ ss -tlnp
 
 A: 组件之间有依赖关系：
 - Aggregator 需要连接 MQTT Broker
-- Client 需要连接 StationService 和 Aggregator
+- Client 需要连接 DeviceAgent 和 Aggregator
 
 **Q: 如何重启某个组件？**
 

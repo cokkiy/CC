@@ -4,12 +4,13 @@
 # =================================================================
 # This script starts all CC project components in the correct order:
 #   1. Mosquitto MQTT Broker (if not running)
-#   2. CC-rStationService (workstation service)
+#   2. CC-rDeviceAgent (workstation service)
 #   3. CC-Aggregator (MQTT to WebSocket data aggregator)
 #   4. CC-rClient (Tauri frontend application)
 #
 # Usage: ./start-all.sh [debug|release] [--status]
 #   Default mode: release
+#   Set CC_RDEVICEAGENT_DIR to point at a split CC-rDeviceAgent checkout
 #   Press Ctrl+C to stop all components
 # =================================================================
 
@@ -30,29 +31,50 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_MODE="release"
 
 # Project directories
-STATIONSERVICE_DIR="$REPO_DIR/CC-rStationService"
+resolve_deviceagent_dir() {
+    local configured_dir="${CC_RDEVICEAGENT_DIR:-${CC_RSTATIONSERVICE_DIR:-}}"
+    local candidate
+
+    if [[ -n "$configured_dir" ]]; then
+        candidate="$configured_dir"
+    elif [[ -f "$REPO_DIR/CC-rDeviceAgent/Cargo.toml" ]]; then
+        candidate="$REPO_DIR/CC-rDeviceAgent"
+    else
+        candidate="$(cd "$REPO_DIR/.." && pwd)/CC-rDeviceAgent"
+    fi
+
+    if [[ ! -f "$candidate/Cargo.toml" ]]; then
+        echo -e "${RED}[ERROR]${NC} CC-rDeviceAgent checkout not found: $candidate" >&2
+        echo -e "${RED}[ERROR]${NC} Clone it next to this repository or set CC_RDEVICEAGENT_DIR." >&2
+        return 1
+    fi
+
+    cd "$candidate" && pwd
+}
+
+DEVICEAGENT_DIR="$(resolve_deviceagent_dir)"
 AGGREGATOR_DIR="$REPO_DIR/CC-Aggregator"
 CLIENT_DIR="$REPO_DIR/CC-rClient"
 
 # Binaries (resolved by mode)
-STATIONSERVICE_BIN=""
+DEVICEAGENT_BIN=""
 AGGREGATOR_BIN=""
 CLIENT_BIN=""
 
 # Logs
 LOG_DIR="$REPO_DIR/logs"
-STATIONSERVICE_LOG="$LOG_DIR/rstationservice.log"
+DEVICEAGENT_LOG="$LOG_DIR/rdeviceagent.log"
 AGGREGATOR_LOG="$LOG_DIR/aggregator.log"
 CLIENT_LOG="$LOG_DIR/rclient.log"
 IOT_SIM_COMPOSE_FILE="$LOG_DIR/iot-sim/docker-compose.generated.yml"
 
 # Ports
 MQTT_PORT=1883
-STATIONSERVICE_PORT=50051
+DEVICEAGENT_PORT=50051
 AGGREGATOR_PORT=8080
 
 # PIDs (empty means not started by this script)
-STATIONSERVICE_PID=""
+DEVICEAGENT_PID=""
 AGGREGATOR_PID=""
 CLIENT_PID=""
 
@@ -158,7 +180,7 @@ ensure_rust_binary() {
 
 # Configure binary paths by build mode
 configure_binary_paths() {
-    STATIONSERVICE_BIN="$STATIONSERVICE_DIR/target/$BUILD_MODE/cc-rstationservice"
+    DEVICEAGENT_BIN="$DEVICEAGENT_DIR/target/$BUILD_MODE/cc-rdeviceagent"
     AGGREGATOR_BIN="$AGGREGATOR_DIR/target/$BUILD_MODE/cc-aggregator"
     CLIENT_BIN="$CLIENT_DIR/src-tauri/target/$BUILD_MODE/cc-rclient"
 }
@@ -219,8 +241,8 @@ check_mosquitto() {
     fi
 }
 
-check_stationservice() {
-    if is_port_listening $STATIONSERVICE_PORT; then
+check_deviceagent() {
+    if is_port_listening $DEVICEAGENT_PORT; then
         return 0  # Running
     else
         return 1  # Not running
@@ -298,16 +320,16 @@ start_mosquitto() {
     return 1
 }
 
-start_stationservice() {
-    log_info "Starting CC-rStationService..."
+start_deviceagent() {
+    log_info "Starting CC-rDeviceAgent..."
     
-    if check_stationservice; then
-        log_success "CC-rStationService is already running (port $STATIONSERVICE_PORT)"
+    if check_deviceagent; then
+        log_success "CC-rDeviceAgent is already running (port $DEVICEAGENT_PORT)"
         return 0
     fi
     
     # Check if binary exists
-    if ! ensure_rust_binary "CC-rStationService" "$STATIONSERVICE_DIR" "$STATIONSERVICE_BIN"; then
+    if ! ensure_rust_binary "CC-rDeviceAgent" "$DEVICEAGENT_DIR" "$DEVICEAGENT_BIN"; then
         return 1
     fi
     
@@ -315,21 +337,21 @@ start_stationservice() {
     mkdir -p "$LOG_DIR"
     
     # Start in foreground mode (background)
-    cd "$STATIONSERVICE_DIR"
-    nohup "$STATIONSERVICE_BIN" foreground --config "$STATIONSERVICE_DIR/CC-rStationService.toml" >"$STATIONSERVICE_LOG" 2>&1 &
-    STATIONSERVICE_PID=$!
+    cd "$DEVICEAGENT_DIR"
+    nohup "$DEVICEAGENT_BIN" foreground --config "$DEVICEAGENT_DIR/CC-rDeviceAgent.toml" >"$DEVICEAGENT_LOG" 2>&1 &
+    DEVICEAGENT_PID=$!
     
     # Wait for service to be ready
     for i in $(seq 1 30); do
-        if check_stationservice; then
-            log_success "CC-rStationService started (PID: $STATIONSERVICE_PID)"
-            log_info "  Log file: $STATIONSERVICE_LOG"
+        if check_deviceagent; then
+            log_success "CC-rDeviceAgent started (PID: $DEVICEAGENT_PID)"
+            log_info "  Log file: $DEVICEAGENT_LOG"
             return 0
         fi
         sleep 0.5
     done
     
-    log_error "CC-rStationService failed to start. Check log: $STATIONSERVICE_LOG"
+    log_error "CC-rDeviceAgent failed to start. Check log: $DEVICEAGENT_LOG"
     return 1
 }
 
@@ -427,12 +449,12 @@ start_client() {
 # Stop Functions
 # =================================================================
 
-stop_stationservice() {
-    if [[ -n "$STATIONSERVICE_PID" ]] && is_process_running "$STATIONSERVICE_PID"; then
-        log_info "Stopping CC-rStationService (PID: $STATIONSERVICE_PID)..."
-        kill "$STATIONSERVICE_PID" 2>/dev/null || true
-        wait "$STATIONSERVICE_PID" 2>/dev/null || true
-        log_success "CC-rStationService stopped"
+stop_deviceagent() {
+    if [[ -n "$DEVICEAGENT_PID" ]] && is_process_running "$DEVICEAGENT_PID"; then
+        log_info "Stopping CC-rDeviceAgent (PID: $DEVICEAGENT_PID)..."
+        kill "$DEVICEAGENT_PID" 2>/dev/null || true
+        wait "$DEVICEAGENT_PID" 2>/dev/null || true
+        log_success "CC-rDeviceAgent stopped"
     fi
 }
 
@@ -465,7 +487,7 @@ cleanup() {
     # Stop in reverse order
     stop_client
     stop_aggregator
-    stop_stationservice
+    stop_deviceagent
     
     log_success "All components stopped."
     exit 0
@@ -490,11 +512,11 @@ show_status() {
         log_error   "Mosquitto MQTT Broker    - Not running"
     fi
     
-    # StationService
-    if check_stationservice; then
-        log_success "CC-rStationService       - Running (port $STATIONSERVICE_PORT)"
+    # DeviceAgent
+    if check_deviceagent; then
+        log_success "CC-rDeviceAgent       - Running (port $DEVICEAGENT_PORT)"
     else
-        log_error   "CC-rStationService       - Not running"
+        log_error   "CC-rDeviceAgent       - Not running"
     fi
     
     # Aggregator
@@ -506,7 +528,7 @@ show_status() {
     
     echo ""
     echo "Log files:"
-    echo "  StationService: $STATIONSERVICE_LOG"
+    echo "  DeviceAgent: $DEVICEAGENT_LOG"
     echo "  Aggregator:     $AGGREGATOR_LOG"
     echo "  Client:         $CLIENT_LOG"
     echo "=========================================="
@@ -548,9 +570,9 @@ main() {
         failed=1
     fi
     
-    # 2. Start StationService
-    if ! start_stationservice; then
-        log_error "Failed to start CC-rStationService"
+    # 2. Start DeviceAgent
+    if ! start_deviceagent; then
+        log_error "Failed to start CC-rDeviceAgent"
         failed=1
     fi
     
@@ -580,12 +602,12 @@ main() {
     echo ""
     echo "Component endpoints:"
     echo "  - Mosquitto:     localhost:$MQTT_PORT (MQTT)"
-    echo "  - StationService: localhost:$STATIONSERVICE_PORT (gRPC control)"
+    echo "  - DeviceAgent: localhost:$DEVICEAGENT_PORT (gRPC control)"
     echo "  - Aggregator:    localhost:$AGGREGATOR_PORT (WebSocket)"
     echo "  - Client:        Tauri GUI window (bundled CC-rClient/dist assets)"
     echo ""
     echo "Log files:"
-    echo "  - StationService: $STATIONSERVICE_LOG"
+    echo "  - DeviceAgent: $DEVICEAGENT_LOG"
     echo "  - Aggregator:     $AGGREGATOR_LOG"
     echo "  - Client:         $CLIENT_LOG"
     echo ""
