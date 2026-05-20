@@ -2,7 +2,7 @@
  * Station Group and Tag System Type Definitions
  * Part of Phase 8: Device Group and Tag System
  *
- * NOTE: Types are aligned with Rust backend models in CC-rClient/src-tauri/src/
+ * NOTE: Types are aligned with Rust backend models in CC-rController/src-tauri/src/
  * - StationGroup: { id, name, description, color, icon?, station_ids }
  * - TagDefinition: { id, name, description, color, created_at, updated_at }
  */

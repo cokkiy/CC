@@ -2791,7 +2791,7 @@ export function useScripts() {
 ## 8. 文件结构
 
 ```
-CC-rClient/src/plugin/script/
+CC-rController/src/plugin/script/
 ├── index.ts                      # 导出入口
 ├── types.ts                      # 类型定义（已存在）
 ├── ScriptHost.ts                 # 核心门面类

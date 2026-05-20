@@ -69,7 +69,7 @@ message StationRunningState {
 
 ```
   ┌─────────────────────────────────────────────────────────────────────────────┐
-  │                              CC-rClient (Tauri + React)                      │
+  │                              CC-rController (Tauri + React)                      │
   │                                                                              │
   │   Plugin Host ←→ Config-Driven UI ←→ Template Marketplace                    │
   │         ↕ WebSocket（Tauri Rust 端处理）                                     │
@@ -89,13 +89,13 @@ message StationRunningState {
               ┌────────────────────┼────────────────────┐
               │ MQTT (rumqttc)     │                    │
     ┌─────────┴──────────┐    ┌─────┴──────────┐    ┌────┴─────────┐
-    │  CC-rStationService │    │  CC-rStationService │    │  CC-rStationService │
+    │  CC-rDeviceAgent │    │  CC-rDeviceAgent │    │  CC-rDeviceAgent │
     │  插件: cpu-monitor   │    │  插件: gpu-monitor  │    │  插件: disk-io      │
     │  插件: disk-info     │    │  插件: custom-sensor│    │  插件: iptables     │
     │  (rumqttc publish)   │    │  (rumqttc publish)   │    │  (rumqttc publish)   │
     │                       │    │                       │    │                       │
     │  ─── IoT 设备 ───    │    │                       │    │                       │
-    │  CC-rStationService  │    │                       │    │                       │
+    │  CC-rDeviceAgent  │    │                       │    │                       │
     │  (embassy-rs/CBOR)   │    │                       │    │                       │
     │  MQTT-SN (UDP/DTLS)  │    │                       │    │                       │
     └─────────────────────┘    └──────────────────────┘    └──────────────────────┘
@@ -103,8 +103,8 @@ message StationRunningState {
 
 **部署核心原则：**
 - `CC-Aggregator` = 单一 Rust 二进制，开发模式内嵌 NATS（零依赖）
-- `CC-rStationService` = 现有 Rust 服务 + `rumqttc` 插件 + `libloading` 插件 Host
-- `CC-rClient` = 现有 Tauri 服务，Tauri Rust 端处理 WebSocket/MQTT 桥接
+- `CC-rDeviceAgent` = 现有 Rust 服务 + `rumqttc` 插件 + `libloading` 插件 Host
+- `CC-rController` = 现有 Tauri 服务，Tauri Rust 端处理 WebSocket/MQTT 桥接
 - 所有组件均为 `cargo build --release` 输出，无额外运行时脚本
 
 ---
@@ -146,7 +146,7 @@ fn encode(bundle: &TelemetryBundle, encoding: Encoding) -> Vec<u8> {
 **客户端 → Aggregator：** WebSocket（Tauri Rust 端处理，无浏览器 MQTT.js 依赖）
 
 ```rust
-// CC-rClient Tauri 端：WebSocket ↔ MQTT 桥接
+// CC-rController Tauri 端：WebSocket ↔ MQTT 桥接
 // 浏览器前端通过 invoke() 订阅/取消订阅，工作站侧无感知
 
 async fn start_mqtt_bridge(state: &AppState, ws_stream: WebSocketStream) {
@@ -282,7 +282,7 @@ pub trait TelemetryPlugin: Send + Sync {
 #### 插件加载
 
 ```toml
-# CC-rStationService.toml
+# CC-rDeviceAgent.toml
 
 [plugins]
 dir = "./plugins"
@@ -309,7 +309,7 @@ use rumqttc::{MqttClient, Event, Packet};
 use libloading::Library;
 
 fn main() -> anyhow::Result<()> {
-    let config = AppConfig::load("CC-rStationService.toml")?;
+    let config = AppConfig::load("CC-rDeviceAgent.toml")?;
     let (mqtt_client, mut eventloop) = MqttClient::new(
         config.mqtt.broker_url,
         config.mqtt.client_id.clone(),
@@ -421,7 +421,7 @@ cargo build --release -p cc-aggregator
 **原则：客户端 = 插件 Host + 配置文件，UI 代码量应随功能增长而非随站点数量增长。**
 
 ```
-CC-rClient/
+CC-rController/
 ├── src/
 │   ├── host/               # 插件 Host（固定不变）
 │   │   ├── PluginManager.ts    # 插件加载/卸载/生命周期
@@ -557,13 +557,13 @@ interface CCExtension {
    - `rusqlite` 本地存储（开发），`sqlx`+PostgreSQL（生产）
    - 构建：`cargo build --release -p cc-aggregator`
 
-2. **CC-rStationService 改造**
+2. **CC-rDeviceAgent 改造**
    - 移除 `tonic` gRPC Server（`StationControl` 降级为 `axum` REST）
    - 接入 `rumqttc` MQTT Publisher
    - `libloading` 插件 Host 实现
    - 内置 5 个核心插件（CPU、内存、网络、进程、磁盘）
 
-3. **CC-rClient 改造**
+3. **CC-rController 改造**
    - Tauri Rust 端 WebSocket 客户端（连接 Aggregator）
    - 前端 DynamicPanel + 配置化 UI
 
@@ -739,7 +739,7 @@ cargo build --release -p cc-aggregator
  │
   少量IoT设备 ◀──MQTT-SN──▶ │
  NATS联邦(可选) ▼
- CC-rClient
+ CC-rController
  (WebSocket)
 ```
 
@@ -870,8 +870,8 @@ Mosquitto 替代 NATS 的理由：
 | 组件 | 影响 | 变更内容 |
 |------|------|----------|
 | CC-Aggregator | 高 | 内嵌 rumqttd 替代 embedded-nats；Mosquitto 连接替换 NATS 连接 |
-| CC-rStationService | 低 | MQTT Client 库保持 rumqttc，仅 Broker 地址变更 |
-| CC-rClient | 低 | WebSocket 桥接逻辑不变（Aggregator 地址变更）|
+| CC-rDeviceAgent | 低 | MQTT Client 库保持 rumqttc，仅 Broker 地址变更 |
+| CC-rController | 低 | WebSocket 桥接逻辑不变（Aggregator 地址变更）|
 | 部署文档 | 中 | NATS 部署步骤替换为 Mosquitto 部署 |
 | 监控告警 | 低 | NATS 监控替换为 Mosquitto 监控（mosquitto_sub / mqtt_exporter）|
 

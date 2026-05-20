@@ -11,8 +11,8 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 use uuid::Uuid;
 
-const LOCAL_STATION_ID: &str = "local-rstationservice";
-const LOCAL_STATION_NAME: &str = "Local CC-rStationService";
+const LOCAL_STATION_ID: &str = "local-rdeviceagent";
+const LOCAL_STATION_NAME: &str = "Local CC-rDeviceAgent";
 const LOCAL_STATION_ENDPOINTS: [&str; 2] = ["127.0.0.1:50051", "localhost:50051"];
 
 #[derive(Debug)]
@@ -141,7 +141,7 @@ impl StateStore {
 
 fn state_file_path() -> Result<PathBuf, StorageError> {
     let home = dirs::home_dir().ok_or(StorageError::InvalidHomeDir)?;
-    Ok(home.join(".CC-rClient").join("state.json"))
+    Ok(home.join(".CC-rController").join("state.json"))
 }
 
 fn legacy_xml_path() -> Result<PathBuf, StorageError> {
@@ -676,21 +676,21 @@ SavePathForWindows=C:\weather
 {
   "stations": [
     {
-      "id": "local-rstationservice",
-      "name": "Local CC-rStationService",
+      "id": "local-rdeviceagent",
+      "name": "Local CC-rDeviceAgent",
       "networkInterfaces": [
         {
           "mac": "",
           "ips": [" 127.0.0.1:50051 ", ""]
         }
       ],
-      "monitorProcesses": ["vite", " ", "cc-rstationservice"]
+      "monitorProcesses": ["vite", " ", "cc-rdeviceagent"]
     }
   ],
   "options": {
     "interval": 2,
     "isFirstTimeRun": false,
-    "monitorProcesses": ["vite", "cc-rclient", "cc-rstationservice"],
+    "monitorProcesses": ["vite", "cc-rcontroller", "cc-rdeviceagent"],
     "weatherImageDownloadOption": {
       "download": 2
     }
@@ -708,7 +708,7 @@ SavePathForWindows=C:\weather
         );
         assert_eq!(
             payload.stations[0].monitor_processes,
-            vec!["vite", "cc-rstationservice"]
+            vec!["vite", "cc-rdeviceagent"]
         );
     }
 

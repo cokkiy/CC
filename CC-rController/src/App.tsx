@@ -63,10 +63,10 @@ import {
   type StationViewMode,
 } from "./stations-browser";
 
-const STATION_VIEW_MODE_STORAGE_KEY = "cc-rclient.station-view-mode";
-const STATION_LIST_COLUMNS_STORAGE_KEY = "cc-rclient.station-list-columns";
-const STATION_GRID_COLUMNS_STORAGE_KEY = "cc-rclient.station-grid-columns";
-const STATION_PANEL_WIDTH_STORAGE_KEY = "cc-rclient.station-panel-width";
+const STATION_VIEW_MODE_STORAGE_KEY = "cc-rcontroller.station-view-mode";
+const STATION_LIST_COLUMNS_STORAGE_KEY = "cc-rcontroller.station-list-columns";
+const STATION_GRID_COLUMNS_STORAGE_KEY = "cc-rcontroller.station-grid-columns";
+const STATION_PANEL_WIDTH_STORAGE_KEY = "cc-rcontroller.station-panel-width";
 
 const MIN_BROWSER_PANEL_WIDTH = 320;
 const MIN_DETAIL_PANEL_WIDTH = 360;
@@ -95,7 +95,7 @@ const emptyStation = (): Station => ({
 });
 
 const MQTT_DISCOVERY_SOURCE = "mqtt";
-const LOCAL_STATION_ID = "local-rstationservice";
+const LOCAL_STATION_ID = "local-rdeviceagent";
 
 type MqttTelemetryEventPayload = {
   station_id: string;
@@ -200,7 +200,7 @@ function reconcileStationIdentity(
     ...target,
     id: toId,
     name:
-      source.name === "Local CC-rStationService"
+      source.name === "Local CC-rDeviceAgent"
         ? source.name
         : target.name || source.name || computerName || toId,
     blocked: target.blocked || source.blocked,
@@ -2263,7 +2263,7 @@ function AppShell() {
         <div
           className={`heroBanner ${hasStationMessage ? "heroBanner--smallVisible" : "heroBanner--largeVisible"}`}
           role="img"
-          aria-label="CC-rClient top banner"
+          aria-label="CC-rController top banner"
         >
           <img
             src={topBanner}

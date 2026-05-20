@@ -6,8 +6,8 @@
 ## 当前状态分析
 
 ### 已完成
-- CC-rStationService: Rust实现的工作站服务(gRPC)
-- CC-rClient: Tauri + React实现的客户端
+- CC-rDeviceAgent: Rust实现的工作站服务(gRPC)
+- CC-rController: Tauri + React实现的客户端
 - Phase 3-5: 调试日志和数据流测试任务
 
 ### 待重构问题
@@ -41,14 +41,14 @@
 
 ## Phase 1.2: MQTT客户端集成
 
-### 1.2.1 rumqttc集成到CC-rStationService
+### 1.2.1 rumqttc集成到CC-rDeviceAgent
 **任务**:
 - [ ] 在Cargo.toml添加rumqttc依赖
-- [ ] 创建 `CC-rStationService/src/mqtt.rs` 模块
+- [ ] 创建 `CC-rDeviceAgent/src/mqtt.rs` 模块
 - [ ] 实现MQTT客户端初始化
 - [ ] 实现主题订阅和发布
 
-**文件**: `CC-rStationService/src/mqtt.rs`
+**文件**: `CC-rDeviceAgent/src/mqtt.rs`
 
 ### 1.2.2 MQTT主题结构设计
 **主题规范**:
@@ -132,7 +132,7 @@ cc/{station_id}/config/set       # 配置更新 (订阅)
 
 ---
 
-## Phase 1.5: CC-rClient改造
+## Phase 1.5: CC-rController改造
 
 ### 1.5.1 Tauri端MQTT桥接
 **任务**:
@@ -151,13 +151,13 @@ cc/{station_id}/config/set       # 配置更新 (订阅)
 
 ### 代码
 1. `CC-Aggregator/` - Aggregator服务完整实现
-2. `CC-rStationService/src/mqtt.rs` - MQTT客户端模块
-3. `CC-rStationService/src/mqtt_bridge.rs` - MQTT桥接模块
-4. `CC-rClient/src-tauri/src/mqtt_ws_bridge.rs` - WebSocket-MQTT桥接
+2. `CC-rDeviceAgent/src/mqtt.rs` - MQTT客户端模块
+3. `CC-rDeviceAgent/src/mqtt_bridge.rs` - MQTT桥接模块
+4. `CC-rController/src-tauri/src/mqtt_ws_bridge.rs` - WebSocket-MQTT桥接
 
 ### 配置
 1. `nats-server.conf` - NATS服务器配置
-2. `CC-rStationService.toml` - 添加MQTT配置项
+2. `CC-rDeviceAgent.toml` - 添加MQTT配置项
 3. `CC-Aggregator.toml` - Aggregator配置
 
 ### 文档
@@ -211,8 +211,8 @@ cc/{station_id}/config/set       # 配置更新 (订阅)
 |------|------|
 | 架构师(Hermes) | 主题设计，Schema规范，技术选型 |
 | 后端开发A | CC-Aggregator实现 |
-| 后端开发B | CC-rStationService MQTT改造 |
-| 前端开发 | CC-rClient WebSocket适配 |
+| 后端开发B | CC-rDeviceAgent MQTT改造 |
+| 前端开发 | CC-rController WebSocket适配 |
 | 测试 | 集成测试，性能测试 |
 
 ---
